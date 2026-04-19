@@ -484,9 +484,11 @@ double ppsa(
   int ftAttempted,
   int? points,
 ) {
-  if (fgAttempted == 0) return 0.0;
-  double effectiveFgAttempted = 0.44 * ftAttempted;
-  return points != null ? points / (fgAttempted + effectiveFgAttempted) : 0.0;
+  if (fgAttempted == 0 && ftAttempted == 0) return 0.0;
+  if (points == null) return 0.0;
+  double denominator = fgAttempted + (0.44 * ftAttempted);
+  if (denominator == 0) return 0.0;
+  return points / denominator;
 }
 
 String? ast2tov(
