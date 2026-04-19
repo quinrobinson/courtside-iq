@@ -8,9 +8,11 @@ The app is live on the App Store and Google Play. Primary audience: parents trac
 
 ## How the codebase is structured
 
-This is a FlutterFlow-generated Flutter app with a Supabase backend. The architecture has three distinct layers, and editing the wrong layer wastes work.
+This is a FlutterFlow-generated Flutter app with a Supabase backend.
 
-**FlutterFlow-generated code (do NOT edit directly — will be overwritten on next FF pull):**
+**New feature workflow (Phase 1 onward):** New screens and features are built with Claude Code + Figma directly in Flutter/Dart — not through the FlutterFlow visual builder. New feature code lives in `lib/features/`. The existing FlutterFlow build is left untouched.
+
+**FlutterFlow-generated code (do NOT edit — existing build, leave as-is):**
 - `lib/main.dart`
 - `lib/backend/supabase/` (generated table definitions)
 - `lib/pages/` (generated screen widgets)
@@ -18,9 +20,9 @@ This is a FlutterFlow-generated Flutter app with a Supabase backend. The archite
 - `ios/` and `android/` platform folders
 - `pubspec.yaml` (managed by FlutterFlow)
 
-**Custom code surfaces (safe to edit, persists across FF pulls):**
-- `lib/custom_code/actions/` — Custom Actions, invoked from FF action flows
-- `lib/custom_code/widgets/` — Custom Widgets (if any)
+**New feature code (safe to create and edit):**
+- `lib/features/` — new screens and widgets built with Claude Code
+- `lib/courtside_iq/` — shared config and utilities (e.g. `metrics_config.dart`)
 - `lib/flutter_flow/custom_functions.dart` — Custom Functions, pure Dart utilities
 - `assets/` — images, fonts, static files
 
