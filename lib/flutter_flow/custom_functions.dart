@@ -10,6 +10,7 @@ import 'package:ff_commons/flutter_flow/place.dart';
 import 'package:ff_commons/flutter_flow/uploaded_file.dart';
 import '/backend/supabase/supabase.dart';
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/metrics_config.dart';
 
 double? calculatePlayerFGPercent(
   int? totalFGMade,
@@ -483,8 +484,7 @@ double ppsa(
   int ftAttempted,
   int? points,
 ) {
-  // points per shot attempt. formula: points / (fgAttempted = 0.44*ftAttempted). return a decimal number
-  if (fgAttempted == 0) return 0.0; // Avoid division by zero
+  if (fgAttempted == 0) return 0.0;
   double effectiveFgAttempted = 0.44 * ftAttempted;
   return points != null ? points / (fgAttempted + effectiveFgAttempted) : 0.0;
 }
@@ -525,9 +525,7 @@ bool ast2tovActive(
   int? assist,
   int? turnover,
 ) {
-  // Require at least 3 assists before activating AST/TOV rating
-  // and assists must be greater than turnovers
-  if (assist == null || turnover == null || assist < 3) {
+  if (assist == null || turnover == null || assist < kAstTovMinAssists) {
     return false;
   }
   return true;
@@ -541,11 +539,11 @@ bool ast2tovGood(
   if (assist == 0) return false;
 
   if (turnover == 0) {
-    return assist >= 1 && assist < 3;
+    return assist >= 1 && assist < kAstTovMinAssists;
   }
 
   final double ratio = assist / turnover;
-  return ratio >= 2.0 && ratio < 4.0;
+  return ratio >= kAstTovGoodMin && ratio < kAstTovEliteMin;
 }
 
 bool ast2tovElite(
@@ -556,10 +554,10 @@ bool ast2tovElite(
   if (assist == 0) return false;
 
   if (turnover == 0) {
-    return assist >= 3;
+    return assist >= kAstTovMinAssists;
   }
 
-  return (assist / turnover) >= 4.0;
+  return (assist / turnover) >= kAstTovEliteMin;
 }
 
 bool ast2tovSolid(
@@ -571,7 +569,7 @@ bool ast2tovSolid(
   if (assist == 0) return false;
 
   final double ratio = assist / turnover;
-  return ratio > 0.0 && ratio < 2.0;
+  return ratio > 0.0 && ratio < kAstTovGoodMin;
 }
 
 int? disrupt(
@@ -580,12 +578,15 @@ int? disrupt(
   int? oreb,
   int? dreb,
 ) {
-  // Effort + Disruption Score is    (oreb* 2) + (steals * 1) + (block * .5) + (dreb * .5)
   if (steals == null || blocks == null || oreb == null || dreb == null) {
     return null;
   }
 
-  return ((oreb * 2) + (steals * 1) + (blocks * 0.5) + (dreb * 0.5)).round();
+  return ((oreb * kDisruptWeightOreb) +
+          (steals * kDisruptWeightSteals) +
+          (blocks * kDisruptWeightBlocks) +
+          (dreb * kDisruptWeightDreb))
+      .round();
 }
 
 bool disruptActive(
@@ -598,56 +599,48 @@ bool disruptActive(
     return false;
   }
 
-  return ((oreb * 2) + (steals * 1) + (blocks * 0.5) + (dreb * 0.5)).round() >=
-      3;
+  return ((oreb * kDisruptWeightOreb) +
+              (steals * kDisruptWeightSteals) +
+              (blocks * kDisruptWeightBlocks) +
+              (dreb * kDisruptWeightDreb))
+          .round() >=
+      kDisruptActiveMin;
 }
 
-bool disruptGood(
-  int? disrupt,
-  int goodMin,
-  int goodMax,
-) {
-  // Check if disrupt is greater than good or equal to goodMin, and less than or equal to goodMax, if yes, return true. If not, return false.
-  return (disrupt != null && disrupt >= goodMin && disrupt <= goodMax);
+bool disruptGood(int? disrupt) {
+  return disrupt != null &&
+      disrupt >= kDisruptGoodMin &&
+      disrupt <= kDisruptGoodMax;
 }
 
-bool? disruptElite(
-  int? disrupt,
-  int eliteMinStocks,
-) {
-  // Check if disrupt is greater than or equal to eliteMinStocks return true, else return false.
-  return disrupt != null && disrupt >= eliteMinStocks;
+bool disruptElite(int? disrupt) {
+  return disrupt != null && disrupt >= kDisruptEliteMin;
 }
 
-bool disruptSolid(
-  int badMaxStocks,
-  int? disrupt,
-) {
-  // Check if disrupt is less than or equal to badMaxStocks then return true, else return false if it is more than badMaxStocks.
-  return disrupt != null && disrupt <= badMaxStocks;
+bool disruptSolid(int? disrupt) {
+  return disrupt != null && disrupt <= kDisruptSolidMax;
 }
 
 bool ppsaSolid(double ppsa) {
-  return ppsa >= 0.75 && ppsa < 1.0;
+  return ppsa >= kPpsaSolidMin && ppsa < kPpsaGoodMin;
 }
 
 bool ppsaElite(double ppsa) {
-  return ppsa >= 1.25;
+  return ppsa >= kPpsaEliteMin;
 }
 
 bool ppsaActive(
   double ppsa,
   int? shotAttempts,
 ) {
-  // Require at least 5 shot attempts before activating PPSA rating
-  if (shotAttempts == null || shotAttempts < 5) {
+  if (shotAttempts == null || shotAttempts < kPpsaMinAttempts) {
     return false;
   }
-  return ppsa >= 0.75;
+  return ppsa >= kPpsaSolidMin;
 }
 
 bool ppsaGood(double ppsa) {
-  return ppsa >= 1.0 && ppsa < 1.25;
+  return ppsa >= kPpsaGoodMin && ppsa < kPpsaEliteMin;
 }
 
 bool? checkDateThreshold(
