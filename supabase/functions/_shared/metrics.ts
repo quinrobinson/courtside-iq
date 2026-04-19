@@ -65,3 +65,19 @@ export function astTovTier(assists: number, turnovers: number): "Solid" | "Good"
   if (ratio >= AST_TOV_GOOD_MIN) return "Good";
   return "Solid";
 }
+
+// birthDate should be an ISO date string (YYYY-MM-DD) or null.
+// NULL returns '11U-13U' (middle band fallback, mirrors get_age_band SQL function).
+export function getAgeBand(birthDate: string | null): "8U-10U" | "11U-13U" | "14U-18U" {
+  if (!birthDate) return "11U-13U";
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  if (age <= 10) return "8U-10U";
+  if (age <= 13) return "11U-13U";
+  return "14U-18U";
+}
