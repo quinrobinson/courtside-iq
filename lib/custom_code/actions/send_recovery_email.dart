@@ -1,0 +1,30 @@
+// Automatic FlutterFlow imports
+import '/backend/supabase/supabase.dart';
+import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'index.dart'; // Imports other custom actions
+import '/flutter_flow/custom_functions.dart'; // Imports custom functions
+import 'package:flutter/material.dart';
+// Begin custom action code
+// DO NOT REMOVE OR MODIFY THE CODE ABOVE!
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<String?> sendRecoveryEmail(
+  String email,
+  String? redirectTo,
+) async {
+  // Add your function code here!
+
+  // Get a reference your Supabase client
+  final supabase = SupaFlow.client;
+
+  // Try to send password recovery email
+  try {
+    await supabase.auth.resetPasswordForEmail(email, redirectTo: redirectTo);
+    return null;
+  } catch (e) {
+    // If failed (i.e. email address not found), return error
+    return e.toString();
+  }
+}
