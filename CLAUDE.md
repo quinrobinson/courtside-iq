@@ -80,12 +80,27 @@ These apply to every change, every session:
 
 ## Workflow preferences
 
+- **UX must be designed and approved in Figma before any code is written.** No exceptions for new screens, modals, sheets, banners, badges, empty states, or copy-visible surfaces. If a feature has a user-facing visual component, pause and ask for the Figma link (or a design pass) before implementing. Code-first UX produces throwaway work and mis-scoped PRs.
 - **Always propose a plan before writing code.** State which files you'll touch, the order of changes, and what tests or verification you'll run. Wait for approval before executing.
 - **Work on feature branches, never directly on main.** Branch naming: `phase-N-short-description` (e.g., `phase-0-tier-thresholds`).
 - **Open pull requests for review** rather than merging to main directly. Keep PRs scoped to one roadmap item where possible.
 - **Run `flutter analyze` before committing** any Dart changes. Fix warnings unless there's a reason not to.
 - **For Edge Function work, test locally with `supabase functions serve`** before deploying. Deploy only when explicitly asked.
 - **Show me new Edge Function files before deploying** until we've established a rhythm.
+
+## Supabase environments
+
+There are two Supabase projects. **Never mix them up.**
+
+- **Test** — `yihmccmyijtyrffpzstb` (Courtside IQ Test 1)
+- **Prod** — `ejwgxsszmfabujdqxxdz` (Courtside IQ v1, the live App Store / Play Store app)
+
+**Rules:**
+- All in-progress dev work targets **test**. Migrations, schema changes, and Edge Function deploys go to test first and stay there until the feature ships.
+- **Never apply migrations, raw SQL, or Edge Function deploys to prod** without explicit user approval in the current message. Treat prod as read-only from Claude's side.
+- The test-env switch lives in `lib/backend/supabase/supabase.dart` as `const bool _kUseTestSupabase = true;` (introduced on `infra-setup`, commit `3d3ad50`). Must be flipped to `false` before app store submission.
+- **At the start of any session that touches Supabase — or anytime a device test is about to run — verify `_kUseTestSupabase` exists in `lib/backend/supabase/supabase.dart`.** If the current branch predates `infra-setup` (i.e. the flag isn't there), the app will hit prod and writes to new schema will silently fail. Flag this to the user before running; don't propose applying migrations to prod to "fix" it.
+- When the user reports a save/fetch failing on a new feature, check the env flag and migration target before anything else.
 
 ## Schema and data model notes
 
