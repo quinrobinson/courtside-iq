@@ -553,12 +553,8 @@ bool ast2tovElite(
   int? turnover,
 ) {
   if (assist == null || turnover == null) return false;
-  if (assist == 0) return false;
-
-  if (turnover == 0) {
-    return assist >= kAstTovMinAssists;
-  }
-
+  if (assist < kAstTovEliteMinAssists) return false;
+  if (turnover == 0) return true;
   return (assist / turnover) >= kAstTovEliteMin;
 }
 
@@ -609,40 +605,60 @@ bool disruptActive(
       kDisruptActiveMin;
 }
 
-bool disruptGood(int? disrupt) {
+// Legacy FF callers pass hardcoded thresholds as extra args — accept and
+// ignore them; centralized constants in metrics_config are the source of truth.
+bool disruptGood(int? disrupt, [int? legacyGoodMin, int? legacyGoodMax]) {
   return disrupt != null &&
       disrupt >= kDisruptGoodMin &&
       disrupt <= kDisruptGoodMax;
 }
 
-bool disruptElite(int? disrupt) {
+bool disruptElite(int? disrupt, [int? legacyEliteMin]) {
   return disrupt != null && disrupt >= kDisruptEliteMin;
 }
 
-bool disruptSolid(int? disrupt) {
+// Legacy FF signature passes (solidMax, disrupt). If only one arg is given,
+// treat it as disrupt.
+bool disruptSolid(int? a, [int? b]) {
+  final disrupt = b ?? a;
   return disrupt != null && disrupt <= kDisruptSolidMax;
 }
 
-bool ppsaSolid(double ppsa) {
-  return ppsa >= kPpsaSolidMin && ppsa < kPpsaGoodMin;
+// PPSA tier checks. When [ageBandString] is null, falls back to the 14U-18U
+// thresholds so existing FlutterFlow callers (pre-Phase-1.10) keep their
+// current behavior. New callers should pass the player's age band — the
+// string returned by the SQL get_age_band function ('8U-10U', '11U-13U',
+// '14U-18U').
+PpsaThresholds _ppsaThresholdsFor(String? ageBandString) {
+  final band = ageBandString == null
+      ? AgeBand.u18
+      : ageBandFromString(ageBandString);
+  return kPpsaThresholds[band]!;
 }
 
-bool ppsaElite(double ppsa) {
-  return ppsa >= kPpsaEliteMin;
+bool ppsaSolid(double ppsa, [String? ageBandString]) {
+  final t = _ppsaThresholdsFor(ageBandString);
+  return ppsa >= t.solidMin && ppsa < t.goodMin;
+}
+
+bool ppsaElite(double ppsa, [String? ageBandString]) {
+  return ppsa >= _ppsaThresholdsFor(ageBandString).eliteMin;
 }
 
 bool ppsaActive(
   double ppsa,
-  int? shotAttempts,
-) {
+  int? shotAttempts, [
+  String? ageBandString,
+]) {
   if (shotAttempts == null || shotAttempts < kPpsaMinAttempts) {
     return false;
   }
-  return ppsa >= kPpsaSolidMin;
+  return ppsa >= _ppsaThresholdsFor(ageBandString).solidMin;
 }
 
-bool ppsaGood(double ppsa) {
-  return ppsa >= kPpsaGoodMin && ppsa < kPpsaEliteMin;
+bool ppsaGood(double ppsa, [String? ageBandString]) {
+  final t = _ppsaThresholdsFor(ageBandString);
+  return ppsa >= t.goodMin && ppsa < t.eliteMin;
 }
 
 bool? checkDateThreshold(

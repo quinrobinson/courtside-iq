@@ -7,3 +7,4 @@ export 'set_dark_mode_on.dart' show setDarkModeOn;
 export 'set_dark_mode_off.dart' show setDarkModeOff;
 export 'set_dark_mode_system.dart' show setDarkModeSystem;
 export 'login_to_revenue_cat.dart' show loginToRevenueCat;
+export 'generate_game_insight.dart' show generateGameInsight;
