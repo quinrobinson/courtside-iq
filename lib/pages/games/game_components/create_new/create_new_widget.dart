@@ -113,7 +113,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      if (_model.getActivePlayersCount!.length < 3)
+                      if ((_model.getActivePlayersCount?.length ?? 0) < 3)
                         Expanded(
                           child: InkWell(
                             splashColor: Colors.transparent,
@@ -196,7 +196,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                             ),
                           ),
                         ),
-                      if (_model.getActivePlayersCount!.length >= 1)
+                      if ((_model.getActivePlayersCount?.length ?? 0) >= 1)
                         Expanded(
                           child: InkWell(
                             splashColor: Colors.transparent,
