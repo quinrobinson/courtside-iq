@@ -1239,7 +1239,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                         mainAxisAlignment: MainAxisAlignment.start,
                                                                                         crossAxisAlignment: CrossAxisAlignment.end,
                                                                                         children: [
-                                                                                          if (functions.disruptElite(functions.disrupt(containerVPlayerGameStatsRow?.steal, containerVPlayerGameStatsRow?.block, containerVPlayerGameStatsRow?.offReb, containerVPlayerGameStatsRow?.defReb), 13) ?? true)
+                                                                                          if (functions.disruptElite(functions.disrupt(containerVPlayerGameStatsRow?.steal, containerVPlayerGameStatsRow?.block, containerVPlayerGameStatsRow?.offReb, containerVPlayerGameStatsRow?.defReb)))
                                                                                             Container(
                                                                                               decoration: BoxDecoration(
                                                                                                 color: Color(0x262BC18C),
@@ -1263,7 +1263,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 ),
                                                                                               ),
                                                                                             ),
-                                                                                          if (functions.disruptGood(functions.disrupt(containerVPlayerGameStatsRow?.steal, containerVPlayerGameStatsRow?.block, containerVPlayerGameStatsRow?.offReb, containerVPlayerGameStatsRow?.defReb), 6, 12))
+                                                                                          if (functions.disruptGood(functions.disrupt(containerVPlayerGameStatsRow?.steal, containerVPlayerGameStatsRow?.block, containerVPlayerGameStatsRow?.offReb, containerVPlayerGameStatsRow?.defReb)))
                                                                                             Container(
                                                                                               decoration: BoxDecoration(
                                                                                                 color: Color(0x27E5B029),
@@ -1287,7 +1287,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 ),
                                                                                               ),
                                                                                             ),
-                                                                                          if (functions.disruptSolid(5, functions.disrupt(containerVPlayerGameStatsRow?.steal, containerVPlayerGameStatsRow?.block, containerVPlayerGameStatsRow?.offReb, containerVPlayerGameStatsRow?.defReb)))
+                                                                                          if (functions.disruptSolid(functions.disrupt(containerVPlayerGameStatsRow?.steal, containerVPlayerGameStatsRow?.block, containerVPlayerGameStatsRow?.offReb, containerVPlayerGameStatsRow?.defReb)))
                                                                                             Container(
                                                                                               decoration: BoxDecoration(
                                                                                                 color: FlutterFlowTheme.of(context).gray4,
