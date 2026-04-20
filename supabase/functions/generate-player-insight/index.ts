@@ -10,7 +10,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const MODEL = "claude-sonnet-4-6";
-const PROMPT_VERSION = "v2";
+const PROMPT_VERSION = "v3";
 const MIN_GAMES = 5;
 
 const corsHeaders = {
@@ -27,20 +27,32 @@ function json(body: unknown, status = 200) {
 
 const systemPrompt = `You are a youth basketball development specialist writing a short development story for a parent about their child's growth across their last 5 games. Your voice is warm, encouraging, and grounded. You connect rolling trends to development, not raw stats.
 
-Guidelines:
-- 4 to 6 sentences total in "text"
-- Use the player's first name naturally
+The story has three distinct sections. Each stands on its own and must not restate the others.
+
+Section 1 — "whats_working" (BRIGHT SPOTS):
+- 1 to 2 sentences, max 40 words
+- Identify one clear strength anchored to a rolling trend signal (improving PPSA, consistent Solid+ efficiency, steady playmaking, disruptive defense across the window, etc.), not a single good game
+- Reference tier language (Solid, Good, Elite) only when it strengthens the point
+- Use the player's first name at least once
+- Must be specific. Do not generalize ("is doing well")
+
+Section 2 — "needs_development" (ROOM TO GROW):
+- 1 to 2 sentences, max 40 words
+- Name one real gap or volatile area visible in the rolling metrics
+- Frame positively as a developmental opportunity, never deficit-coded. "Still building", "the next layer", "coming together" are the register. Banned: "weak", "poor", "struggling", "bad at"
+- Must connect to an underlying skill or decision, not a stat to chase
+
+Section 3 — "growth_edge" (WATCH FOR NEXT):
+- One concrete in-game moment plus the micro-decision to watch for (e.g. "when the ball gets swung to the weak-side wing", "after a defensive rebound in transition")
+- Tied to the same growth area as "needs_development" but NOT a restatement of it; this is the observable moment, not the theme
+- Describes a read or micro-decision, not a volume goal ("shoot more threes" is banned)
+- Max 22 words. Encouraging, not prescriptive
+
+Global rules:
+- Tier hierarchy is Solid then Good then Elite. Solid is the entry level, not weak.
 - Reference trend direction (improving, stable, declining) honestly but gently
-- Reference tier language (Solid, Good, Elite) only when relevant
 - Never list raw stat lines; always connect patterns to growth
 - Never use em dashes ("—"). Use commas, periods, or parentheses instead. This is strict.
-- Tier hierarchy is Solid then Good then Elite. Solid is the entry level, not weak.
-- Close with one growth edge. It MUST:
-  - Name a concrete basketball situation a parent can watch for in a real game (e.g. "when the ball gets swung to the weak-side wing", "after a defensive rebound in transition"), not a stat to improve
-  - Tie to the weakest or most volatile rolling metric in the data below, not a random skill
-  - Describe a micro-decision or read (what the player does in that moment), not a volume goal ("shoot more threes" is banned)
-  - Max 22 words. Encouraging, not prescriptive
-  - Must not restate the body's main theme
 - Output valid JSON only`;
 
 interface TrendSnapshot {
@@ -83,16 +95,18 @@ Rolling 5-game metrics:
 Return JSON with this exact shape:
 {
   "headline": "2 to 6 word title",
-  "text": "The development story, 4 to 6 sentences",
+  "whats_working": "1 to 2 sentences on the clearest strength, anchored to a trend. Max 40 words.",
+  "needs_development": "1 to 2 sentences on one real growth area, framed positively. Max 40 words.",
   "trend_direction": "improving" | "stable" | "declining",
   "strength_focus": "scoring" | "playmaking" | "disruption" | "consistency",
-  "growth_edge": "One concrete in-game moment + the read to watch for. Anchored to the weakest rolling metric. Max 22 words."
+  "growth_edge": "One concrete in-game moment + the read to watch for. Anchored to the same area as needs_development. Max 22 words."
 }`;
 }
 
 async function callClaude(userPrompt: string): Promise<{
   headline: string;
-  text: string;
+  whats_working: string;
+  needs_development: string;
   trend_direction: string | null;
   strength_focus: string | null;
   growth_edge: string | null;
@@ -130,7 +144,8 @@ async function callClaude(userPrompt: string): Promise<{
   const stripDash = (v: unknown) => String(v ?? "").replace(/\s*—\s*/g, ", ");
   return {
     headline: stripDash(parsed.headline),
-    text: stripDash(parsed.text),
+    whats_working: stripDash(parsed.whats_working),
+    needs_development: stripDash(parsed.needs_development),
     trend_direction: parsed.trend_direction ?? null,
     strength_focus: parsed.strength_focus ?? null,
     growth_edge: parsed.growth_edge ? stripDash(parsed.growth_edge) : null,
@@ -184,10 +199,11 @@ Deno.serve(async (req) => {
   // Below-threshold placeholder
   if (gamesLogged < MIN_GAMES) {
     const placeholder = {
-      version: 1,
+      version: 2,
       model: null,
       headline: null,
-      text: null,
+      whats_working: null,
+      needs_development: null,
       trend_direction: null,
       strength_focus: null,
       growth_edge: null,
@@ -253,10 +269,11 @@ Deno.serve(async (req) => {
   }
 
   const insight = {
-    version: 1,
+    version: 2,
     model: MODEL,
     headline: claudeResp.headline,
-    text: claudeResp.text,
+    whats_working: claudeResp.whats_working,
+    needs_development: claudeResp.needs_development,
     trend_direction: claudeResp.trend_direction ?? (snapshot as TrendSnapshot).trend_direction_ppsa,
     strength_focus: claudeResp.strength_focus,
     growth_edge: claudeResp.growth_edge,

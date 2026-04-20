@@ -5,6 +5,7 @@ import 'trend_pill.dart';
 
 const _purple = Color(0xFF7936FF);
 const _magenta = Color(0xFFD9005C);
+const _green = Color(0xFF2BC18C);
 const _text = Color(0xFF0F0F0F);
 const _text2 = Color(0xFF8A8A8A);
 const _border = Color(0xFFE6E6E6);
@@ -83,6 +84,10 @@ class _EligibleBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasSplit = insight.hasSplitNarrative;
+    final legacyText = insight.text;
+    final showLegacy = !hasSplit && legacyText != null && legacyText.trim().isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -99,10 +104,10 @@ class _EligibleBody extends StatelessWidget {
               height: 1.3,
             ),
           ),
-        const SizedBox(height: 10),
-        if (insight.text != null)
+        if (showLegacy) ...[
+          const SizedBox(height: 10),
           Text(
-            insight.text!,
+            legacyText,
             style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -110,46 +115,86 @@ class _EligibleBody extends StatelessWidget {
               height: 1.5,
             ),
           ),
-        if (insight.growthEdge != null) ...[
+        ],
+        if (insight.whatsWorking != null &&
+            insight.whatsWorking!.trim().isNotEmpty) ...[
           const SizedBox(height: 22),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          _AccentSection(
+            color: _green,
+            label: 'BRIGHT SPOTS',
+            body: insight.whatsWorking!,
+          ),
+        ],
+        if (insight.needsDevelopment != null &&
+            insight.needsDevelopment!.trim().isNotEmpty) ...[
+          const SizedBox(height: 18),
+          _AccentSection(
+            color: _magenta,
+            label: 'ROOM TO GROW',
+            body: insight.needsDevelopment!,
+          ),
+        ],
+        if (insight.growthEdge != null) ...[
+          const SizedBox(height: 18),
+          _AccentSection(
+            color: _purple,
+            label: 'WATCH FOR NEXT',
+            body: insight.growthEdge!,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _AccentSection extends StatelessWidget {
+  const _AccentSection({
+    required this.color,
+    required this.label,
+    required this.body,
+  });
+
+  final Color color;
+  final String label;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(width: 4, color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(width: 4, color: _purple),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'WATCH FOR NEXT',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: _purple,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        insight.growthEdge!,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 13,
-                          color: _text,
-                          height: 1.45,
-                        ),
-                      ),
-                    ],
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 13,
+                    color: _text,
+                    height: 1.45,
                   ),
                 ),
               ],
             ),
           ),
         ],
-      ],
+      ),
     );
   }
 }

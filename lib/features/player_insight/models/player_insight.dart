@@ -2,6 +2,8 @@ class PlayerInsight {
   PlayerInsight({
     required this.headline,
     required this.text,
+    required this.whatsWorking,
+    required this.needsDevelopment,
     required this.growthEdge,
     required this.trendDirection,
     required this.strengthFocus,
@@ -9,16 +11,26 @@ class PlayerInsight {
   });
 
   final String? headline;
+  // Legacy v2 field. Kept so stale cache rows render gracefully during
+  // the v2 → v3 transition. Preferred path is whatsWorking + needsDevelopment.
   final String? text;
+  final String? whatsWorking;
+  final String? needsDevelopment;
   final String? growthEdge;
   final String? trendDirection;
   final String? strengthFocus;
   final bool belowThreshold;
 
+  bool get hasSplitNarrative =>
+      (whatsWorking != null && whatsWorking!.trim().isNotEmpty) ||
+      (needsDevelopment != null && needsDevelopment!.trim().isNotEmpty);
+
   static PlayerInsight fromJson(Map<String, dynamic> json) {
     return PlayerInsight(
       headline: json['headline'] as String?,
       text: json['text'] as String?,
+      whatsWorking: json['whats_working'] as String?,
+      needsDevelopment: json['needs_development'] as String?,
       growthEdge: json['growth_edge'] as String?,
       trendDirection: json['trend_direction'] as String?,
       strengthFocus: json['strength_focus'] as String?,
