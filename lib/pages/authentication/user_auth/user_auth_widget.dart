@@ -57,6 +57,30 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        // Dev-only bypass: the FF onboarding flow (Apple/Google/email screens)
+        // renders blank on iOS 26.4 due to SingleChildScrollView+Expanded
+        // layout bugs in the generated code. This FAB signs in directly with
+        // the test account so development isn't blocked while the flow is
+        // being rebuilt.
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            GoRouter.of(context).prepareAuthEvent();
+            final user = await authManager.signInWithEmail(
+              context,
+              'testuser@mail.com',
+              '123456',
+            );
+            if (user == null) return;
+            if (loggedIn && context.mounted) {
+              context.goNamedAuth(
+                HomeWidget.routeName,
+                context.mounted,
+              );
+            }
+          },
+          label: const Text('Dev sign-in'),
+          icon: const Icon(Icons.bolt),
+        ),
         body: Stack(
           children: [
             ClipRRect(
@@ -68,7 +92,8 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                 fit: BoxFit.fill,
               ),
             ),
-            Container(
+            Positioned.fill(
+              child: Container(
               decoration: BoxDecoration(),
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(
@@ -79,9 +104,8 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                     ),
                     12.0,
                     12.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                child: Column(
+                    mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(

@@ -9,6 +9,12 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import '/features/players/birth_date_profile_banner.dart';
+import '/features/player_insight/player_profile_page.dart';
+
+// Phase 2 dev redirect: when true, opening a player profile replaces the old
+// FF profile route with the new Claude-built PlayerProfilePageV2. Flip to
+// false before shipping or when the FF profile is deprecated.
+const bool _kRedirectToV2Profile = true;
 
 /// Place this at the top of the player profile screen. Self-fetches
 /// `players.birth_date` by [playerId]; renders the teal banner only when the
@@ -40,6 +46,18 @@ class _BirthDateProfileBannerWidgetState
   @override
   void initState() {
     super.initState();
+    if (_kRedirectToV2Profile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) =>
+                PlayerProfilePageV2(playerId: widget.playerId),
+          ),
+        );
+      });
+      return;
+    }
     _load();
   }
 

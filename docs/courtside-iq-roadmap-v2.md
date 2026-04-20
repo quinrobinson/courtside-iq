@@ -52,7 +52,13 @@
 
 ### Phase 2
 
-Not started. Leave untracked until Phase 1 reaches 100% `v`.
+| Item | Built | Wired | Device-verified | Notes |
+|------|-------|-------|-----------------|-------|
+| 2.1 `player_development_insights` table | ✅ | — | — | Table + RLS on test (migration `20260420000001`) |
+| 2.2 `player_trend_snapshots` table + trigger + backfill | ✅ | — | — | Table (`20260420000002`), trigger (`20260420000003`); backfill verified: Jada 7 snapshots, Jordan 0 (below threshold) |
+| 2.6 `generate-player-insight` Edge Function | ✅ | ✅ | ✅ | Deployed to test; smoke tested via `tool/smoke_player_insight.dart`; wired into `PlayerProfilePageV2` Development tab; device-verified |
+| 2.x Player Profile V2 (3-tab + Development story) | ✅ | ✅ | ✅ | New screen `lib/features/player_insight/player_profile_page.dart`; reached via dev redirect in `BirthDateProfileBannerWidget` (`_kRedirectToV2Profile`); Figma baselines on Claude Code page (1532:212, 1535:212/230/253). Averages + Games tabs are placeholders |
+| 2.7 Prompt tuning — growth-edge specificity | ✅ | ✅ | ✅ | `PROMPT_VERSION` bumped to `v2`; growth edge now requires concrete in-game moment + read anchored to weakest metric, max 22 words, no volume goals; device-verified on Jada (skip-pass weak-side wing read) |
 
 **Parked for Phase 2:**
 - **`highlight_metric` selection logic.** Currently Claude picks freely from `ppsa | ast_tov | disrupt | effort | null` with no rules in the prompt, so selection can feel arbitrary across similar games. Decide between (a) adding explicit selection rules to the prompt (e.g. "pick the highest-tier metric"), or (b) computing the highlight server-side and passing the choice to Claude. Tie the decision to the Phase 2 narrative prompt design work.
