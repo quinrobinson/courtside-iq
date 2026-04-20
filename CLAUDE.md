@@ -56,6 +56,7 @@ When starting a session, the user will tell you which roadmap item to work on. S
 ## Design references
 
 - Figma file: **CourtsideIQ — Performance Analytics** — https://www.figma.com/design/E8n8IE9ZnPRs6vykzINIyg/CourtsideIQ---Performance-Analytics. This is the single source of truth for UI designs across the project. Use the Figma MCP to read frames and draft variants; always land on an approved variant before writing UI code.
+- **Claude-authored Figma work belongs on the "Claude Code" page** (not "Inspiration" or any active page the desktop app happens to be focused on). When creating new frames via `use_figma`, append to the Claude Code page explicitly — e.g. find the page with `/claude\s*code/i.test(p.name)` and `await page.loadAsync()` before appending. Place new frames beside the relevant existing section on that page.
 
 ## Product constraints and rules
 
