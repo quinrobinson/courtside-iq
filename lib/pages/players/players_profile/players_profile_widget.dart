@@ -7,6 +7,7 @@ import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import '/pages/global/empty_states/no_games/no_games_widget.dart';
 import '/pages/global/header_player_profile/header_player_profile_widget.dart';
 import 'dart:ui';
+import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
@@ -1992,38 +1993,29 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                   listViewVPlayerGameStatsRow
                                                                           .gameInsights !=
                                                                       '')
-                                                                Container(
-                                                                  width: 24.0,
-                                                                  height: 24.0,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            6.0),
-                                                                  ),
-                                                                  alignment:
-                                                                      AlignmentDirectional(
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .max,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Icon(
-                                                                        FFIcons
-                                                                            .kaiSpark,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .vividViolet,
-                                                                        size:
-                                                                            16.0,
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
+                                                                Builder(
+                                                                    builder:
+                                                                        (_) {
+                                                                  final hm = listViewVPlayerGameStatsRow
+                                                                          .gameInsightsJson?[
+                                                                      'highlight_metric'] as String?;
+                                                                  if (hm !=
+                                                                      null) {
+                                                                    return custom_widgets
+                                                                        .HighlightMetricTagWidget(
+                                                                      highlightMetric:
+                                                                          hm,
+                                                                    );
+                                                                  }
+                                                                  return Icon(
+                                                                    FFIcons
+                                                                        .kaiSpark,
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .vividViolet,
+                                                                    size: 16.0,
+                                                                  );
+                                                                }),
                                                             ].divide(SizedBox(
                                                                 width: 3.0)),
                                                           ),

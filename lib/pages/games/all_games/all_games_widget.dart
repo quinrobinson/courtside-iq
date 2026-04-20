@@ -12,6 +12,7 @@ import '/pages/global/informational_dialog/informational_dialog_widget.dart';
 import '/pages/players/player_components/new_player/new_player_widget.dart';
 import 'dart:math';
 import 'dart:ui';
+import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
@@ -1461,25 +1462,17 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                     ),
                                                                                   ),
                                                                                 if (allGamesVarItem.gameInsights != null && allGamesVarItem.gameInsights != '')
-                                                                                  Container(
-                                                                                    width: 24.0,
-                                                                                    height: 24.0,
-                                                                                    decoration: BoxDecoration(
-                                                                                      borderRadius: BorderRadius.circular(6.0),
-                                                                                    ),
-                                                                                    alignment: AlignmentDirectional(0.0, 0.0),
-                                                                                    child: Row(
-                                                                                      mainAxisSize: MainAxisSize.max,
-                                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                                      children: [
-                                                                                        Icon(
-                                                                                          FFIcons.kaiSpark,
-                                                                                          color: FlutterFlowTheme.of(context).vividViolet,
-                                                                                          size: 16.0,
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  ),
+                                                                                  Builder(builder: (_) {
+                                                                                    final hm = allGamesVarItem.gameInsightsJson?['highlight_metric'] as String?;
+                                                                                    if (hm != null) {
+                                                                                      return custom_widgets.HighlightMetricTagWidget(highlightMetric: hm);
+                                                                                    }
+                                                                                    return Icon(
+                                                                                      FFIcons.kaiSpark,
+                                                                                      color: FlutterFlowTheme.of(context).vividViolet,
+                                                                                      size: 16.0,
+                                                                                    );
+                                                                                  }),
                                                                               ].divide(SizedBox(width: 6.0)),
                                                                             ),
                                                                           ],

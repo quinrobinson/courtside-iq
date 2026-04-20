@@ -101,6 +101,18 @@ class VPlayerGameStatsRow extends SupabaseDataRow {
   int? get defFoul => getField<int>('def_foul');
   set defFoul(int? value) => setField<int>('def_foul', value);
 
-  String? get gameInsights => getField<String>('game_insights');
+  String? get gameInsights {
+    final raw = data['game_insights'];
+    if (raw == null) return null;
+    if (raw is String) return raw;
+    if (raw is Map) return raw['text']?.toString();
+    return raw.toString();
+  }
   set gameInsights(String? value) => setField<String>('game_insights', value);
+
+  Map<String, dynamic>? get gameInsightsJson {
+    final raw = data['game_insights'];
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return null;
+  }
 }

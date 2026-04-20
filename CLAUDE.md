@@ -53,6 +53,10 @@ The full phased plan for current work is at `docs/roadmap.md`. Always read it at
 
 When starting a session, the user will tell you which roadmap item to work on. Stay scoped to that item unless explicitly asked to expand.
 
+## Design references
+
+- Figma file: **CourtsideIQ — Performance Analytics** — https://www.figma.com/design/E8n8IE9ZnPRs6vykzINIyg/CourtsideIQ---Performance-Analytics. This is the single source of truth for UI designs across the project. Use the Figma MCP to read frames and draft variants; always land on an approved variant before writing UI code.
+
 ## Product constraints and rules
 
 These apply to every change, every session:
