@@ -231,7 +231,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Container(
-                        height: 70.0,
+                        height: 95.0,
                         decoration: BoxDecoration(),
                         child: wrapWithModel(
                           model: _model.headerPlayerProfileModel,
@@ -252,6 +252,11 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                 ?.playerProfilePic,
                             playerID:
                                 playersProfilePlayerProfileViewRow?.playerId,
+                            ageBand: playersProfilePlayerProfileViewRow
+                                        ?.birthDate !=
+                                    null
+                                ? playersProfilePlayerProfileViewRow?.ageBand
+                                : null,
                           ),
                         ),
                       ),

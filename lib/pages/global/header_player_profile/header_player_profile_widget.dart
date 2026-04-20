@@ -20,6 +20,7 @@ class HeaderPlayerProfileWidget extends StatefulWidget {
     this.playerPosition,
     this.playerProfilePic,
     this.playerID,
+    this.ageBand,
   });
 
   final String? firstName;
@@ -28,6 +29,7 @@ class HeaderPlayerProfileWidget extends StatefulWidget {
   final String? playerPosition;
   final String? playerProfilePic;
   final String? playerID;
+  final String? ageBand;
 
   @override
   State<HeaderPlayerProfileWidget> createState() =>
@@ -106,12 +108,11 @@ class _HeaderPlayerProfileWidgetState extends State<HeaderPlayerProfileWidget> {
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 12.0),
                 child: Container(
                   width: double.infinity,
-                  height: 42.0,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -157,6 +158,30 @@ class _HeaderPlayerProfileWidgetState extends State<HeaderPlayerProfileWidget> {
                                   .fontStyle,
                             ),
                       ),
+                      if (widget!.ageBand != null &&
+                          widget!.ageBand!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              0.0, 4.0, 0.0, 0.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 2.0),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1A1A1A),
+                              borderRadius: BorderRadius.circular(999.0),
+                            ),
+                            child: Text(
+                              widget!.ageBand!,
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
+                                fontSize: 11.0,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
