@@ -15,6 +15,7 @@ import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
+import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
@@ -4385,30 +4386,16 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       FFAppState().gameCompleteStatus =
                                           ' Creating performance insights...';
                                       FFAppState().update(() {});
-                                      // Game Insights
-                                      _model.getGameInsights =
-                                          await GetGameInsightsCall.call(
-                                        points: FFAppState().livePoints,
-                                        fgMade: FFAppState().liveTwoMade +
-                                            FFAppState().liveThreeMade,
-                                        fgAttempt: FFAppState().liveTwoAttempt +
-                                            FFAppState().liveThreeAttempt,
-                                        ftMade: FFAppState().liveFtMade,
-                                        ftAttempt: FFAppState().liveFtAttempt,
-                                        threeMade: FFAppState().liveThreeMade,
-                                        threeAttempt:
-                                            FFAppState().liveThreeAttempt,
-                                        offReb: FFAppState().liveOffReb,
-                                        defReb: FFAppState().liveDefReb,
-                                        assist: FFAppState().liveAssist,
-                                        steal: FFAppState().liveSteals,
-                                        turnover: FFAppState().liveTurnover,
-                                        block: FFAppState().liveBlocks,
-                                        offFoul: FFAppState().liveOffFoul,
-                                        defFoul: FFAppState().liveDefFoul,
-                                        gameId: _model.newGame?.id,
-                                        playerId: FFAppState().livePlayerID,
-                                      );
+                                      // Phase 1.10: Buildship → Supabase Edge
+                                      // Function. Stats are fetched server-side
+                                      // from v_player_game_stats; we only pass
+                                      // the game id. Insight jsonb is written
+                                      // to player_game_stats.game_insights.
+                                      final gameId = _model.newGame?.id;
+                                      if (gameId != null) {
+                                        await actions
+                                            .generateGameInsight(gameId);
+                                      }
 
                                       _shouldSetState = true;
                                     }

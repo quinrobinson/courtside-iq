@@ -231,7 +231,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Container(
-                        height: 70.0,
+                        height: 95.0,
                         decoration: BoxDecoration(),
                         child: wrapWithModel(
                           model: _model.headerPlayerProfileModel,
@@ -252,6 +252,11 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                 ?.playerProfilePic,
                             playerID:
                                 playersProfilePlayerProfileViewRow?.playerId,
+                            ageBand: playersProfilePlayerProfileViewRow
+                                        ?.birthDate !=
+                                    null
+                                ? playersProfilePlayerProfileViewRow?.ageBand
+                                : null,
                           ),
                         ),
                       ),
@@ -263,6 +268,31 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               children: [
+                                // Phase 1.3: birth-date backfill banner. Shows
+                                // only when players.birth_date is null; the
+                                // widget self-fetches.
+                                if (playersProfilePlayerProfileViewRow
+                                            ?.playerId !=
+                                        null &&
+                                    playersProfilePlayerProfileViewRow!
+                                        .playerId!
+                                        .isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 10.0, 0.0, 0.0),
+                                    child: custom_widgets
+                                        .BirthDateProfileBannerWidget(
+                                      width: double.infinity,
+                                      playerId:
+                                          playersProfilePlayerProfileViewRow!
+                                              .playerId!,
+                                      playerFirstName: valueOrDefault<String>(
+                                        playersProfilePlayerProfileViewRow
+                                            ?.playerFirstName,
+                                        '',
+                                      ),
+                                    ),
+                                  ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 10.0, 0.0, 0.0),
