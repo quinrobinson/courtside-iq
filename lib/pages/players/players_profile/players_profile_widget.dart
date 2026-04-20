@@ -2023,38 +2023,29 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                   listViewVPlayerGameStatsRow
                                                                           .gameInsights !=
                                                                       '')
-                                                                Container(
-                                                                  width: 24.0,
-                                                                  height: 24.0,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            6.0),
-                                                                  ),
-                                                                  alignment:
-                                                                      AlignmentDirectional(
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .max,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Icon(
-                                                                        FFIcons
-                                                                            .kaiSpark,
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .vividViolet,
-                                                                        size:
-                                                                            16.0,
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
+                                                                Builder(
+                                                                    builder:
+                                                                        (_) {
+                                                                  final hm = listViewVPlayerGameStatsRow
+                                                                          .gameInsightsJson?[
+                                                                      'highlight_metric'] as String?;
+                                                                  if (hm !=
+                                                                      null) {
+                                                                    return custom_widgets
+                                                                        .HighlightMetricTagWidget(
+                                                                      highlightMetric:
+                                                                          hm,
+                                                                    );
+                                                                  }
+                                                                  return Icon(
+                                                                    FFIcons
+                                                                        .kaiSpark,
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .vividViolet,
+                                                                    size: 16.0,
+                                                                  );
+                                                                }),
                                                             ].divide(SizedBox(
                                                                 width: 3.0)),
                                                           ),
