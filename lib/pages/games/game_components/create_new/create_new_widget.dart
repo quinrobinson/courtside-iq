@@ -4,7 +4,7 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/pages/global/bottom_sheets/new_live_game/new_live_game_widget.dart';
-import '/pages/players/player_components/new_player/new_player_widget.dart';
+import '/features/players/add_player_sheet.dart';
 import 'dart:math';
 import 'dart:ui';
 import '/index.dart';
@@ -113,7 +113,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      if (_model.getActivePlayersCount!.length < 3)
+                      if ((_model.getActivePlayersCount?.length ?? 0) < 3)
                         Expanded(
                           child: InkWell(
                             splashColor: Colors.transparent,
@@ -123,22 +123,8 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                             onTap: () async {
                               if (FFAppState().playerCount < 3) {
                                 Navigator.pop(context);
-                                await showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  barrierColor: FlutterFlowTheme.of(context)
-                                      .bottomSheetBg,
-                                  context: context,
-                                  builder: (context) {
-                                    return Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: Container(
-                                        height: 520.0,
-                                        child: NewPlayerWidget(),
-                                      ),
-                                    );
-                                  },
-                                ).then((value) => safeSetState(() {}));
+                                await showAddPlayerSheet(context)
+                                    .then((value) => safeSetState(() {}));
                               } else {
                                 return;
                               }
@@ -210,7 +196,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                             ),
                           ),
                         ),
-                      if (_model.getActivePlayersCount!.length >= 1)
+                      if ((_model.getActivePlayersCount?.length ?? 0) >= 1)
                         Expanded(
                           child: InkWell(
                             splashColor: Colors.transparent,

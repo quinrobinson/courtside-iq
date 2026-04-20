@@ -15,6 +15,60 @@
 
 ---
 
+## Status tracker
+
+**Definition of Done:** a phase item is only complete when all three boxes are checked. "Built" alone is not "done" — the AddPlayerSheet shipped in Phase 1.2 but wasn't wired to call sites until Phase 1.12, costing real user value in between.
+
+- `[b]` **Built** — code/migration/function exists in the repo
+- `[w]` **Wired** — every call site, route, or entry point uses it
+- `[v]` **Verified** — observed working on a real device/prod build (not just `flutter analyze`)
+
+### Phase 0
+
+| Item | b | w | v | Notes |
+|---|---|---|---|---|
+| 0.1 Centralize tier thresholds | ✅ | ✅ | ✅ | `metrics_config.dart` + disrupt call sites fixed (PR #1, #8) |
+| 0.2 `game_insights` → jsonb | ✅ | ✅ | ✅ | View exposes jsonb; client shim decodes both shapes (PR #10) |
+| 0.3 Merge `player_game_insights` | ✅ | ✅ | ❓ | Confirm legacy table dropped on prod |
+| 0.4 PPSA FT-only edge case | ✅ | ✅ | ❓ | Verify with a real FT-only game |
+| 0.5 Clean up `environment_values.dart` | ❓ | ❓ | ❓ | Unconfirmed — investigate |
+
+### Phase 1
+
+| Item | b | w | v | Notes |
+|---|---|---|---|---|
+| 1.1 `birth_date` column | ✅ | ✅ | ✅ | Test DB has column; player_profile_view exposes `age_band` |
+| 1.2 Player creation with birth date | ✅ | ✅ | ✅ | `AddPlayerSheet` wired to all 5 entry points (PR #10) |
+| 1.3 Existing player backfill (gate + banner) | ✅ | ✅ | ✅ | BirthDatePromptGate + BirthDateProfileBannerWidget live |
+| 1.4 Edge Function fallback for null birth date | ✅ | ✅ | 🟡 | Code-path only. BirthDateGate blocks UI reach; no null-DOB players left once gate runs |
+| 1.5 Age-band PPSA thresholds | ✅ | ✅ | ✅ | Verified via Jada 8U-10U game: PPSA 2.0 → Elite tier threshold applied |
+| 1.6 Effort/Disruption rebalance + AST/TOV floor | ✅ | ✅ | ✅ | Dart + TS configs match spec (oreb×2/steals×1.5/blocks×1/dreb×0.5; Elite AST/TOV requires ≥4 assists) |
+| 1.7 Supabase Edge Function toolchain | ✅ | ✅ | ✅ | Deploy path works (PR #5) |
+| 1.8 `generate-game-insight` function | ✅ | ✅ | ✅ | End-to-end verified: Claude → jsonb → view, full payload written |
+| 1.9 Per-game prompt design | ✅ | ✅ | ✅ | Varied highlight_metric observed (ppsa, disrupt). Em-dash enforcement weak, logged as tech debt |
+| 1.10 FF client migration (Buildship → Edge) | ✅ | ✅ | ✅ | PR #2 merged; single route via `generateGameInsight` action |
+| 1.11 `highlight_metric` tag UI | ✅ | ✅ | ✅ | Purple pill replaces fallback icon (PR #9, #10) |
+| 1.12 Parallel run + cutover | ✅ | ✅ | ✅ | Buildship already removed; Edge Function verified across normal/below-threshold/age-band cases |
+
+### Phase 2
+
+Not started. Leave untracked until Phase 1 reaches 100% `v`.
+
+**Parked for Phase 2:**
+- **`highlight_metric` selection logic.** Currently Claude picks freely from `ppsa | ast_tov | disrupt | effort | null` with no rules in the prompt, so selection can feel arbitrary across similar games. Decide between (a) adding explicit selection rules to the prompt (e.g. "pick the highest-tier metric"), or (b) computing the highlight server-side and passing the choice to Claude. Tie the decision to the Phase 2 narrative prompt design work.
+
+### Outstanding tech debt / follow-ups
+
+- Backfill `highlight_metric` on prod (test manually backfilled for testuser)
+- Edge Function should always write a non-null `highlight_metric` (root cause of the null-values-but-key-exists bug)
+- Mirror null-safety fixes (`CreateNewWidget`, `HomeWidget:837`, `NewGameWidget:484`) in FlutterFlow before next regeneration
+- Client-side below-threshold short-circuit in `game_stat_tracker_widget` duplicates server-side logic; consolidate or document which wins
+- Claude ignores the "no em dashes" prompt rule intermittently; strengthen prompt or add post-process strip before jsonb write
+- Profile screen doesn't auto-refresh after birth-date backfill sheet closes; needs invalidation on return
+- Rebuild path broken: `flutter pub get` pulled SDK-incompatible packages; pin or revert lock before next device rebuild
+
+---
+
 ## Phase 0 — Foundation (before any new features)
 
 Non-negotiable cleanup that prevents tech debt from compounding once Phase 1 and 2 ship. All of this should land before the first Edge Function goes live.
