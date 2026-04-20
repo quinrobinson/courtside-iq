@@ -7,6 +7,7 @@ import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import '/pages/global/empty_states/no_games/no_games_widget.dart';
 import '/pages/global/header_player_profile/header_player_profile_widget.dart';
 import 'dart:ui';
+import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
@@ -262,6 +263,31 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               children: [
+                                // Phase 1.3: birth-date backfill banner. Shows
+                                // only when players.birth_date is null; the
+                                // widget self-fetches.
+                                if (playersProfilePlayerProfileViewRow
+                                            ?.playerId !=
+                                        null &&
+                                    playersProfilePlayerProfileViewRow!
+                                        .playerId!
+                                        .isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 10.0, 0.0, 0.0),
+                                    child: custom_widgets
+                                        .BirthDateProfileBannerWidget(
+                                      width: double.infinity,
+                                      playerId:
+                                          playersProfilePlayerProfileViewRow!
+                                              .playerId!,
+                                      playerFirstName: valueOrDefault<String>(
+                                        playersProfilePlayerProfileViewRow
+                                            ?.playerFirstName,
+                                        '',
+                                      ),
+                                    ),
+                                  ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 10.0, 0.0, 0.0),

@@ -12,6 +12,7 @@ import '/pages/global/informational_dialog/informational_dialog_widget.dart';
 import '/pages/players/player_components/new_player/new_player_widget.dart';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
+import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
@@ -148,6 +149,13 @@ class _HomeWidgetState extends State<HomeWidget> {
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
+                // Phase 1.3: invisible gate that prompts parents to backfill
+                // player birth dates. Zero-size; shows dialog from initState.
+                const SizedBox(
+                  width: 0,
+                  height: 0,
+                  child: custom_widgets.BirthDatePromptGate(),
+                ),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Image.asset(
@@ -226,14 +234,13 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   child: Padding(
                                     padding: EdgeInsets.all(12.0),
                                     child: Column(
-                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Expanded(
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
+                                        Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
                                               Container(
                                                 decoration: BoxDecoration(
                                                   borderRadius:
@@ -382,8 +389,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                         .primaryBackground,
                                                 size: 18.0,
                                               ),
-                                            ].divide(SizedBox(width: 12.0)),
-                                          ),
+                                          ].divide(SizedBox(width: 12.0)),
                                         ),
                                       ].divide(SizedBox(height: 12.0)),
                                     ),
