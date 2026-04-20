@@ -94,4 +94,10 @@ class PlayerProfileViewRow extends SupabaseDataRow {
 
   int? get totalGames => getField<int>('total_games');
   set totalGames(int? value) => setField<int>('total_games', value);
+
+  DateTime? get birthDate => getField<DateTime>('birth_date');
+  set birthDate(DateTime? value) => setField<DateTime>('birth_date', value);
+
+  String? get ageBand => getField<String>('age_band');
+  set ageBand(String? value) => setField<String>('age_band', value);
 }

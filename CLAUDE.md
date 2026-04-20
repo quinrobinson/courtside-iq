@@ -88,6 +88,20 @@ These apply to every change, every session:
 - **For Edge Function work, test locally with `supabase functions serve`** before deploying. Deploy only when explicitly asked.
 - **Show me new Edge Function files before deploying** until we've established a rhythm.
 
+## Supabase environments
+
+There are two Supabase projects. **Never mix them up.**
+
+- **Test** — `yihmccmyijtyrffpzstb` (Courtside IQ Test 1)
+- **Prod** — `ejwgxsszmfabujdqxxdz` (Courtside IQ v1, the live App Store / Play Store app)
+
+**Rules:**
+- All in-progress dev work targets **test**. Migrations, schema changes, and Edge Function deploys go to test first and stay there until the feature ships.
+- **Never apply migrations, raw SQL, or Edge Function deploys to prod** without explicit user approval in the current message. Treat prod as read-only from Claude's side.
+- The test-env switch lives in `lib/backend/supabase/supabase.dart` as `const bool _kUseTestSupabase = true;` (introduced on `infra-setup`, commit `3d3ad50`). Must be flipped to `false` before app store submission.
+- **At the start of any session that touches Supabase — or anytime a device test is about to run — verify `_kUseTestSupabase` exists in `lib/backend/supabase/supabase.dart`.** If the current branch predates `infra-setup` (i.e. the flag isn't there), the app will hit prod and writes to new schema will silently fail. Flag this to the user before running; don't propose applying migrations to prod to "fix" it.
+- When the user reports a save/fetch failing on a new feature, check the env flag and migration target before anything else.
+
 ## Schema and data model notes
 
 Current Supabase tables relevant to insight work:
