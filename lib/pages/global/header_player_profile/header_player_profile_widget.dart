@@ -168,7 +168,7 @@ class _HeaderPlayerProfileWidgetState extends State<HeaderPlayerProfileWidget> {
                                 horizontal: 8.0, vertical: 2.0),
                             decoration: BoxDecoration(
                               color: const Color(0xFF1A1A1A),
-                              borderRadius: BorderRadius.circular(999.0),
+                              borderRadius: BorderRadius.circular(6.0),
                             ),
                             child: Text(
                               widget!.ageBand!,
