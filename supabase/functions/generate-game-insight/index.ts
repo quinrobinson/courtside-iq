@@ -40,8 +40,9 @@ Guidelines:
 - Use the player's first name naturally
 - Reference specific tier language (Solid, Good, Elite) only when provided
 - Never list raw stats; always connect them to development
-- Never use em dashes
+- Never use em dashes ("—"). Use commas, periods, or parentheses instead. This is strict.
 - Close with one small, encouraging observation or thing to watch for next time
+- highlight_metric MUST be one of "ppsa", "ast_tov", "disrupt", "effort" whenever any tier (Solid/Good/Elite) is provided for that metric. Only return null if no tier data is given.
 - Output valid JSON only`;
 
 function buildUserPrompt(args: {
@@ -80,6 +81,30 @@ Return JSON with this exact shape:
 }`;
 }
 
+const TIER_RANK: Record<string, number> = { Elite: 3, Good: 2, Solid: 1 };
+
+function pickHighlightMetric(tiers: {
+  ppsa: string | null;
+  disrupt: string | null;
+  ast_tov: string | null;
+}): string | null {
+  // Priority order defines the tie-break; scoring leads because it's the
+  // most visible dimension for parents.
+  const ordered: Array<[string, string | null]> = [
+    ["ppsa", tiers.ppsa],
+    ["disrupt", tiers.disrupt],
+    ["ast_tov", tiers.ast_tov],
+  ];
+  let best: { key: string; rank: number } | null = null;
+  for (const [key, label] of ordered) {
+    const rank = label ? (TIER_RANK[label] ?? 0) : 0;
+    if (rank > 0 && (best === null || rank > best.rank)) {
+      best = { key, rank };
+    }
+  }
+  return best?.key ?? null;
+}
+
 async function callClaude(userPrompt: string): Promise<{
   text: string;
   highlight_metric: string | null;
@@ -116,8 +141,11 @@ async function callClaude(userPrompt: string): Promise<{
     .replace(/\s*```$/i, "")
     .trim();
   const parsed = JSON.parse(cleaned);
+  // Em dashes slip past the prompt rule often enough that we strip
+  // them defensively. Replace with ", " so sentence flow survives.
+  const text = String(parsed.text ?? "").replace(/\s*—\s*/g, ", ");
   return {
-    text: String(parsed.text ?? ""),
+    text,
     highlight_metric: parsed.highlight_metric ?? null,
     tier_context: parsed.tier_context ?? null,
   };
@@ -233,11 +261,20 @@ Deno.serve(async (req) => {
     return json({ error: "insight_unavailable" }, 502);
   }
 
+  // Deterministic fallback: if Claude omits highlight_metric, pick the
+  // metric with the strongest tier so the game-row tag never silently
+  // disappears. Ties break ppsa > disrupt > ast_tov (scoring-first).
+  const highlightMetric = claudeResp.highlight_metric ?? pickHighlightMetric({
+    ppsa: ppsaTierLabel,
+    disrupt: disruptTierLabel,
+    ast_tov: astTovTierLabel,
+  });
+
   const insight = {
     version: 1,
     model: MODEL,
     text: claudeResp.text,
-    highlight_metric: claudeResp.highlight_metric,
+    highlight_metric: highlightMetric,
     tier_context: claudeResp.tier_context,
     prompt_version: PROMPT_VERSION,
     generated_at: nowIso,
