@@ -7,7 +7,7 @@ import '/pages/games/game_components/event_selection/event_selection_widget.dart
 import '/pages/games/game_components/new_event/new_event_widget.dart';
 import '/pages/games/game_components/team_selection/team_selection_widget.dart';
 import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
-import '/pages/players/player_components/new_player/new_player_widget.dart';
+import '/features/players/add_player_sheet.dart';
 import '/pages/players/player_components/new_team/new_team_widget.dart';
 import 'dart:ui';
 import '/flutter_flow/custom_functions.dart' as functions;
@@ -481,8 +481,9 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               children: [
-                                                if (_model.userPlayerList!
-                                                        .length <=
+                                                if ((_model.userPlayerList
+                                                            ?.length ??
+                                                        0) <=
                                                     2)
                                                   Expanded(
                                                     child: InkWell(
@@ -495,45 +496,11 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                       highlightColor:
                                                           Colors.transparent,
                                                       onTap: () async {
-                                                        await showModalBottomSheet(
-                                                          isScrollControlled:
-                                                              true,
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          barrierColor:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bottomSheetBg,
-                                                          isDismissible: false,
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return GestureDetector(
-                                                              onTap: () {
-                                                                FocusScope.of(
-                                                                        context)
-                                                                    .unfocus();
-                                                                FocusManager
-                                                                    .instance
-                                                                    .primaryFocus
-                                                                    ?.unfocus();
-                                                              },
-                                                              child: Padding(
-                                                                padding: MediaQuery
-                                                                    .viewInsetsOf(
-                                                                        context),
-                                                                child:
-                                                                    Container(
-                                                                  height: 520.0,
-                                                                  child:
-                                                                      NewPlayerWidget(),
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                        ).then((value) =>
-                                                            safeSetState(
-                                                                () {}));
+                                                        await showAddPlayerSheet(
+                                                                context)
+                                                            .then((value) =>
+                                                                safeSetState(
+                                                                    () {}));
                                                       },
                                                       child: Container(
                                                         width: double.infinity,
