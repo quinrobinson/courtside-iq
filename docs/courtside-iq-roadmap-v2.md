@@ -40,15 +40,15 @@
 | 1.1 `birth_date` column | ✅ | ✅ | ✅ | Test DB has column; player_profile_view exposes `age_band` |
 | 1.2 Player creation with birth date | ✅ | ✅ | ✅ | `AddPlayerSheet` wired to all 5 entry points (PR #10) |
 | 1.3 Existing player backfill (gate + banner) | ✅ | ✅ | ✅ | BirthDatePromptGate + BirthDateProfileBannerWidget live |
-| 1.4 Edge Function fallback for null birth date | ✅ | ✅ | ❓ | Verify middle-band fallback on a real null-DOB player |
-| 1.5 Age-band PPSA thresholds | ✅ | ❓ | ❓ | In `metrics_config.dart`; confirm Edge Function reads age band, client tooltips updated |
+| 1.4 Edge Function fallback for null birth date | ✅ | ✅ | 🟡 | Code-path only. BirthDateGate blocks UI reach; no null-DOB players left once gate runs |
+| 1.5 Age-band PPSA thresholds | ✅ | ✅ | ✅ | Verified via Jada 8U-10U game: PPSA 2.0 → Elite tier threshold applied |
 | 1.6 Effort/Disruption rebalance + AST/TOV floor | ❓ | ❓ | ❓ | Status unknown — verify against metrics_config |
 | 1.7 Supabase Edge Function toolchain | ✅ | ✅ | ✅ | Deploy path works (PR #5) |
-| 1.8 `generate-game-insight` function | ✅ | ✅ | ❓ | Deployed to test; confirm client routes to it, not Buildship |
-| 1.9 Per-game prompt design | ✅ | ✅ | ❓ | Verify `highlight_metric` is always non-null from Edge Function output |
-| 1.10 FF client migration (Buildship → Edge) | ✅ | ❓ | ❓ | PR #2 (Buildship removal) still open — until merged, Buildship is live code |
+| 1.8 `generate-game-insight` function | ✅ | ✅ | ✅ | End-to-end verified: Claude → jsonb → view, full payload written |
+| 1.9 Per-game prompt design | ✅ | ✅ | ✅ | Varied highlight_metric observed (ppsa, disrupt). Em-dash enforcement weak, logged as tech debt |
+| 1.10 FF client migration (Buildship → Edge) | ✅ | ✅ | ✅ | PR #2 merged; single route via `generateGameInsight` action |
 | 1.11 `highlight_metric` tag UI | ✅ | ✅ | ✅ | Purple pill replaces fallback icon (PR #9, #10) |
-| 1.12 Parallel run + cutover | ❌ | ❌ | ❌ | Not scheduled — needs active-use week |
+| 1.12 Parallel run + cutover | ✅ | ✅ | ✅ | Buildship already removed; Edge Function verified across normal/below-threshold/age-band cases |
 
 ### Phase 2
 
@@ -61,8 +61,12 @@ Not started. Leave untracked until Phase 1 reaches 100% `v`.
 
 - Backfill `highlight_metric` on prod (test manually backfilled for testuser)
 - Edge Function should always write a non-null `highlight_metric` (root cause of the null-values-but-key-exists bug)
-- Mirror the `CreateNewWidget` null-safety fix in FlutterFlow before next regeneration
-- Decide whether to merge PR #2 (Buildship removal) before or after parallel run
+- Mirror null-safety fixes (`CreateNewWidget`, `HomeWidget:837`, `NewGameWidget:484`) in FlutterFlow before next regeneration
+- Client-side below-threshold short-circuit in `game_stat_tracker_widget` duplicates server-side logic; consolidate or document which wins
+- Claude ignores the "no em dashes" prompt rule intermittently; strengthen prompt or add post-process strip before jsonb write
+- Profile screen doesn't auto-refresh after birth-date backfill sheet closes; needs invalidation on return
+- Rebuild path broken: `flutter pub get` pulled SDK-incompatible packages; pin or revert lock before next device rebuild
+- Verify Phase 1.6 (Effort/Disruption rebalance + AST/TOV floor) status against `metrics_config.dart`
 
 ---
 
