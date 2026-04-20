@@ -42,7 +42,7 @@
 | 1.3 Existing player backfill (gate + banner) | ✅ | ✅ | ✅ | BirthDatePromptGate + BirthDateProfileBannerWidget live |
 | 1.4 Edge Function fallback for null birth date | ✅ | ✅ | 🟡 | Code-path only. BirthDateGate blocks UI reach; no null-DOB players left once gate runs |
 | 1.5 Age-band PPSA thresholds | ✅ | ✅ | ✅ | Verified via Jada 8U-10U game: PPSA 2.0 → Elite tier threshold applied |
-| 1.6 Effort/Disruption rebalance + AST/TOV floor | ❓ | ❓ | ❓ | Status unknown — verify against metrics_config |
+| 1.6 Effort/Disruption rebalance + AST/TOV floor | ✅ | ✅ | ✅ | Dart + TS configs match spec (oreb×2/steals×1.5/blocks×1/dreb×0.5; Elite AST/TOV requires ≥4 assists) |
 | 1.7 Supabase Edge Function toolchain | ✅ | ✅ | ✅ | Deploy path works (PR #5) |
 | 1.8 `generate-game-insight` function | ✅ | ✅ | ✅ | End-to-end verified: Claude → jsonb → view, full payload written |
 | 1.9 Per-game prompt design | ✅ | ✅ | ✅ | Varied highlight_metric observed (ppsa, disrupt). Em-dash enforcement weak, logged as tech debt |
@@ -66,7 +66,6 @@ Not started. Leave untracked until Phase 1 reaches 100% `v`.
 - Claude ignores the "no em dashes" prompt rule intermittently; strengthen prompt or add post-process strip before jsonb write
 - Profile screen doesn't auto-refresh after birth-date backfill sheet closes; needs invalidation on return
 - Rebuild path broken: `flutter pub get` pulled SDK-incompatible packages; pin or revert lock before next device rebuild
-- Verify Phase 1.6 (Effort/Disruption rebalance + AST/TOV floor) status against `metrics_config.dart`
 
 ---
 
