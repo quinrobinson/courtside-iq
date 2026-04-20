@@ -9,7 +9,7 @@ import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import '/pages/global/empty_states/no_games/no_games_widget.dart';
 import '/pages/global/informational_dialog/informational_dialog_widget.dart';
-import '/pages/players/player_components/new_player/new_player_widget.dart';
+import '/features/players/add_player_sheet.dart';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
 import '/custom_code/widgets/index.dart' as custom_widgets;
@@ -1006,47 +1006,11 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                               },
                                                             );
                                                           } else {
-                                                            await showModalBottomSheet(
-                                                              isScrollControlled:
-                                                                  true,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              barrierColor:
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bottomSheetBg,
-                                                              context: context,
-                                                              builder:
-                                                                  (context) {
-                                                                return GestureDetector(
-                                                                  onTap: () {
-                                                                    FocusScope.of(
-                                                                            context)
-                                                                        .unfocus();
-                                                                    FocusManager
-                                                                        .instance
-                                                                        .primaryFocus
-                                                                        ?.unfocus();
-                                                                  },
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: MediaQuery
-                                                                        .viewInsetsOf(
-                                                                            context),
-                                                                    child:
-                                                                        Container(
-                                                                      height:
-                                                                          520.0,
-                                                                      child:
-                                                                          NewPlayerWidget(),
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ).then((value) =>
-                                                                safeSetState(
-                                                                    () {}));
+                                                            await showAddPlayerSheet(
+                                                                    context)
+                                                                .then((value) =>
+                                                                    safeSetState(
+                                                                        () {}));
                                                           }
                                                         },
                                                       ),
