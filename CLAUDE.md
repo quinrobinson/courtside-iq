@@ -85,6 +85,8 @@ These apply to every change, every session:
 
 ## Workflow preferences
 
+- **When the user asks "which option?" or "should I do A or B?" — state a recommendation, give the one-line reason, then act.** Don't serve up a menu and wait. The user has said they prefer to understand the judgment call and move forward, not to pick from a checklist. If the decision is truly reversible and low-stakes, just make it.
+- **Definition of Done for phase items = built + wired + device-verified.** Don't mark a `docs/roadmap.md` item complete until all three are true. A component built in `lib/features/` but not wired into call sites is **not done** — this is how the AddPlayerSheet got lost between Phase 1.2 and Phase 1.12. Every phase item in `roadmap.md` should carry three checkboxes so gaps are visible.
 - **UX must be designed and approved in Figma before any code is written.** No exceptions for new screens, modals, sheets, banners, badges, empty states, or copy-visible surfaces. If a feature has a user-facing visual component, pause and ask for the Figma link (or a design pass) before implementing. Code-first UX produces throwaway work and mis-scoped PRs.
 - **Always propose a plan before writing code.** State which files you'll touch, the order of changes, and what tests or verification you'll run. Wait for approval before executing.
 - **Work on feature branches, never directly on main.** Branch naming: `phase-N-short-description` (e.g., `phase-0-tier-thresholds`).

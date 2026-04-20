@@ -109,7 +109,13 @@ async function callClaude(userPrompt: string): Promise<{
   const textBlock = body.content?.[0]?.text;
   if (!textBlock) throw new Error("Claude returned no text block");
 
-  const parsed = JSON.parse(textBlock);
+  // Claude occasionally wraps JSON in ```json ... ``` fences — strip before parse.
+  const cleaned = textBlock
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+  const parsed = JSON.parse(cleaned);
   return {
     text: String(parsed.text ?? ""),
     highlight_metric: parsed.highlight_metric ?? null,

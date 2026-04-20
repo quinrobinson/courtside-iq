@@ -481,8 +481,9 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               children: [
-                                                if (_model.userPlayerList!
-                                                        .length <=
+                                                if ((_model.userPlayerList
+                                                            ?.length ??
+                                                        0) <=
                                                     2)
                                                   Expanded(
                                                     child: InkWell(

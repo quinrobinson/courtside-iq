@@ -15,6 +15,57 @@
 
 ---
 
+## Status tracker
+
+**Definition of Done:** a phase item is only complete when all three boxes are checked. "Built" alone is not "done" — the AddPlayerSheet shipped in Phase 1.2 but wasn't wired to call sites until Phase 1.12, costing real user value in between.
+
+- `[b]` **Built** — code/migration/function exists in the repo
+- `[w]` **Wired** — every call site, route, or entry point uses it
+- `[v]` **Verified** — observed working on a real device/prod build (not just `flutter analyze`)
+
+### Phase 0
+
+| Item | b | w | v | Notes |
+|---|---|---|---|---|
+| 0.1 Centralize tier thresholds | ✅ | ✅ | ✅ | `metrics_config.dart` + disrupt call sites fixed (PR #1, #8) |
+| 0.2 `game_insights` → jsonb | ✅ | ✅ | ✅ | View exposes jsonb; client shim decodes both shapes (PR #10) |
+| 0.3 Merge `player_game_insights` | ✅ | ✅ | ❓ | Confirm legacy table dropped on prod |
+| 0.4 PPSA FT-only edge case | ✅ | ✅ | ❓ | Verify with a real FT-only game |
+| 0.5 Clean up `environment_values.dart` | ❓ | ❓ | ❓ | Unconfirmed — investigate |
+
+### Phase 1
+
+| Item | b | w | v | Notes |
+|---|---|---|---|---|
+| 1.1 `birth_date` column | ✅ | ✅ | ✅ | Test DB has column; player_profile_view exposes `age_band` |
+| 1.2 Player creation with birth date | ✅ | ✅ | ✅ | `AddPlayerSheet` wired to all 5 entry points (PR #10) |
+| 1.3 Existing player backfill (gate + banner) | ✅ | ✅ | ✅ | BirthDatePromptGate + BirthDateProfileBannerWidget live |
+| 1.4 Edge Function fallback for null birth date | ✅ | ✅ | ❓ | Verify middle-band fallback on a real null-DOB player |
+| 1.5 Age-band PPSA thresholds | ✅ | ❓ | ❓ | In `metrics_config.dart`; confirm Edge Function reads age band, client tooltips updated |
+| 1.6 Effort/Disruption rebalance + AST/TOV floor | ❓ | ❓ | ❓ | Status unknown — verify against metrics_config |
+| 1.7 Supabase Edge Function toolchain | ✅ | ✅ | ✅ | Deploy path works (PR #5) |
+| 1.8 `generate-game-insight` function | ✅ | ✅ | ❓ | Deployed to test; confirm client routes to it, not Buildship |
+| 1.9 Per-game prompt design | ✅ | ✅ | ❓ | Verify `highlight_metric` is always non-null from Edge Function output |
+| 1.10 FF client migration (Buildship → Edge) | ✅ | ❓ | ❓ | PR #2 (Buildship removal) still open — until merged, Buildship is live code |
+| 1.11 `highlight_metric` tag UI | ✅ | ✅ | ✅ | Purple pill replaces fallback icon (PR #9, #10) |
+| 1.12 Parallel run + cutover | ❌ | ❌ | ❌ | Not scheduled — needs active-use week |
+
+### Phase 2
+
+Not started. Leave untracked until Phase 1 reaches 100% `v`.
+
+**Parked for Phase 2:**
+- **`highlight_metric` selection logic.** Currently Claude picks freely from `ppsa | ast_tov | disrupt | effort | null` with no rules in the prompt, so selection can feel arbitrary across similar games. Decide between (a) adding explicit selection rules to the prompt (e.g. "pick the highest-tier metric"), or (b) computing the highlight server-side and passing the choice to Claude. Tie the decision to the Phase 2 narrative prompt design work.
+
+### Outstanding tech debt / follow-ups
+
+- Backfill `highlight_metric` on prod (test manually backfilled for testuser)
+- Edge Function should always write a non-null `highlight_metric` (root cause of the null-values-but-key-exists bug)
+- Mirror the `CreateNewWidget` null-safety fix in FlutterFlow before next regeneration
+- Decide whether to merge PR #2 (Buildship removal) before or after parallel run
+
+---
+
 ## Phase 0 — Foundation (before any new features)
 
 Non-negotiable cleanup that prevents tech debt from compounding once Phase 1 and 2 ship. All of this should land before the first Edge Function goes live.

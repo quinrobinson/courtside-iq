@@ -834,18 +834,18 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                           Text(
                                                             valueOrDefault<
                                                                 String>(
-                                                              _model.getActivePlayers!
-                                                                          .length >
+                                                              (_model.getActivePlayers
+                                                                              ?.length ??
+                                                                          0) >
                                                                       1
                                                                   ? valueOrDefault<
                                                                       String>(
                                                                       '1+',
                                                                       '0',
                                                                     )
-                                                                  : _model
-                                                                      .getActivePlayers
-                                                                      ?.length
-                                                                      ?.toString(),
+                                                                  : (_model.getActivePlayers
+                                                                          ?.length
+                                                                          ?.toString()),
                                                               '0',
                                                             ),
                                                             style: FlutterFlowTheme
