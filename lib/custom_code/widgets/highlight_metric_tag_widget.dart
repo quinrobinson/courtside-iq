@@ -33,10 +33,12 @@ class HighlightMetricTagWidget extends StatelessWidget {
     if (label == null) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      height: 24,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFC7F0DE),
-        borderRadius: BorderRadius.circular(999),
+        color: const Color(0xFFEDE9FE),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -45,7 +47,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
           const Icon(
             FFIcons.kaiSpark,
             size: 14,
-            color: Color(0xFF8A5CF5),
+            color: Color(0xFF6D28D9),
           ),
           const SizedBox(width: 4),
           Text(
@@ -55,7 +57,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
-              color: const Color(0xFF00643D),
+              color: const Color(0xFF5B21B6),
             ),
           ),
         ],
