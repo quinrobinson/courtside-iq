@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../database.dart';
 
 class VPlayerGameStatsTable extends SupabaseTable<VPlayerGameStatsRow> {
@@ -120,6 +122,13 @@ class VPlayerGameStatsRow extends SupabaseDataRow {
   /// (e.g. `highlight_metric`).
   Map<String, dynamic>? get gameInsightsJson {
     final raw = data['game_insights'];
-    return raw is Map ? Map<String, dynamic>.from(raw) : null;
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    if (raw is String && raw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      } catch (_) {}
+    }
+    return null;
   }
 }
