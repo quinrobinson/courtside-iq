@@ -1,9 +1,8 @@
 import {
-  PPSA_SOLID_MIN,
-  PPSA_GOOD_MIN,
-  PPSA_ELITE_MIN,
+  PPSA_THRESHOLDS,
   PPSA_MIN_ATTEMPTS,
   AST_TOV_MIN_ASSISTS,
+  AST_TOV_ELITE_MIN_ASSISTS,
   AST_TOV_GOOD_MIN,
   AST_TOV_ELITE_MIN,
   DISRUPT_WEIGHT_OREB,
@@ -15,6 +14,7 @@ import {
   DISRUPT_GOOD_MIN,
   DISRUPT_GOOD_MAX,
   DISRUPT_ELITE_MIN,
+  AgeBand,
 } from "./metrics_config.ts";
 
 export function ppsa(fgAttempted: number, ftAttempted: number, points: number): number {
@@ -24,14 +24,15 @@ export function ppsa(fgAttempted: number, ftAttempted: number, points: number): 
   return points / denominator;
 }
 
-export function ppsaActive(ppsaValue: number, shotAttempts: number): boolean {
-  return shotAttempts >= PPSA_MIN_ATTEMPTS && ppsaValue >= PPSA_SOLID_MIN;
+export function ppsaActive(ppsaValue: number, shotAttempts: number, ageBand: AgeBand): boolean {
+  return shotAttempts >= PPSA_MIN_ATTEMPTS && ppsaValue >= PPSA_THRESHOLDS[ageBand].solidMin;
 }
 
-export function ppsaTier(ppsaValue: number): "Solid" | "Good" | "Elite" | null {
-  if (ppsaValue >= PPSA_ELITE_MIN) return "Elite";
-  if (ppsaValue >= PPSA_GOOD_MIN) return "Good";
-  if (ppsaValue >= PPSA_SOLID_MIN) return "Solid";
+export function ppsaTier(ppsaValue: number, ageBand: AgeBand): "Solid" | "Good" | "Elite" | null {
+  const t = PPSA_THRESHOLDS[ageBand];
+  if (ppsaValue >= t.eliteMin) return "Elite";
+  if (ppsaValue >= t.goodMin) return "Good";
+  if (ppsaValue >= t.solidMin) return "Solid";
   return null;
 }
 
@@ -61,14 +62,14 @@ export function astTovRatio(assists: number, turnovers: number): number | null {
 export function astTovTier(assists: number, turnovers: number): "Solid" | "Good" | "Elite" | null {
   if (assists < AST_TOV_MIN_ASSISTS) return null;
   const ratio = turnovers === 0 ? assists : assists / turnovers;
-  if (ratio >= AST_TOV_ELITE_MIN) return "Elite";
+  if (ratio >= AST_TOV_ELITE_MIN && assists >= AST_TOV_ELITE_MIN_ASSISTS) return "Elite";
   if (ratio >= AST_TOV_GOOD_MIN) return "Good";
   return "Solid";
 }
 
 // birthDate should be an ISO date string (YYYY-MM-DD) or null.
 // NULL returns '11U-13U' (middle band fallback, mirrors get_age_band SQL function).
-export function getAgeBand(birthDate: string | null): "8U-10U" | "11U-13U" | "14U-18U" {
+export function getAgeBand(birthDate: string | null): AgeBand {
   if (!birthDate) return "11U-13U";
   const birth = new Date(birthDate);
   const today = new Date();
