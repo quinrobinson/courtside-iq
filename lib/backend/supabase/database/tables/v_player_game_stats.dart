@@ -101,6 +101,25 @@ class VPlayerGameStatsRow extends SupabaseDataRow {
   int? get defFoul => getField<int>('def_foul');
   set defFoul(int? value) => setField<int>('def_foul', value);
 
-  String? get gameInsights => getField<String>('game_insights');
+  // Phase 0.3: game_insights is now jsonb. Callers still expect the insight
+  // text as a String; extract it safely and tolerate the legacy text shape.
+  String? get gameInsights {
+    final raw = data['game_insights'];
+    if (raw == null) return null;
+    if (raw is String) return raw.isEmpty ? null : raw;
+    if (raw is Map) {
+      final text = raw['text'];
+      return text is String && text.isNotEmpty ? text : null;
+    }
+    return null;
+  }
+
   set gameInsights(String? value) => setField<String>('game_insights', value);
+
+  /// Full jsonb payload, used by widgets that need fields beyond `text`
+  /// (e.g. `highlight_metric`).
+  Map<String, dynamic>? get gameInsightsJson {
+    final raw = data['game_insights'];
+    return raw is Map ? Map<String, dynamic>.from(raw) : null;
+  }
 }
