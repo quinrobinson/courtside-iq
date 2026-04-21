@@ -7,7 +7,7 @@ import '/index.dart';
 import 'spark_icon.dart';
 
 const _card = Colors.white;
-const _cardBorder = Color(0xFFE2E0DF);
+const _cardBorder = Color(0xFFE3E1E0);
 const _tile = Color(0xFFF3F3F3);
 const _ink = Color(0xFF0F0F0F);
 const _sub = Color(0xFF6A6A6A);
@@ -125,13 +125,13 @@ class _GamesTabState extends State<GamesTab> {
 
     return Material(
       color: _card,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: _cardBorder, width: 1),
           ),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -189,7 +189,7 @@ class _GamesTabState extends State<GamesTab> {
 
   Widget _statTile(String value, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
         color: _tile,
         borderRadius: BorderRadius.circular(10),

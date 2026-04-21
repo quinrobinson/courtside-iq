@@ -8,7 +8,7 @@ const _magenta = Color(0xFFD9005C);
 const _green = Color(0xFF2BC18C);
 const _text = Color(0xFF0F0F0F);
 const _text2 = Color(0xFF8A8A8A);
-const _border = Color(0xFFE6E6E6);
+const _border = Color(0xFFE3E1E0);
 const _track = Color(0xFFF5F5F5);
 const _skeleton = Color(0xFFE8E8E8);
 
@@ -278,13 +278,10 @@ class _BelowBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (games / 5).clamp(0.0, 1.0);
     final remaining = (5 - games).clamp(0, 5);
-    final chipLabel = remaining == 1
-        ? '✦ 1 game to go'
-        : '✦ $remaining games to go';
+    final chipLabel = remaining == 1 ? '✦ 1 to go' : '✦ $remaining to go';
     final headline = remaining == 1
-        ? "$firstName's story opens next game"
+        ? "One more for $firstName's first story"
         : "$firstName's story is taking shape";
     final body = remaining == 1
         ? "You'll see where $firstName is shining, where there's room to grow, and what to watch for next."
@@ -330,53 +327,58 @@ class _BelowBody extends StatelessWidget {
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 24),
+        _DotProgress(filled: games, total: 5),
+        const SizedBox(height: 8),
         Text(
-          '$games of 5 games',
+          '$games of 5 games logged',
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 12,
-            fontWeight: FontWeight.w600,
             color: _text2,
           ),
         ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 6,
-            backgroundColor: _track,
-            valueColor: const AlwaysStoppedAnimation(_purple),
-          ),
-        ),
-        const SizedBox(height: 22),
-        Opacity(
-          opacity: 0.4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _AccentSection(
-                color: _green,
-                label: 'BRIGHT SPOTS',
-                body: "Where $firstName's game is clicking",
-              ),
-              const SizedBox(height: 14),
-              const _AccentSection(
-                color: _magenta,
-                label: 'ROOM TO GROW',
-                body: 'The next layer of development',
-              ),
-              const SizedBox(height: 14),
-              const _AccentSection(
-                color: _purple,
-                label: 'WATCH FOR NEXT',
-                body: 'A real moment to watch next game',
-              ),
-            ],
+        const SizedBox(height: 16),
+        Text(
+          'Unlocks bright spots, room to grow, and what to watch for next',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 12,
+            color: _text2.withValues(alpha: 0.7),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DotProgress extends StatelessWidget {
+  const _DotProgress({required this.filled, required this.total});
+  final int filled;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(total, (i) {
+        final isFilled = i < filled;
+        return Padding(
+          padding: EdgeInsets.only(right: i < total - 1 ? 8 : 0),
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isFilled ? _purple : Colors.transparent,
+              border: Border.all(
+                color: isFilled ? _purple : const Color(0xFFD0CDD0),
+                width: 1.5,
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
