@@ -67,6 +67,10 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
         elevation: 0,
         foregroundColor: _text,
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).maybePop(),
+          icon: const Icon(Icons.west, size: 20, color: _text),
+        ),
         title: _player == null
             ? null
             : Text(
@@ -81,23 +85,9 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
         actions: _player == null
             ? null
             : [
-                TextButton(
+                IconButton(
                   onPressed: _openEditSheet,
-                  style: TextButton.styleFrom(
-                    foregroundColor: _text,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    minimumSize: const Size(48, 44),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    'Edit',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: _text,
-                    ),
-                  ),
+                  icon: const Icon(Icons.edit_note, size: 26, color: _text),
                 ),
                 const SizedBox(width: 4),
               ],
@@ -124,28 +114,26 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: EdgeInsets.only(top: kToolbarHeight + MediaQuery.of(context).padding.top),
+        padding: EdgeInsets.only(top: kToolbarHeight + MediaQuery.of(context).padding.top - 14),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              if (position != null) ...[
-                const SizedBox(height: 4),
+              if (position != null)
                 Text(
                   position,
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
-                    color: _text2,
+                    color: _text,
                   ),
                 ),
-              ],
               if (ageBand != null) ...[
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                   decoration: BoxDecoration(
                     color: _pillInk,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     ageBand,
@@ -159,12 +147,12 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                   ),
                 ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 28),
               _ProfileAvatar(
                 pic: pic,
                 onTap: () => _editPhoto(pic),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 32),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: _TabControl(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
 
 const _card = Colors.white;
+const _cardBorder = Color(0xFFE2E0DF);
 const _tile = Color(0xFFF3F3F3);
 const _ink = Color(0xFF0F0F0F);
 const _sub = Color(0xFF6A6A6A);
@@ -145,6 +146,7 @@ class _AveragesTabState extends State<AveragesTab> {
       decoration: BoxDecoration(
         color: _card,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _cardBorder, width: 1),
       ),
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -199,6 +201,7 @@ class _AveragesTabState extends State<AveragesTab> {
       decoration: BoxDecoration(
         color: _card,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _cardBorder, width: 1),
       ),
       padding: const EdgeInsets.all(14),
       child: Column(

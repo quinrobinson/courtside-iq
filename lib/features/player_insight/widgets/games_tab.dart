@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/custom_code/widgets/highlight_metric_tag_widget.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 import 'spark_icon.dart';
 
 const _card = Colors.white;
+const _cardBorder = Color(0xFFE2E0DF);
 const _tile = Color(0xFFF3F3F3);
 const _ink = Color(0xFF0F0F0F);
 const _sub = Color(0xFF6A6A6A);
@@ -80,7 +84,7 @@ class _GamesTabState extends State<GamesTab> {
         children: [
           ...(_games!.map((g) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: _gameCard(g),
+                child: _gameCard(g, () => _openGame(g['game_id']?.toString())),
               ))),
           const SizedBox(height: 4),
           const Center(
@@ -94,7 +98,18 @@ class _GamesTabState extends State<GamesTab> {
     );
   }
 
-  Widget _gameCard(Map<String, dynamic> g) {
+  void _openGame(String? gameId) {
+    if (gameId == null || gameId.isEmpty) return;
+    context.pushNamed(
+      GameStatsWidget.routeName,
+      queryParameters: {
+        'playerID': serializeParam(widget.playerId, ParamType.String),
+        'gameID': serializeParam(gameId, ParamType.String),
+      }.withoutNulls,
+    );
+  }
+
+  Widget _gameCard(Map<String, dynamic> g, VoidCallback onTap) {
     final created = DateTime.tryParse(g['created_at']?.toString() ?? '');
     final date = created != null ? _fmtDate(created) : '—';
     final opponent = (g['opponent_team'] as String?)?.trim();
@@ -102,15 +117,25 @@ class _GamesTabState extends State<GamesTab> {
     final pts = ((g['points'] as num?) ?? 0).toInt();
     final reb = (((g['off_reb'] as num?) ?? 0) + ((g['def_reb'] as num?) ?? 0)).toInt();
     final ast = ((g['assist'] as num?) ?? 0).toInt();
-    final hasInsight = g['game_insights'] != null;
+    final insights = g['game_insights'];
+    final highlightMetric = insights is Map
+        ? insights['highlight_metric'] as String?
+        : null;
+    final hasInsight = insights != null;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: _card,
+    return Material(
+      color: _card,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _cardBorder, width: 1),
+          ),
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          child: Column(
         children: [
           Row(
             children: [
@@ -141,7 +166,9 @@ class _GamesTabState extends State<GamesTab> {
                   ],
                 ),
               ),
-              if (hasInsight)
+              if (highlightMetric != null)
+                HighlightMetricTagWidget(highlightMetric: highlightMetric)
+              else if (hasInsight)
                 const SparkIcon(size: 14, color: _purple),
             ],
           ),
@@ -154,6 +181,8 @@ class _GamesTabState extends State<GamesTab> {
             Expanded(child: _statTile('$ast', 'AST')),
           ]),
         ],
+          ),
+        ),
       ),
     );
   }
@@ -196,6 +225,6 @@ class _GamesTabState extends State<GamesTab> {
     const months = [
       'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
     ];
-    return '${months[d.month - 1]} ${d.day.toString().padLeft(2, '0')}';
+    return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }
 }
