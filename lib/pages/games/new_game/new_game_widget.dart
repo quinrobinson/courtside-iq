@@ -3,11 +3,10 @@ import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/pages/games/game_components/event_selection/event_selection_widget.dart';
 import '/pages/games/game_components/new_event/new_event_widget.dart';
-import '/pages/games/game_components/team_selection/team_selection_widget.dart';
 import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import '/features/players/add_player_sheet.dart';
+import '/features/players/picker_sheet.dart';
 import '/pages/players/player_components/new_team/new_team_widget.dart';
 import 'dart:ui';
 import '/flutter_flow/custom_functions.dart' as functions;
@@ -65,6 +64,124 @@ class _NewGameWidgetState extends State<NewGameWidget> {
     _model.dispose();
 
     super.dispose();
+  }
+
+  void _warnSelectPlayerFirst() {
+    FFAppState().msg = 'Select a player first.';
+    FFAppState().showsnackbard = true;
+    FFAppState().msgtype = false;
+    FFAppState().update(() {});
+  }
+
+  Future<void> _pickTeam() async {
+    if (_model.selectedPlayerID == null || _model.selectedPlayerID!.isEmpty) {
+      _warnSelectPlayerFirst();
+      return;
+    }
+    final rows = await PlayerTeamsTable().queryRows(
+      queryFn: (q) => q
+          .eqOrNull('player_id', _model.selectedPlayerID)
+          .eqOrNull('user_id', currentUserUid),
+    );
+    final teams = rows
+        .map((r) => r.teamName ?? '')
+        .where((n) => n.isNotEmpty)
+        .toList();
+    if (!mounted) return;
+    final picked = await presentPickerSheet<String>(
+      context,
+      title: 'Team',
+      options: teams,
+      labelOf: (t) => t,
+      current: _model.selectedTeam,
+      addNew: PickerAddNew(
+        label: 'Add new team',
+        onTap: (sheetContext) async {
+          Navigator.of(sheetContext).pop();
+          await showModalBottomSheet(
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            barrierColor: FlutterFlowTheme.of(context).bottomSheetBg,
+            isDismissible: false,
+            context: context,
+            builder: (ctx) => GestureDetector(
+              onTap: () {
+                FocusScope.of(ctx).unfocus();
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              child: Padding(
+                padding: MediaQuery.viewInsetsOf(ctx),
+                child: Container(
+                  height: 362.0,
+                  child: NewTeamWidget(playerID: _model.selectedPlayerID!),
+                ),
+              ),
+            ),
+          );
+          if (!mounted) return;
+          safeSetState(() {});
+        },
+      ),
+    );
+    if (picked != null) {
+      _model.selectedTeam = picked;
+      if (mounted) safeSetState(() {});
+    }
+  }
+
+  Future<void> _pickEvent() async {
+    if (_model.selectedPlayerID == null || _model.selectedPlayerID!.isEmpty) {
+      _warnSelectPlayerFirst();
+      return;
+    }
+    final rows = await GameEventsTable().queryRows(
+      queryFn: (q) => q
+          .eqOrNull('user_id', currentUserUid)
+          .eqOrNull('player_id', _model.selectedPlayerID),
+    );
+    final events = rows
+        .map((r) => r.eventName ?? '')
+        .where((n) => n.isNotEmpty)
+        .toList();
+    if (!mounted) return;
+    final picked = await presentPickerSheet<String>(
+      context,
+      title: 'Event',
+      options: events,
+      labelOf: (e) => e,
+      current: _model.selectedEvent,
+      addNew: PickerAddNew(
+        label: 'Add new event',
+        onTap: (sheetContext) async {
+          Navigator.of(sheetContext).pop();
+          await showModalBottomSheet(
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            barrierColor: FlutterFlowTheme.of(context).bottomSheetBg,
+            context: context,
+            builder: (ctx) => GestureDetector(
+              onTap: () {
+                FocusScope.of(ctx).unfocus();
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              child: Padding(
+                padding: MediaQuery.viewInsetsOf(ctx),
+                child: Container(
+                  height: 510.0,
+                  child: NewEventWidget(playerID: _model.selectedPlayerID!),
+                ),
+              ),
+            ),
+          );
+          if (!mounted) return;
+          safeSetState(() {});
+        },
+      ),
+    );
+    if (picked != null) {
+      _model.selectedEvent = picked;
+      if (mounted) safeSetState(() {});
+    }
   }
 
   @override
@@ -654,63 +771,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                           .transparent,
                                                                   onTap:
                                                                       () async {
-                                                                    if (_model.selectedName !=
-                                                                            null &&
-                                                                        _model.selectedName !=
-                                                                            '') {
-                                                                      await showModalBottomSheet(
-                                                                        isScrollControlled:
-                                                                            true,
-                                                                        backgroundColor:
-                                                                            Colors.transparent,
-                                                                        barrierColor:
-                                                                            FlutterFlowTheme.of(context).bottomSheetBg,
-                                                                        context:
-                                                                            context,
-                                                                        builder:
-                                                                            (context) {
-                                                                          return GestureDetector(
-                                                                            onTap:
-                                                                                () {
-                                                                              FocusScope.of(context).unfocus();
-                                                                              FocusManager.instance.primaryFocus?.unfocus();
-                                                                            },
-                                                                            child:
-                                                                                Padding(
-                                                                              padding: MediaQuery.viewInsetsOf(context),
-                                                                              child: Container(
-                                                                                height: 374.0,
-                                                                                child: TeamSelectionWidget(
-                                                                                  playerID: _model.selectedPlayerID!,
-                                                                                  selectedTeam: (teamSelection) async {
-                                                                                    _model.selectedTeam = teamSelection;
-                                                                                    safeSetState(() {});
-                                                                                  },
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      ).then((value) =>
-                                                                          safeSetState(
-                                                                              () {}));
-
-                                                                      return;
-                                                                    } else {
-                                                                      FFAppState()
-                                                                              .msg =
-                                                                          'Select a player first.';
-                                                                      FFAppState()
-                                                                              .showsnackbard =
-                                                                          true;
-                                                                      FFAppState()
-                                                                              .msgtype =
-                                                                          false;
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                      return;
-                                                                    }
+                                                                    await _pickTeam();
                                                                   },
                                                                   child:
                                                                       Container(
@@ -1027,56 +1088,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             .transparent,
                                                                     onTap:
                                                                         () async {
-                                                                      if (_model.selectedName !=
-                                                                              null &&
-                                                                          _model.selectedName !=
-                                                                              '') {
-                                                                        await showModalBottomSheet(
-                                                                          isScrollControlled:
-                                                                              true,
-                                                                          backgroundColor:
-                                                                              Colors.transparent,
-                                                                          barrierColor:
-                                                                              FlutterFlowTheme.of(context).bottomSheetBg,
-                                                                          context:
-                                                                              context,
-                                                                          builder:
-                                                                              (context) {
-                                                                            return GestureDetector(
-                                                                              onTap: () {
-                                                                                FocusScope.of(context).unfocus();
-                                                                                FocusManager.instance.primaryFocus?.unfocus();
-                                                                              },
-                                                                              child: Padding(
-                                                                                padding: MediaQuery.viewInsetsOf(context),
-                                                                                child: Container(
-                                                                                  height: 380.0,
-                                                                                  child: EventSelectionWidget(
-                                                                                    playerID: _model.selectedPlayerID!,
-                                                                                    selectedEvent: (eventSelection) async {
-                                                                                      _model.selectedEvent = eventSelection;
-                                                                                      safeSetState(() {});
-                                                                                    },
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                        ).then((value) =>
-                                                                            safeSetState(() {}));
-
-                                                                        return;
-                                                                      } else {
-                                                                        FFAppState().msg =
-                                                                            'Select a player first.';
-                                                                        FFAppState().showsnackbard =
-                                                                            true;
-                                                                        FFAppState().msgtype =
-                                                                            false;
-                                                                        FFAppState()
-                                                                            .update(() {});
-                                                                        return;
-                                                                      }
+                                                                      await _pickEvent();
                                                                     },
                                                                     child:
                                                                         Container(
