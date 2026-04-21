@@ -4,6 +4,7 @@ import '/backend/supabase/supabase.dart';
 import 'widgets/averages_tab.dart';
 import 'widgets/development_tab.dart';
 import 'widgets/games_tab.dart';
+import 'widgets/profile_photo_sheet.dart';
 
 const _bg = Color(0xFFF0F0F0);
 const _text = Color(0xFF0F0F0F);
@@ -135,12 +136,9 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                 ),
               ],
               const SizedBox(height: 16),
-              CircleAvatar(
-                radius: 44,
-                backgroundColor: const Color(0xFFDCDCDC),
-                backgroundImage: (pic != null && pic.isNotEmpty)
-                    ? NetworkImage(pic)
-                    : null,
+              _ProfileAvatar(
+                pic: pic,
+                onTap: () => _editPhoto(pic),
               ),
               const SizedBox(height: 20),
               Padding(
@@ -158,6 +156,22 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
         ),
       ),
     );
+  }
+
+  Future<void> _editPhoto(String? currentPic) async {
+    final hasPhoto = currentPic != null && currentPic.isNotEmpty;
+    final result = await ProfilePhotoEditor.present(
+      context,
+      playerId: widget.playerId,
+      hasPhoto: hasPhoto,
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      _player = {
+        ...?_player,
+        'player_profile_pic': result.removed ? null : result.newUrl,
+      };
+    });
   }
 
   Widget _tabContent(String firstName) {
@@ -257,6 +271,87 @@ class _TabControl extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({required this.pic, required this.onTap});
+
+  final String? pic;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 88.0;
+    const badgeSize = 30.0;
+    final hasPhoto = pic != null && pic!.isNotEmpty;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: size + 4,
+        height: size + 4,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Avatar
+            Positioned(
+              left: 0,
+              top: 0,
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: hasPhoto ? Colors.white : const Color(0xFFE6E6E6),
+                  image: hasPhoto
+                      ? DecorationImage(
+                          image: NetworkImage(pic!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: hasPhoto
+                    ? null
+                    : const Icon(
+                        Icons.person,
+                        size: 52,
+                        color: Color(0xFFC3BFBB),
+                      ),
+              ),
+            ),
+            // Camera badge
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                width: badgeSize,
+                height: badgeSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF0F0F0F),
+                  border: Border.all(color: Colors.white, width: 2.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.photo_camera,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
