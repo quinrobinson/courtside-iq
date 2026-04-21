@@ -1,6 +1,7 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -17,8 +18,21 @@ import 'flutter_flow/nav/nav.dart';
 import 'index.dart';
 import 'flutter_flow/revenue_cat_util.dart' as revenue_cat;
 
+/// App is a light-mode design, so the iOS/Android status bar should always
+/// render dark (black) icons against the light background. FF's generated
+/// AppBars otherwise flip the overlay style based on their own background,
+/// which caused the time/battery/signal icons to toggle between dark and
+/// light as the user navigated. Setting this once at startup plus the
+/// [AnnotatedRegion] below in [_MyAppState.build] pins it.
+const _lightModeStatusBar = SystemUiOverlayStyle(
+  statusBarColor: Colors.transparent,
+  statusBarIconBrightness: Brightness.dark, // Android
+  statusBarBrightness: Brightness.light,    // iOS
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(_lightModeStatusBar);
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
@@ -113,30 +127,33 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Courtside IQ',
-      scrollBehavior: MyAppScrollBehavior(),
-      localizationsDelegates: [
-        FFLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        FallbackMaterialLocalizationDelegate(),
-        FallbackCupertinoLocalizationDelegate(),
-      ],
-      locale: _locale,
-      supportedLocales: const [
-        Locale('en'),
-      ],
-      theme: ThemeData(
-        brightness: Brightness.light,
-        scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all(false),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: _lightModeStatusBar,
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'Courtside IQ',
+        scrollBehavior: MyAppScrollBehavior(),
+        localizationsDelegates: [
+          FFLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          FallbackMaterialLocalizationDelegate(),
+          FallbackCupertinoLocalizationDelegate(),
+        ],
+        locale: _locale,
+        supportedLocales: const [
+          Locale('en'),
+        ],
+        theme: ThemeData(
+          brightness: Brightness.light,
+          scrollbarTheme: ScrollbarThemeData(
+            thumbVisibility: MaterialStateProperty.all(false),
+          ),
         ),
+        themeMode: _themeMode,
+        routerConfig: _router,
       ),
-      themeMode: _themeMode,
-      routerConfig: _router,
     );
   }
 }
