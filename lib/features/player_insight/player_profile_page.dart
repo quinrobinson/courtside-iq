@@ -130,11 +130,13 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
               if (ageBand != null) ...[
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  height: 26,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: _pillInk,
                     borderRadius: BorderRadius.circular(6),
                   ),
+                  alignment: Alignment.center,
                   child: Text(
                     ageBand,
                     style: const TextStyle(
@@ -246,9 +248,10 @@ class _TabControl extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final trackW = c.maxWidth;
-        final tabW = (trackW - 8) / 3;
+        const padding = 4.0;
+        final tabW = (trackW - padding * 2) / 3;
         return SizedBox(
-          height: 44,
+          height: 48,
           child: Stack(
             children: [
               Container(
@@ -260,10 +263,10 @@ class _TabControl extends StatelessWidget {
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOut,
-                left: 4 + index * tabW,
-                top: 4,
+                left: padding + index * tabW,
+                top: padding,
                 width: tabW,
-                height: 36,
+                height: 40,
                 child: Container(
                   decoration: BoxDecoration(
                     color: _card,
@@ -317,8 +320,8 @@ class _ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const size = 88.0;
-    const badgeSize = 30.0;
+    const size = 120.0;
+    const badgeSize = 40.0;
     final hasPhoto = pic != null && pic!.isNotEmpty;
 
     return GestureDetector(
@@ -351,7 +354,7 @@ class _ProfileAvatar extends StatelessWidget {
                     ? null
                     : const Icon(
                         Icons.person,
-                        size: 52,
+                        size: 68,
                         color: Color(0xFFC3BFBB),
                       ),
               ),
@@ -366,7 +369,6 @@ class _ProfileAvatar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFF0F0F0F),
-                  border: Border.all(color: Colors.white, width: 2.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.12),
@@ -378,7 +380,7 @@ class _ProfileAvatar extends StatelessWidget {
                 alignment: Alignment.center,
                 child: const Icon(
                   Icons.photo_camera,
-                  size: 16,
+                  size: 20,
                   color: Colors.white,
                 ),
               ),
