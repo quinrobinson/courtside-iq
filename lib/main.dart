@@ -1,6 +1,7 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -17,8 +18,19 @@ import 'flutter_flow/nav/nav.dart';
 import 'index.dart';
 import 'flutter_flow/revenue_cat_util.dart' as revenue_cat;
 
+/// App is a light-mode design: status bar must always show dark (black) icons.
+/// FF-generated AppBars flip the overlay style based on their own background,
+/// causing time/battery/signal icons to toggle. Setting this at startup and
+/// wrapping MaterialApp with AnnotatedRegion pins it globally.
+const _lightModeStatusBar = SystemUiOverlayStyle(
+  statusBarColor: Colors.transparent,
+  statusBarIconBrightness: Brightness.dark, // Android
+  statusBarBrightness: Brightness.light,    // iOS
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(_lightModeStatusBar);
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
@@ -113,7 +125,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: _lightModeStatusBar,
+      child: MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Courtside IQ',
       scrollBehavior: MyAppScrollBehavior(),
@@ -137,6 +151,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: _themeMode,
       routerConfig: _router,
+      ),
     );
   }
 }
