@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/player_insight_service.dart';
 import '../models/player_insight.dart';
+import 'about_story_sheet.dart';
 import 'development_story_card.dart';
 
 class DevelopmentTab extends StatefulWidget {
@@ -160,12 +161,33 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
             onRetry: _refreshFailed ? _startRefresh : null,
           ),
           const SizedBox(height: 14),
-          Text(
-            "Based on ${widget.firstName}'s last 5 games",
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 11,
-              color: Color(0xFF8A8A8A),
+          InkWell(
+            onTap: () => AboutStorySheet.show(context),
+            borderRadius: BorderRadius.circular(4),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Based on ${widget.firstName}'s last 5 games",
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      color: Color(0xFF8A8A8A),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'ⓘ',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      color: Color(0xFF8A8A8A),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
