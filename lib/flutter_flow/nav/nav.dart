@@ -18,6 +18,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
 
 import '/index.dart';
+import '/features/player_insight/player_profile_page.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
     as $lock_orientation_library_opafp4;
 
@@ -257,11 +258,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: PlayersProfileWidget.routeName,
         path: PlayersProfileWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => PlayersProfileWidget(
-          playerID: params.getParam(
+        builder: (context, params) => PlayerProfilePageV2(
+          playerId: params.getParam(
             'playerID',
             ParamType.String,
-          ),
+          ) ?? '',
         ),
       ),
       FFRoute(
