@@ -208,6 +208,16 @@ class _BelowBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = (games / 5).clamp(0.0, 1.0);
     final remaining = (5 - games).clamp(0, 5);
+    final chipLabel = remaining == 1
+        ? '✦ 1 game to go'
+        : '✦ $remaining games to go';
+    final headline = remaining == 1
+        ? "$firstName's story opens next game"
+        : "$firstName's story is taking shape";
+    final body = remaining == 1
+        ? "You'll see where $firstName is shining, where there's room to grow, and what to watch for next."
+        : "Every game you log sharpens what we can see in $firstName's development.";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -217,9 +227,9 @@ class _BelowBody extends StatelessWidget {
             color: _purple.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: const Text(
-            '✦ Unlocks at 5',
-            style: TextStyle(
+          child: Text(
+            chipLabel,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -229,7 +239,7 @@ class _BelowBody extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Text(
-          "$firstName's story is still being written",
+          headline,
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 20,
@@ -240,7 +250,7 @@ class _BelowBody extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          "Development stories appear once a player has five logged games. Keep logging and $firstName's personalized insight will be ready soon.",
+          body,
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -268,15 +278,30 @@ class _BelowBody extends StatelessWidget {
             valueColor: const AlwaysStoppedAnimation(_purple),
           ),
         ),
-        const SizedBox(height: 12),
-        Text(
-          remaining == 1
-              ? '1 more game to unlock'
-              : '$remaining more games to unlock',
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 11,
-            color: _text2,
+        const SizedBox(height: 22),
+        Opacity(
+          opacity: 0.4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _AccentSection(
+                color: _green,
+                label: 'BRIGHT SPOTS',
+                body: "Where $firstName's game is clicking",
+              ),
+              const SizedBox(height: 14),
+              const _AccentSection(
+                color: _magenta,
+                label: 'ROOM TO GROW',
+                body: 'The next layer of development',
+              ),
+              const SizedBox(height: 14),
+              const _AccentSection(
+                color: _purple,
+                label: 'WATCH FOR NEXT',
+                body: 'A real moment to watch next game',
+              ),
+            ],
           ),
         ),
       ],
