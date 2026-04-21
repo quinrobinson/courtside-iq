@@ -25,6 +25,7 @@ Future<T?> presentPickerSheet<T>(
   required List<T> options,
   required String Function(T) labelOf,
   T? current,
+  PickerAddNew? addNew,
 }) async {
   FocusScope.of(context).unfocus();
   await Future<void>.delayed(const Duration(milliseconds: 60));
@@ -38,8 +39,18 @@ Future<T?> presentPickerSheet<T>(
       options: options,
       labelOf: labelOf,
       current: current,
+      addNew: addNew,
     ),
   );
+}
+
+/// Optional "+ Add new" row rendered at the top of a [PickerSheet]. The
+/// [onTap] callback receives the sheet's context so the caller can pop the
+/// picker before presenting a follow-on creation sheet.
+class PickerAddNew {
+  const PickerAddNew({required this.label, required this.onTap});
+  final String label;
+  final Future<void> Function(BuildContext sheetContext) onTap;
 }
 
 /// Tappable field card — drop-in replacement for `DropdownButton`. Matches
@@ -109,12 +120,14 @@ class PickerSheet<T> extends StatelessWidget {
     required this.options,
     required this.labelOf,
     required this.current,
+    this.addNew,
   });
 
   final String title;
   final List<T> options;
   final String Function(T) labelOf;
   final T? current;
+  final PickerAddNew? addNew;
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +168,33 @@ class PickerSheet<T> extends StatelessWidget {
               ),
             ),
           ),
+          if (addNew != null)
+            InkWell(
+              onTap: () => addNew!.onTap(context),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.add, size: 20, color: _purple),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        addNew!.label,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: _purple,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Flexible(
             child: ListView.builder(
               shrinkWrap: true,
@@ -163,16 +203,17 @@ class PickerSheet<T> extends StatelessWidget {
               itemBuilder: (context, i) {
                 final opt = options[i];
                 final selected = current != null && current == opt;
+                final showTopBorder = i != 0 || addNew != null;
                 return InkWell(
                   onTap: () => Navigator.of(context).pop(opt),
                   child: Container(
-                    decoration: i == 0
-                        ? null
-                        : const BoxDecoration(
+                    decoration: showTopBorder
+                        ? const BoxDecoration(
                             border: Border(
                               top: BorderSide(color: _border, width: 1),
                             ),
-                          ),
+                          )
+                        : null,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 14,
