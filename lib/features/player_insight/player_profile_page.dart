@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '../players/edit_player_sheet.dart';
 import 'widgets/averages_tab.dart';
 import 'widgets/development_tab.dart';
 import 'widgets/games_tab.dart';
@@ -39,7 +40,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
       final row = await SupaFlow.client
           .from('player_profile_view')
           .select(
-            'player_id, player_first_name, player_position, player_profile_pic, age_band, total_games',
+            'player_id, player_first_name, player_position, player_profile_pic, age_band, total_games, birth_date',
           )
           .eq('player_id', widget.playerId)
           .maybeSingle();
@@ -77,6 +78,29 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                   color: _text,
                 ),
               ),
+        actions: _player == null
+            ? null
+            : [
+                TextButton(
+                  onPressed: _openEditSheet,
+                  style: TextButton.styleFrom(
+                    foregroundColor: _text,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    minimumSize: const Size(48, 44),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    'Edit',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: _text,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+              ],
       ),
       body: _error != null
           ? Center(child: Text('Error: $_error'))
@@ -156,6 +180,28 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
         ),
       ),
     );
+  }
+
+  Future<void> _openEditSheet() async {
+    final p = _player;
+    if (p == null) return;
+    final rawBirth = p['birth_date'];
+    DateTime? birth;
+    if (rawBirth is DateTime) {
+      birth = rawBirth;
+    } else if (rawBirth is String && rawBirth.isNotEmpty) {
+      birth = DateTime.tryParse(rawBirth);
+    }
+    final changed = await showEditPlayerSheet(
+      context,
+      playerId: widget.playerId,
+      firstName: (p['player_first_name'] as String?) ?? '',
+      position: p['player_position'] as String?,
+      birthDate: birth,
+    );
+    if (changed == true) {
+      await _load();
+    }
   }
 
   Future<void> _editPhoto(String? currentPic) async {
