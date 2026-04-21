@@ -17,8 +17,9 @@ class DevelopmentStoryCard extends StatelessWidget {
     super.key,
     required PlayerInsight this.insight,
     required this.firstName,
+    this.suppressTrendPill = false,
+    this.onRetry,
   })  : gamesLogged = null,
-        onRetry = null,
         _state = _CardState.eligible;
 
   const DevelopmentStoryCard.belowThreshold({
@@ -27,6 +28,7 @@ class DevelopmentStoryCard extends StatelessWidget {
     required int this.gamesLogged,
   })  : insight = null,
         onRetry = null,
+        suppressTrendPill = false,
         _state = _CardState.below;
 
   const DevelopmentStoryCard.loading({super.key})
@@ -34,6 +36,7 @@ class DevelopmentStoryCard extends StatelessWidget {
         firstName = '',
         gamesLogged = null,
         onRetry = null,
+        suppressTrendPill = false,
         _state = _CardState.loading;
 
   const DevelopmentStoryCard.error({
@@ -42,12 +45,14 @@ class DevelopmentStoryCard extends StatelessWidget {
     required VoidCallback this.onRetry,
   })  : insight = null,
         gamesLogged = null,
+        suppressTrendPill = false,
         _state = _CardState.error;
 
   final PlayerInsight? insight;
   final String firstName;
   final int? gamesLogged;
   final VoidCallback? onRetry;
+  final bool suppressTrendPill;
   final _CardState _state;
 
   @override
@@ -67,7 +72,11 @@ class DevelopmentStoryCard extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(20),
       child: switch (_state) {
-        _CardState.eligible => _EligibleBody(insight: insight!),
+        _CardState.eligible => _EligibleBody(
+            insight: insight!,
+            suppressTrendPill: suppressTrendPill,
+            onRetry: onRetry,
+          ),
         _CardState.below => _BelowBody(firstName: firstName, games: gamesLogged ?? 0),
         _CardState.loading => const _LoadingBody(),
         _CardState.error => _ErrorBody(firstName: firstName, onRetry: onRetry!),
@@ -79,8 +88,14 @@ class DevelopmentStoryCard extends StatelessWidget {
 enum _CardState { eligible, below, loading, error }
 
 class _EligibleBody extends StatelessWidget {
-  const _EligibleBody({required this.insight});
+  const _EligibleBody({
+    required this.insight,
+    this.suppressTrendPill = false,
+    this.onRetry,
+  });
   final PlayerInsight insight;
+  final bool suppressTrendPill;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +106,10 @@ class _EligibleBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TrendPill(direction: insight.trendDirection),
-        const SizedBox(height: 14),
+        if (!suppressTrendPill) ...[
+          TrendPill(direction: insight.trendDirection),
+          const SizedBox(height: 14),
+        ],
         if (insight.headline != null)
           Text(
             insight.headline!,
@@ -141,6 +158,10 @@ class _EligibleBody extends StatelessWidget {
             label: 'WATCH FOR NEXT',
             body: insight.growthEdge!,
           ),
+        ],
+        if (onRetry != null) ...[
+          const SizedBox(height: 22),
+          _RetryChip(onTap: onRetry!),
         ],
       ],
     );
@@ -194,6 +215,57 @@ class _AccentSection extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RetryChip extends StatelessWidget {
+  const _RetryChip({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: _track,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: _border),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '↻',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _text2,
+                  ),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  "Couldn't refresh · tap to retry",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _text2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
