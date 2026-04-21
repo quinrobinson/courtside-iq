@@ -8,3 +8,5 @@ export 'set_dark_mode_off.dart' show setDarkModeOff;
 export 'set_dark_mode_system.dart' show setDarkModeSystem;
 export 'login_to_revenue_cat.dart' show loginToRevenueCat;
 export 'generate_game_insight.dart' show generateGameInsight;
+export 'open_player_insight_debug.dart' show openPlayerInsightDebug;
+export 'open_player_profile_v2.dart' show openPlayerProfileV2;

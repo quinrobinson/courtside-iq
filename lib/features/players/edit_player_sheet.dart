@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
 import 'picker_sheet.dart';
 
-// Light mode design tokens
+// Design tokens — mirror AddPlayerSheet so the two sheets feel like siblings.
 const _sheetBg      = Color(0xFFFFFFFF);
 const _fieldBg      = Color(0xFFF0F0F0);
 const _labelColor   = Color(0xFF1A1A1A);
@@ -20,31 +20,51 @@ const _months = [
   'September', 'October', 'November', 'December',
 ];
 
-Future<void> showAddPlayerSheet(
+/// Opens the Edit Player sheet pre-filled with the player's current values.
+/// Returns `true` if the player was updated (so the caller can refresh).
+Future<bool?> showEditPlayerSheet(
   BuildContext context, {
-  VoidCallback? onPlayerAdded,
+  required String playerId,
+  required String firstName,
+  required String? position,
+  required DateTime? birthDate,
 }) {
-  return showModalBottomSheet(
+  return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => AddPlayerSheet(onPlayerAdded: onPlayerAdded),
+    builder: (_) => EditPlayerSheet(
+      playerId: playerId,
+      initialFirstName: firstName,
+      initialPosition: position,
+      initialBirthDate: birthDate,
+    ),
   );
 }
 
-class AddPlayerSheet extends StatefulWidget {
-  const AddPlayerSheet({super.key, this.onPlayerAdded});
-  final VoidCallback? onPlayerAdded;
+class EditPlayerSheet extends StatefulWidget {
+  const EditPlayerSheet({
+    super.key,
+    required this.playerId,
+    required this.initialFirstName,
+    required this.initialPosition,
+    required this.initialBirthDate,
+  });
+
+  final String playerId;
+  final String initialFirstName;
+  final String? initialPosition;
+  final DateTime? initialBirthDate;
 
   @override
-  State<AddPlayerSheet> createState() => _AddPlayerSheetState();
+  State<EditPlayerSheet> createState() => _EditPlayerSheetState();
 }
 
-class _AddPlayerSheetState extends State<AddPlayerSheet> {
-  final _nameController = TextEditingController();
+class _EditPlayerSheetState extends State<EditPlayerSheet> {
+  late final TextEditingController _nameController;
   String? _position;
-  int?    _month;
-  int?    _year;
+  int? _month;
+  int? _year;
   List<String> _positions = [];
   bool _saving = false;
 
@@ -53,16 +73,32 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
     return List.generate(17, (i) => now - 3 - i);
   }
 
-  bool get _canSave =>
+  bool get _valid =>
       _nameController.text.trim().isNotEmpty &&
       _position != null &&
       _month != null &&
       _year != null;
 
+  bool get _dirty {
+    if (_nameController.text.trim() != widget.initialFirstName.trim()) {
+      return true;
+    }
+    if (_position != widget.initialPosition) return true;
+    final bd = widget.initialBirthDate;
+    if (bd?.month != _month || bd?.year != _year) return true;
+    return false;
+  }
+
+  bool get _canSave => _valid && _dirty;
+
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController(text: widget.initialFirstName);
     _nameController.addListener(() => setState(() {}));
+    _position = widget.initialPosition;
+    _month = widget.initialBirthDate?.month;
+    _year = widget.initialBirthDate?.year;
     _loadPositions();
   }
 
@@ -82,28 +118,50 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
       _positions = (rows as List)
           .map((r) => r['position_name'] as String)
           .toList();
+      // Ensure the currently-set position is present in the options even if
+      // it's been deprecated from the catalog.
+      if (_position != null && !_positions.contains(_position)) {
+        _positions = [_position!, ..._positions];
+      }
     });
+  }
+
+  Future<void> _pick<T>({
+    required String title,
+    required List<T> options,
+    required String Function(T) labelOf,
+    required T? current,
+    required ValueChanged<T> onPicked,
+  }) async {
+    final picked = await presentPickerSheet<T>(
+      context,
+      title: title,
+      options: options,
+      labelOf: labelOf,
+      current: current,
+    );
+    if (picked != null) onPicked(picked);
   }
 
   Future<void> _save() async {
     if (!_canSave || _saving) return;
     setState(() => _saving = true);
 
-    final userId = SupaFlow.client.auth.currentUser?.id;
-    if (userId == null) { setState(() => _saving = false); return; }
-
     final birthDate =
         '$_year-${_month!.toString().padLeft(2, '0')}-01';
 
-    await SupaFlow.client.from('players').insert({
-      'first_name':       _nameController.text.trim(),
-      'player_position':  _position!,
-      'user_id':          userId,
-      'birth_date':       birthDate,
-    });
+    try {
+      await SupaFlow.client.from('players').update({
+        'first_name': _nameController.text.trim(),
+        'player_position': _position!,
+        'birth_date': birthDate,
+      }).eq('id', widget.playerId);
+    } catch (_) {
+      if (mounted) setState(() => _saving = false);
+      return;
+    }
 
-    widget.onPlayerAdded?.call();
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) Navigator.of(context).pop(true);
   }
 
   @override
@@ -120,10 +178,10 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag handle
           Center(
             child: Container(
-              width: 34, height: 6,
+              width: 34,
+              height: 6,
               decoration: BoxDecoration(
                 color: _handleColor,
                 borderRadius: BorderRadius.circular(3),
@@ -132,12 +190,11 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
           ),
           const SizedBox(height: 18),
 
-          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Add Player',
+                'Edit Player',
                 style: TextStyle(
                   fontFamily: _fontMontserrat,
                   fontSize: 24,
@@ -160,7 +217,6 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
           ),
           const SizedBox(height: 20),
 
-          // NAME
           const _Label('NAME'),
           const SizedBox(height: 6),
           _FieldCard(
@@ -180,82 +236,69 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 18,
+                  horizontal: 16,
+                  vertical: 18,
                 ),
               ),
             ),
           ),
           const SizedBox(height: 16),
 
-          // PLAYER POSITION
           const _Label('PLAYER POSITION'),
           const SizedBox(height: 6),
           PickerField<String>(
             value: _position,
             placeholder: 'Select position',
             displayOf: (v) => v,
-            onTap: () async {
-              final picked = await presentPickerSheet<String>(
-                context,
-                title: 'Select position',
-                options: _positions,
-                labelOf: (v) => v,
-                current: _position,
-              );
-              if (picked != null) setState(() => _position = picked);
-            },
+            onTap: () => _pick<String>(
+              title: 'Select position',
+              options: _positions,
+              labelOf: (v) => v,
+              current: _position,
+              onPicked: (v) => setState(() => _position = v),
+            ),
           ),
           const SizedBox(height: 16),
 
-          // BIRTH MONTH & YEAR
           const _Label('BIRTH MONTH & YEAR'),
           const SizedBox(height: 6),
           Row(
             children: [
-              // Month (~62%)
               Expanded(
                 flex: 62,
                 child: PickerField<int>(
                   value: _month,
                   placeholder: 'Month',
                   displayOf: (m) => _months[m - 1],
-                  onTap: () async {
-                    final picked = await presentPickerSheet<int>(
-                      context,
-                      title: 'Select month',
-                      options: List.generate(12, (i) => i + 1),
-                      labelOf: (m) => _months[m - 1],
-                      current: _month,
-                    );
-                    if (picked != null) setState(() => _month = picked);
-                  },
+                  onTap: () => _pick<int>(
+                    title: 'Select month',
+                    options: List.generate(12, (i) => i + 1),
+                    labelOf: (m) => _months[m - 1],
+                    current: _month,
+                    onPicked: (v) => setState(() => _month = v),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
-              // Year (~38%)
               Expanded(
                 flex: 38,
                 child: PickerField<int>(
                   value: _year,
                   placeholder: 'Year',
                   displayOf: (y) => '$y',
-                  onTap: () async {
-                    final picked = await presentPickerSheet<int>(
-                      context,
-                      title: 'Select year',
-                      options: _years,
-                      labelOf: (y) => '$y',
-                      current: _year,
-                    );
-                    if (picked != null) setState(() => _year = picked);
-                  },
+                  onTap: () => _pick<int>(
+                    title: 'Select year',
+                    options: _years,
+                    labelOf: (y) => '$y',
+                    current: _year,
+                    onPicked: (v) => setState(() => _year = v),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
 
-          // Helper text
           const Text(
             'Used to give your player age-appropriate ratings.',
             style: TextStyle(
@@ -266,7 +309,6 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
           ),
           const SizedBox(height: 24),
 
-          // Save button
           SizedBox(
             width: double.infinity,
             height: 60,
@@ -284,7 +326,8 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
               ),
               child: _saving
                   ? const SizedBox(
-                      width: 20, height: 20,
+                      width: 20,
+                      height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: Colors.white,
@@ -341,3 +384,4 @@ class _FieldCard extends StatelessWidget {
     );
   }
 }
+
