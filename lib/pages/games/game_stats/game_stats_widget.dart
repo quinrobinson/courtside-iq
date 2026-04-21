@@ -68,13 +68,23 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).globalBackground,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: FlutterFlowTheme.of(context).primaryText,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: Icon(
+              Icons.west,
+              size: 20.0,
+              color: FlutterFlowTheme.of(context).primaryText,
+            ),
+          ),
+        ),
         body: Padding(
           padding: EdgeInsetsDirectional.fromSTEB(
               0.0,
-              valueOrDefault<double>(
-                isAndroid ? 46.0 : 76.0,
-                76.0,
-              ),
+              0.0,
               0.0,
               valueOrDefault<double>(
                 isAndroid ? 66.0 : 30.0,
@@ -2718,26 +2728,6 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                               );
                                             },
                                           ),
-                                        ),
-                                        FlutterFlowIconButton(
-                                          borderColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
-                                          borderRadius: 30.0,
-                                          borderWidth: 1.0,
-                                          buttonSize: 60.0,
-                                          fillColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primaryBackground,
-                                          icon: Icon(
-                                            Icons.close,
-                                            color: FlutterFlowTheme.of(context)
-                                                .primaryText,
-                                            size: 26.0,
-                                          ),
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                          },
                                         ),
                                       ].divide(SizedBox(width: 12.0)),
                                     ),
