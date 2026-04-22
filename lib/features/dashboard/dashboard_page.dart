@@ -263,15 +263,21 @@ class _Body extends StatelessWidget {
                         padding: EdgeInsets.fromLTRB(20, top + 16, 20, 0),
                         child: const _UpgradeBanner(),
                       ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          20, isPremium ? top + 24 : 16, 20, 0),
-                      child: _Greeting(
-                        displayName: data.displayName,
-                        playerCount: data.playerCount,
-                        totalGames: data.totalGames,
+
+                    // ── Stats badge ────────────────────────────────────
+                    if (data.playerCount > 0)
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          20,
+                          isPremium ? top + 20 : 16,
+                          20,
+                          0,
+                        ),
+                        child: _StatsBadge(
+                          playerCount: data.playerCount,
+                          totalGames: data.totalGames,
+                        ),
                       ),
-                    ),
                     if (eligible.isNotEmpty) ...[
                       Padding(
                         padding:
@@ -297,35 +303,18 @@ class _Body extends StatelessWidget {
 
             // ── Recent Games ───────────────────────────────────────────
             if (data.recentGames.isNotEmpty) ...[
-              SliverToBoxAdapter(
+              const SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'RECENT GAMES',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF8A8A8A),
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {},
-                        child: const Text(
-                          'See all',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF0F0F0F),
-                          ),
-                        ),
-                      ),
-                    ],
+                  padding: EdgeInsets.fromLTRB(20, 24, 20, 12),
+                  child: Text(
+                    'RECENT GAMES',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF8A8A8A),
+                      letterSpacing: 0.8,
+                    ),
                   ),
                 ),
               ),
@@ -334,13 +323,33 @@ class _Body extends StatelessWidget {
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, i) => Padding(
-                      padding: EdgeInsets.only(
-                        bottom:
-                            i < data.recentGames.length - 1 ? 12 : 0,
-                      ),
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: GameFeedCard(row: data.recentGames[i]),
                     ),
                     childCount: data.recentGames.length,
+                  ),
+                ),
+              ),
+              // See all — full-width ghost button below the game feed
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+                  child: OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF0F0F0F),
+                      side: const BorderSide(color: Color(0xFFE3E1E0)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size(double.infinity, 44),
+                      textStyle: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: const Text('See all games'),
                   ),
                 ),
               ),
@@ -362,56 +371,45 @@ class _Body extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Greeting — white text, sits on gradient
+// Stats badge — "N players · N games tracked", transparent bg + 1px border
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _Greeting extends StatelessWidget {
-  const _Greeting({
-    required this.displayName,
+class _StatsBadge extends StatelessWidget {
+  const _StatsBadge({
     required this.playerCount,
     required this.totalGames,
   });
 
-  final String displayName;
   final int playerCount;
   final int totalGames;
 
   @override
   Widget build(BuildContext context) {
-    final greeting =
-        displayName.isNotEmpty ? 'Hey, $displayName 👋' : 'Hey there 👋';
-
     final playerLabel =
         playerCount == 1 ? '1 player' : '$playerCount players';
     final gameLabel =
         totalGames == 1 ? '1 game tracked' : '$totalGames games tracked';
-    final subtitle = '$playerLabel · $gameLabel';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          greeting,
+    return IntrinsicWidth(
+      child: Container(
+        height: 26,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE3E1E0)),
+        ),
+        child: Text(
+          '$playerLabel · $gameLabel',
           style: const TextStyle(
             fontFamily: 'Inter',
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
             color: Color(0xFF0F0F0F),
-            height: 1.2,
           ),
         ),
-        if (playerCount > 0) ...[
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 14,
-              color: Color(0xFF6A6A6A),
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 }
