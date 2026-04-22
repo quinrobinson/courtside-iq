@@ -145,6 +145,16 @@ class _MyAppState extends State<MyApp> {
       ],
       theme: ThemeData(
         brightness: Brightness.light,
+        // Pin dark status-bar icons for every AppBar in the app.
+        // FF-generated AppBars override the AnnotatedRegion approach, so this
+        // ThemeData default is the only reliable place to set it globally.
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark, // Android
+            statusBarBrightness: Brightness.light,    // iOS
+          ),
+        ),
         scrollbarTheme: ScrollbarThemeData(
           thumbVisibility: MaterialStateProperty.all(false),
         ),

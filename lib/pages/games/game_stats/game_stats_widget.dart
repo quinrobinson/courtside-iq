@@ -18,6 +18,8 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'game_stats_model.dart';
 export 'game_stats_model.dart';
+import '/flutter_flow/revenue_cat_util.dart' as revenue_cat;
+import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 
 class GameStatsWidget extends StatefulWidget {
   const GameStatsWidget({
@@ -2457,6 +2459,31 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                           child: FFButtonWidget(
                                                             onPressed:
                                                                 () async {
+                                                              // Gate: subscribers only
+                                                              if (revenue_cat.activeEntitlementIds.isEmpty) {
+                                                                await showModalBottomSheet(
+                                                                  isScrollControlled: true,
+                                                                  backgroundColor: Colors.transparent,
+                                                                  context: context,
+                                                                  builder: (context) {
+                                                                    return GestureDetector(
+                                                                      onTap: () {
+                                                                        FocusScope.of(context).unfocus();
+                                                                        FocusManager.instance.primaryFocus?.unfocus();
+                                                                      },
+                                                                      child: Padding(
+                                                                        padding: MediaQuery.viewInsetsOf(context),
+                                                                        child: Container(
+                                                                          height: MediaQuery.sizeOf(context).height * 1.0,
+                                                                          child: PaywallWidget(),
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                ).then((value) => safeSetState(() {}));
+                                                                return;
+                                                              }
+
                                                               await showDialog(
                                                                 barrierColor:
                                                                     FlutterFlowTheme.of(
