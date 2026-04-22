@@ -203,13 +203,13 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                           ),
                           if (FFAppState().isUserPremium)
                             FlutterFlowIconButton(
-                              borderColor: FlutterFlowTheme.of(context).teal,
+                              borderColor: Colors.transparent,
                               borderRadius: 12.0,
-                              borderWidth: 2.0,
+                              borderWidth: 0.0,
                               buttonSize: 40.0,
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.add_rounded,
-                                color: FlutterFlowTheme.of(context).teal,
+                                color: Colors.white,
                                 size: 24.0,
                               ),
                               onPressed: () async {

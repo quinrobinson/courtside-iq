@@ -253,9 +253,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                   Container(
                                                                     decoration:
                                                                         BoxDecoration(
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primaryText,
+                                                                      color: const Color(0xFFD0F4FC),
                                                                       borderRadius:
                                                                           BorderRadius.circular(
                                                                               8.0),
@@ -287,7 +285,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 fontWeight: FontWeight.w600,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
-                                                                              color: FlutterFlowTheme.of(context).primaryBackground,
+                                                                              color: const Color(0xFF0DC1EF),
                                                                               fontSize: 12.0,
                                                                               letterSpacing: 0.0,
                                                                               fontWeight: FontWeight.w600,

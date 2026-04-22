@@ -10,7 +10,8 @@ const _sub = Color(0xFF8A8A8A);
 const _magenta = Color(0xFFD9005C);
 const _purple = Color(0xFF7936FF);
 const _border = Color(0xFFE3E1E0);
-const _badgeBg = Color(0xFFF3F3F3);
+const _badgeBlueBg = Color(0xFFD0F4FC);
+const _badgeBlueText = Color(0xFF0DC1EF);
 
 class GameFeedCard extends StatelessWidget {
   const GameFeedCard({super.key, required this.row});
@@ -23,9 +24,6 @@ class GameFeedCard extends StatelessWidget {
     final lastName = row.lastName ?? '';
     final fullName =
         [firstName, lastName].where((s) => s.isNotEmpty).join(' ');
-    final initials =
-        '${firstName.isNotEmpty ? firstName[0] : ''}${lastName.isNotEmpty ? lastName[0] : ''}'
-            .toUpperCase();
 
     final pts = row.points ?? 0;
     final reb = (row.offReb ?? 0) + (row.defReb ?? 0);
@@ -59,7 +57,6 @@ class GameFeedCard extends StatelessWidget {
               children: [
                 DashboardAvatar(
                   profilePic: row.playerProfilePic,
-                  initials: initials,
                   size: 42,
                 ),
                 const SizedBox(width: 10),
@@ -110,16 +107,9 @@ class GameFeedCard extends StatelessWidget {
             ),
           ),
 
-          // ── Insight (gray footer) ─────────────────────────────────────────
+          // ── Insight ───────────────────────────────────────────────────────
           if (insight != null && insight.isNotEmpty)
-            Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFF3F3F3),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
+            Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -169,7 +159,7 @@ class _EventBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: _badgeBg,
+        color: _badgeBlueBg,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -178,7 +168,7 @@ class _EventBadge extends StatelessWidget {
           fontFamily: 'Inter',
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: _sub,
+          color: _badgeBlueText,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,

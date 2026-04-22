@@ -177,7 +177,7 @@ class LightModeTheme extends FlutterFlowTheme {
   late Color zeroStatBG = const Color(0x00F0F0F0);
   late Color violet4550 = const Color(0x729C1BFA);
   late Color violet1520 = const Color(0x0E9C1BFA);
-  late Color globalBackground = const Color(0xFFF0F0F0);
+  late Color globalBackground = const Color(0xFFF0EDE7);
   late Color techBlue = const Color(0xFF023BFF);
   late Color crispCyan = const Color(0xFF22D3EE);
   late Color imperial = const Color(0xFFFB3640);

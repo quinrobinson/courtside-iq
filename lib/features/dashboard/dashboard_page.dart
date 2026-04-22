@@ -18,6 +18,10 @@ import 'widgets/game_feed_card.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 const bool kUseDashboardV2 = true;
 
+// Dev-only: set to true to hide the upgrade banner during development.
+// Flip to false before App Store submission.
+const bool _kDevPremiumOverride = true;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Data models
 // ─────────────────────────────────────────────────────────────────────────────
@@ -39,9 +43,6 @@ class _PlayerSnapshot {
   final int totalGames;
   final PlayerInsight? insight;
 
-  String get initials =>
-      '${firstName.isNotEmpty ? firstName[0] : ''}${lastName != null && lastName!.isNotEmpty ? lastName![0] : ''}'
-          .toUpperCase();
 }
 
 class _DashboardData {
@@ -82,6 +83,13 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
+    // Dev override: force premium across all FF screens so the paywall
+    // doesn't block testing. Flip _kDevPremiumOverride to false before ship.
+    if (_kDevPremiumOverride) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FFAppState().isUserPremium = true;
+      });
+    }
     _dataFuture = _loadData();
   }
 
@@ -193,7 +201,7 @@ class _DashboardPageState extends State<DashboardPage> {
         statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F0F0),
+        backgroundColor: const Color(0xFFF0EDE7),
         body: FutureBuilder<_DashboardData>(
           future: _dataFuture,
           builder: (context, snap) {
@@ -237,7 +245,8 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     final eligible = data.eligibleSnapshots;
-    final isPremium = context.watch<FFAppState>().isUserPremium;
+    final isPremium =
+        _kDevPremiumOverride || context.watch<FFAppState>().isUserPremium;
 
     return Stack(
       children: [
@@ -258,28 +267,20 @@ class _Body extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ── Header bar: logo · badge · account avatar ─────
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, top + 14, 20, 0),
+                      child: _DashboardHeader(
+                        playerCount: data.playerCount,
+                        totalGames: data.totalGames,
+                      ),
+                    ),
+
                     // ── Upgrade banner (non-premium only) ─────────────
                     if (!isPremium)
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20, top + 16, 20, 0),
-                        child: const _UpgradeBanner(),
-                      ),
-
-                    // ── Stats badge (centered) ─────────────────────────
-                    if (data.playerCount > 0)
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          20,
-                          isPremium ? top + 20 : 16,
-                          20,
-                          0,
-                        ),
-                        child: Center(
-                          child: _StatsBadge(
-                            playerCount: data.playerCount,
-                            totalGames: data.totalGames,
-                          ),
-                        ),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+                        child: _UpgradeBanner(),
                       ),
                     if (eligible.isNotEmpty) ...[
                       Padding(
@@ -315,7 +316,7 @@ class _Body extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF8A8A8A),
+                      color: Color(0xFF0F0F0F),
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -401,7 +402,7 @@ class _StatsBadge extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFE3E1E0)),
+          border: Border.all(color: const Color(0xFF0F0F0F)),
         ),
         child: Text(
           '$playerLabel · $gameLabel',
@@ -444,7 +445,7 @@ class _SectionHeader extends StatelessWidget {
             fontFamily: 'Inter',
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF8A8A8A),
+            color: Color(0xFF0F0F0F),
             letterSpacing: 0.8,
           ),
         ),
@@ -459,9 +460,7 @@ class _SectionHeader extends StatelessWidget {
                   width: active ? 16 : 6,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: active
-                        ? const Color(0xFF7936FF)
-                        : const Color(0xFFD0CDD0),
+                    color: const Color(0xFF0F0F0F),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -499,8 +498,7 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
   void initState() {
     super.initState();
     _controller = PageController(
-      // Only peek at next card if there's more than one
-      viewportFraction: widget.snapshots.length > 1 ? 0.92 : 1.0,
+      viewportFraction: widget.snapshots.length > 1 ? 0.88 : 1.0,
       initialPage: widget.currentIndex,
     );
   }
@@ -517,6 +515,7 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
       height: 180,
       child: PageView.builder(
         controller: _controller,
+        padEnds: false,
         physics: widget.snapshots.length > 1
             ? const PageScrollPhysics()
             : const NeverScrollableScrollPhysics(),
@@ -527,15 +526,22 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
           return Padding(
             padding: EdgeInsets.only(
               left: 20,
-              right: widget.snapshots.length > 1 ? 0 : 20,
+              right: widget.snapshots.length > 1 ? 8 : 20,
             ),
-            child: SnapshotCard(
-              firstName: s.firstName,
-              lastName: s.lastName,
-              initials: s.initials,
-              totalGames: s.totalGames,
-              profilePic: s.profilePic,
-              insight: s.insight,
+            child: GestureDetector(
+              onTap: () => context.pushNamed(
+                'PlayersProfile',
+                queryParameters: {
+                  'playerID': serializeParam(s.playerId, ParamType.String),
+                }.withoutNulls,
+              ),
+              child: SnapshotCard(
+                firstName: s.firstName,
+                lastName: s.lastName,
+                totalGames: s.totalGames,
+                profilePic: s.profilePic,
+                insight: s.insight,
+              ),
             ),
           );
         },
@@ -639,6 +645,143 @@ class _UpgradeBanner extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard header — mark + "Home" label left, account avatar right
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _DashboardHeader extends StatelessWidget {
+  const _DashboardHeader({
+    required this.playerCount,
+    required this.totalGames,
+  });
+
+  final int playerCount;
+  final int totalGames;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Logo mark
+        Image.asset(
+          'assets/images/logo-mark.png',
+          width: 32,
+          height: 32,
+          fit: BoxFit.contain,
+        ),
+        // Stats badge — centered between mark and avatar
+        if (playerCount > 0)
+          Expanded(
+            child: Center(
+              child: _StatsBadge(
+                playerCount: playerCount,
+                totalGames: totalGames,
+              ),
+            ),
+          )
+        else
+          const Spacer(),
+        // Account avatar — taps to Menu
+        GestureDetector(
+          onTap: () => context.pushNamed(MenuWidget.routeName),
+          child: _AccountAvatar(
+            photoUrl: currentUserPhoto,
+            displayName: currentUserDisplayName,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Account avatar — bordered circle, photo / initials / icon ──────────────
+
+class _AccountAvatar extends StatelessWidget {
+  const _AccountAvatar({
+    required this.photoUrl,
+    required this.displayName,
+  });
+
+  final String photoUrl;
+  final String displayName;
+
+  @override
+  Widget build(BuildContext context) {
+    const double size = 32;
+    const border = BorderSide(color: Color(0xFF0F0F0F), width: 1);
+
+    Widget inner;
+
+    if (photoUrl.isNotEmpty) {
+      inner = ClipOval(
+        child: Image.network(
+          photoUrl,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) =>
+              _avatarContent(displayName, size),
+        ),
+      );
+    } else {
+      inner = _avatarContent(displayName, size);
+    }
+
+    // Wrap with a bordered circle that has no fill
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.fromBorderSide(border),
+      ),
+      alignment: Alignment.center,
+      child: ClipOval(child: inner),
+    );
+  }
+
+  static Widget _avatarContent(String displayName, double size) {
+    final initials = _getInitials(displayName);
+    if (initials.isNotEmpty) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: Center(
+          child: Text(
+            initials,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: size * 0.33,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF0F0F0F),
+            ),
+          ),
+        ),
+      );
+    }
+    // Fallback: person icon
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Icon(
+        Icons.person_rounded,
+        size: size * 0.6,
+        color: const Color(0xFF0F0F0F),
+      ),
+    );
+  }
+
+  static String _getInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '';
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    final first = parts.first.isNotEmpty ? parts.first[0] : '';
+    final last = parts.last.isNotEmpty ? parts.last[0] : '';
+    return '$first$last'.toUpperCase();
   }
 }
 

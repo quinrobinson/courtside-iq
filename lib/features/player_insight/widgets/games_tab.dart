@@ -113,7 +113,7 @@ class _GamesTabState extends State<GamesTab> {
     final created = DateTime.tryParse(g['created_at']?.toString() ?? '');
     final date = created != null ? _fmtDate(created) : '—';
     final opponent = (g['opponent_team'] as String?)?.trim();
-    final opp = (opponent == null || opponent.isEmpty) ? 'Opponent' : 'vs $opponent';
+    final eventName = (g['event_name'] as String?)?.trim();
     final pts = ((g['points'] as num?) ?? 0).toInt();
     final reb = (((g['off_reb'] as num?) ?? 0) + ((g['def_reb'] as num?) ?? 0)).toInt();
     final ast = ((g['assist'] as num?) ?? 0).toInt();
@@ -139,8 +139,10 @@ class _GamesTabState extends State<GamesTab> {
         children: [
           Row(
             children: [
+              // Date stacked above opponent
               Expanded(
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       date,
@@ -151,10 +153,9 @@ class _GamesTabState extends State<GamesTab> {
                         color: _ink,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        opp,
+                    if (opponent != null && opponent.isNotEmpty)
+                      Text(
+                        'vs $opponent',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontFamily: 'Inter',
@@ -162,10 +163,14 @@ class _GamesTabState extends State<GamesTab> {
                           color: _sub,
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
+              // Badges: event first, then insight
+              if (eventName != null && eventName.isNotEmpty) ...[
+                _EventTag(label: eventName),
+                const SizedBox(width: 6),
+              ],
               if (highlightMetric != null)
                 HighlightMetricTagWidget(highlightMetric: highlightMetric)
               else if (hasInsight)
@@ -226,5 +231,34 @@ class _GamesTabState extends State<GamesTab> {
       'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
     ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
+  }
+}
+
+// ── Event badge ───────────────────────────────────────────────────────────────
+
+class _EventTag extends StatelessWidget {
+  const _EventTag({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD0F4FC),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF0DC1EF),
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }
