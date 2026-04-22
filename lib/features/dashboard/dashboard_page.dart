@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import '/app_state.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '../player_insight/models/player_insight.dart';
 import 'widgets/snapshot_card.dart';
@@ -160,7 +164,7 @@ class _DashboardPageState extends State<DashboardPage> {
         .select()
         .eq('user_id', uid)
         .order('created_at', ascending: false)
-        .limit(5);
+        .limit(3);
 
     final recentGames = (gameRows as List)
         .map((r) => VPlayerGameStatsRow(Map<String, dynamic>.from(r)))
@@ -232,6 +236,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     final eligible = data.eligibleSnapshots;
+    final isPremium = context.watch<FFAppState>().isUserPremium;
 
     return Stack(
       children: [
@@ -252,8 +257,15 @@ class _Body extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ── Upgrade banner (non-premium only) ─────────────
+                    if (!isPremium)
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, top + 16, 20, 0),
+                        child: const _UpgradeBanner(),
+                      ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(20, top + 24, 20, 0),
+                      padding: EdgeInsets.fromLTRB(
+                          20, isPremium ? top + 24 : 16, 20, 0),
                       child: _Greeting(
                         displayName: data.displayName,
                         playerCount: data.playerCount,
@@ -309,7 +321,7 @@ class _Body extends StatelessWidget {
                             fontFamily: 'Inter',
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF7936FF),
+                            color: Color(0xFF0F0F0F),
                           ),
                         ),
                       ),
@@ -384,7 +396,7 @@ class _Greeting extends StatelessWidget {
             fontFamily: 'Inter',
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: Color(0xFF0F0F0F),
             height: 1.2,
           ),
         ),
@@ -392,10 +404,10 @@ class _Greeting extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.75),
+              color: Color(0xFF6A6A6A),
             ),
           ),
         ],
@@ -427,11 +439,11 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Colors.white.withValues(alpha: 0.8),
+            color: Color(0xFF8A8A8A),
             letterSpacing: 0.8,
           ),
         ),
@@ -447,8 +459,8 @@ class _SectionHeader extends StatelessWidget {
                   height: 6,
                   decoration: BoxDecoration(
                     color: active
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.4),
+                        ? const Color(0xFF7936FF)
+                        : const Color(0xFFD0CDD0),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -526,6 +538,104 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Upgrade banner (shown to non-premium users above the greeting)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _UpgradeBanner extends StatelessWidget {
+  const _UpgradeBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _openPaywall(context),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFF2BC18C),
+          image: DecorationImage(
+            fit: BoxFit.fitWidth,
+            alignment: AlignmentDirectional.bottomCenter,
+            image: Image.asset('assets/images/gradient-bg-black-b.png').image,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // "PRO" badge
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.35),
+                ),
+              ),
+              child: Text(
+                'PRO',
+                style: GoogleFonts.montserrat(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Copy
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Upgrade to a Pro plan',
+                    style: GoogleFonts.ibmPlexSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.2,
+                    ),
+                  ),
+                  Text(
+                    'Unlimited games and 3 player profiles.',
+                    style: GoogleFonts.ibmPlexSans(
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.8),
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static void _openPaywall(BuildContext context) {
+    showModalBottomSheet<void>(
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      enableDrag: false,
+      context: context,
+      builder: (ctx) => GestureDetector(
+        onTap: () => FocusScope.of(ctx).unfocus(),
+        child: Padding(
+          padding: MediaQuery.viewInsetsOf(ctx),
+          child: SizedBox(
+            height: MediaQuery.sizeOf(ctx).height,
+            child: const PaywallWidget(),
+          ),
+        ),
       ),
     );
   }

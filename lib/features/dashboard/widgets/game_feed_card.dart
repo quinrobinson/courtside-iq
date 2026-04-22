@@ -110,11 +110,17 @@ class GameFeedCard extends StatelessWidget {
             ),
           ),
 
-          // ── Insight ──────────────────────────────────────────────────────
-          if (insight != null && insight.isNotEmpty) ...[
-            const Divider(height: 20, thickness: 1, color: _border),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          // ── Insight (gray footer) ─────────────────────────────────────────
+          if (insight != null && insight.isNotEmpty)
+            Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFF3F3F3),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -138,9 +144,9 @@ class GameFeedCard extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ] else
-            const SizedBox(height: 14),
+            )
+          else
+            const SizedBox(height: 12),
         ],
       ),
     );

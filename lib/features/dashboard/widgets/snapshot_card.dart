@@ -6,7 +6,6 @@ import 'dashboard_avatar.dart';
 const _text = Color(0xFF0F0F0F);
 const _sub = Color(0xFF8A8A8A);
 const _purple = Color(0xFF7936FF);
-const _border = Color(0xFFE3E1E0);
 
 /// A single card in the Development Snapshots carousel.
 ///
@@ -44,6 +43,13 @@ class SnapshotCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,10 +93,6 @@ class SnapshotCard extends StatelessWidget {
           ),
 
           // ── Narrative body ───────────────────────────────────────────────
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Divider(height: 20, thickness: 1, color: _border),
-          ),
           if (body != null)
             Container(
               margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),

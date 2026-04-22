@@ -16,8 +16,8 @@ class DashboardAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const bg = Color(0xFFEDE9FF);
-    const fg = Color(0xFF7936FF);
+    const bg = Color(0xFFE8E8E8);
+    const fg = Color(0xFF6A6A6A);
 
     return ClipOval(
       child: SizedBox(
