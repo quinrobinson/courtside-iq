@@ -10,7 +10,7 @@ class TrendPill extends StatelessWidget {
     final (label, color) = switch (direction) {
       'improving' => ('↑ Improving', const Color(0xFF2BC18C)),
       'declining' => ('↓ Cooling', const Color(0xFFD9005C)),
-      _ => ('Stable', const Color(0xFF8A8A8A)),
+      _ => ('Active', const Color(0xFF8A8A8A)),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

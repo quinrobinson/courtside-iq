@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '../players/edit_player_sheet.dart';
 import 'widgets/averages_tab.dart';
 import 'widgets/development_tab.dart';
 import 'widgets/games_tab.dart';
 import 'widgets/profile_photo_sheet.dart';
 
-const _bg = Color(0xFFF0F0F0);
+const _bg = Color(0xFFF0EDE7);
 const _text = Color(0xFF0F0F0F);
 const _text2 = Color(0xFF8A8A8A);
 const _card = Colors.white;
 const _track = Color(0xFFF5F5F5);
-const _pillInk = Color(0xFF1A1A1A);
 
 class PlayerProfilePageV2 extends StatefulWidget {
   const PlayerProfilePageV2({super.key, required this.playerId});
@@ -100,6 +100,10 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                   children: [
                     const _TopGradient(),
                     _buildBody(_player!),
+                    const Align(
+                      alignment: Alignment.bottomCenter,
+                      child: CustomNavBarWidget(page: 'Players'),
+                    ),
                   ],
                 ),
     );
@@ -116,6 +120,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
       child: Padding(
         padding: EdgeInsets.only(top: kToolbarHeight + MediaQuery.of(context).padding.top - 14),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 110),
           child: Column(
             children: [
               if (position != null)
@@ -129,20 +134,25 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                 ),
               if (ageBand != null) ...[
                 const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _pillInk,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    ageBand,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: 0.2,
+                IntrinsicWidth(
+                  child: Container(
+                    height: 26,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: _text, width: 1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      ageBand,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: _text,
+                        letterSpacing: 0.2,
+                      ),
                     ),
                   ),
                 ),
@@ -246,9 +256,10 @@ class _TabControl extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final trackW = c.maxWidth;
-        final tabW = (trackW - 8) / 3;
+        const padding = 4.0;
+        final tabW = (trackW - padding * 2) / 3;
         return SizedBox(
-          height: 44,
+          height: 48,
           child: Stack(
             children: [
               Container(
@@ -260,10 +271,10 @@ class _TabControl extends StatelessWidget {
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOut,
-                left: 4 + index * tabW,
-                top: 4,
+                left: padding + index * tabW,
+                top: padding,
                 width: tabW,
-                height: 36,
+                height: 40,
                 child: Container(
                   decoration: BoxDecoration(
                     color: _card,
@@ -317,8 +328,8 @@ class _ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const size = 88.0;
-    const badgeSize = 30.0;
+    const size = 120.0;
+    const badgeSize = 40.0;
     final hasPhoto = pic != null && pic!.isNotEmpty;
 
     return GestureDetector(
@@ -351,7 +362,7 @@ class _ProfileAvatar extends StatelessWidget {
                     ? null
                     : const Icon(
                         Icons.person,
-                        size: 52,
+                        size: 68,
                         color: Color(0xFFC3BFBB),
                       ),
               ),
@@ -366,7 +377,6 @@ class _ProfileAvatar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFF0F0F0F),
-                  border: Border.all(color: Colors.white, width: 2.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.12),
@@ -378,7 +388,7 @@ class _ProfileAvatar extends StatelessWidget {
                 alignment: Alignment.center,
                 child: const Icon(
                   Icons.photo_camera,
-                  size: 16,
+                  size: 20,
                   color: Colors.white,
                 ),
               ),

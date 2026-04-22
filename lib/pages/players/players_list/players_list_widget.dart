@@ -697,7 +697,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                         width: 46.0,
                                                                                         height: 46.0,
                                                                                         decoration: BoxDecoration(
-                                                                                          color: FlutterFlowTheme.of(context).gray4,
+                                                                                          color: const Color(0xFFE8E8E8),
                                                                                           borderRadius: BorderRadius.circular(23.0),
                                                                                         ),
                                                                                         child: Row(
@@ -705,9 +705,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           mainAxisAlignment: MainAxisAlignment.center,
                                                                                           children: [
                                                                                             Icon(
-                                                                                              Icons.person,
-                                                                                              color: FlutterFlowTheme.of(context).gray2,
-                                                                                              size: 24.0,
+                                                                                              Icons.person_rounded,
+                                                                                              color: const Color(0xFF6A6A6A),
+                                                                                              size: 28.0,
                                                                                             ),
                                                                                           ],
                                                                                         ),

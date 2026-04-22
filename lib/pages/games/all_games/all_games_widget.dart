@@ -1430,7 +1430,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                   Container(
                                                                                     height: 24.0,
                                                                                     decoration: BoxDecoration(
-                                                                                      color: FlutterFlowTheme.of(context).gray4,
+                                                                                      color: const Color(0xFFD0F4FC),
                                                                                       borderRadius: BorderRadius.circular(6.0),
                                                                                     ),
                                                                                     alignment: AlignmentDirectional(0.0, 0.0),
@@ -1450,7 +1450,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                                     fontWeight: FontWeight.normal,
                                                                                                     fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                                   ),
-                                                                                                  color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                                  color: const Color(0xFF0DC1EF),
                                                                                                   fontSize: 13.0,
                                                                                                   letterSpacing: 0.0,
                                                                                                   fontWeight: FontWeight.normal,
