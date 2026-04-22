@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '/app_state.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '../player_insight/models/player_insight.dart';
@@ -264,7 +265,7 @@ class _Body extends StatelessWidget {
                         child: const _UpgradeBanner(),
                       ),
 
-                    // ── Stats badge ────────────────────────────────────
+                    // ── Stats badge (centered) ─────────────────────────
                     if (data.playerCount > 0)
                       Padding(
                         padding: EdgeInsets.fromLTRB(
@@ -273,9 +274,11 @@ class _Body extends StatelessWidget {
                           20,
                           0,
                         ),
-                        child: _StatsBadge(
-                          playerCount: data.playerCount,
-                          totalGames: data.totalGames,
+                        child: Center(
+                          child: _StatsBadge(
+                            playerCount: data.playerCount,
+                            totalGames: data.totalGames,
+                          ),
                         ),
                       ),
                     if (eligible.isNotEmpty) ...[
@@ -335,7 +338,7 @@ class _Body extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () => context.pushNamed(AllGamesWidget.routeName),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF0F0F0F),
                       side: const BorderSide(color: Color(0xFFE3E1E0)),
