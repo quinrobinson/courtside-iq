@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '../player_insight/models/player_insight.dart';
 import 'widgets/snapshot_card.dart';
 import 'widgets/game_feed_card.dart';
@@ -52,6 +53,10 @@ class _DashboardData {
   final int totalGames;
   final List<_PlayerSnapshot> snapshots;
   final List<VPlayerGameStatsRow> recentGames;
+
+  /// Only snapshots with a real (above-threshold) insight.
+  List<_PlayerSnapshot> get eligibleSnapshots =>
+      snapshots.where((s) => s.insight != null && !s.insight!.belowThreshold).toList();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,7 +95,9 @@ class _DashboardPageState extends State<DashboardPage> {
     // ── 1. Players + totals ────────────────────────────────────────────────
     final profileRows = await SupaFlow.client
         .from('player_profile_view')
-        .select('player_id, player_first_name, player_last_name, player_profile_pic, total_games')
+        .select(
+          'player_id, player_first_name, player_last_name, player_profile_pic, total_games',
+        )
         .eq('user_id', uid);
 
     final playerCount = (profileRows as List).length;
@@ -105,7 +112,7 @@ class _DashboardPageState extends State<DashboardPage> {
         .where((id) => id.isNotEmpty)
         .toList();
 
-    Map<String, PlayerInsight> insightMap = {};
+    final Map<String, PlayerInsight> insightMap = {};
     if (playerIds.isNotEmpty) {
       final insightRows = await SupaFlow.client
           .from('player_development_insights')
@@ -141,8 +148,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
     // Sort: players with insights first, then by most games
     snapshots.sort((a, b) {
-      final aHas = a.insight != null ? 0 : 1;
-      final bHas = b.insight != null ? 0 : 1;
+      final aHas = a.insight != null && !a.insight!.belowThreshold ? 0 : 1;
+      final bHas = b.insight != null && !b.insight!.belowThreshold ? 0 : 1;
       if (aHas != bHas) return aHas.compareTo(bHas);
       return b.totalGames.compareTo(a.totalGames);
     });
@@ -207,7 +214,7 @@ class _DashboardPageState extends State<DashboardPage> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Body
+// Body — Stack: scroll content + fixed nav bar
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _Body extends StatelessWidget {
@@ -224,98 +231,126 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
+    final eligible = data.eligibleSnapshots;
 
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, top + 20, 20, 0),
-            child: _Greeting(
-              displayName: data.displayName,
-              playerCount: data.playerCount,
-              totalGames: data.totalGames,
-            ),
-          ),
-        ),
-
-        // ── Development Snapshots ──────────────────────────────────────
-        if (data.snapshots.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
-              child: _SectionHeader(
-                label: 'DEVELOPMENT SNAPSHOTS',
-                count: data.snapshots.length,
-                currentIndex: snapshotIndex,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _SnapshotCarousel(
-              snapshots: data.snapshots,
-              currentIndex: snapshotIndex,
-              onIndexChanged: onSnapshotIndexChanged,
-            ),
-          ),
-        ],
-
-        // ── Recent Games ───────────────────────────────────────────────
-        if (data.recentGames.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'RECENT GAMES',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF8A8A8A),
-                      letterSpacing: 0.8,
-                    ),
+    return Stack(
+      children: [
+        // ── Scroll content ─────────────────────────────────────────────
+        CustomScrollView(
+          slivers: [
+            // ── Gradient hero: greeting + snapshots ───────────────────
+            SliverToBoxAdapter(
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image:
+                        AssetImage('assets/images/Profile_Gradient.png'),
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
                   ),
-                  GestureDetector(
-                    onTap: () {}, // TODO: navigate to all-games list
-                    child: const Text(
-                      'See all',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF7936FF),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, top + 24, 20, 0),
+                      child: _Greeting(
+                        displayName: data.displayName,
+                        playerCount: data.playerCount,
+                        totalGames: data.totalGames,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, i) => Padding(
-                  padding: EdgeInsets.only(
-                      bottom: i < data.recentGames.length - 1 ? 12 : 0),
-                  child: GameFeedCard(row: data.recentGames[i]),
+                    if (eligible.isNotEmpty) ...[
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                        child: _SectionHeader(
+                          label: 'DEVELOPMENT SNAPSHOTS',
+                          count: eligible.length,
+                          currentIndex: snapshotIndex,
+                        ),
+                      ),
+                      _SnapshotCarousel(
+                        snapshots: eligible,
+                        currentIndex: snapshotIndex,
+                        onIndexChanged: onSnapshotIndexChanged,
+                      ),
+                      const SizedBox(height: 28),
+                    ] else
+                      const SizedBox(height: 28),
+                  ],
                 ),
-                childCount: data.recentGames.length,
               ),
             ),
-          ),
-        ],
 
-        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+            // ── Recent Games ───────────────────────────────────────────
+            if (data.recentGames.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'RECENT GAMES',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF8A8A8A),
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {},
+                        child: const Text(
+                          'See all',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF7936FF),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) => Padding(
+                      padding: EdgeInsets.only(
+                        bottom:
+                            i < data.recentGames.length - 1 ? 12 : 0,
+                      ),
+                      child: GameFeedCard(row: data.recentGames[i]),
+                    ),
+                    childCount: data.recentGames.length,
+                  ),
+                ),
+              ),
+            ],
+
+            // Bottom padding for nav bar clearance
+            const SliverToBoxAdapter(child: SizedBox(height: 120)),
+          ],
+        ),
+
+        // ── Fixed nav bar ──────────────────────────────────────────────
+        const Align(
+          alignment: Alignment.bottomCenter,
+          child: CustomNavBarWidget(page: 'Home'),
+        ),
       ],
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Greeting
+// Greeting — white text, sits on gradient
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _Greeting extends StatelessWidget {
@@ -331,9 +366,8 @@ class _Greeting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final greeting = displayName.isNotEmpty
-        ? 'Hey, $displayName 👋'
-        : 'Hey there 👋';
+    final greeting =
+        displayName.isNotEmpty ? 'Hey, $displayName 👋' : 'Hey there 👋';
 
     final playerLabel =
         playerCount == 1 ? '1 player' : '$playerCount players';
@@ -350,7 +384,7 @@ class _Greeting extends StatelessWidget {
             fontFamily: 'Inter',
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF0F0F0F),
+            color: Colors.white,
             height: 1.2,
           ),
         ),
@@ -358,10 +392,10 @@ class _Greeting extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
-              color: Color(0xFF8A8A8A),
+              color: Colors.white.withValues(alpha: 0.75),
             ),
           ),
         ],
@@ -371,7 +405,7 @@ class _Greeting extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Section header with pagination dots
+// Section header — white on gradient
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
@@ -393,11 +427,11 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF8A8A8A),
+            color: Colors.white.withValues(alpha: 0.8),
             letterSpacing: 0.8,
           ),
         ),
@@ -413,8 +447,8 @@ class _SectionHeader extends StatelessWidget {
                   height: 6,
                   decoration: BoxDecoration(
                     color: active
-                        ? const Color(0xFF7936FF)
-                        : const Color(0xFFD0CDD0),
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -452,7 +486,8 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
   void initState() {
     super.initState();
     _controller = PageController(
-      viewportFraction: 0.92,
+      // Only peek at next card if there's more than one
+      viewportFraction: widget.snapshots.length > 1 ? 0.92 : 1.0,
       initialPage: widget.currentIndex,
     );
   }
@@ -469,12 +504,18 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
       height: 180,
       child: PageView.builder(
         controller: _controller,
+        physics: widget.snapshots.length > 1
+            ? const PageScrollPhysics()
+            : const NeverScrollableScrollPhysics(),
         itemCount: widget.snapshots.length,
         onPageChanged: widget.onIndexChanged,
         itemBuilder: (context, i) {
           final s = widget.snapshots[i];
           return Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: EdgeInsets.only(
+              left: 20,
+              right: widget.snapshots.length > 1 ? 0 : 20,
+            ),
             child: SnapshotCard(
               firstName: s.firstName,
               lastName: s.lastName,

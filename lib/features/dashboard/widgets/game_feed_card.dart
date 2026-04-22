@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/database/tables/v_player_game_stats.dart';
+import '/features/player_insight/widgets/spark_icon.dart';
 import 'dashboard_avatar.dart';
 
 const _text = Color(0xFF0F0F0F);
@@ -96,10 +97,7 @@ class GameFeedCard extends StatelessWidget {
           ),
 
           // ── Stats ────────────────────────────────────────────────────────
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Divider(height: 22, thickness: 1, color: _border),
-          ),
+          const Divider(height: 22, thickness: 1, color: _border),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: _StatGrid(
@@ -114,28 +112,22 @@ class GameFeedCard extends StatelessWidget {
 
           // ── Insight ──────────────────────────────────────────────────────
           if (insight != null && insight.isNotEmpty) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Divider(height: 20, thickness: 1, color: _border),
-            ),
+            const Divider(height: 20, thickness: 1, color: _border),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '✦',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 11,
-                      color: _purple,
-                      height: 1.7,
-                    ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: SparkIcon(size: 12, color: _purple),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       insight,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 13,
