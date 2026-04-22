@@ -122,12 +122,9 @@ class GameFeedCard extends StatelessWidget {
               ),
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 2),
-                    child: SparkIcon(size: 12, color: _purple),
-                  ),
+                  const SparkIcon(size: 12, color: _purple),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
