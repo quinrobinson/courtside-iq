@@ -143,45 +143,68 @@ class LightModeTheme extends FlutterFlowTheme {
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
 
-  late Color primary = const Color(0xFF9DFF00);
-  late Color secondary = const Color(0xFFFB3640);
-  late Color tertiary = const Color(0xFFE5A500);
-  late Color alternate = const Color(0xFFE0E000);
-  late Color primaryText = const Color(0xFF0F0F0F);
-  late Color secondaryText = const Color(0xFF292928);
-  late Color primaryBackground = const Color(0xFFFFFFFF);
-  late Color secondaryBackground = const Color(0xFFE2E0DF);
-  late Color accent1 = const Color(0xFF9DFF00);
-  late Color accent2 = const Color(0xFFFB3640);
-  late Color accent3 = const Color(0xFF287E87);
-  late Color accent4 = const Color(0xB2FFFFFF);
-  late Color success = const Color(0xFF44D600);
-  late Color warning = const Color(0xFFFFCC00);
-  late Color error = const Color(0xFFFB3442);
-  late Color info = const Color(0xFF1D1D1D);
+  // ===========================================================================
+  // Courtside IQ — tuned palette (Apr 2026)
+  // Token names preserved. Values shifted for family cohesion.
+  // Full rationale: docs/palette-swap-handoff.md
+  // ===========================================================================
 
-  late Color gray4 = const Color(0xFFF5F5F5);
-  late Color gray1 = const Color(0xFF2B2B2B);
-  late Color gray2 = const Color(0xFF8A8A8A);
-  late Color gray3 = const Color(0xFFCCCCCC);
-  late Color neon = const Color(0xFF9DFF00);
-  late Color primaryButtonText = const Color(0xFF0F0F0F);
-  late Color grayButton = const Color(0xFF94918E);
-  late Color pbg30 = const Color(0x4DFFFFFF);
-  late Color pbg0 = const Color(0x000F0F0F);
-  late Color bottomSheetBg = const Color(0x9A0F0F0F);
-  late Color disableText = const Color(0xFF585858);
-  late Color vividViolet = const Color(0xFF9C1BFA);
-  late Color blackAlway = const Color(0xFF0F0F0F);
-  late Color shadow = const Color(0x57FFFFFF);
-  late Color zeroStatBG = const Color(0x00F0F0F0);
-  late Color violet4550 = const Color(0x729C1BFA);
-  late Color violet1520 = const Color(0x0E9C1BFA);
-  late Color globalBackground = const Color(0xFFF0F0F0);
-  late Color techBlue = const Color(0xFF023BFF);
-  late Color crispCyan = const Color(0xFF22D3EE);
-  late Color imperial = const Color(0xFFFB3640);
-  late Color teal = const Color(0xFF2BC18C);
+  // Material / FF defaults — aligned from dead neon scheme to Jade
+  late Color primary = const Color(0xFF0FA889);           // was #9DFF00 (dead neon) → Jade-500
+  late Color secondary = const Color(0xFFE04867);         // was #FB3640 → Rose-500
+  late Color tertiary = const Color(0xFFF2A43A);          // was #E5A500 → Spark-500 (AI mark amber)
+  late Color alternate = const Color(0xFFE8E2D7);         // was #E0E000 (dead neon yellow) → warm neutral
+
+  // Text + surfaces
+  late Color primaryText = const Color(0xFF1B1D24);       // was #0F0F0F → Ink-900 (faint cool shift)
+  late Color secondaryText = const Color(0xFF3A3F4B);     // was #292928 → Ink-700
+  late Color primaryBackground = const Color(0xFFFFFFFF); // unchanged
+  late Color secondaryBackground = const Color(0xFFE2E0DF); // unchanged
+
+  // Accents — aligned to semantic four
+  late Color accent1 = const Color(0xFF0FA889);           // was #9DFF00 → Jade-500 (matches primary)
+  late Color accent2 = const Color(0xFFE04867);           // was #FB3640 → Rose-500
+  late Color accent3 = const Color(0xFF0A6B5A);           // was #287E87 → Jade-700 (Elite deep-jade)
+  late Color accent4 = const Color(0xB2FFFFFF);           // unchanged
+
+  // Semantic state
+  late Color success = const Color(0xFF3F8C5C);           // was #44D600 → Moss-500 (warmer green)
+  late Color warning = const Color(0xFFC77A2E);           // was #FFCC00 → burnt amber (distinct from Spark)
+  late Color error = const Color(0xFFDC2626);             // was #FB3442 → true red (now distinct from Rose)
+  late Color info = const Color(0xFF2558B8);              // was #1D1D1D (nonsensical) → Steel-500
+
+  // Grayscale — warmer Ink neutrals
+  late Color gray4 = const Color(0xFFF8F7F4);             // was #F5F5F5 → Ink-50
+  late Color gray1 = const Color(0xFF3A3F4B);             // was #2B2B2B → Ink-700
+  late Color gray2 = const Color(0xFF7A8290);             // was #8A8A8A → Ink-500
+  late Color gray3 = const Color(0xFFD0D4DB);             // was #CCCCCC → Ink-300
+
+  // Utility tokens (unchanged except noted)
+  late Color neon = const Color(0xFF0FA889);              // was #9DFF00 (dead) → Jade-500
+  late Color primaryButtonText = const Color(0xFF0F0F0F); // unchanged
+  late Color grayButton = const Color(0xFF94918E);        // unchanged
+  late Color pbg30 = const Color(0x4DFFFFFF);             // unchanged
+  late Color pbg0 = const Color(0x000F0F0F);              // unchanged
+  late Color bottomSheetBg = const Color(0x9A0F0F0F);     // unchanged
+  late Color disableText = const Color(0xFF585858);       // unchanged
+  late Color blackAlway = const Color(0xFF0F0F0F);        // unchanged
+  late Color shadow = const Color(0x57FFFFFF);            // unchanged
+  late Color zeroStatBG = const Color(0x00F0F0F0);        // unchanged
+
+  // AI mark — repointed from Violet to Spark amber
+  // Call sites using vividViolet/violet4550/violet1520 now render amber automatically.
+  late Color vividViolet = const Color(0xFFF2A43A);       // was #9C1BFA → Spark-500
+  late Color violet4550 = const Color(0x72F2A43A);        // was 0x729C1BFA → Spark-500 @ 45% alpha
+  late Color violet1520 = const Color(0x0EF2A43A);        // was 0x0E9C1BFA → Spark-500 @ 5% alpha
+
+  // Global background — warm canvas
+  late Color globalBackground = const Color(0xFFF5F3EF);  // was #F0F0F0 → warm-lean neutral
+
+  // Named brand tokens — the semantic four
+  late Color techBlue = const Color(0xFF2558B8);          // was #023BFF → Steel-500 (change/info)
+  late Color crispCyan = const Color(0xFF0FA889);         // was #22D3EE → Jade-500
+  late Color imperial = const Color(0xFFE04867);          // was #FB3640 → Rose-500 (growth edge, softened)
+  late Color teal = const Color(0xFF0FA889);              // was #2BC18C → Jade-500 (everyday primary)
 }
 
 abstract class Typography {
