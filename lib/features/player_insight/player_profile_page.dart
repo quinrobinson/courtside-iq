@@ -8,11 +8,12 @@ import 'widgets/development_tab.dart';
 import 'widgets/games_tab.dart';
 import 'widgets/profile_photo_sheet.dart';
 
-const _bg = Color(0xFFF0EDE7);
+const _bg = Color(0xFFF2F3F5);
 const _text = Color(0xFF0F0F0F);
 const _text2 = Color(0xFF8A8A8A);
 const _card = Colors.white;
-const _track = Color(0xFFF5F5F5);
+// Midpoint between _bg (#F2F3F5) and skeleton (#DADBDE).
+const _track = Color(0xFFE5E6E9);
 
 class PlayerProfilePageV2 extends StatefulWidget {
   const PlayerProfilePageV2({super.key, required this.playerId});
@@ -65,6 +66,8 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         foregroundColor: _text,
         centerTitle: true,
         leading: IconButton(
@@ -98,7 +101,6 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
               ? const Center(child: CircularProgressIndicator())
               : Stack(
                   children: [
-                    const _TopGradient(),
                     _buildBody(_player!),
                     const Align(
                       alignment: Alignment.bottomCenter,
@@ -224,6 +226,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
         return DevelopmentTab(
           playerId: widget.playerId,
           firstName: firstName,
+          gamesCount: _gamesCount,
         );
       case 1:
         return AveragesTab(playerId: widget.playerId);
@@ -350,7 +353,7 @@ class _ProfileAvatar extends StatelessWidget {
                 height: size,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: hasPhoto ? Colors.white : const Color(0xFFE6E6E6),
+                  color: Colors.white,
                   image: hasPhoto
                       ? DecorationImage(
                           image: NetworkImage(pic!),
@@ -400,41 +403,3 @@ class _ProfileAvatar extends StatelessWidget {
   }
 }
 
-class _TopGradient extends StatelessWidget {
-  const _TopGradient();
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: SizedBox(
-        height: 360,
-        width: double.infinity,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              'assets/images/profile_v2_gradient.png',
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-            ),
-            // Fade to page bg at the bottom so the gradient blends cleanly
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    _bg.withValues(alpha: 0),
-                    _bg.withValues(alpha: 0),
-                    _bg,
-                  ],
-                  stops: const [0.0, 0.75, 1.0],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

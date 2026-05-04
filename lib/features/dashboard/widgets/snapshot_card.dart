@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import '../../player_insight/models/player_insight.dart';
 import 'dashboard_avatar.dart';
 
-const _bg = Color(0xFF0F0F0F);
-const _text = Color(0xFFFFFFFF);
-const _sub = Color(0xFF9A9A9A);
-const _divider = Color(0xFF2A2A2A);
-const _border = Color(0xFF1A1A1A);
+const _bg = Colors.white;
+const _text = Color(0xFF0F0F0F);
+const _sub = Color(0xFF8A8A8A);
+const _divider = Color(0xFFE3E1E0);
 
 /// A single card in the Development Snapshots carousel.
 ///
@@ -40,12 +39,21 @@ class SnapshotCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: _bg,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF9C1BFA), Color(0xFFF2A43A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _border),
       ),
-      // Column stretches to fill the carousel height.
-      child: Column(
+      padding: const EdgeInsets.all(1.5),
+      child: Container(
+        decoration: BoxDecoration(
+          color: _bg,
+          borderRadius: BorderRadius.circular(14.5),
+        ),
+        // Column stretches to fill the carousel height.
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Header ──────────────────────────────────────────────────────
@@ -117,6 +125,7 @@ class SnapshotCard extends StatelessWidget {
               ),
             ),
         ],
+        ),
       ),
     );
   }

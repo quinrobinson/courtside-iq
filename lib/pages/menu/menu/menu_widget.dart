@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -77,13 +78,37 @@ class _MenuWidgetState extends State<MenuWidget> {
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 24, 12, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Account header: avatar + name + email
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 48, height: 48, radius: 24),
+                        SizedBox(width: 14),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 180, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    // Menu rows
+                    const SkeletonBox(width: double.infinity, height: 52),
+                    const SizedBox(height: 8),
+                    const SkeletonBox(width: double.infinity, height: 52),
+                    const SizedBox(height: 8),
+                    const SkeletonBox(width: double.infinity, height: 52),
+                    const SizedBox(height: 8),
+                    const SkeletonBox(width: double.infinity, height: 52),
+                  ],
                 ),
               ),
             ),
@@ -104,15 +129,6 @@ class _MenuWidgetState extends State<MenuWidget> {
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Align(
                   alignment: AlignmentDirectional(0.0, -1.0),
                   child: Padding(

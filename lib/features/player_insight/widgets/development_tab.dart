@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../data/player_insight_service.dart';
 import '../models/player_insight.dart';
 import 'about_story_sheet.dart';
 import 'development_story_card.dart';
 
+// Games required before a development insight unlocks.
+// Must stay in sync with the Edge Function threshold.
+const int _kMinGamesForInsight = 5;
+
 class DevelopmentTab extends StatefulWidget {
   const DevelopmentTab({
     super.key,
     required this.playerId,
     required this.firstName,
+    this.gamesCount,
   });
 
   final String playerId;
   final String firstName;
+  /// Current total games for this player, sourced from player_profile_view.
+  /// Used to suppress stale cached insights when the player has dropped below
+  /// the threshold — prevents the "flash eligible → below-threshold" race.
+  final int? gamesCount;
 
   @override
   State<DevelopmentTab> createState() => _DevelopmentTabState();
@@ -54,11 +64,20 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
       final cached = await cacheFuture;
       if (!mounted) return;
       if (cached != null && _insight == null) {
-        // Server hasn't arrived yet — show cached instantly.
-        setState(() {
-          _insight = cached;
-          _initialLoading = false;
-        });
+        // If the profile page already told us the player is below the game
+        // threshold, don't render the stale cached insight — it would flash
+        // the eligible card for a frame before the server returns
+        // belowThreshold:true. Keep _initialLoading true and let the server
+        // response settle the state cleanly.
+        final gc = widget.gamesCount;
+        final alreadyBelowThreshold =
+            gc != null && gc < _kMinGamesForInsight;
+        if (!alreadyBelowThreshold) {
+          setState(() {
+            _insight = cached;
+            _initialLoading = false;
+          });
+        }
       }
     } catch (_) {
       // Cache read failure is non-fatal; the server call still covers us.
@@ -171,19 +190,19 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
                 children: [
                   Text(
                     "Based on ${widget.firstName}'s last 5 games",
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 11,
-                      color: Color(0xFF8A8A8A),
+                    style: GoogleFonts.ibmPlexSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: const Color(0xFF3A3F4B),
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     'ⓘ',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 11,
-                      color: Color(0xFF8A8A8A),
+                    style: GoogleFonts.ibmPlexSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: const Color(0xFF3A3F4B),
                     ),
                   ),
                 ],

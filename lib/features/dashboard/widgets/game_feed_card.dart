@@ -8,15 +8,15 @@ const _text = Color(0xFF0F0F0F);
 const _muted = Color(0xFFC0C0C0);
 const _sub = Color(0xFF8A8A8A);
 const _magenta = Color(0xFFD9005C);
-const _purple = Color(0xFF7936FF);
 const _border = Color(0xFFE3E1E0);
-const _badgeBlueBg = Color(0xFFD0F4FC);
-const _badgeBlueText = Color(0xFF0DC1EF);
+const _badgeBlueBg = Color(0x80E2E3E6);
+const _badgeBlueText = Color(0xFF52535D);
 
 class GameFeedCard extends StatelessWidget {
-  const GameFeedCard({super.key, required this.row});
+  const GameFeedCard({super.key, required this.row, this.onTap});
 
   final VPlayerGameStatsRow row;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,9 @@ class GameFeedCard extends StatelessWidget {
     final event = row.eventName;
     final insight = row.gameInsights;
 
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -114,7 +116,7 @@ class GameFeedCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SparkIcon(size: 12, color: _purple),
+                  const SparkIcon(size: 12),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -136,6 +138,7 @@ class GameFeedCard extends StatelessWidget {
             const SizedBox(height: 12),
         ],
       ),
+    ),
     );
   }
 

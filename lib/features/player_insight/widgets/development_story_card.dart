@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import '../models/player_insight.dart';
 import 'trend_pill.dart';
 
-const _purple = Color(0xFF7936FF);
-const _magenta = Color(0xFFD9005C);
+const _purple = Color(0xFF7936FF); // kept for WATCH FOR NEXT accent
+const _amber = Color(0xFFF2A43A);  // below-threshold chip + progress dots
+const _magenta = Color(0xFFD9005C); // ROOM TO GROW accent
 const _green = Color(0xFF2BC18C);
 const _text = Color(0xFF0F0F0F);
 const _text2 = Color(0xFF8A8A8A);
-const _border = Color(0xFFE3E1E0);
+const _border = Color(0xFFE0E1E5);
 const _track = Color(0xFFF5F5F5);
 const _skeleton = Color(0xFFE8E8E8);
 
@@ -299,7 +300,7 @@ class _BelowBody extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: _purple.withValues(alpha: 0.12),
+            color: _amber.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
@@ -308,7 +309,7 @@ class _BelowBody extends StatelessWidget {
               fontFamily: 'Inter',
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: _purple,
+              color: _amber,
             ),
           ),
         ),
@@ -376,9 +377,9 @@ class _DotProgress extends StatelessWidget {
             height: 10,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isFilled ? _purple : Colors.transparent,
+              color: isFilled ? _amber : Colors.transparent,
               border: Border.all(
-                color: isFilled ? _purple : const Color(0xFFD0CDD0),
+                color: isFilled ? _amber : const Color(0xFFD0CDD0),
                 width: 1.5,
               ),
             ),

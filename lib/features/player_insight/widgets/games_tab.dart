@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/custom_code/widgets/highlight_metric_tag_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'spark_icon.dart';
 
 const _card = Colors.white;
-const _cardBorder = Color(0xFFE3E1E0);
-const _tile = Color(0xFFF3F3F3);
+const _cardBorder = Color(0xFFE0E1E5);
+const _tile = Color(0x80F2F3F5); // page bg at 50 % opacity
 const _ink = Color(0xFF0F0F0F);
 const _sub = Color(0xFF6A6A6A);
 const _hint = Color(0xFF8E8E8E);
-const _purple = Color(0xFF7936FF);
 
 class GamesTab extends StatefulWidget {
   const GamesTab({super.key, required this.playerId});
@@ -26,6 +26,7 @@ class GamesTab extends StatefulWidget {
 class _GamesTabState extends State<GamesTab> {
   List<Map<String, dynamic>>? _games;
   String? _error;
+  String? _activeEvent; // null = All
 
   @override
   void initState() {
@@ -62,8 +63,16 @@ class _GamesTabState extends State<GamesTab> {
     }
     if (_games == null) {
       return const Padding(
-        padding: EdgeInsets.all(40),
-        child: Center(child: CircularProgressIndicator()),
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 20),
+        child: Column(
+          children: [
+            SkeletonBox(width: double.infinity, height: 92),
+            SizedBox(height: 10),
+            SkeletonBox(width: double.infinity, height: 92),
+            SizedBox(height: 10),
+            SkeletonBox(width: double.infinity, height: 92),
+          ],
+        ),
       );
     }
     if (_games!.isEmpty) {
@@ -77,20 +86,67 @@ class _GamesTabState extends State<GamesTab> {
       );
     }
 
+    // Distinct event names present in this player's games.
+    final eventNames = _games!
+        .map((g) => (g['event_name'] as String?)?.trim())
+        .where((e) => e != null && e.isNotEmpty)
+        .toSet()
+        .cast<String>()
+        .toList()
+      ..sort();
+
+    // Games visible after applying the active event filter.
+    final visible = _activeEvent == null
+        ? _games!
+        : _games!
+            .where((g) =>
+                (g['event_name'] as String?)?.trim() == _activeEvent)
+            .toList();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...(_games!.map((g) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _gameCard(g, () => _openGame(g['game_id']?.toString())),
-              ))),
+          // ── Event filter chips (only when 2+ distinct events) ──────
+          if (eventNames.length >= 2) ...[
+            _EventFilterChips(
+              eventNames: eventNames,
+              activeEvent: _activeEvent,
+              onSelect: (e) => setState(() => _activeEvent = e),
+            ),
+            const SizedBox(height: 12),
+          ],
+          // ── Game cards ────────────────────────────────────────────
+          if (visible.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Center(
+                child: Text(
+                  'No games for this event.',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: _sub,
+                  ),
+                ),
+              ),
+            )
+          else
+            ...visible.map((g) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child:
+                      _gameCard(g, () => _openGame(g['game_id']?.toString())),
+                )),
           const SizedBox(height: 4),
           const Center(
             child: Text(
               '✦ marks games with an AI insight · tap a row for details',
-              style: TextStyle(fontFamily: 'Inter', fontSize: 10, color: _hint),
+              style: TextStyle(
+                fontFamily: 'IBM Plex Sans',
+                fontSize: 14,
+                color: Color(0xFF3A3F4B),
+              ),
             ),
           ),
         ],
@@ -121,7 +177,15 @@ class _GamesTabState extends State<GamesTab> {
     final highlightMetric = insights is Map
         ? insights['highlight_metric'] as String?
         : null;
-    final hasInsight = insights != null;
+    // Only consider an insight present if there is real text or a highlight metric.
+    // A non-null but empty/incomplete jsonb object (e.g. {}) must not trigger the spark.
+    final insightText = switch (insights) {
+      final String s when s.isNotEmpty => s,
+      final Map m when (m['text'] is String && (m['text'] as String).isNotEmpty) =>
+        m['text'] as String,
+      _ => null,
+    };
+    final hasInsight = insightText != null || highlightMetric != null;
 
     return Material(
       color: _card,
@@ -174,7 +238,7 @@ class _GamesTabState extends State<GamesTab> {
               if (highlightMetric != null)
                 HighlightMetricTagWidget(highlightMetric: highlightMetric)
               else if (hasInsight)
-                const SparkIcon(size: 14, color: _purple),
+                const SparkIcon(size: 14),
             ],
           ),
           const SizedBox(height: 10),
@@ -234,6 +298,66 @@ class _GamesTabState extends State<GamesTab> {
   }
 }
 
+// ── Event filter chip row ─────────────────────────────────────────────────────
+
+class _EventFilterChips extends StatelessWidget {
+  const _EventFilterChips({
+    required this.eventNames,
+    required this.activeEvent,
+    required this.onSelect,
+  });
+
+  final List<String> eventNames;
+  final String? activeEvent;
+  final void Function(String?) onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _chip('All', activeEvent == null, () => onSelect(null)),
+          ...eventNames.map(
+            (e) => Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: _chip(e, activeEvent == e, () => onSelect(e)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _chip(String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: active ? _ink : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: active ? _ink : _cardBorder,
+            width: 1,
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'IBM Plex Sans',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: active ? Colors.white : _sub,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ── Event badge ───────────────────────────────────────────────────────────────
 
 class _EventTag extends StatelessWidget {
@@ -245,7 +369,7 @@ class _EventTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFD0F4FC),
+        color: const Color(0x80E2E3E6),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -254,7 +378,7 @@ class _EventTag extends StatelessWidget {
           fontFamily: 'Inter',
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF0DC1EF),
+          color: Color(0xFF52535D),
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,

@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -148,13 +149,27 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header: title stub + button stub
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 100, height: 28),
+                        Spacer(),
+                        SkeletonBox(width: 80, height: 36, radius: 8),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    const SkeletonBox(width: double.infinity, height: 88),
+                    const SizedBox(height: 10),
+                    const SkeletonBox(width: double.infinity, height: 88),
+                    const SizedBox(height: 10),
+                    const SkeletonBox(width: double.infinity, height: 88),
+                  ],
                 ),
               ),
             ),
@@ -173,15 +188,6 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
                       0.0,
@@ -996,7 +1002,10 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
                                         _model.selectedDate =
-                                            getUniqueDatesItem;
+                                            _model.selectedDate ==
+                                                    getUniqueDatesItem
+                                                ? null
+                                                : getUniqueDatesItem;
                                         safeSetState(() {});
                                       },
                                       child: Container(
@@ -1430,7 +1439,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                   Container(
                                                                                     height: 24.0,
                                                                                     decoration: BoxDecoration(
-                                                                                      color: const Color(0xFFD0F4FC),
+                                                                                      color: const Color(0x80E2E3E6),
                                                                                       borderRadius: BorderRadius.circular(6.0),
                                                                                     ),
                                                                                     alignment: AlignmentDirectional(0.0, 0.0),
@@ -1450,7 +1459,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                                     fontWeight: FontWeight.normal,
                                                                                                     fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                                   ),
-                                                                                                  color: const Color(0xFF0DC1EF),
+                                                                                                  color: const Color(0xFF52535D),
                                                                                                   fontSize: 13.0,
                                                                                                   letterSpacing: 0.0,
                                                                                                   fontWeight: FontWeight.normal,

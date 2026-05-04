@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/skeleton_widget.dart';
 
 const _card = Colors.white;
-const _cardBorder = Color(0xFFE3E1E0);
-const _tile = Color(0xFFF3F3F3);
+const _cardBorder = Color(0xFFE0E1E5);
+const _tile = Color(0x80F2F3F5); // page bg at 50 % opacity
 const _ink = Color(0xFF0F0F0F);
 const _sub = Color(0xFF6A6A6A);
 const _hint = Color(0xFF8E8E8E);
@@ -75,8 +76,15 @@ class _AveragesTabState extends State<AveragesTab> {
     }
     if (_profile == null || _recent == null) {
       return const Padding(
-        padding: EdgeInsets.all(40),
-        child: Center(child: CircularProgressIndicator()),
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SkeletonBox(width: double.infinity, height: 172),
+            SizedBox(height: 10),
+            SkeletonBox(width: double.infinity, height: 140),
+          ],
+        ),
       );
     }
     final p = _profile!;

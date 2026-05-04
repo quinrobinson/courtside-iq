@@ -22,8 +22,8 @@ enum _SheetAction { camera, library, remove }
 ///
 /// Returns [ProfilePhotoResult] when the row changed, or null on cancel.
 class ProfilePhotoEditor {
-  static const _purpleBubble = Color(0xFFF5F2FF);
-  static const _purpleIcon = Color(0xFF7936FF);
+  static const _purpleBubble = Color(0xFFF3F1EE); // warm neutral bubble, no purple
+  static const _purpleIcon = Color(0xFF6A6A6A);   // grayscale icon
   static const _destructiveBubble = Color(0xFFFFEEF2);
   static const _destructive = Color(0xFFE52B6C);
   static const _text = Color(0xFF0F0F0F);
@@ -139,20 +139,20 @@ class _Sheet extends StatelessWidget {
             ),
           ),
           _Row(
-            icon: Icons.photo_camera_outlined,
+            icon: Icons.photo_camera,
             label: 'Take photo',
             topDivider: false,
             onTap: () => Navigator.of(context).pop(_SheetAction.camera),
           ),
           _Row(
-            icon: Icons.photo_library_outlined,
+            icon: Icons.photo_library,
             label: 'Choose from library',
             topDivider: true,
             onTap: () => Navigator.of(context).pop(_SheetAction.library),
           ),
           if (hasPhoto)
             _Row(
-              icon: Icons.delete_outline,
+              icon: Icons.delete,
               label: 'Remove photo',
               topDivider: true,
               destructive: true,

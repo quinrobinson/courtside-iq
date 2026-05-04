@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -82,13 +83,69 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header: title stub + button stub
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 100, height: 28),
+                        Spacer(),
+                        SkeletonBox(width: 80, height: 36, radius: 8),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    // Player row 1
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 44, height: 44, radius: 22),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 80, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    // Player row 2
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 44, height: 44, radius: 22),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 80, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    // Player row 3
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 44, height: 44, radius: 22),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 80, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -107,15 +164,6 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
                       0.0,

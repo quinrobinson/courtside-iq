@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -8,6 +9,7 @@ import '/pages/games/game_components/new_event/new_event_widget.dart';
 import '/pages/games/game_components/team_selection/team_selection_widget.dart';
 import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import '/features/players/add_player_sheet.dart';
+import '/features/players/picker_sheet.dart';
 import '/pages/players/player_components/new_team/new_team_widget.dart';
 import 'dart:ui';
 import '/flutter_flow/custom_functions.dart' as functions;
@@ -84,14 +86,47 @@ class _NewGameWidgetState extends State<NewGameWidget> {
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
-                ),
+            body: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(
+                24.0,
+                valueOrDefault<double>(isAndroid ? 24.0 : 66.0, 66.0) + 12.0,
+                24.0,
+                0.0,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  const SkeletonBox(width: 120, height: 28, radius: 8),
+                  const SizedBox(height: 20),
+                  // PLAYERS label
+                  const SkeletonBox(width: 64, height: 11, radius: 4),
+                  const SizedBox(height: 8),
+                  // Player cards row
+                  Row(children: [
+                    const SkeletonBox(width: 81, height: 100),
+                    const SizedBox(width: 6),
+                    const SkeletonBox(width: 81, height: 100),
+                    const SizedBox(width: 6),
+                    const SkeletonBox(width: 81, height: 100),
+                  ]),
+                  const SizedBox(height: 20),
+                  // OPPONENT label + field
+                  const SkeletonBox(width: 80, height: 11, radius: 4),
+                  const SizedBox(height: 8),
+                  const SkeletonBox(width: double.infinity, height: 56),
+                  const SizedBox(height: 20),
+                  // TEAMS label + field
+                  const SkeletonBox(width: 52, height: 11, radius: 4),
+                  const SizedBox(height: 8),
+                  const SkeletonBox(width: double.infinity, height: 56),
+                  const SizedBox(height: 20),
+                  // EVENTS label + field
+                  const SkeletonBox(width: 60, height: 11, radius: 4),
+                  const SizedBox(height: 8),
+                  const SkeletonBox(width: double.infinity, height: 56),
+                ],
               ),
             ),
           );
@@ -551,7 +586,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                               _model.selectedName != null &&
                                                       _model.selectedName != ''
                                                   ? 1.0
-                                                  : .3,
+                                                  : 0.5,
                                               1.0,
                                             ),
                                             child: Column(
@@ -563,28 +598,15 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                           -1.0, 1.0),
                                                   child: Container(
                                                     width: double.infinity,
-                                                    decoration: BoxDecoration(
-                                                      color: FlutterFlowTheme
-                                                              .of(context)
-                                                          .primaryBackground,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12.0),
-                                                      border: Border.all(
-                                                        color: FlutterFlowTheme
-                                                                .of(context)
-                                                            .secondaryBackground,
-                                                        width: 1.0,
-                                                      ),
-                                                    ),
+                                                    decoration: const BoxDecoration(),
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
+                                                          const EdgeInsetsDirectional
                                                               .fromSTEB(
-                                                                  12.0,
-                                                                  12.0,
-                                                                  12.0,
-                                                                  12.0),
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0),
                                                       child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
@@ -604,30 +626,13 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             12.0),
                                                                 child: Text(
                                                                   'TEAMS',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleMedium
-                                                                      .override(
-                                                                        font: GoogleFonts
-                                                                            .montserrat(
-                                                                          fontWeight:
-                                                                              FontWeight.w600,
-                                                                          fontStyle: FlutterFlowTheme.of(context)
-                                                                              .titleMedium
-                                                                              .fontStyle,
-                                                                        ),
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .primaryText,
-                                                                        fontSize:
-                                                                            14.0,
-                                                                        letterSpacing:
-                                                                            1.0,
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        fontStyle: FlutterFlowTheme.of(context)
-                                                                            .titleMedium
-                                                                            .fontStyle,
-                                                                      ),
+                                                                  style: const TextStyle(
+                                                                    fontFamily: 'IBM Plex Sans',
+                                                                    fontSize: 11,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    letterSpacing: 1.2,
+                                                                    color: Color(0xFF1A1A1A),
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ],
@@ -658,43 +663,31 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             null &&
                                                                         _model.selectedName !=
                                                                             '') {
-                                                                      await showModalBottomSheet(
-                                                                        isScrollControlled:
-                                                                            true,
-                                                                        backgroundColor:
-                                                                            Colors.transparent,
-                                                                        barrierColor:
-                                                                            FlutterFlowTheme.of(context).bottomSheetBg,
-                                                                        context:
-                                                                            context,
-                                                                        builder:
-                                                                            (context) {
-                                                                          return GestureDetector(
-                                                                            onTap:
-                                                                                () {
-                                                                              FocusScope.of(context).unfocus();
-                                                                              FocusManager.instance.primaryFocus?.unfocus();
-                                                                            },
-                                                                            child:
-                                                                                Padding(
-                                                                              padding: MediaQuery.viewInsetsOf(context),
-                                                                              child: Container(
-                                                                                height: 374.0,
-                                                                                child: TeamSelectionWidget(
-                                                                                  playerID: _model.selectedPlayerID!,
-                                                                                  selectedTeam: (teamSelection) async {
-                                                                                    _model.selectedTeam = teamSelection;
-                                                                                    safeSetState(() {});
-                                                                                  },
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      ).then((value) =>
-                                                                          safeSetState(
-                                                                              () {}));
-
+                                                                      final rows =
+                                                                          await PlayerTeamsTable()
+                                                                              .queryRows(
+                                                                        queryFn: (q) => q
+                                                                            .eqOrNull('player_id', _model.selectedPlayerID)
+                                                                            .eqOrNull('user_id', currentUserUid),
+                                                                      );
+                                                                      final teams = rows
+                                                                          .map((r) => r.teamName ?? '')
+                                                                          .where((t) => t.isNotEmpty)
+                                                                          .toList();
+                                                                      if (!mounted) return;
+                                                                      final picked =
+                                                                          await presentPickerSheet<
+                                                                              String>(
+                                                                        context,
+                                                                        title: 'Select team',
+                                                                        options: teams,
+                                                                        labelOf: (t) => t,
+                                                                        current: _model.selectedTeam,
+                                                                      );
+                                                                      if (picked != null) {
+                                                                        _model.selectedTeam = picked;
+                                                                        safeSetState(() {});
+                                                                      }
                                                                       return;
                                                                     } else {
                                                                       FFAppState()
@@ -714,81 +707,42 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                   },
                                                                   child:
                                                                       Container(
-                                                                    height:
-                                                                        50.0,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .gray4,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                    height: 56.0,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.white,
+                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                      border: Border.all(
+                                                                        color: const Color(0xFFE0E1E5),
+                                                                        width: 1.0,
+                                                                      ),
                                                                     ),
-                                                                    alignment:
-                                                                        AlignmentDirectional(
-                                                                            -1.0,
-                                                                            0.0),
                                                                     child: Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
                                                                       children: [
                                                                         Expanded(
-                                                                          child:
-                                                                              Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                12.0,
-                                                                                0.0,
-                                                                                12.0,
-                                                                                0.0),
-                                                                            child:
-                                                                                Text(
-                                                                              valueOrDefault<String>(
-                                                                                _model.selectedTeam != null && _model.selectedTeam != '' ? _model.selectedTeam : 'Select a team',
-                                                                                'Select a team',
+                                                                          child: Padding(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 12.0, 0.0),
+                                                                            child: Text(
+                                                                              _model.selectedTeam != null && _model.selectedTeam != ''
+                                                                                  ? _model.selectedTeam!
+                                                                                  : 'Select a team',
+                                                                              maxLines: 1,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: TextStyle(
+                                                                                fontFamily: 'IBM Plex Sans',
+                                                                                fontSize: 16.0,
+                                                                                color: _model.selectedTeam != null && _model.selectedTeam != ''
+                                                                                    ? const Color(0xFF1A1A1A)
+                                                                                    : const Color(0xFFAAAAAA),
                                                                               ),
-                                                                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
-                                                                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                                    ),
-                                                                                    color: valueOrDefault<Color>(
-                                                                                      () {
-                                                                                        if (_model.selectedPlayerID == null || _model.selectedPlayerID == '') {
-                                                                                          return FlutterFlowTheme.of(context).secondaryBackground;
-                                                                                        } else if ((_model.selectedPlayerID != null && _model.selectedPlayerID != '') && (_model.selectedTeam == null || _model.selectedTeam == '')) {
-                                                                                          return FlutterFlowTheme.of(context).secondaryText;
-                                                                                        } else {
-                                                                                          return FlutterFlowTheme.of(context).primaryText;
-                                                                                        }
-                                                                                      }(),
-                                                                                      FlutterFlowTheme.of(context).secondaryText,
-                                                                                    ),
-                                                                                    fontSize: 16.0,
-                                                                                    letterSpacing: 0.0,
-                                                                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                                  ),
                                                                             ),
                                                                           ),
                                                                         ),
-                                                                        Padding(
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              0.0,
-                                                                              0.0,
-                                                                              12.0,
-                                                                              0.0),
-                                                                          child:
-                                                                              Icon(
-                                                                            Icons.keyboard_arrow_down,
-                                                                            color:
-                                                                                valueOrDefault<Color>(
-                                                                              _model.selectedPlayerID != null && _model.selectedPlayerID != '' ? FlutterFlowTheme.of(context).secondaryText : FlutterFlowTheme.of(context).secondaryBackground,
-                                                                              FlutterFlowTheme.of(context).secondaryBackground,
-                                                                            ),
-                                                                            size:
-                                                                                24.0,
+                                                                        const Padding(
+                                                                          padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
+                                                                          child: Icon(
+                                                                            Icons.arrow_drop_down,
+                                                                            color: Color(0xFF888888),
+                                                                            size: 24.0,
                                                                           ),
                                                                         ),
                                                                       ],
@@ -808,7 +762,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                   borderRadius:
                                                                       12.0,
                                                                   buttonSize:
-                                                                      50.0,
+                                                                      56.0,
                                                                   fillColor: FlutterFlowTheme.of(
                                                                           context)
                                                                       .primaryBackground,
@@ -884,7 +838,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                               _model.selectedName != null &&
                                                       _model.selectedName != ''
                                                   ? 1.0
-                                                  : .3,
+                                                  : 0.5,
                                               1.0,
                                             ),
                                             child: Column(
@@ -896,23 +850,10 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                           -1.0, 1.0),
                                                   child: Container(
                                                     width: double.infinity,
-                                                    decoration: BoxDecoration(
-                                                      color: FlutterFlowTheme
-                                                              .of(context)
-                                                          .primaryBackground,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12.0),
-                                                      border: Border.all(
-                                                        color: FlutterFlowTheme
-                                                                .of(context)
-                                                            .secondaryBackground,
-                                                        width: 1.0,
-                                                      ),
-                                                    ),
+                                                    decoration: const BoxDecoration(),
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsets.all(12.0),
+                                                          EdgeInsets.zero,
                                                       child: Column(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
@@ -935,30 +876,13 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             12.0),
                                                                 child: Text(
                                                                   'EVENTS',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleMedium
-                                                                      .override(
-                                                                        font: GoogleFonts
-                                                                            .montserrat(
-                                                                          fontWeight:
-                                                                              FontWeight.w600,
-                                                                          fontStyle: FlutterFlowTheme.of(context)
-                                                                              .titleMedium
-                                                                              .fontStyle,
-                                                                        ),
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .gray1,
-                                                                        fontSize:
-                                                                            14.0,
-                                                                        letterSpacing:
-                                                                            1.0,
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        fontStyle: FlutterFlowTheme.of(context)
-                                                                            .titleMedium
-                                                                            .fontStyle,
-                                                                      ),
+                                                                  style: const TextStyle(
+                                                                    fontFamily: 'IBM Plex Sans',
+                                                                    fontSize: 11,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    letterSpacing: 1.2,
+                                                                    color: Color(0xFF1A1A1A),
+                                                                  ),
                                                                 ),
                                                               ),
                                                               Padding(
@@ -971,28 +895,13 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             12.0),
                                                                 child: Text(
                                                                   '(optional)',
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleMedium
-                                                                      .override(
-                                                                        font: GoogleFonts
-                                                                            .montserrat(
-                                                                          fontWeight:
-                                                                              FontWeight.normal,
-                                                                          fontStyle:
-                                                                              FontStyle.italic,
-                                                                        ),
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .secondaryText,
-                                                                        fontSize:
-                                                                            13.0,
-                                                                        letterSpacing:
-                                                                            0.0,
-                                                                        fontWeight:
-                                                                            FontWeight.normal,
-                                                                        fontStyle:
-                                                                            FontStyle.italic,
-                                                                      ),
+                                                                  style: const TextStyle(
+                                                                    fontFamily: 'IBM Plex Sans',
+                                                                    fontSize: 11,
+                                                                    fontWeight: FontWeight.normal,
+                                                                    letterSpacing: 0.4,
+                                                                    color: Color(0xFFAAAAAA),
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ],
@@ -1031,40 +940,31 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                               null &&
                                                                           _model.selectedName !=
                                                                               '') {
-                                                                        await showModalBottomSheet(
-                                                                          isScrollControlled:
-                                                                              true,
-                                                                          backgroundColor:
-                                                                              Colors.transparent,
-                                                                          barrierColor:
-                                                                              FlutterFlowTheme.of(context).bottomSheetBg,
-                                                                          context:
-                                                                              context,
-                                                                          builder:
-                                                                              (context) {
-                                                                            return GestureDetector(
-                                                                              onTap: () {
-                                                                                FocusScope.of(context).unfocus();
-                                                                                FocusManager.instance.primaryFocus?.unfocus();
-                                                                              },
-                                                                              child: Padding(
-                                                                                padding: MediaQuery.viewInsetsOf(context),
-                                                                                child: Container(
-                                                                                  height: 380.0,
-                                                                                  child: EventSelectionWidget(
-                                                                                    playerID: _model.selectedPlayerID!,
-                                                                                    selectedEvent: (eventSelection) async {
-                                                                                      _model.selectedEvent = eventSelection;
-                                                                                      safeSetState(() {});
-                                                                                    },
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                        ).then((value) =>
-                                                                            safeSetState(() {}));
-
+                                                                        final rows =
+                                                                            await GameEventsTable()
+                                                                                .queryRows(
+                                                                          queryFn: (q) => q
+                                                                              .eqOrNull('user_id', currentUserUid)
+                                                                              .eqOrNull('player_id', _model.selectedPlayerID),
+                                                                        );
+                                                                        final events = rows
+                                                                            .map((r) => r.eventName ?? '')
+                                                                            .where((e) => e.isNotEmpty)
+                                                                            .toList();
+                                                                        if (!mounted) return;
+                                                                        final picked =
+                                                                            await presentPickerSheet<
+                                                                                String>(
+                                                                          context,
+                                                                          title: 'Select event',
+                                                                          options: events,
+                                                                          labelOf: (e) => e,
+                                                                          current: _model.selectedEvent,
+                                                                        );
+                                                                        if (picked != null) {
+                                                                          _model.selectedEvent = picked;
+                                                                          safeSetState(() {});
+                                                                        }
                                                                         return;
                                                                       } else {
                                                                         FFAppState().msg =
@@ -1080,73 +980,45 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                     },
                                                                     child:
                                                                         Container(
-                                                                      width: double
-                                                                          .infinity,
-                                                                      height:
-                                                                          50.0,
+                                                                      height: 56.0,
                                                                       decoration:
                                                                           BoxDecoration(
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .gray4,
+                                                                        color: Colors.white,
                                                                         borderRadius:
-                                                                            BorderRadius.circular(12.0),
+                                                                            BorderRadius.circular(8.0),
+                                                                        border: Border.all(
+                                                                          color: const Color(0xFFE0E1E5),
+                                                                          width: 1.0,
+                                                                        ),
                                                                       ),
-                                                                      alignment:
-                                                                          AlignmentDirectional(
-                                                                              -1.0,
-                                                                              0.0),
                                                                       child:
                                                                           Row(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.max,
                                                                         children: [
                                                                           Expanded(
                                                                             child:
                                                                                 Padding(
-                                                                              padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
+                                                                              padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 12.0, 0.0),
                                                                               child: Text(
-                                                                                valueOrDefault<String>(
-                                                                                  _model.selectedEvent != null && _model.selectedEvent != '' ? _model.selectedEvent : 'Select an event',
-                                                                                  'Select an event',
+                                                                                _model.selectedEvent != null && _model.selectedEvent != ''
+                                                                                    ? _model.selectedEvent!
+                                                                                    : 'Select an event',
+                                                                                maxLines: 1,
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                                style: TextStyle(
+                                                                                  fontFamily: 'IBM Plex Sans',
+                                                                                  fontSize: 16.0,
+                                                                                  color: _model.selectedEvent != null && _model.selectedEvent != ''
+                                                                                      ? const Color(0xFF1A1A1A)
+                                                                                      : const Color(0xFFAAAAAA),
                                                                                 ),
-                                                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
-                                                                                        fontWeight: FontWeight.normal,
-                                                                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                                      ),
-                                                                                      color: valueOrDefault<Color>(
-                                                                                        () {
-                                                                                          if (_model.selectedPlayerID == null || _model.selectedPlayerID == '') {
-                                                                                            return FlutterFlowTheme.of(context).secondaryBackground;
-                                                                                          } else if ((_model.selectedPlayerID != null && _model.selectedPlayerID != '') && (_model.selectedEvent == null || _model.selectedEvent == '')) {
-                                                                                            return FlutterFlowTheme.of(context).secondaryText;
-                                                                                          } else {
-                                                                                            return FlutterFlowTheme.of(context).primaryText;
-                                                                                          }
-                                                                                        }(),
-                                                                                        FlutterFlowTheme.of(context).secondaryText,
-                                                                                      ),
-                                                                                      fontSize: 16.0,
-                                                                                      letterSpacing: 0.0,
-                                                                                      fontWeight: FontWeight.normal,
-                                                                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                                    ),
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                          Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                0.0,
-                                                                                0.0,
-                                                                                6.0,
-                                                                                0.0),
-                                                                            child:
-                                                                                Icon(
-                                                                              Icons.keyboard_arrow_down,
-                                                                              color: valueOrDefault<Color>(
-                                                                                _model.selectedPlayerID != null && _model.selectedPlayerID != '' ? FlutterFlowTheme.of(context).secondaryText : FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                FlutterFlowTheme.of(context).secondaryBackground,
-                                                                              ),
+                                                                          const Padding(
+                                                                            padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
+                                                                            child: Icon(
+                                                                              Icons.arrow_drop_down,
+                                                                              color: Color(0xFF888888),
                                                                               size: 24.0,
                                                                             ),
                                                                           ),
@@ -1168,7 +1040,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                   borderRadius:
                                                                       12.0,
                                                                   buttonSize:
-                                                                      50.0,
+                                                                      56.0,
                                                                   fillColor: FlutterFlowTheme.of(
                                                                           context)
                                                                       .primaryBackground,
@@ -1221,8 +1093,13 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                                 ),
                                                                               );
                                                                             },
-                                                                          ).then((value) =>
-                                                                              safeSetState(() {}));
+                                                                          ).then((value) {
+                                                                            // Auto-select the newly created event.
+                                                                            if (value is String && value.isNotEmpty) {
+                                                                              _model.selectedEvent = value;
+                                                                            }
+                                                                            safeSetState(() {});
+                                                                          });
                                                                         },
                                                                 ),
                                                               ),
@@ -1623,13 +1500,9 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                         BorderRadius.circular(
                                                             12.0),
                                                     disabledColor:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .secondaryBackground,
+                                                        const Color(0xFFDADBDE),
                                                     disabledTextColor:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .gray3,
+                                                        const Color(0xFF9A9BA8),
                                                   ),
                                                   showLoadingIndicator: false,
                                                 ),

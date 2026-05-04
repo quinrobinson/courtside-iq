@@ -209,15 +209,6 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                       ),
                     ),
                   ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
                       0.0,

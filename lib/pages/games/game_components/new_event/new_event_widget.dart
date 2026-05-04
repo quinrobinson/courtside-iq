@@ -588,15 +588,16 @@ class _NewEventWidgetState extends State<NewEventWidget> {
                                                 _model.eventType == ''))
                                         ? null
                                         : () async {
+                                            final newEventName = _model
+                                                .eventNameTextController.text;
                                             _model.addNewEvent =
                                                 await GameEventsTable().insert({
                                               'user_id': currentUserUid,
-                                              'event_name': _model
-                                                  .eventNameTextController.text,
+                                              'event_name': newEventName,
                                               'player_id': widget!.playerID,
                                               'event_type': _model.eventType,
                                             });
-                                            Navigator.pop(context);
+                                            Navigator.pop(context, newEventName);
                                             FFAppState().msg =
                                                 'Event added successfully!';
                                             FFAppState().showsnackbard = true;

@@ -61,8 +61,16 @@ class _DashboardData {
   final List<VPlayerGameStatsRow> recentGames;
 
   /// Only snapshots with a real (above-threshold) insight.
-  List<_PlayerSnapshot> get eligibleSnapshots =>
-      snapshots.where((s) => s.insight != null && !s.insight!.belowThreshold).toList();
+  /// The totalGames check guards against stale cached insights: if games were
+  /// deleted and the count dropped below 5 the cached row may still have
+  /// belowThreshold=false, so we enforce the threshold here too.
+  static const int _minGamesForInsight = 5;
+  List<_PlayerSnapshot> get eligibleSnapshots => snapshots
+      .where((s) =>
+          s.insight != null &&
+          !s.insight!.belowThreshold &&
+          s.totalGames >= _minGamesForInsight)
+      .toList();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -201,7 +209,7 @@ class _DashboardPageState extends State<DashboardPage> {
         statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0EDE7),
+        backgroundColor: const Color(0xFFF2F3F5),
         body: FutureBuilder<_DashboardData>(
           future: _dataFuture,
           builder: (context, snap) {
@@ -247,24 +255,16 @@ class _Body extends StatelessWidget {
     final eligible = data.eligibleSnapshots;
     final isPremium =
         _kDevPremiumOverride || context.watch<FFAppState>().isUserPremium;
+    final isLive = context.watch<FFAppState>().liveGameStatus;
 
     return Stack(
       children: [
         // ── Scroll content ─────────────────────────────────────────────
         CustomScrollView(
           slivers: [
-            // ── Gradient hero: greeting + snapshots ───────────────────
+            // ── Header + snapshots section ────────────────────────────
             SliverToBoxAdapter(
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image:
-                        AssetImage('assets/images/Profile_Gradient.png'),
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                  ),
-                ),
-                child: Column(
+              child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Header bar: logo · badge · account avatar ─────
@@ -275,6 +275,13 @@ class _Body extends StatelessWidget {
                         totalGames: data.totalGames,
                       ),
                     ),
+
+                    // ── Live game callout (paused game) ───────────────
+                    if (isLive)
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+                        child: _LiveGameCallout(),
+                      ),
 
                     // ── Upgrade banner (non-premium only) ─────────────
                     if (!isPremium)
@@ -301,7 +308,6 @@ class _Body extends StatelessWidget {
                     ] else
                       const SizedBox(height: 28),
                   ],
-                ),
               ),
             ),
 
@@ -328,7 +334,25 @@ class _Body extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, i) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: GameFeedCard(row: data.recentGames[i]),
+                      child: GameFeedCard(
+                      row: data.recentGames[i],
+                      onTap: () {
+                        final r = data.recentGames[i];
+                        context.pushNamed(
+                          GameStatsWidget.routeName,
+                          queryParameters: {
+                            'playerID': serializeParam(
+                              r.playerId,
+                              ParamType.String,
+                            ),
+                            'gameID': serializeParam(
+                              r.gameId,
+                              ParamType.String,
+                            ),
+                          }.withoutNulls,
+                        );
+                      },
+                    ),
                     ),
                     childCount: data.recentGames.length,
                   ),
@@ -525,8 +549,8 @@ class _SnapshotCarouselState extends State<_SnapshotCarousel> {
           final s = widget.snapshots[i];
           return Padding(
             padding: EdgeInsets.only(
-              left: 20,
-              right: widget.snapshots.length > 1 ? 8 : 20,
+              left: i == 0 ? 20 : 12,
+              right: widget.snapshots.length > 1 ? 0 : 20,
             ),
             child: GestureDetector(
               onTap: () => context.pushNamed(
@@ -826,8 +850,224 @@ class _Skeleton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE8E8E8),
+        color: const Color(0xFFDADBDE),
         borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Live game callout — shown between snapshots and recent games when a game
+// is paused. Uses FFAppState live* fields; matches production home behaviour.
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _LiveGameCallout extends StatefulWidget {
+  const _LiveGameCallout();
+
+  @override
+  State<_LiveGameCallout> createState() => _LiveGameCalloutState();
+}
+
+class _LiveGameCalloutState extends State<_LiveGameCallout>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _opacity = Tween<double>(begin: 1.0, end: 0.35).animate(
+      CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.watch<FFAppState>();
+    final pts = s.livePoints;
+    final reb = s.liveOffReb + s.liveDefReb;
+    final ast = s.liveAssist;
+    final blk = s.liveBlocks;
+    final stl = s.liveSteals;
+    final tov = s.liveTurnover;
+    final opp = s.liveOppTeam.isNotEmpty ? s.liveOppTeam : '—';
+    final name = s.liveName.isNotEmpty ? s.liveName : 'Player';
+
+    return GestureDetector(
+      onTap: () => context.goNamed(
+        GameStatTrackerWidget.routeName,
+        queryParameters: <String, String>{
+          if (s.liveName.isNotEmpty) 'playerName': s.liveName,
+          if (s.liveOppTeam.isNotEmpty) 'oppName': s.liveOppTeam,
+          if (s.livePlayerID.isNotEmpty) 'playerID': s.livePlayerID,
+        },
+        extra: <String, dynamic>{
+          '__transition_info__': const TransitionInfo(
+            hasTransition: true,
+            transitionType: PageTransitionType.fade,
+            duration: Duration(milliseconds: 400),
+          ),
+        },
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE3E1E0)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Top row: live dot + label + resume button ───────────
+            Row(
+              children: [
+                // Pulsing dot
+                FadeTransition(
+                  opacity: _opacity,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE53935),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Text(
+                  'LIVE',
+                  style: TextStyle(
+                    fontFamily: 'IBM Plex Sans',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0F0F0F),
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const Spacer(),
+                // Resume button — 6px radius
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE53935),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    'Resume',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // ── Player name · vs opponent ─────────────────────────────
+            Row(
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF0F0F0F),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'vs $opp',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF9A9A9A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // ── Live stats ────────────────────────────────────────────
+            Row(
+              children: [
+                _LiveStat(value: '$pts', label: 'PTS'),
+                const SizedBox(width: 6),
+                _LiveStat(value: '$reb', label: 'REB'),
+                const SizedBox(width: 6),
+                _LiveStat(value: '$ast', label: 'AST'),
+                const SizedBox(width: 6),
+                _LiveStat(value: '$blk', label: 'BLK'),
+                const SizedBox(width: 6),
+                _LiveStat(value: '$stl', label: 'STL'),
+                const SizedBox(width: 6),
+                _LiveStat(value: '$tov', label: 'TOV'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LiveStat extends StatelessWidget {
+  const _LiveStat({required this.value, required this.label});
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0x80F2F3F5), // 50 % opacity on white card
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE2E0DF), width: 1),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF0F0F0F),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF6A6A6A),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
