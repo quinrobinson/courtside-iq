@@ -143,45 +143,47 @@ class LightModeTheme extends FlutterFlowTheme {
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
 
-  late Color primary = const Color(0xFF9DFF00);
-  late Color secondary = const Color(0xFFFB3640);
-  late Color tertiary = const Color(0xFFE5A500);
-  late Color alternate = const Color(0xFFE0E000);
-  late Color primaryText = const Color(0xFF0F0F0F);
-  late Color secondaryText = const Color(0xFF292928);
-  late Color primaryBackground = const Color(0xFFFFFFFF);
-  late Color secondaryBackground = const Color(0xFFE2E0DF);
-  late Color accent1 = const Color(0xFF9DFF00);
-  late Color accent2 = const Color(0xFFFB3640);
-  late Color accent3 = const Color(0xFF287E87);
-  late Color accent4 = const Color(0xB2FFFFFF);
+  // v1.5 standard FF color mapping
+  late Color primary = const Color(0xFF1B1D24);           // ink
+  late Color secondary = const Color(0xFF0FA889);         // jade500
+  late Color tertiary = const Color(0xFF6B35C9);          // royal500
+  late Color alternate = const Color(0xFFF2A43A);         // spark500
+  late Color primaryText = const Color(0xFF1B1D24);       // ink
+  late Color secondaryText = const Color(0xFF4A4D56);     // ink2
+  late Color primaryBackground = const Color(0xFFEFEFF1); // canvas
+  late Color secondaryBackground = const Color(0xFFFFFFFF); // surface
+  late Color accent1 = const Color(0xFFE04867);           // rose500
+  late Color accent2 = const Color(0xFF2558B8);           // steel500
+  late Color accent3 = const Color(0xFFE5E5E8);           // canvasSunk
+  late Color accent4 = const Color(0xFFE2E2E5);           // hairline
   late Color success = const Color(0xFF44D600);
   late Color warning = const Color(0xFFFFCC00);
   late Color error = const Color(0xFFFB3442);
-  late Color info = const Color(0xFF1D1D1D);
+  late Color info = const Color(0xFF1B1D24);              // ink
 
-  late Color gray4 = const Color(0xFFF5F5F5);
-  late Color gray1 = const Color(0xFF2B2B2B);
-  late Color gray2 = const Color(0xFF8A8A8A);
-  late Color gray3 = const Color(0xFFCCCCCC);
-  late Color neon = const Color(0xFF9DFF00);
-  late Color primaryButtonText = const Color(0xFF0F0F0F);
-  late Color grayButton = const Color(0xFF94918E);
-  late Color pbg30 = const Color(0x4DFFFFFF);
-  late Color pbg0 = const Color(0x000F0F0F);
-  late Color bottomSheetBg = const Color(0x9A0F0F0F);
-  late Color disableText = const Color(0xFF585858);
-  late Color vividViolet = const Color(0xFF9C1BFA);
-  late Color blackAlway = const Color(0xFF0F0F0F);
-  late Color shadow = const Color(0x57FFFFFF);
-  late Color zeroStatBG = const Color(0x00F0F0F0);
-  late Color violet4550 = const Color(0x729C1BFA);
-  late Color violet1520 = const Color(0x0E9C1BFA);
-  late Color globalBackground = const Color(0xFFF2F3F5);
-  late Color techBlue = const Color(0xFF023BFF);
-  late Color crispCyan = const Color(0xFF22D3EE);
-  late Color imperial = const Color(0xFFFB3640);
-  late Color teal = const Color(0xFF2BC18C);
+  // v1.5 semantic extras — updated to nearest token
+  late Color gray4 = const Color(0xFFF7F7F9);             // surfaceAlt
+  late Color gray1 = const Color(0xFF1B1D24);             // ink
+  late Color gray2 = const Color(0xFF797B85);             // ink3
+  late Color gray3 = const Color(0xFFABADB5);             // ink4
+  late Color neon = const Color(0xFF9DFF00);              // no v1.5 mapping
+  late Color primaryButtonText = const Color(0xFFFFFFFF); // inkOnBrand (primary is now Ink)
+  late Color grayButton = const Color(0xFF797B85);        // ink3
+  late Color pbg30 = const Color(0x4DFFFFFF);             // no v1.5 mapping
+  late Color pbg0 = const Color(0x000F0F0F);              // no v1.5 mapping
+  late Color bottomSheetBg = const Color(0x9A0F0F0F);     // no v1.5 mapping
+  late Color disableText = const Color(0xFFABADB5);       // ink4
+  late Color vividViolet = const Color(0xFF6B35C9);       // royal500
+  late Color blackAlway = const Color(0xFF1B1D24);        // ink
+  late Color shadow = const Color(0x57FFFFFF);            // no v1.5 mapping
+  late Color zeroStatBG = const Color(0x00F0F0F0);        // transparent — unchanged
+  late Color violet4550 = const Color(0x726B35C9);        // royal500 @ 45% opacity
+  late Color violet1520 = const Color(0x0E6B35C9);        // royal500 @ 5% opacity
+  late Color globalBackground = const Color(0xFFEFEFF1);  // canvas (exact value)
+  late Color techBlue = const Color(0xFF023BFF);          // no v1.5 mapping
+  late Color crispCyan = const Color(0xFF22D3EE);         // no v1.5 mapping
+  late Color imperial = const Color(0xFFFB3640);          // no v1.5 mapping
+  late Color teal = const Color(0xFF0FA889);              // jade500
 }
 
 abstract class Typography {
@@ -237,109 +239,113 @@ class ThemeTypography extends Typography {
 
   final FlutterFlowTheme theme;
 
-  String get displayLargeFamily => 'Montserrat';
+  // v1.5: DM Sans throughout. Display styles → weight 400 (THE INVERSION).
+  // Headings → 700/700/600. Body/small → 400.
+
+  String get displayLargeFamily => 'DM Sans';
   bool get displayLargeIsCustom => false;
-  TextStyle get displayLarge => GoogleFonts.montserrat(
+  TextStyle get displayLarge => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.bold,
-        fontSize: 50.0,
+        fontWeight: FontWeight.w400,
+        fontSize: 56.0,
       );
-  String get displayMediumFamily => 'Montserrat';
+  String get displayMediumFamily => 'DM Sans';
   bool get displayMediumIsCustom => false;
-  TextStyle get displayMedium => GoogleFonts.montserrat(
+  TextStyle get displayMedium => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.bold,
-        fontSize: 42.0,
+        fontWeight: FontWeight.w400,
+        fontSize: 40.0,
       );
-  String get displaySmallFamily => 'Montserrat';
+  String get displaySmallFamily => 'DM Sans';
   bool get displaySmallIsCustom => false;
-  TextStyle get displaySmall => GoogleFonts.montserrat(
+  TextStyle get displaySmall => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.w600,
-        fontSize: 34.0,
+        fontWeight: FontWeight.w400,
+        fontSize: 28.0,
       );
-  String get headlineLargeFamily => 'Montserrat';
+  String get headlineLargeFamily => 'DM Sans';
   bool get headlineLargeIsCustom => false;
-  TextStyle get headlineLarge => GoogleFonts.montserrat(
+  TextStyle get headlineLarge => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.w600,
-        fontSize: 30.0,
+        fontWeight: FontWeight.w700,
+        fontSize: 22.0,
       );
-  String get headlineMediumFamily => 'Montserrat';
+  String get headlineMediumFamily => 'DM Sans';
   bool get headlineMediumIsCustom => false;
-  TextStyle get headlineMedium => GoogleFonts.montserrat(
+  TextStyle get headlineMedium => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.normal,
-        fontSize: 26.0,
+        fontWeight: FontWeight.w700,
+        fontSize: 17.0,
       );
-  String get headlineSmallFamily => 'Montserrat';
+  String get headlineSmallFamily => 'DM Sans';
   bool get headlineSmallIsCustom => false;
-  TextStyle get headlineSmall => GoogleFonts.montserrat(
+  TextStyle get headlineSmall => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.normal,
-        fontSize: 22.0,
+        fontWeight: FontWeight.w600,
+        fontSize: 14.0,
       );
-  String get titleLargeFamily => 'IBM Plex Sans';
+  String get titleLargeFamily => 'DM Sans';
   bool get titleLargeIsCustom => false;
-  TextStyle get titleLarge => GoogleFonts.ibmPlexSans(
+  TextStyle get titleLarge => GoogleFonts.dmSans(
         color: theme.primaryText,
         fontWeight: FontWeight.w600,
-        fontSize: 22.0,
+        fontSize: 14.0,
       );
-  String get titleMediumFamily => 'IBM Plex Sans';
+  String get titleMediumFamily => 'DM Sans';
   bool get titleMediumIsCustom => false;
-  TextStyle get titleMedium => GoogleFonts.ibmPlexSans(
-        color: theme.info,
-        fontWeight: FontWeight.w600,
-        fontSize: 18.0,
+  TextStyle get titleMedium => GoogleFonts.dmSans(
+        color: theme.primaryText,
+        fontWeight: FontWeight.w500,
+        fontSize: 14.0,
       );
-  String get titleSmallFamily => 'IBM Plex Sans';
+  String get titleSmallFamily => 'DM Sans';
   bool get titleSmallIsCustom => false;
-  TextStyle get titleSmall => GoogleFonts.ibmPlexSans(
-        color: theme.info,
-        fontWeight: FontWeight.w600,
-        fontSize: 16.0,
+  TextStyle get titleSmall => GoogleFonts.dmSans(
+        color: theme.primaryText,
+        fontWeight: FontWeight.w500,
+        fontSize: 14.0,
       );
-  String get labelLargeFamily => 'IBM Plex Sans';
+  String get labelLargeFamily => 'DM Sans';
   bool get labelLargeIsCustom => false;
-  TextStyle get labelLarge => GoogleFonts.ibmPlexSans(
+  TextStyle get labelLarge => GoogleFonts.dmSans(
         color: theme.secondaryText,
-        fontWeight: FontWeight.bold,
-        fontSize: 16.0,
+        fontWeight: FontWeight.w700,
+        fontSize: 14.0,
       );
-  String get labelMediumFamily => 'IBM Plex Sans';
+  String get labelMediumFamily => 'DM Sans';
   bool get labelMediumIsCustom => false;
-  TextStyle get labelMedium => GoogleFonts.ibmPlexSans(
+  TextStyle get labelMedium => GoogleFonts.dmSans(
         color: theme.secondaryText,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w700,
         fontSize: 14.0,
       );
-  String get labelSmallFamily => 'IBM Plex Sans';
+  String get labelSmallFamily => 'DM Sans';
   bool get labelSmallIsCustom => false;
-  TextStyle get labelSmall => GoogleFonts.ibmPlexSans(
+  TextStyle get labelSmall => GoogleFonts.dmSans(
         color: theme.secondaryText,
-        fontWeight: FontWeight.bold,
-        fontSize: 12.0,
+        fontWeight: FontWeight.w500,
+        fontSize: 11.0,
       );
-  String get bodyLargeFamily => 'IBM Plex Sans';
+  String get bodyLargeFamily => 'DM Sans';
   bool get bodyLargeIsCustom => false;
-  TextStyle get bodyLarge => GoogleFonts.ibmPlexSans(
+  TextStyle get bodyLarge => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontSize: 16.0,
+        fontWeight: FontWeight.w400,
+        fontSize: 14.0,
       );
-  String get bodyMediumFamily => 'IBM Plex Sans';
+  String get bodyMediumFamily => 'DM Sans';
   bool get bodyMediumIsCustom => false;
-  TextStyle get bodyMedium => GoogleFonts.ibmPlexSans(
+  TextStyle get bodyMedium => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.normal,
+        fontWeight: FontWeight.w400,
         fontSize: 14.0,
       );
-  String get bodySmallFamily => 'Montserrat';
+  String get bodySmallFamily => 'DM Sans';
   bool get bodySmallIsCustom => false;
-  TextStyle get bodySmall => GoogleFonts.montserrat(
+  TextStyle get bodySmall => GoogleFonts.dmSans(
         color: theme.primaryText,
-        fontWeight: FontWeight.normal,
-        fontSize: 14.0,
+        fontWeight: FontWeight.w400,
+        fontSize: 13.0,
       );
 }
 
@@ -373,23 +379,23 @@ class FFShadows {
   final FlutterFlowTheme theme;
   BoxShadow get sm => const BoxShadow(
       blurRadius: 3.0,
-      color: const Color(0x1A000000),
-      offset: const Offset(0.0, 1.0),
+      color: Color(0x1A000000),
+      offset: Offset(0.0, 1.0),
       spreadRadius: 0.0);
   BoxShadow get md => const BoxShadow(
       blurRadius: 6.0,
-      color: const Color(0x1A000000),
-      offset: const Offset(0.0, 3.0),
+      color: Color(0x1A000000),
+      offset: Offset(0.0, 3.0),
       spreadRadius: 0.0);
   BoxShadow get lg => const BoxShadow(
       blurRadius: 15.0,
-      color: const Color(0x1A000000),
-      offset: const Offset(0.0, 8.0),
+      color: Color(0x1A000000),
+      offset: Offset(0.0, 8.0),
       spreadRadius: 0.0);
   BoxShadow get xl => const BoxShadow(
       blurRadius: 25.0,
-      color: const Color(0x1A000000),
-      offset: const Offset(0.0, 16.0),
+      color: Color(0x1A000000),
+      offset: Offset(0.0, 16.0),
       spreadRadius: 0.0);
 }
 
