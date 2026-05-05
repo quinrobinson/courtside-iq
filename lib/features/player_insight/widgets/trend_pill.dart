@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class TrendPill extends StatelessWidget {
@@ -8,9 +9,9 @@ class TrendPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color) = switch (direction) {
-      'improving' => ('↑ Improving', const Color(0xFF2BC18C)),
-      'declining' => ('↓ Cooling', const Color(0xFFD9005C)),
-      _ => ('Active', const Color(0xFF8A8A8A)),
+      'improving' => ('↑ Improving', CIColors.jade500),
+      'declining' => ('↓ Cooling', CIColors.rose500),
+      _ => ('Active', CIColors.ink3),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

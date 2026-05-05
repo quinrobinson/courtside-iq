@@ -1,7 +1,7 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
-/// Cool-toned skeleton placeholder block.
-/// Colour: #DADBDE — same undertone as the app canvas (#F2F3F5), ~10% darker.
+/// Cool-toned skeleton placeholder block. Uses CIColors.canvasSunk.
 /// Use for loading states in place of spinners.
 class SkeletonBox extends StatelessWidget {
   const SkeletonBox({
@@ -21,7 +21,7 @@ class SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFDADBDE),
+        color: CIColors.canvasSunk,
         borderRadius: BorderRadius.circular(radius),
       ),
     );

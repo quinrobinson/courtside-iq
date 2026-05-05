@@ -1,8 +1,9 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Four-point rounded sparkle, matching assets/images/spark.svg.
 /// Reference path is 14x14; scaled to [size].
-/// Always rendered with the Spark gradient: #9C1BFA (purple) → #F2A43A (amber).
+/// Always rendered with the Spark gradient: royal500 → spark500.
 class SparkIcon extends StatelessWidget {
   const SparkIcon({super.key, this.size = 14});
 
@@ -22,7 +23,7 @@ class _SparkPainter extends CustomPainter {
   _SparkPainter();
 
   static const _gradient = LinearGradient(
-    colors: [Color(0xFF9C1BFA), Color(0xFFF2A43A)],
+    colors: [CIColors.royal500, CIColors.spark500],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

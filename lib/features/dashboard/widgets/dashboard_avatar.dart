@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Reusable avatar for the dashboard — shows a network photo if [profilePic]
@@ -14,8 +15,8 @@ class DashboardAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const bg = Color(0xFFE8E8E8);
-    const fg = Color(0xFF6A6A6A);
+    const bg = CIColors.canvasSunk;
+    const fg = CIColors.ink3;
 
     return ClipOval(
       child: SizedBox(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 // Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
+import '/courtside_iq/design_tokens.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import '/flutter_flow/custom_icons.dart';
 
@@ -37,7 +39,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDE9FE),
+        color: CIColors.royal50,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -47,7 +49,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
           const Icon(
             FFIcons.kaiSpark,
             size: 14,
-            color: Color(0xFF6D28D9),
+            color: CIColors.royal500,
           ),
           const SizedBox(width: 4),
           Text(
@@ -57,7 +59,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
-              color: const Color(0xFF5B21B6),
+              color: CIColors.royal600,
             ),
           ),
         ],
