@@ -1,15 +1,15 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
 import 'picker_sheet.dart';
 
-// Light mode design tokens
-const _sheetBg      = Color(0xFFFFFFFF);
-const _fieldBg      = Color(0xFFF0F0F0);
-const _labelColor   = Color(0xFF1A1A1A);
-const _hintColor    = Color(0xFFAAAAAA);
-const _saveDisabled = Color(0xFFE8E8E8);
-const _saveEnabled  = Color(0xFF1A1A1A);
-const _handleColor  = Color(0xFFC7C7C7);
+const _sheetBg      = CIColors.surface;
+const _fieldBg      = CIColors.surfaceAlt;
+const _labelColor   = CIColors.ink;
+const _hintColor    = CIColors.ink4;
+const _saveDisabled = CIColors.canvasSunk;
+const _saveEnabled  = CIColors.ink;
+const _handleColor  = CIColors.ink4;
 
 const _fontMontserrat  = 'Montserrat';
 const _fontIBMPlexSans = 'IBM Plex Sans';
@@ -275,7 +275,7 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: _canSave ? _saveEnabled : _saveDisabled,
                 disabledBackgroundColor: _saveDisabled,
-                foregroundColor: Colors.white,
+                foregroundColor: CIColors.inkOnBrand,
                 disabledForegroundColor: _hintColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -287,7 +287,7 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
                       width: 20, height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: CIColors.inkOnBrand,
                       ),
                     )
                   : const Text(
