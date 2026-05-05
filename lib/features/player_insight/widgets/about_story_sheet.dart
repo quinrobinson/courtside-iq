@@ -1,8 +1,9 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
-const _purple = Color(0xFF7936FF);
-const _text = Color(0xFF0F0F0F);
-const _border = Color(0xFFE6E6E6);
+const _purple = CIColors.royal500;
+const _text = CIColors.ink;
+const _border = CIColors.hairline;
 
 class AboutStorySheet extends StatelessWidget {
   const AboutStorySheet({super.key});
@@ -22,7 +23,7 @@ class AboutStorySheet extends StatelessWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: CIColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),

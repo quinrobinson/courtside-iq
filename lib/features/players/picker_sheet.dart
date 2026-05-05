@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Shared picker model used by AddPlayerSheet and EditPlayerSheet.
@@ -8,12 +9,12 @@ import 'package:flutter/material.dart';
 /// selected state. Keeps both flows visually consistent and avoids the
 /// stock Material dropdown menu that feels disconnected from our sheets.
 
-const _fieldBg = Color(0xFFF0F0F0);
-const _labelColor = Color(0xFF1A1A1A);
-const _hintColor = Color(0xFFAAAAAA);
-const _purple = Color(0xFF7936FF);
-const _border = Color(0xFFE6E6E6);
-const _handle = Color(0xFFC7C7C7);
+const _fieldBg = CIColors.surfaceAlt;
+const _labelColor = CIColors.ink;
+const _hintColor = CIColors.ink4;
+const _purple = CIColors.royal500;
+const _border = CIColors.hairline;
+const _handle = CIColors.ink4;
 const _fontIBMPlexSans = 'IBM Plex Sans';
 
 /// Shows the picker sheet and returns the chosen option, or null on dismiss.
@@ -124,7 +125,7 @@ class PickerSheet<T> extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(maxHeight: maxH + bottomInset + 80),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: CIColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(

@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -193,7 +194,7 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
                     style: GoogleFonts.ibmPlexSans(
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
-                      color: const Color(0xFF3A3F4B),
+                      color: CIColors.ink2,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -202,7 +203,7 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
                     style: GoogleFonts.ibmPlexSans(
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
-                      color: const Color(0xFF3A3F4B),
+                      color: CIColors.ink2,
                     ),
                   ),
                 ],

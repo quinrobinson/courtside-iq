@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
@@ -22,13 +23,13 @@ enum _SheetAction { camera, library, remove }
 ///
 /// Returns [ProfilePhotoResult] when the row changed, or null on cancel.
 class ProfilePhotoEditor {
-  static const _purpleBubble = Color(0xFFF3F1EE); // warm neutral bubble, no purple
-  static const _purpleIcon = Color(0xFF6A6A6A);   // grayscale icon
-  static const _destructiveBubble = Color(0xFFFFEEF2);
-  static const _destructive = Color(0xFFE52B6C);
-  static const _text = Color(0xFF0F0F0F);
-  static const _muted = Color(0xFF8A8A8A);
-  static const _border = Color(0xFFE6E6E6);
+  static const _purpleBubble = CIColors.surfaceAlt;
+  static const _purpleIcon = CIColors.ink3;
+  static const _destructiveBubble = CIColors.rose50;
+  static const _destructive = CIColors.rose500;
+  static const _text = CIColors.ink;
+  static const _muted = CIColors.ink3;
+  static const _border = CIColors.hairline;
 
   static Future<ProfilePhotoResult?> present(
     BuildContext context, {
@@ -106,7 +107,7 @@ class _Sheet extends StatelessWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: CIColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.only(bottom: 12 + bottomInset),

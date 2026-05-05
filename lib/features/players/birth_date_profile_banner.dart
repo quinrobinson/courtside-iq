@@ -1,8 +1,9 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'set_birth_date_sheet.dart';
 
-const _bannerBg   = Color(0xFFE0F7F4);
-const _bannerText = Color(0xFF108A7C);
+const _bannerBg   = CIColors.jade50;
+const _bannerText = CIColors.jade700;
 
 const _fontIBMPlexSans = 'IBM Plex Sans';
 

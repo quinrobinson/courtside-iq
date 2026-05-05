@@ -1,13 +1,14 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'birth_date_prompt_service.dart';
 import 'set_birth_date_sheet.dart';
 
-const _modalBg     = Color(0xFFFFFFFF);
-const _titleColor  = Color(0xFF1A1A1A);
-const _bodyColor   = Color(0xFF787878);
-const _btnBg       = Color(0xFF1A1A1A);
-const _btnText     = Color(0xFFFFFFFF);
-const _linkColor   = Color(0xFF787878);
+const _modalBg     = CIColors.surface;
+const _titleColor  = CIColors.ink;
+const _bodyColor   = CIColors.ink3;
+const _btnBg       = CIColors.ink;
+const _btnText     = CIColors.inkOnBrand;
+const _linkColor   = CIColors.ink3;
 
 const _fontMontserrat  = 'Montserrat';
 const _fontIBMPlexSans = 'IBM Plex Sans';
