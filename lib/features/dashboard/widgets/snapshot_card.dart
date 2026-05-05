@@ -1,12 +1,13 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../../player_insight/models/player_insight.dart';
 import 'dashboard_avatar.dart';
 
-const _bg = Colors.white;
-const _text = Color(0xFF0F0F0F);
-const _sub = Color(0xFF8A8A8A);
-const _divider = Color(0xFFE3E1E0);
+const _bg = CIColors.surface;
+const _text = CIColors.ink;
+const _sub = CIColors.ink3;
+const _divider = CIColors.hairline;
 
 /// A single card in the Development Snapshots carousel.
 ///
@@ -40,7 +41,7 @@ class SnapshotCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF9C1BFA), Color(0xFFF2A43A)],
+          colors: [CIColors.royal500, CIColors.spark500],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

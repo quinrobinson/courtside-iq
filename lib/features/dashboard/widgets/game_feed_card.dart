@@ -1,16 +1,16 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/database/tables/v_player_game_stats.dart';
 import '/features/player_insight/widgets/spark_icon.dart';
 import 'dashboard_avatar.dart';
 
-const _text = Color(0xFF0F0F0F);
-const _muted = Color(0xFFC0C0C0);
-const _sub = Color(0xFF8A8A8A);
-const _magenta = Color(0xFFD9005C);
-const _border = Color(0xFFE3E1E0);
-const _badgeBlueBg = Color(0x80E2E3E6);
-const _badgeBlueText = Color(0xFF52535D);
+const _text = CIColors.ink;
+const _muted = CIColors.ink4;
+const _sub = CIColors.ink3;
+const _magenta = CIColors.rose500;
+const _border = CIColors.hairline;
+const _badgeBlueText = CIColors.ink2;
 
 class GameFeedCard extends StatelessWidget {
   const GameFeedCard({super.key, required this.row, this.onTap});
@@ -44,7 +44,7 @@ class GameFeedCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: CIColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _border),
       ),
@@ -162,7 +162,7 @@ class _EventBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: _badgeBlueBg,
+        color: CIColors.canvas.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -236,7 +236,7 @@ class _Tile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: CIColors.surface,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(

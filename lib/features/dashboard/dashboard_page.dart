@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -209,7 +210,7 @@ class _DashboardPageState extends State<DashboardPage> {
         statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF2F3F5),
+        backgroundColor: CIColors.canvas,
         body: FutureBuilder<_DashboardData>(
           future: _dataFuture,
           builder: (context, snap) {
@@ -322,7 +323,7 @@ class _Body extends StatelessWidget {
                       fontFamily: 'Inter',
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F0F0F),
+                      color: CIColors.ink,
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -365,8 +366,8 @@ class _Body extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => context.pushNamed(AllGamesWidget.routeName),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF0F0F0F),
-                      side: const BorderSide(color: Color(0xFFE3E1E0)),
+                      foregroundColor: CIColors.ink,
+                      side: const BorderSide(color: CIColors.hairline),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -426,7 +427,7 @@ class _StatsBadge extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFF0F0F0F)),
+          border: Border.all(color: CIColors.ink),
         ),
         child: Text(
           '$playerLabel · $gameLabel',
@@ -434,7 +435,7 @@ class _StatsBadge extends StatelessWidget {
             fontFamily: 'Inter',
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF0F0F0F),
+            color: CIColors.ink,
           ),
         ),
       ),
@@ -469,7 +470,7 @@ class _SectionHeader extends StatelessWidget {
             fontFamily: 'Inter',
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF0F0F0F),
+            color: CIColors.ink,
             letterSpacing: 0.8,
           ),
         ),
@@ -484,7 +485,7 @@ class _SectionHeader extends StatelessWidget {
                   width: active ? 16 : 6,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F0F0F),
+                    color: CIColors.ink,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -588,7 +589,7 @@ class _UpgradeBanner extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF2BC18C),
+          color: CIColors.jade500,
           image: DecorationImage(
             fit: BoxFit.fitWidth,
             alignment: AlignmentDirectional.bottomCenter,
@@ -655,7 +656,7 @@ class _UpgradeBanner extends StatelessWidget {
   static void _openPaywall(BuildContext context) {
     showModalBottomSheet<void>(
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: CIColors.surface,
       enableDrag: false,
       context: context,
       builder: (ctx) => GestureDetector(
@@ -736,7 +737,7 @@ class _AccountAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double size = 32;
-    const border = BorderSide(color: Color(0xFF0F0F0F), width: 1);
+    const border = BorderSide(color: CIColors.ink, width: 1);
 
     Widget inner;
 
@@ -781,7 +782,7 @@ class _AccountAvatar extends StatelessWidget {
               fontFamily: 'Inter',
               fontSize: size * 0.33,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF0F0F0F),
+              color: CIColors.ink,
             ),
           ),
         ),
@@ -794,7 +795,7 @@ class _AccountAvatar extends StatelessWidget {
       child: Icon(
         Icons.person_rounded,
         size: size * 0.6,
-        color: const Color(0xFF0F0F0F),
+        color: CIColors.ink,
       ),
     );
   }
@@ -850,7 +851,7 @@ class _Skeleton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFDADBDE),
+        color: CIColors.canvasSunk,
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -922,9 +923,9 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: CIColors.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE3E1E0)),
+          border: Border.all(color: CIColors.hairline),
         ),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Column(
@@ -940,7 +941,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                     width: 8,
                     height: 8,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFE53935),
+                      color: CIColors.rose500,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -952,7 +953,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                     fontFamily: 'IBM Plex Sans',
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF0F0F0F),
+                    color: CIColors.ink,
                     letterSpacing: 1.0,
                   ),
                 ),
@@ -962,7 +963,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                   padding: const EdgeInsets.symmetric(
                       horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE53935),
+                    color: CIColors.rose500,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(
@@ -987,7 +988,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                     fontFamily: 'Inter',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F0F0F),
+                    color: CIColors.ink,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -999,7 +1000,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                       fontFamily: 'Inter',
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF9A9A9A),
+                      color: CIColors.ink3,
                     ),
                   ),
                 ),
@@ -1040,9 +1041,9 @@ class _LiveStat extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0x80F2F3F5), // 50 % opacity on white card
+          color: CIColors.canvas.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E0DF), width: 1),
+          border: Border.all(color: CIColors.hairline, width: 1),
         ),
         child: Column(
           children: [
@@ -1052,7 +1053,7 @@ class _LiveStat extends StatelessWidget {
                 fontFamily: 'Inter',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF0F0F0F),
+                color: CIColors.ink,
               ),
             ),
             const SizedBox(height: 2),
@@ -1062,7 +1063,7 @@ class _LiveStat extends StatelessWidget {
                 fontFamily: 'Inter',
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF6A6A6A),
+                color: CIColors.ink3,
                 letterSpacing: 0.5,
               ),
             ),
@@ -1089,7 +1090,7 @@ class _ErrorState extends StatelessWidget {
               fontFamily: 'Inter',
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0F0F0F),
+              color: CIColors.ink,
             ),
           ),
           const SizedBox(height: 12),
@@ -1100,7 +1101,7 @@ class _ErrorState extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
-                color: Color(0xFF7936FF),
+                color: CIColors.royal500,
               ),
             ),
           ),
