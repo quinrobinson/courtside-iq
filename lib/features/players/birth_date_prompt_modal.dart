@@ -10,8 +10,6 @@ const _btnBg       = CIColors.ink;
 const _btnText     = CIColors.inkOnBrand;
 const _linkColor   = CIColors.ink3;
 
-const _fontMontserrat  = 'Montserrat';
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 Future<void> showBirthDatePromptModal(
   BuildContext context, {
@@ -84,7 +82,7 @@ class BirthDatePromptModal extends StatelessWidget {
             Text(
               "Help us improve $playerFirstName's ratings",
               style: const TextStyle(
-                fontFamily: _fontMontserrat,
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: _titleColor,
@@ -95,7 +93,7 @@ class BirthDatePromptModal extends StatelessWidget {
             Text(
               "Add $playerFirstName's birth year so Courtside IQ can give age-appropriate ratings compared to players in the same age group.",
               style: const TextStyle(
-                fontFamily: _fontIBMPlexSans,
+                fontFamily: CIType.fontFamily,
                 fontSize: 14,
                 color: _bodyColor,
                 height: 1.43,
@@ -117,7 +115,7 @@ class BirthDatePromptModal extends StatelessWidget {
                 child: const Text(
                   'Set birth year',
                   style: TextStyle(
-                    fontFamily: _fontIBMPlexSans,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -134,7 +132,7 @@ class BirthDatePromptModal extends StatelessWidget {
                   'Remind me later',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: _fontIBMPlexSans,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: _linkColor,

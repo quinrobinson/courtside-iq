@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design_tokens.dart';
 
-import 'package:google_fonts/google_fonts.dart';
 import '/flutter_flow/custom_icons.dart';
 
 const Map<String, String> _kHighlightMetricLabels = {
@@ -55,7 +54,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontFamily: GoogleFonts.ibmPlexSans().fontFamily,
+              fontFamily: CIType.fontFamily,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,

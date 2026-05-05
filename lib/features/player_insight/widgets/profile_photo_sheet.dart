@@ -132,7 +132,7 @@ class _Sheet extends StatelessWidget {
             child: Text(
               'Profile photo',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: ProfilePhotoEditor._text,
@@ -223,7 +223,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: fg,

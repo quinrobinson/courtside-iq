@@ -11,8 +11,6 @@ const _saveDisabled = CIColors.canvasSunk;
 const _saveEnabled  = CIColors.ink;
 const _handleColor  = CIColors.ink4;
 
-const _fontMontserrat  = 'Montserrat';
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 const _months = [
   'January', 'February', 'March', 'April',
@@ -196,7 +194,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
               const Text(
                 'Edit Player',
                 style: TextStyle(
-                  fontFamily: _fontMontserrat,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 24,
                   fontWeight: FontWeight.w400,
                   color: _labelColor,
@@ -207,7 +205,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
                 child: const Text(
                   '×',
                   style: TextStyle(
-                    fontFamily: _fontMontserrat,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 24,
                     color: _labelColor,
                   ),
@@ -223,14 +221,14 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
             child: TextField(
               controller: _nameController,
               style: const TextStyle(
-                fontFamily: _fontIBMPlexSans,
+                fontFamily: CIType.fontFamily,
                 fontSize: 16,
                 color: _labelColor,
               ),
               decoration: const InputDecoration(
                 hintText: 'Enter player name...',
                 hintStyle: TextStyle(
-                  fontFamily: _fontIBMPlexSans,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 16,
                   color: _hintColor,
                 ),
@@ -302,7 +300,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
           const Text(
             'Used to give your player age-appropriate ratings.',
             style: TextStyle(
-              fontFamily: _fontIBMPlexSans,
+              fontFamily: CIType.fontFamily,
               fontSize: 13,
               color: _hintColor,
             ),
@@ -336,7 +334,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
                   : const Text(
                       'Save',
                       style: TextStyle(
-                        fontFamily: _fontIBMPlexSans,
+                        fontFamily: CIType.fontFamily,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -358,7 +356,7 @@ class _Label extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(
-        fontFamily: _fontIBMPlexSans,
+        fontFamily: CIType.fontFamily,
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 1.2,

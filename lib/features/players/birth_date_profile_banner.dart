@@ -5,7 +5,6 @@ import 'set_birth_date_sheet.dart';
 const _bannerBg   = CIColors.jade50;
 const _bannerText = CIColors.jade700;
 
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 class BirthDateProfileBanner extends StatelessWidget {
   const BirthDateProfileBanner({
@@ -41,7 +40,7 @@ class BirthDateProfileBanner extends StatelessWidget {
               child: Text(
                 'Set birth year for age-appropriate ratings',
                 style: TextStyle(
-                  fontFamily: _fontIBMPlexSans,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: _bannerText,

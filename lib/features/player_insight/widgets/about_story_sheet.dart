@@ -45,7 +45,7 @@ class AboutStorySheet extends StatelessWidget {
           const Text(
             'About this story',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: _text,
@@ -83,7 +83,7 @@ class _Section extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 11,
             fontWeight: FontWeight.w700,
             color: _purple,
@@ -94,7 +94,7 @@ class _Section extends StatelessWidget {
         Text(
           body,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 14,
             color: _text,
             height: 1.5,

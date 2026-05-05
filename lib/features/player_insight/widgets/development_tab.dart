@@ -191,7 +191,7 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
                 children: [
                   Text(
                     "Based on ${widget.firstName}'s last 5 games",
-                    style: GoogleFonts.ibmPlexSans(
+                    style: GoogleFonts.dmSans(
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                       color: CIColors.ink2,
@@ -200,7 +200,7 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
                   const SizedBox(width: 4),
                   Text(
                     'ⓘ',
-                    style: GoogleFonts.ibmPlexSans(
+                    style: GoogleFonts.dmSans(
                       fontSize: 14,
                       fontWeight: FontWeight.normal,
                       color: CIColors.ink2,

@@ -25,7 +25,7 @@ class TrendPill extends StatelessWidget {
           color: color,
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
+          fontFamily: CIType.fontFamily,
         ),
       ),
     );

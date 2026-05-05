@@ -10,8 +10,6 @@ const _saveDisabled = CIColors.canvasSunk;
 const _saveEnabled  = CIColors.ink;
 const _handleColor  = CIColors.ink4;
 
-const _fontMontserrat  = 'Montserrat';
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 const _months = [
   'January', 'February', 'March', 'April',
@@ -120,7 +118,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
               const Text(
                 'Set birth year',
                 style: TextStyle(
-                  fontFamily: _fontMontserrat,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 24,
                   fontWeight: FontWeight.w400,
                   color: _labelColor,
@@ -131,7 +129,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
                 child: const Text(
                   '×',
                   style: TextStyle(
-                    fontFamily: _fontMontserrat,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 24,
                     color: _labelColor,
                   ),
@@ -143,7 +141,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
           Text(
             "Add ${widget.playerFirstName}'s birth month and year so Courtside IQ can give age-appropriate ratings.",
             style: const TextStyle(
-              fontFamily: _fontIBMPlexSans,
+              fontFamily: CIType.fontFamily,
               fontSize: 14,
               color: _hintColor,
               height: 1.4,
@@ -154,7 +152,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
           const Text(
             'BIRTH MONTH & YEAR',
             style: TextStyle(
-              fontFamily: _fontIBMPlexSans,
+              fontFamily: CIType.fontFamily,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.2,
@@ -176,7 +174,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
                         child: Text(
                           'Month',
                           style: TextStyle(
-                            fontFamily: _fontIBMPlexSans,
+                            fontFamily: CIType.fontFamily,
                             fontSize: 16,
                             color: _hintColor,
                           ),
@@ -187,7 +185,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
                         child: Icon(Icons.keyboard_arrow_down, color: _hintColor),
                       ),
                       style: const TextStyle(
-                        fontFamily: _fontIBMPlexSans,
+                        fontFamily: CIType.fontFamily,
                         fontSize: 16,
                         color: _labelColor,
                       ),
@@ -216,7 +214,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
                         child: Text(
                           'Year',
                           style: TextStyle(
-                            fontFamily: _fontIBMPlexSans,
+                            fontFamily: CIType.fontFamily,
                             fontSize: 16,
                             color: _hintColor,
                           ),
@@ -227,7 +225,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
                         child: Icon(Icons.keyboard_arrow_down, color: _hintColor),
                       ),
                       style: const TextStyle(
-                        fontFamily: _fontIBMPlexSans,
+                        fontFamily: CIType.fontFamily,
                         fontSize: 16,
                         color: _labelColor,
                       ),
@@ -273,7 +271,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
                   : const Text(
                       'Save',
                       style: TextStyle(
-                        fontFamily: _fontIBMPlexSans,
+                        fontFamily: CIType.fontFamily,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),

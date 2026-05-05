@@ -15,7 +15,7 @@ const _hintColor = CIColors.ink4;
 const _purple = CIColors.royal500;
 const _border = CIColors.hairline;
 const _handle = CIColors.ink4;
-const _fontIBMPlexSans = 'IBM Plex Sans';
+
 
 /// Shows the picker sheet and returns the chosen option, or null on dismiss.
 /// Drops keyboard focus first so the sheet doesn't get shoved up by
@@ -84,7 +84,7 @@ class PickerField<T> extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: _fontIBMPlexSans,
+                      fontFamily: CIType.fontFamily,
                       fontSize: 16,
                       color: isPlaceholder ? _hintColor : _labelColor,
                     ),
@@ -149,7 +149,7 @@ class PickerSheet<T> extends StatelessWidget {
             child: Text(
               title,
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: _labelColor,
@@ -184,7 +184,7 @@ class PickerSheet<T> extends StatelessWidget {
                           child: Text(
                             labelOf(opt),
                             style: TextStyle(
-                              fontFamily: 'Inter',
+                              fontFamily: CIType.fontFamily,
                               fontSize: 15,
                               fontWeight:
                                   selected ? FontWeight.w600 : FontWeight.w500,
