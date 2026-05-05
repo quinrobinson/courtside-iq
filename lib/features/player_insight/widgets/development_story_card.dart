@@ -1,17 +1,18 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../models/player_insight.dart';
 import 'trend_pill.dart';
 
-const _purple = Color(0xFF7936FF); // kept for WATCH FOR NEXT accent
-const _amber = Color(0xFFF2A43A);  // below-threshold chip + progress dots
-const _magenta = Color(0xFFD9005C); // ROOM TO GROW accent
-const _green = Color(0xFF2BC18C);
-const _text = Color(0xFF0F0F0F);
-const _text2 = Color(0xFF8A8A8A);
-const _border = Color(0xFFE0E1E5);
-const _track = Color(0xFFF5F5F5);
-const _skeleton = Color(0xFFE8E8E8);
+const _purple = CIColors.royal500;
+const _amber = CIColors.spark500;
+const _magenta = CIColors.rose500;
+const _green = CIColors.jade500;
+const _text = CIColors.ink;
+const _text2 = CIColors.ink3;
+const _border = CIColors.hairline;
+const _track = CIColors.surfaceAlt;
+const _skeleton = CIColors.canvasSunk;
 
 class DevelopmentStoryCard extends StatelessWidget {
   const DevelopmentStoryCard.eligible({
@@ -60,7 +61,7 @@ class DevelopmentStoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: CIColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _border),
         boxShadow: [
@@ -379,7 +380,7 @@ class _DotProgress extends StatelessWidget {
               shape: BoxShape.circle,
               color: isFilled ? _amber : Colors.transparent,
               border: Border.all(
-                color: isFilled ? _amber : const Color(0xFFD0CDD0),
+                color: isFilled ? _amber : CIColors.hairline,
                 width: 1.5,
               ),
             ),
@@ -479,7 +480,7 @@ class _ErrorBody extends StatelessWidget {
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
               backgroundColor: _text,
-              foregroundColor: Colors.white,
+              foregroundColor: CIColors.inkOnBrand,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

@@ -1,18 +1,18 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/skeleton_widget.dart';
 
-const _card = Colors.white;
-const _cardBorder = Color(0xFFE0E1E5);
-const _tile = Color(0x80F2F3F5); // page bg at 50 % opacity
-const _ink = Color(0xFF0F0F0F);
-const _sub = Color(0xFF6A6A6A);
-const _hint = Color(0xFF8E8E8E);
-const _green = Color(0xFF2BC18C);
-const _greenBg = Color(0xFFE6F7EF);
-const _red = Color(0xFFD9005C);
-const _redBg = Color(0xFFFBE5EE);
+const _card = CIColors.surface;
+const _cardBorder = CIColors.hairline;
+const _ink = CIColors.ink;
+const _sub = CIColors.ink3;
+const _hint = CIColors.ink3;
+const _green = CIColors.jade500;
+const _greenBg = CIColors.jade50;
+const _red = CIColors.rose500;
+const _redBg = CIColors.rose50;
 
 class AveragesTab extends StatefulWidget {
   const AveragesTab({super.key, required this.playerId});
@@ -249,7 +249,7 @@ class _AveragesTabState extends State<AveragesTab> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
-        color: _tile,
+        color: CIColors.canvas.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -289,12 +289,12 @@ class _AveragesTabState extends State<AveragesTab> {
     } else if (delta < -0.5) {
       fg = _red; bg = _redBg; tag = '↓ ${delta.toStringAsFixed(1)}';
     } else {
-      fg = _sub; bg = Colors.white; border = const Color(0xFFD9D9D9); tag = '±0';
+      fg = _sub; bg = CIColors.surface; border = CIColors.hairline; tag = '±0';
     }
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: _tile,
+        color: CIColors.canvas.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(

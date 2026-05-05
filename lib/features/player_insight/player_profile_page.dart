@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
@@ -8,12 +9,11 @@ import 'widgets/development_tab.dart';
 import 'widgets/games_tab.dart';
 import 'widgets/profile_photo_sheet.dart';
 
-const _bg = Color(0xFFF2F3F5);
-const _text = Color(0xFF0F0F0F);
-const _text2 = Color(0xFF8A8A8A);
-const _card = Colors.white;
-// Midpoint between _bg (#F2F3F5) and skeleton (#DADBDE).
-const _track = Color(0xFFE5E6E9);
+const _bg = CIColors.canvas;
+const _text = CIColors.ink;
+const _text2 = CIColors.ink3;
+const _card = CIColors.surface;
+const _track = CIColors.canvasSunk;
 
 class PlayerProfilePageV2 extends StatefulWidget {
   const PlayerProfilePageV2({super.key, required this.playerId});
@@ -353,7 +353,7 @@ class _ProfileAvatar extends StatelessWidget {
                 height: size,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: CIColors.surface,
                   image: hasPhoto
                       ? DecorationImage(
                           image: NetworkImage(pic!),
@@ -366,7 +366,7 @@ class _ProfileAvatar extends StatelessWidget {
                     : const Icon(
                         Icons.person,
                         size: 68,
-                        color: Color(0xFFC3BFBB),
+                        color: CIColors.ink4,
                       ),
               ),
             ),
@@ -379,7 +379,7 @@ class _ProfileAvatar extends StatelessWidget {
                 height: badgeSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF0F0F0F),
+                  color: CIColors.ink,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.12),
@@ -392,7 +392,7 @@ class _ProfileAvatar extends StatelessWidget {
                 child: const Icon(
                   Icons.photo_camera,
                   size: 20,
-                  color: Colors.white,
+                  color: CIColors.inkOnBrand,
                 ),
               ),
             ),

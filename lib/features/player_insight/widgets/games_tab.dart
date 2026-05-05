@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
@@ -7,12 +8,11 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'spark_icon.dart';
 
-const _card = Colors.white;
-const _cardBorder = Color(0xFFE0E1E5);
-const _tile = Color(0x80F2F3F5); // page bg at 50 % opacity
-const _ink = Color(0xFF0F0F0F);
-const _sub = Color(0xFF6A6A6A);
-const _hint = Color(0xFF8E8E8E);
+const _card = CIColors.surface;
+const _cardBorder = CIColors.hairline;
+const _ink = CIColors.ink;
+const _sub = CIColors.ink3;
+const _hint = CIColors.ink3;
 
 class GamesTab extends StatefulWidget {
   const GamesTab({super.key, required this.playerId});
@@ -145,7 +145,7 @@ class _GamesTabState extends State<GamesTab> {
               style: TextStyle(
                 fontFamily: 'IBM Plex Sans',
                 fontSize: 14,
-                color: Color(0xFF3A3F4B),
+                color: CIColors.ink2,
               ),
             ),
           ),
@@ -260,7 +260,7 @@ class _GamesTabState extends State<GamesTab> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
-        color: _tile,
+        color: CIColors.canvas.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -350,7 +350,7 @@ class _EventFilterChips extends StatelessWidget {
             fontFamily: 'IBM Plex Sans',
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: active ? Colors.white : _sub,
+            color: active ? CIColors.inkOnBrand : _sub,
           ),
         ),
       ),
@@ -369,7 +369,7 @@ class _EventTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0x80E2E3E6),
+        color: CIColors.canvas.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -378,7 +378,7 @@ class _EventTag extends StatelessWidget {
           fontFamily: 'Inter',
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF52535D),
+          color: CIColors.ink2,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
