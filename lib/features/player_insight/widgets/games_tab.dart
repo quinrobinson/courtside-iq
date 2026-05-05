@@ -81,7 +81,7 @@ class _GamesTabState extends State<GamesTab> {
         child: Text(
           'No games logged yet.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: _sub, fontFamily: 'Inter'),
+          style: TextStyle(color: _sub, fontFamily: CIType.fontFamily),
         ),
       );
     }
@@ -125,7 +125,7 @@ class _GamesTabState extends State<GamesTab> {
                 child: Text(
                   'No games for this event.',
                   style: const TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 14,
                     color: _sub,
                   ),
@@ -143,7 +143,7 @@ class _GamesTabState extends State<GamesTab> {
             child: Text(
               '✦ marks games with an AI insight · tap a row for details',
               style: TextStyle(
-                fontFamily: 'IBM Plex Sans',
+                fontFamily: CIType.fontFamily,
                 fontSize: 14,
                 color: CIColors.ink2,
               ),
@@ -211,7 +211,7 @@ class _GamesTabState extends State<GamesTab> {
                     Text(
                       date,
                       style: const TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: CIType.fontFamily,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: _ink,
@@ -222,7 +222,7 @@ class _GamesTabState extends State<GamesTab> {
                         'vs $opponent',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: CIType.fontFamily,
                           fontSize: 12,
                           color: _sub,
                         ),
@@ -268,9 +268,10 @@ class _GamesTabState extends State<GamesTab> {
           Text(
             value,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
+              fontFeatures: const [FontFeature.tabularFigures()],
               color: _ink,
             ),
           ),
@@ -278,7 +279,7 @@ class _GamesTabState extends State<GamesTab> {
           Text(
             label,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: _hint,
@@ -347,7 +348,7 @@ class _EventFilterChips extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontFamily: 'IBM Plex Sans',
+            fontFamily: CIType.fontFamily,
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: active ? CIColors.inkOnBrand : _sub,
@@ -375,7 +376,7 @@ class _EventTag extends StatelessWidget {
       child: Text(
         label,
         style: const TextStyle(
-          fontFamily: 'Inter',
+          fontFamily: CIType.fontFamily,
           fontSize: 11,
           fontWeight: FontWeight.w500,
           color: CIColors.ink2,

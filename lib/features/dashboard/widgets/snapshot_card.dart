@@ -73,7 +73,7 @@ class SnapshotCard extends StatelessWidget {
                     Text(
                       fullName,
                       style: const TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: CIType.fontFamily,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: _text,
@@ -82,7 +82,7 @@ class SnapshotCard extends StatelessWidget {
                     Text(
                       'Last $gameLabel',
                       style: const TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: CIType.fontFamily,
                         fontSize: 12,
                         color: _sub,
                       ),
@@ -103,7 +103,7 @@ class SnapshotCard extends StatelessWidget {
               child: Text(
                 body,
                 style: const TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 13,
                   color: _text,
                   height: 1.55,
@@ -118,7 +118,7 @@ class SnapshotCard extends StatelessWidget {
               child: Text(
                 "Log more games to see $firstName's development story.",
                 style: const TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 13,
                   color: _sub,
                   height: 1.55,

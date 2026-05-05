@@ -95,7 +95,7 @@ class _AveragesTabState extends State<AveragesTab> {
         child: Text(
           'No games logged yet.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: _sub, fontFamily: 'Inter'),
+          style: TextStyle(color: _sub, fontFamily: CIType.fontFamily),
         ),
       );
     }
@@ -163,7 +163,7 @@ class _AveragesTabState extends State<AveragesTab> {
           const Text(
             'Per-game averages',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: _ink,
@@ -173,7 +173,7 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             'Based on $games ${games == 1 ? 'game' : 'games'}',
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 11,
               color: _sub,
             ),
@@ -218,7 +218,7 @@ class _AveragesTabState extends State<AveragesTab> {
           const Text(
             'Shooting',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: _ink,
@@ -229,7 +229,7 @@ class _AveragesTabState extends State<AveragesTab> {
               padding: EdgeInsets.only(top: 2),
               child: Text(
                 'Last 5 vs lifetime',
-                style: TextStyle(fontFamily: 'Inter', fontSize: 11, color: _sub),
+                style: TextStyle(fontFamily: CIType.fontFamily, fontSize: 11, color: _sub),
               ),
             ),
           const SizedBox(height: 10),
@@ -257,9 +257,10 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             value,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
+              fontFeatures: const [FontFeature.tabularFigures()],
               color: _ink,
             ),
           ),
@@ -267,7 +268,7 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             label,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: _hint,
@@ -302,7 +303,7 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             label,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: _hint,
@@ -313,16 +314,17 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             '${pct.toStringAsFixed(1)}%',
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
+              fontFeatures: const [FontFeature.tabularFigures()],
               color: _ink,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             '$made / $att',
-            style: const TextStyle(fontFamily: 'Inter', fontSize: 10, color: _hint),
+            style: const TextStyle(fontFamily: CIType.fontFamily, fontSize: 10, color: _hint),
           ),
           if (showTrend && att > 0) ...[
             const SizedBox(height: 6),
@@ -336,7 +338,7 @@ class _AveragesTabState extends State<AveragesTab> {
               child: Text(
                 tag,
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: fg,

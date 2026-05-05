@@ -320,7 +320,7 @@ class _Body extends StatelessWidget {
                   child: Text(
                     'RECENT GAMES',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: CIType.fontFamily,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: CIColors.ink,
@@ -373,7 +373,7 @@ class _Body extends StatelessWidget {
                       ),
                       minimumSize: const Size(double.infinity, 44),
                       textStyle: const TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: CIType.fontFamily,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -432,7 +432,7 @@ class _StatsBadge extends StatelessWidget {
         child: Text(
           '$playerLabel · $gameLabel',
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: CIColors.ink,
@@ -467,7 +467,7 @@ class _SectionHeader extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 11,
             fontWeight: FontWeight.w700,
             color: CIColors.ink,
@@ -613,7 +613,7 @@ class _UpgradeBanner extends StatelessWidget {
               ),
               child: Text(
                 'PRO',
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.dmSans(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: CIColors.inkOnBrand,
@@ -629,7 +629,7 @@ class _UpgradeBanner extends StatelessWidget {
                 children: [
                   Text(
                     'Upgrade to a Pro plan',
-                    style: GoogleFonts.ibmPlexSans(
+                    style: GoogleFonts.dmSans(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: CIColors.inkOnBrand,
@@ -638,7 +638,7 @@ class _UpgradeBanner extends StatelessWidget {
                   ),
                   Text(
                     'Unlimited games and 3 player profiles.',
-                    style: GoogleFonts.ibmPlexSans(
+                    style: GoogleFonts.dmSans(
                       fontSize: 12,
                       color: Colors.white.withValues(alpha: 0.8),
                       height: 1.2,
@@ -779,7 +779,7 @@ class _AccountAvatar extends StatelessWidget {
           child: Text(
             initials,
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: size * 0.33,
               fontWeight: FontWeight.w600,
               color: CIColors.ink,
@@ -950,7 +950,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                 const Text(
                   'LIVE',
                   style: TextStyle(
-                    fontFamily: 'IBM Plex Sans',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: CIColors.ink,
@@ -969,7 +969,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                   child: const Text(
                     'Resume',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: CIType.fontFamily,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: CIColors.inkOnBrand,
@@ -985,7 +985,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                 Text(
                   name,
                   style: const TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: CIColors.ink,
@@ -997,7 +997,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                     'vs $opp',
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: CIType.fontFamily,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: CIColors.ink3,
@@ -1050,9 +1050,10 @@ class _LiveStat extends StatelessWidget {
             Text(
               value,
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w400,
+                fontFeatures: const [FontFeature.tabularFigures()],
                 color: CIColors.ink,
               ),
             ),
@@ -1060,7 +1061,7 @@ class _LiveStat extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: CIColors.ink3,
@@ -1087,7 +1088,7 @@ class _ErrorState extends StatelessWidget {
           const Text(
             'Could not load dashboard',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: CIColors.ink,
@@ -1099,7 +1100,7 @@ class _ErrorState extends StatelessWidget {
             child: const Text(
               'Try again',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 14,
                 color: CIColors.royal500,
               ),

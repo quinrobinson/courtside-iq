@@ -116,7 +116,7 @@ class _EligibleBody extends StatelessWidget {
           Text(
             insight.headline!,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: _text,
@@ -128,7 +128,7 @@ class _EligibleBody extends StatelessWidget {
           Text(
             legacyText,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 14,
               color: _text,
               height: 1.5,
@@ -202,7 +202,7 @@ class _AccentSection extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: color,
@@ -213,7 +213,7 @@ class _AccentSection extends StatelessWidget {
                 Text(
                   body,
                   style: const TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 13,
                     color: _text,
                     height: 1.45,
@@ -254,7 +254,7 @@ class _RetryChip extends StatelessWidget {
                 Text(
                   '↻',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: _text2,
@@ -264,7 +264,7 @@ class _RetryChip extends StatelessWidget {
                 Text(
                   "Couldn't refresh · tap to retry",
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: _text2,
@@ -307,7 +307,7 @@ class _BelowBody extends StatelessWidget {
           child: Text(
             chipLabel,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: _amber,
@@ -318,7 +318,7 @@ class _BelowBody extends StatelessWidget {
         Text(
           headline,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: _text,
@@ -329,7 +329,7 @@ class _BelowBody extends StatelessWidget {
         Text(
           body,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 14,
             color: _text,
             height: 1.5,
@@ -341,7 +341,7 @@ class _BelowBody extends StatelessWidget {
         Text(
           '$games of 5 games logged',
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 12,
             color: _text2,
           ),
@@ -350,7 +350,7 @@ class _BelowBody extends StatelessWidget {
         Text(
           'Unlocks bright spots, room to grow, and what to watch for next',
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 12,
             color: _text2.withValues(alpha: 0.7),
           ),
@@ -444,7 +444,7 @@ class _ErrorBody extends StatelessWidget {
           child: const Text(
             "Couldn't load",
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: _magenta,
@@ -455,7 +455,7 @@ class _ErrorBody extends StatelessWidget {
         Text(
           "We couldn't generate $firstName's story",
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: _text,
@@ -466,7 +466,7 @@ class _ErrorBody extends StatelessWidget {
         const Text(
           'Something went wrong reaching the insight service. Your data is safe. Try again in a moment.',
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 14,
             color: _text,
             height: 1.5,
@@ -485,7 +485,7 @@ class _ErrorBody extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               textStyle: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),

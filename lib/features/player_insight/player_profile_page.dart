@@ -79,7 +79,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
             : Text(
                 firstName,
                 style: const TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: _text,
@@ -129,7 +129,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                 Text(
                   position,
                   style: const TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 14,
                     color: _text,
                   ),
@@ -149,7 +149,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                     child: Text(
                       ageBand,
                       style: const TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: CIType.fontFamily,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: _text,
@@ -303,7 +303,7 @@ class _TabControl extends StatelessWidget {
                         child: Text(
                           labels[i],
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: CIType.fontFamily,
                             fontSize: 13,
                             fontWeight:
                                 active ? FontWeight.w600 : FontWeight.w500,

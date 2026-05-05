@@ -69,7 +69,7 @@ class GameFeedCard extends StatelessWidget {
                       Text(
                         fullName,
                         style: const TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: CIType.fontFamily,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: _text,
@@ -79,7 +79,7 @@ class GameFeedCard extends StatelessWidget {
                         Text(
                           sub,
                           style: const TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: CIType.fontFamily,
                             fontSize: 12,
                             color: _sub,
                           ),
@@ -124,7 +124,7 @@ class GameFeedCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: CIType.fontFamily,
                         fontSize: 13,
                         color: _text,
                         height: 1.45,
@@ -168,7 +168,7 @@ class _EventBadge extends StatelessWidget {
       child: Text(
         label,
         style: const TextStyle(
-          fontFamily: 'Inter',
+          fontFamily: CIType.fontFamily,
           fontSize: 11,
           fontWeight: FontWeight.w500,
           color: _badgeBlueText,
@@ -244,9 +244,10 @@ class _Tile extends StatelessWidget {
             Text(
               '$value',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 20,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w400,
+                fontFeatures: const [FontFeature.tabularFigures()],
                 color: valueColor,
                 height: 1.1,
               ),
@@ -255,7 +256,7 @@ class _Tile extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
                 color: _sub,
