@@ -616,7 +616,7 @@ class _UpgradeBanner extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: CIColors.inkOnBrand,
                 ),
               ),
             ),
@@ -632,7 +632,7 @@ class _UpgradeBanner extends StatelessWidget {
                     style: GoogleFonts.ibmPlexSans(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: CIColors.inkOnBrand,
                       height: 1.2,
                     ),
                   ),
@@ -972,7 +972,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                       fontFamily: 'Inter',
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: CIColors.inkOnBrand,
                     ),
                   ),
                 ),
