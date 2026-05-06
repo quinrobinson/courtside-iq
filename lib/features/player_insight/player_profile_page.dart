@@ -282,13 +282,7 @@ class _TabControl extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: _card,
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+                    boxShadow: CIElevation.card,
                   ),
                 ),
               ),
@@ -380,13 +374,7 @@ class _ProfileAvatar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: CIColors.ink,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  boxShadow: CIElevation.card,
                 ),
                 alignment: Alignment.center,
                 child: const Icon(

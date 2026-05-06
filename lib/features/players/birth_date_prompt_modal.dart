@@ -66,13 +66,7 @@ class BirthDatePromptModal extends StatelessWidget {
         decoration: BoxDecoration(
           color: _modalBg,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: CIElevation.pop,
         ),
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
         child: Column(
