@@ -109,18 +109,18 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
             elevation: 1.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24.0),
-                topRight: Radius.circular(24.0),
-                bottomLeft: Radius.circular(24.0),
-                bottomRight: Radius.circular(24.0),
+                topLeft: Radius.circular(12.0),
+                topRight: Radius.circular(12.0),
+                bottomLeft: Radius.circular(12.0),
+                bottomRight: Radius.circular(12.0),
               ),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24.0),
-                topRight: Radius.circular(24.0),
-                bottomLeft: Radius.circular(24.0),
-                bottomRight: Radius.circular(24.0),
+                topLeft: Radius.circular(12.0),
+                topRight: Radius.circular(12.0),
+                bottomLeft: Radius.circular(12.0),
+                bottomRight: Radius.circular(12.0),
               ),
               child: Container(
                 width: double.infinity,
@@ -128,10 +128,10 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).globalBackground,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24.0),
-                    topRight: Radius.circular(24.0),
-                    bottomLeft: Radius.circular(24.0),
-                    bottomRight: Radius.circular(24.0),
+                    topLeft: Radius.circular(12.0),
+                    topRight: Radius.circular(12.0),
+                    bottomLeft: Radius.circular(12.0),
+                    bottomRight: Radius.circular(12.0),
                   ),
                 ),
                 child: Stack(
@@ -3129,8 +3129,8 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                             end: AlignmentDirectional(0, 1.0),
                           ),
                           borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(24.0),
-                            bottomRight: Radius.circular(24.0),
+                            bottomLeft: Radius.circular(12.0),
+                            bottomRight: Radius.circular(12.0),
                           ),
                         ),
                         alignment: AlignmentDirectional(0.0, 1.0),

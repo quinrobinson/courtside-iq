@@ -3295,7 +3295,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -3426,7 +3426,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -3549,7 +3549,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -3672,7 +3672,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -3805,7 +3805,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -3927,7 +3927,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -4050,7 +4050,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -4173,7 +4173,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       height: 80.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(40.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,

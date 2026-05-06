@@ -197,7 +197,7 @@ class _AlertDialogGameCompleteWidgetState
                       child: Container(
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).primaryBackground,
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
@@ -368,7 +368,7 @@ class _AlertDialogGameCompleteWidgetState
                       child: Container(
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).primaryBackground,
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(

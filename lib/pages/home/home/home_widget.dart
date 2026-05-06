@@ -1222,8 +1222,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                       height: 24.0,
                                                       decoration: BoxDecoration(
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(16.0),
+                                                            BorderRadius.circular(8.0),
                                                       ),
                                                       alignment:
                                                           AlignmentDirectional(

@@ -549,9 +549,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                   .of(context)
                                                               .primaryBackground,
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      12.0),
+                                                              BorderRadius.circular(8.0),
                                                           border: Border.all(
                                                             color: FlutterFlowTheme
                                                                     .of(context)
@@ -759,7 +757,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                               context)
                                                                           .secondaryBackground,
                                                                   borderRadius:
-                                                                      12.0,
+                                                                       8.0,
                                                                   buttonSize:
                                                                       56.0,
                                                                   fillColor: FlutterFlowTheme.of(
@@ -1037,7 +1035,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                               context)
                                                                           .secondaryBackground,
                                                                   borderRadius:
-                                                                      12.0,
+                                                                       8.0,
                                                                   buttonSize:
                                                                       56.0,
                                                                   fillColor: FlutterFlowTheme.of(
@@ -1204,9 +1202,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                       .of(context)
                                                                   .gray4,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12.0),
+                                                                  BorderRadius.circular(8.0),
                                                             ),
                                                             alignment:
                                                                 AlignmentDirectional(

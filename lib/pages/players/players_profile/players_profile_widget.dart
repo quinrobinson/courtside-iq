@@ -304,11 +304,11 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                             height: 140.0,
                                             decoration: BoxDecoration(
                                               borderRadius:
-                                                  BorderRadius.circular(70.0),
+                                                  BorderRadius.circular(9999.0),
                                             ),
                                             child: ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(70.0),
+                                                  BorderRadius.circular(9999.0),
                                               child: Image.network(
                                                 playersProfilePlayerProfileViewRow!
                                                     .playerProfilePic!,
@@ -337,7 +337,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                   FlutterFlowTheme.of(context)
                                                       .secondaryBackground,
                                               borderRadius:
-                                                  BorderRadius.circular(70.0),
+                                                  BorderRadius.circular(9999.0),
                                             ),
                                             alignment:
                                                 AlignmentDirectional(0.0, 0.0),

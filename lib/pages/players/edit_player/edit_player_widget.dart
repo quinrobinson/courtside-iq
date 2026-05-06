@@ -164,7 +164,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
                                         borderRadius:
-                                            BorderRadius.circular(70.0),
+                                            BorderRadius.circular(9999.0),
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Icon(
@@ -189,7 +189,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                       height: 120.0,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(70.0),
+                                            BorderRadius.circular(9999.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .gray3,
@@ -200,7 +200,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                         children: [
                                           ClipRRect(
                                             borderRadius:
-                                                BorderRadius.circular(70.0),
+                                                BorderRadius.circular(9999.0),
                                             child: Image.network(
                                               editPlayerPlayerProfileViewRow!
                                                   .playerProfilePic!,

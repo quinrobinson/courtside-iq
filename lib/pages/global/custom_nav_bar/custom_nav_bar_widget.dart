@@ -65,7 +65,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
       child: Container(
         height: 60.0,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
+          borderRadius: BorderRadius.circular(9999.0),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.max,

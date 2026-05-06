@@ -1274,8 +1274,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                 .of(context)
                                                             .primaryBackground,
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(18.0),
+                                                            BorderRadius.circular(8.0),
                                                         border: Border.all(
                                                           color: FlutterFlowTheme
                                                                   .of(context)
@@ -1325,8 +1324,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                               context)
                                                                           .secondaryBackground,
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              23.0),
+                                                                          BorderRadius.circular(9999.0),
                                                                     ),
                                                                     child: Row(
                                                                       mainAxisSize:
@@ -1369,8 +1367,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                               context)
                                                                           .gray4,
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              23.0),
+                                                                          BorderRadius.circular(9999.0),
                                                                     ),
                                                                     child: Row(
                                                                       mainAxisSize:

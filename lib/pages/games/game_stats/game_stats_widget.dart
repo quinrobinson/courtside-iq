@@ -1482,8 +1482,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 BoxDecoration(
                                                                               color: FlutterFlowTheme.of(context).gray4,
                                                                               borderRadius: BorderRadius.only(
-                                                                                bottomLeft: Radius.circular(11.0),
-                                                                                bottomRight: Radius.circular(11.0),
+                                                                                bottomLeft: Radius.circular(8.0),
+                                                                                bottomRight: Radius.circular(8.0),
                                                                               ),
                                                                             ),
                                                                             alignment:
@@ -1612,8 +1612,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).gray4,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              bottomLeft: Radius.circular(11.0),
-                                                                              bottomRight: Radius.circular(11.0),
+                                                                              bottomLeft: Radius.circular(8.0),
+                                                                              bottomRight: Radius.circular(8.0),
                                                                             ),
                                                                           ),
                                                                           alignment: AlignmentDirectional(
@@ -1742,8 +1742,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).gray4,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              bottomLeft: Radius.circular(11.0),
-                                                                              bottomRight: Radius.circular(11.0),
+                                                                              bottomLeft: Radius.circular(8.0),
+                                                                              bottomRight: Radius.circular(8.0),
                                                                             ),
                                                                           ),
                                                                           alignment: AlignmentDirectional(
@@ -2629,8 +2629,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                       end: AlignmentDirectional(0, 1.0),
                                     ),
                                     borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(24.0),
-                                      bottomRight: Radius.circular(24.0),
+                                      bottomLeft: Radius.circular(12.0),
+                                      bottomRight: Radius.circular(12.0),
                                     ),
                                   ),
                                   alignment: AlignmentDirectional(0.0, 1.0),
