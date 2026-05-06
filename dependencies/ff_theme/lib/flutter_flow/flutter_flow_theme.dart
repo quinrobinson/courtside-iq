@@ -150,8 +150,8 @@ class LightModeTheme extends FlutterFlowTheme {
   late Color alternate = const Color(0xFFF2A43A);         // spark500
   late Color primaryText = const Color(0xFF1B1D24);       // ink
   late Color secondaryText = const Color(0xFF4A4D56);     // ink2
-  late Color primaryBackground = const Color(0xFFEFEFF1); // canvas
-  late Color secondaryBackground = const Color(0xFFFFFFFF); // surface
+  late Color primaryBackground = const Color(0xFFFFFFFF); // surface (card fill)
+  late Color secondaryBackground = const Color(0xFFEFEFF1); // canvas (sunken tiles)
   late Color accent1 = const Color(0xFFE04867);           // rose500
   late Color accent2 = const Color(0xFF2558B8);           // steel500
   late Color accent3 = const Color(0xFFE5E5E8);           // canvasSunk
