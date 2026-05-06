@@ -410,9 +410,9 @@ class _EventSelectionWidgetState extends State<EventSelectionWidget> {
                                                 ),
                                                 borderRadius: BorderRadius.only(
                                                   topLeft:
-                                                      Radius.circular(12.0),
+                                                      Radius.circular(8.0),
                                                   topRight:
-                                                      Radius.circular(12.0),
+                                                      Radius.circular(8.0),
                                                 ),
                                               ),
                                             ),

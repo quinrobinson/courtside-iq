@@ -187,8 +187,7 @@ class _EditPlayerPositionWidgetState extends State<EditPlayerPositionWidget> {
                                                             .teal
                                                         : Color(0x00000000),
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
+                                                        BorderRadius.circular(8.0),
                                                   ),
                                                   alignment:
                                                       AlignmentDirectional(

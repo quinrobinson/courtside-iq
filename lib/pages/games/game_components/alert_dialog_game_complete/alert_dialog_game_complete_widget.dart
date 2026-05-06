@@ -87,7 +87,7 @@ class _AlertDialogGameCompleteWidgetState
                   spreadRadius: 4.0,
                 )
               ],
-              borderRadius: BorderRadius.circular(12.0),
+              borderRadius: BorderRadius.circular(8.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),

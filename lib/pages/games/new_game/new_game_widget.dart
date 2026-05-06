@@ -370,8 +370,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             context)
                                                                         .primaryBackground,
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                     border:
                                                                         Border
                                                                             .all(
@@ -1497,8 +1496,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                         ),
                                                     elevation: 0.0,
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
+                                                        BorderRadius.circular(8.0),
                                                     disabledColor:
                                                         const Color(0xFFDADBDE),
                                                     disabledTextColor:

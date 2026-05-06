@@ -1124,8 +1124,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1145,8 +1144,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1424,8 +1422,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1445,8 +1442,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons

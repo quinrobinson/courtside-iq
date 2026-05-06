@@ -229,7 +229,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                   ?.playerProfilePic !=
                                               '')
                                         FlutterFlowIconButton(
-                                          borderRadius: 12.0,
+                                          borderRadius: 8.0,
                                           buttonSize: 40.0,
                                           fillColor:
                                               FlutterFlowTheme.of(context)
@@ -262,7 +262,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                           },
                                         ),
                                       FlutterFlowIconButton(
-                                        borderRadius: 12.0,
+                                        borderRadius: 8.0,
                                         buttonSize: 40.0,
                                         fillColor: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
@@ -413,8 +413,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                               .of(context)
                                                           .primaryBackground,
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              12.0),
+                                                          BorderRadius.circular(8.0),
                                                     ),
                                                     child: Padding(
                                                       padding:
@@ -482,9 +481,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                             ),
                                                             child: ClipRRect(
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12.0),
+                                                                  BorderRadius.circular(8.0),
                                                               child: Container(
                                                                 decoration:
                                                                     BoxDecoration(
@@ -492,9 +489,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                                           context)
                                                                       .gray4,
                                                                   borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              12.0),
+                                                                      BorderRadius.circular(8.0),
                                                                 ),
                                                                 child:
                                                                     TextFormField(
@@ -630,9 +625,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                           ),
                                                           ClipRRect(
                                                             borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12.0),
+                                                                BorderRadius.circular(8.0),
                                                             child: Container(
                                                               decoration:
                                                                   BoxDecoration(
@@ -640,9 +633,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                                         context)
                                                                     .gray4,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12.0),
+                                                                    BorderRadius.circular(8.0),
                                                               ),
                                                               child: Padding(
                                                                 padding: EdgeInsetsDirectional
@@ -779,8 +770,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                                 .of(context)
                                                             .primaryBackground,
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
+                                                            BorderRadius.circular(8.0),
                                                       ),
                                                       child: Padding(
                                                         padding:
@@ -1174,8 +1164,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                                 .of(context)
                                                             .primaryBackground,
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
+                                                            BorderRadius.circular(8.0),
                                                       ),
                                                       child: Padding(
                                                         padding:
@@ -1858,9 +1847,7 @@ class _EditPlayerWidgetState extends State<EditPlayerWidget> {
                                                               width: 1.0,
                                                             ),
                                                             borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12.0),
+                                                                BorderRadius.circular(8.0),
                                                           ),
                                                           showLoadingIndicator:
                                                               false,

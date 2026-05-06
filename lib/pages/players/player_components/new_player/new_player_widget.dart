@@ -465,9 +465,9 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                                                 ),
                                                 borderRadius: BorderRadius.only(
                                                   bottomLeft:
-                                                      Radius.circular(12.0),
+                                                      Radius.circular(8.0),
                                                   bottomRight:
-                                                      Radius.circular(12.0),
+                                                      Radius.circular(8.0),
                                                 ),
                                               ),
                                               child: Icon(

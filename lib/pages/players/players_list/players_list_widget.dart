@@ -817,7 +817,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                                 if (FFAppState().isUserPremium == false)
                                                                                                   FlutterFlowIconButton(
                                                                                                     borderColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                                    borderRadius: 12.0,
+                                                                                                    borderRadius: 8.0,
                                                                                                     borderWidth: 1.0,
                                                                                                     buttonSize: 40.0,
                                                                                                     fillColor: FlutterFlowTheme.of(context).primaryBackground,

@@ -1385,8 +1385,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                          BorderRadius.circular(8.0),
                                                                       border:
                                                                           Border
                                                                               .all(
@@ -1411,8 +1410,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(12.0),
-                                                                              topRight: Radius.circular(12.0),
+                                                                              topLeft: Radius.circular(8.0),
+                                                                              topRight: Radius.circular(8.0),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -1519,8 +1518,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                          BorderRadius.circular(8.0),
                                                                       border:
                                                                           Border
                                                                               .all(
@@ -1545,8 +1543,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(12.0),
-                                                                              topRight: Radius.circular(12.0),
+                                                                              topLeft: Radius.circular(8.0),
+                                                                              topRight: Radius.circular(8.0),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -1655,8 +1653,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                          BorderRadius.circular(8.0),
                                                                       border:
                                                                           Border
                                                                               .all(
@@ -1679,8 +1676,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(12.0),
-                                                                              topRight: Radius.circular(12.0),
+                                                                              topLeft: Radius.circular(8.0),
+                                                                              topRight: Radius.circular(8.0),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -2591,9 +2588,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                 width: 1.0,
                                                               ),
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12.0),
+                                                                  BorderRadius.circular(8.0),
                                                             ),
                                                             showLoadingIndicator:
                                                                 false,
@@ -2659,7 +2654,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                             borderColor:
                                                 FlutterFlowTheme.of(context)
                                                     .secondaryBackground,
-                                            borderRadius: 30.0,
+                                            borderRadius: 9999.0,
                                             borderWidth: 1.0,
                                             buttonSize: 60.0,
                                             fillColor:

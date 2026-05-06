@@ -853,9 +853,9 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                   borderRadius:
                                                       BorderRadius.only(
                                                     bottomLeft:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(8.0),
                                                     bottomRight:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(8.0),
                                                   ),
                                                 ),
                                                 child: Padding(
@@ -1055,9 +1055,9 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                   borderRadius:
                                                       BorderRadius.only(
                                                     bottomLeft:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(8.0),
                                                     bottomRight:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(8.0),
                                                   ),
                                                 ),
                                                 child: Padding(

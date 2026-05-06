@@ -898,8 +898,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                                             context)
                                                                         .primaryBackground,
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                     border:
                                                                         Border
                                                                             .all(
@@ -1112,8 +1111,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                                             context)
                                                                         .primaryBackground,
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12.0),
+                                                                        BorderRadius.circular(8.0),
                                                                     border:
                                                                         Border
                                                                             .all(
@@ -1369,7 +1367,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                                         color: FlutterFlowTheme.of(context)
                                                                             .primaryBackground,
                                                                         borderRadius:
-                                                                            BorderRadius.circular(12.0),
+                                                                            BorderRadius.circular(8.0),
                                                                         border:
                                                                             Border.all(
                                                                           color:
@@ -3093,8 +3091,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                       width: 1.0,
                                                     ),
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
+                                                        BorderRadius.circular(8.0),
                                                   ),
                                                   showLoadingIndicator: false,
                                                 ),
@@ -3154,7 +3151,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                 builder: (context) => FlutterFlowIconButton(
                                   borderColor: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
-                                  borderRadius: 30.0,
+                                  borderRadius: 9999.0,
                                   borderWidth: 1.0,
                                   buttonSize: 60.0,
                                   fillColor: FlutterFlowTheme.of(context)
@@ -3202,7 +3199,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                               FlutterFlowIconButton(
                                 borderColor: FlutterFlowTheme.of(context)
                                     .secondaryBackground,
-                                borderRadius: 30.0,
+                                borderRadius: 9999.0,
                                 borderWidth: 1.0,
                                 buttonSize: 60.0,
                                 fillColor: FlutterFlowTheme.of(context)

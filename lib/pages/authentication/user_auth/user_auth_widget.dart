@@ -313,8 +313,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                                                           width: 1.0,
                                                         ),
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(12.0),
+                                                            BorderRadius.circular(8.0),
                                                       ),
                                                     ),
                                             ),
@@ -414,8 +413,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                                                     width: 1.0,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          12.0),
+                                                      BorderRadius.circular(8.0),
                                                 ),
                                               ),
                                             ),
@@ -506,8 +504,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                                                     width: 1.0,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          12.0),
+                                                      BorderRadius.circular(8.0),
                                                 ),
                                               ),
                                             ),
