@@ -332,7 +332,7 @@ class _AveragesTabState extends State<AveragesTab> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: bg,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(CIRadius.full),
                 border: border == null ? null : Border.all(color: border, width: 1),
               ),
               child: Text(

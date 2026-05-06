@@ -191,7 +191,7 @@ class _AccentSection extends StatelessWidget {
             width: 2,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(CIRadius.xs),
             ),
           ),
           const SizedBox(width: 12),
@@ -239,13 +239,13 @@ class _RetryChip extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(CIRadius.md),
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: _track,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(CIRadius.md),
               border: Border.all(color: _border),
             ),
             child: const Row(
@@ -302,7 +302,7 @@ class _BelowBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: _amber.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: Text(
             chipLabel,
@@ -401,7 +401,7 @@ class _LoadingBody extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: _skeleton,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(CIRadius.sm),
           ),
         );
     return Column(
@@ -439,7 +439,7 @@ class _ErrorBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: _magenta.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: const Text(
             "Couldn't load",

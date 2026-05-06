@@ -319,7 +319,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
                 disabledForegroundColor: _hintColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(CIRadius.lg),
                 ),
               ),
               child: _saving
@@ -376,7 +376,7 @@ class _FieldCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: _fieldBg,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: child,
     );

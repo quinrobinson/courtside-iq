@@ -369,7 +369,7 @@ class _Body extends StatelessWidget {
                       foregroundColor: CIColors.ink,
                       side: const BorderSide(color: CIColors.hairline),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(CIRadius.xl),
                       ),
                       minimumSize: const Size(double.infinity, 44),
                       textStyle: const TextStyle(
@@ -426,7 +426,7 @@ class _StatsBadge extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(CIRadius.md),
           border: Border.all(color: CIColors.ink),
         ),
         child: Text(
@@ -595,7 +595,7 @@ class _UpgradeBanner extends StatelessWidget {
             alignment: AlignmentDirectional.bottomCenter,
             image: Image.asset('assets/images/gradient-bg-black-b.png').image,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(CIRadius.xl),
         ),
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -606,7 +606,7 @@ class _UpgradeBanner extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(CIRadius.md),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.35),
                 ),
@@ -852,7 +852,7 @@ class _Skeleton extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: CIColors.canvasSunk,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(CIRadius.xl),
       ),
     );
   }
@@ -964,7 +964,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
                       horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
                     color: CIColors.rose500,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(CIRadius.md),
                   ),
                   child: const Text(
                     'Resume',
@@ -1042,7 +1042,7 @@ class _LiveStat extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: CIColors.canvas.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(CIRadius.lg),
           border: Border.all(color: CIColors.hairline, width: 1),
         ),
         child: Column(

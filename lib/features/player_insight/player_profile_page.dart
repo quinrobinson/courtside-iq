@@ -142,7 +142,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(CIRadius.md),
                       border: Border.all(color: _text, width: 1),
                     ),
                     alignment: Alignment.center,
@@ -268,7 +268,7 @@ class _TabControl extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   color: _track,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(CIRadius.xl),
                 ),
               ),
               AnimatedPositioned(

@@ -338,7 +338,7 @@ class _EventFilterChips extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: active ? _ink : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(CIRadius.xl),
           border: Border.all(
             color: active ? _ink : _cardBorder,
             width: 1,
@@ -371,7 +371,7 @@ class _EventTag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: CIColors.canvas.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(CIRadius.md),
       ),
       child: Text(
         label,

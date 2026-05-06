@@ -67,11 +67,11 @@ class PickerField<T> extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: _fieldBg,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 12, 0),
           child: SizedBox(
@@ -139,7 +139,7 @@ class PickerSheet<T> extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: _handle,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),

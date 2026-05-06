@@ -183,7 +183,7 @@ class _DevelopmentTabState extends State<DevelopmentTab> {
           const SizedBox(height: 14),
           InkWell(
             onTap: () => AboutStorySheet.show(context),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(CIRadius.sm),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               child: Row(

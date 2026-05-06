@@ -109,7 +109,7 @@ class BirthDatePromptModal extends StatelessWidget {
                   foregroundColor: _btnText,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(CIRadius.lg),
                   ),
                 ),
                 child: const Text(

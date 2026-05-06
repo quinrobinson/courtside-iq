@@ -122,7 +122,7 @@ class _Sheet extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: ProfilePhotoEditor._border,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),
