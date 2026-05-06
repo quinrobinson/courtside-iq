@@ -153,7 +153,7 @@ class _AveragesTabState extends State<AveragesTab> {
     return Container(
       decoration: BoxDecoration(
         color: _card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _cardBorder, width: 1),
       ),
       padding: const EdgeInsets.all(14),
@@ -208,7 +208,7 @@ class _AveragesTabState extends State<AveragesTab> {
     return Container(
       decoration: BoxDecoration(
         color: _card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _cardBorder, width: 1),
       ),
       padding: const EdgeInsets.all(14),

@@ -62,7 +62,7 @@ class DevelopmentStoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: CIColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _border),
         boxShadow: CIElevation.card,
       ),

@@ -45,7 +45,7 @@ class GameFeedCard extends StatelessWidget {
       child: Container(
       decoration: BoxDecoration(
         color: CIColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _border),
       ),
       child: Column(

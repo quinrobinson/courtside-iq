@@ -189,13 +189,13 @@ class _GamesTabState extends State<GamesTab> {
 
     return Material(
       color: _card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(CIRadius.lg),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(CIRadius.lg),
             border: Border.all(color: _cardBorder, width: 1),
           ),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),

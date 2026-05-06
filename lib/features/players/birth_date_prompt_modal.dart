@@ -65,7 +65,7 @@ class BirthDatePromptModal extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: _modalBg,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(CIRadius.xl),
           boxShadow: CIElevation.pop,
         ),
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),

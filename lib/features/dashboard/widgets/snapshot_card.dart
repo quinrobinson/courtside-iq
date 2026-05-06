@@ -45,7 +45,7 @@ class SnapshotCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       padding: const EdgeInsets.all(1.5),
       child: Container(
