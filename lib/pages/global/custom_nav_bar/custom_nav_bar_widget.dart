@@ -82,7 +82,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                     height: 60.0,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(18.0),
+                      borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(
                         color: Color(0xFFE0E1E5),
                         width: 1.0,
@@ -127,7 +127,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   color: widget!.page == 'Home'
                                       ? const Color(0xFF0F0F0F)
                                       : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -170,7 +170,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   color: widget!.page == 'Players'
                                       ? const Color(0xFF0F0F0F)
                                       : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -243,7 +243,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   color: widget!.page == 'Games'
                                       ? const Color(0xFF0F0F0F)
                                       : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -286,7 +286,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   color: widget!.page == 'Menu'
                                       ? const Color(0xFF0F0F0F)
                                       : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,

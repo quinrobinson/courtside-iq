@@ -229,7 +229,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         'assets/images/gradient-bg-black-b.png',
                                       ).image,
                                     ),
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Padding(
                                     padding: EdgeInsets.all(12.0),
@@ -411,7 +411,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(8.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryBackground,
@@ -759,7 +759,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1067,7 +1067,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(8.0),
                                     border: Border.all(
                                       color: FlutterFlowTheme.of(context)
                                           .secondaryBackground,
@@ -2090,7 +2090,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -3450,7 +3450,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                             width: 1.0,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                         ),
                                       ),
                                     ),

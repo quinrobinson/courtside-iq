@@ -103,7 +103,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -234,7 +234,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -367,7 +367,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,

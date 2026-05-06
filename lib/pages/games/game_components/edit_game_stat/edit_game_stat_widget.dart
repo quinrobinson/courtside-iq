@@ -66,14 +66,14 @@ class _EditGameStatWidgetState extends State<EditGameStatWidget> {
           color: Colors.transparent,
           elevation: 1.0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
           child: Container(
             width: double.infinity,
             height: 500.0,
             decoration: BoxDecoration(
               color: FlutterFlowTheme.of(context).primaryBackground,
-              borderRadius: BorderRadius.circular(24.0),
+              borderRadius: BorderRadius.circular(8.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).gray4,
                 width: 1.0,
@@ -97,7 +97,7 @@ class _EditGameStatWidgetState extends State<EditGameStatWidget> {
                           height: 2.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).secondaryText,
-                            borderRadius: BorderRadius.circular(3.0),
+                            borderRadius: BorderRadius.circular(2.0),
                           ),
                         ),
                       ],

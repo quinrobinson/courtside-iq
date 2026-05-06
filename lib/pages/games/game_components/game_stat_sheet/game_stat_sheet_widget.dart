@@ -152,7 +152,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryText,
-                                  borderRadius: BorderRadius.circular(3.0),
+                                  borderRadius: BorderRadius.circular(2.0),
                                 ),
                               ),
                             ],
@@ -396,7 +396,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                                         color: FlutterFlowTheme.of(context)
                                                                             .primaryBackground,
                                                                         borderRadius:
-                                                                            BorderRadius.circular(45.0),
+                                                                            BorderRadius.circular(9999.0),
                                                                         border:
                                                                             Border.all(
                                                                           color:
@@ -436,7 +436,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                                       decoration:
                                                                           BoxDecoration(
                                                                         borderRadius:
-                                                                            BorderRadius.circular(45.0),
+                                                                            BorderRadius.circular(9999.0),
                                                                         border:
                                                                             Border.all(
                                                                           color:
@@ -446,7 +446,7 @@ class _GameStatSheetWidgetState extends State<GameStatSheetWidget> {
                                                                       child:
                                                                           ClipRRect(
                                                                         borderRadius:
-                                                                            BorderRadius.circular(45.0),
+                                                                            BorderRadius.circular(9999.0),
                                                                         child: Image
                                                                             .network(
                                                                           containerVPlayerGameStatsRow!

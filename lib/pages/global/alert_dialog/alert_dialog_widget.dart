@@ -74,7 +74,7 @@ class _AlertDialogWidgetState extends State<AlertDialogWidget> {
                   spreadRadius: 4.0,
                 )
               ],
-              borderRadius: BorderRadius.circular(24.0),
+              borderRadius: BorderRadius.circular(8.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),
@@ -188,7 +188,7 @@ class _AlertDialogWidgetState extends State<AlertDialogWidget> {
                                         .secondaryBackground,
                                     width: 1.0,
                                   ),
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                               ),
                             ),
@@ -230,7 +230,7 @@ class _AlertDialogWidgetState extends State<AlertDialogWidget> {
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                               ),
                             ),

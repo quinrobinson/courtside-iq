@@ -61,7 +61,7 @@ class _NewLiveGameWidgetState extends State<NewLiveGameWidget> {
           height: 500.0,
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).primaryBackground,
-            borderRadius: BorderRadius.circular(24.0),
+            borderRadius: BorderRadius.circular(12.0),
           ),
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(24.0, 6.0, 24.0, 48.0),
@@ -77,7 +77,7 @@ class _NewLiveGameWidgetState extends State<NewLiveGameWidget> {
                       height: 2.0,
                       decoration: BoxDecoration(
                         color: FlutterFlowTheme.of(context).secondaryText,
-                        borderRadius: BorderRadius.circular(3.0),
+                        borderRadius: BorderRadius.circular(2.0),
                       ),
                     ),
                   ],

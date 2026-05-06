@@ -206,7 +206,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                             ).image,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                         ),
                                         child: Padding(
                                           padding: EdgeInsets.all(12.0),
@@ -430,7 +430,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                             color: FlutterFlowTheme.of(context)
                                                 .primaryBackground,
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(8.0),
                                             border: Border.all(
                                               color:
                                                   FlutterFlowTheme.of(context)
@@ -641,7 +641,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                         color: FlutterFlowTheme.of(context)
                                             .primaryBackground,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(8.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryBackground,
@@ -779,7 +779,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -1304,7 +1304,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,

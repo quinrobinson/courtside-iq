@@ -884,7 +884,7 @@ class _OnBoardWidgetState extends State<OnBoardWidget> {
                                         .fontStyle,
                                   ),
                               elevation: 0.0,
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
                         ),

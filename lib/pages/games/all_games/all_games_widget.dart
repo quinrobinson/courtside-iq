@@ -373,7 +373,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                     'assets/images/gradient-bg-black-b.png',
                                   ).image,
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Padding(
                                 padding: EdgeInsets.all(12.0),
@@ -564,7 +564,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                 .primaryText,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: valueOrDefault<Color>(
                                               !_model.allPlayers!
@@ -657,7 +657,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         .primaryText
                                                     : Color(0x00000000),
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(8.0),
                                                 border: Border.all(
                                                   color: valueOrDefault<Color>(
                                                     !_model.playerOne!
@@ -759,7 +759,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         .primaryText
                                                     : Color(0x00000000),
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(8.0),
                                                 border: Border.all(
                                                   color: valueOrDefault<Color>(
                                                     !_model.playerTwo!
@@ -860,7 +860,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         .primaryText
                                                     : Color(0x00000000),
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(8.0),
                                                 border: Border.all(
                                                   color: valueOrDefault<Color>(
                                                     !_model.playerThree!
@@ -1023,7 +1023,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                 .globalBackground,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: valueOrDefault<Color>(
                                               _model.selectedDate ==
@@ -1338,7 +1338,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                       children: [
                                                                         ClipRRect(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(23.0),
+                                                                              BorderRadius.circular(9999.0),
                                                                           child:
                                                                               Image.network(
                                                                             allGamesVarItem.playerProfilePic!,

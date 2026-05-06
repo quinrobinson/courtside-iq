@@ -491,7 +491,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                             color: FlutterFlowTheme.of(context)
                                                 .primaryBackground,
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(8.0),
                                             border: Border.all(
                                               color:
                                                   FlutterFlowTheme.of(context)
@@ -705,7 +705,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -907,7 +907,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1112,7 +1112,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1206,7 +1206,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1302,7 +1302,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1401,7 +1401,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1495,7 +1495,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1588,7 +1588,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -1832,7 +1832,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(8.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)

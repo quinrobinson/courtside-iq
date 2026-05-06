@@ -248,14 +248,14 @@ class _ResetPasswordWidgetState extends State<ResetPasswordWidget> {
                                             0.0, 1.0, 0.0, 0.0),
                                         child: ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(8.0),
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color:
                                                   FlutterFlowTheme.of(context)
                                                       .gray4,
                                               borderRadius:
-                                                  BorderRadius.circular(12.0),
+                                                  BorderRadius.circular(8.0),
                                               border: Border.all(
                                                 color:
                                                     FlutterFlowTheme.of(context)
@@ -422,13 +422,13 @@ class _ResetPasswordWidgetState extends State<ResetPasswordWidget> {
                                       ),
                                       ClipRRect(
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(8.0),
                                         child: Container(
                                           decoration: BoxDecoration(
                                             color: FlutterFlowTheme.of(context)
                                                 .gray4,
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(8.0),
                                             border: Border.all(
                                               color:
                                                   FlutterFlowTheme.of(context)
@@ -782,7 +782,7 @@ class _ResetPasswordWidgetState extends State<ResetPasswordWidget> {
                                             ),
                                         elevation: 0.0,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(8.0),
                                         disabledColor:
                                             FlutterFlowTheme.of(context)
                                                 .secondaryBackground,

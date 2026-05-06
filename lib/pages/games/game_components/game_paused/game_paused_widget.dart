@@ -85,13 +85,13 @@ class _GamePausedWidgetState extends State<GamePausedWidget> {
               color: Colors.transparent,
               elevation: 1.0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0),
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: Container(
                 width: 100.0,
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).primaryBackground,
-                  borderRadius: BorderRadius.circular(24.0),
+                  borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(
                     color: FlutterFlowTheme.of(context).gray4,
                     width: 1.0,
@@ -107,7 +107,7 @@ class _GamePausedWidgetState extends State<GamePausedWidget> {
                       Container(
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).imperial,
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Padding(
                           padding: EdgeInsets.all(6.0),

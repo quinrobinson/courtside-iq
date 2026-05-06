@@ -72,13 +72,13 @@ class _NewTeamWidgetState extends State<NewTeamWidget> {
             color: Colors.transparent,
             elevation: 1.0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24.0),
+              borderRadius: BorderRadius.circular(8.0),
             ),
             child: Container(
               height: 256.0,
               decoration: BoxDecoration(
                 color: FlutterFlowTheme.of(context).primaryBackground,
-                borderRadius: BorderRadius.circular(24.0),
+                borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(
                   color: FlutterFlowTheme.of(context).gray4,
                   width: 1.0,
@@ -98,7 +98,7 @@ class _NewTeamWidgetState extends State<NewTeamWidget> {
                           height: 2.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).secondaryText,
-                            borderRadius: BorderRadius.circular(3.0),
+                            borderRadius: BorderRadius.circular(2.0),
                           ),
                         ),
                       ],
@@ -163,12 +163,12 @@ class _NewTeamWidgetState extends State<NewTeamWidget> {
                           Align(
                             alignment: AlignmentDirectional(-1.0, -1.0),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: BorderRadius.circular(8.0),
                               child: Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context).gray4,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
@@ -339,7 +339,7 @@ class _NewTeamWidgetState extends State<NewTeamWidget> {
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                   disabledColor: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
                                   disabledTextColor:

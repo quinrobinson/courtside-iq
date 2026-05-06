@@ -97,7 +97,7 @@ class _EventSelectionWidgetState extends State<EventSelectionWidget> {
             return Container(
               decoration: BoxDecoration(
                 color: FlutterFlowTheme.of(context).primaryBackground,
-                borderRadius: BorderRadius.circular(18.0),
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(24.0, 6.0, 24.0, 24.0),
@@ -113,7 +113,7 @@ class _EventSelectionWidgetState extends State<EventSelectionWidget> {
                           height: 2.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).secondaryText,
-                            borderRadius: BorderRadius.circular(3.0),
+                            borderRadius: BorderRadius.circular(2.0),
                           ),
                         ),
                       ],
@@ -182,7 +182,7 @@ class _EventSelectionWidgetState extends State<EventSelectionWidget> {
                             child: Container(
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context).gray4,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(8.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -201,7 +201,7 @@ class _EventSelectionWidgetState extends State<EventSelectionWidget> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: FlutterFlowTheme.of(context).gray4,
-                                      borderRadius: BorderRadius.circular(12.0),
+                                      borderRadius: BorderRadius.circular(8.0),
                                     ),
                                     child: Container(
                                       height: 159.0,
@@ -529,7 +529,7 @@ class _EventSelectionWidgetState extends State<EventSelectionWidget> {
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
                               ),
                             ),

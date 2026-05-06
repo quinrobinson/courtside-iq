@@ -420,7 +420,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                                 height: 46.0,
                                                                                 decoration: BoxDecoration(
                                                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                  borderRadius: BorderRadius.circular(23.0),
+                                                                                  borderRadius: BorderRadius.circular(9999.0),
                                                                                 ),
                                                                                 child: Row(
                                                                                   mainAxisSize: MainAxisSize.max,
@@ -441,14 +441,14 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                                 height: 46.0,
                                                                                 decoration: BoxDecoration(
                                                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                  borderRadius: BorderRadius.circular(23.0),
+                                                                                  borderRadius: BorderRadius.circular(9999.0),
                                                                                 ),
                                                                                 child: Row(
                                                                                   mainAxisSize: MainAxisSize.max,
                                                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                                                   children: [
                                                                                     ClipRRect(
-                                                                                      borderRadius: BorderRadius.circular(23.0),
+                                                                                      borderRadius: BorderRadius.circular(9999.0),
                                                                                       child: Image.network(
                                                                                         newGameVarItem.playerProfilePic!,
                                                                                         width: 46.0,
@@ -1129,7 +1129,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(8.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)

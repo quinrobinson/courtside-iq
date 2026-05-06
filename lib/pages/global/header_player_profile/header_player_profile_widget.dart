@@ -78,7 +78,7 @@ class _HeaderPlayerProfileWidgetState extends State<HeaderPlayerProfileWidget> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: FlutterFlowIconButton(
                   borderRadius: 12.0,
@@ -109,7 +109,7 @@ class _HeaderPlayerProfileWidgetState extends State<HeaderPlayerProfileWidget> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -200,7 +200,7 @@ class _HeaderPlayerProfileWidgetState extends State<HeaderPlayerProfileWidget> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: FlutterFlowIconButton(
                   borderRadius: 12.0,

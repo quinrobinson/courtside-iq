@@ -87,12 +87,12 @@ class _GameCompleteWidgetState extends State<GameCompleteWidget>
               color: Colors.transparent,
               elevation: 1.0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0),
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: Container(
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).primaryBackground,
-                  borderRadius: BorderRadius.circular(24.0),
+                  borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(
                     color: FlutterFlowTheme.of(context).gray4,
                     width: 1.0,
@@ -108,7 +108,7 @@ class _GameCompleteWidgetState extends State<GameCompleteWidget>
                       Container(
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).teal,
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Padding(
                           padding: EdgeInsets.all(6.0),
