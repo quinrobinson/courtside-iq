@@ -126,7 +126,7 @@ class PickerSheet<T> extends StatelessWidget {
       constraints: BoxConstraints(maxHeight: maxH + bottomInset + 80),
       decoration: const BoxDecoration(
         color: CIColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

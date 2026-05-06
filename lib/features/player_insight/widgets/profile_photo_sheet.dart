@@ -108,7 +108,7 @@ class _Sheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: CIColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       padding: EdgeInsets.only(bottom: 12 + bottomInset),
       child: Column(

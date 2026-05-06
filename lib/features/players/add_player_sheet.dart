@@ -111,7 +111,7 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: _sheetBg,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       padding: EdgeInsets.fromLTRB(24, 12, 24, 48 + bottomInset),
       child: Column(

@@ -17,7 +17,7 @@ class TrendPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(CIRadius.md),
+        borderRadius: BorderRadius.circular(CIRadius.sm),
       ),
       child: Text(
         label,

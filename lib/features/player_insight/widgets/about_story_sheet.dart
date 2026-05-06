@@ -24,7 +24,7 @@ class AboutStorySheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: CIColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
       child: Column(

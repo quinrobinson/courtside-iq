@@ -163,7 +163,7 @@ class _EventBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: CIColors.canvas.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(CIRadius.lg),
+        borderRadius: BorderRadius.circular(CIRadius.sm),
       ),
       child: Text(
         label,

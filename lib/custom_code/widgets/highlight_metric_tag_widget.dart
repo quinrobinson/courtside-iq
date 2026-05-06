@@ -39,7 +39,7 @@ class HighlightMetricTagWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: CIColors.royal50,
-        borderRadius: BorderRadius.circular(CIRadius.md),
+        borderRadius: BorderRadius.circular(CIRadius.sm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
