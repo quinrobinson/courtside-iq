@@ -476,7 +476,7 @@ class _ErrorBody extends StatelessWidget {
               backgroundColor: _text,
               foregroundColor: CIColors.inkOnBrand,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(CIRadius.lg),
               ),
               textStyle: const TextStyle(
                 fontFamily: CIType.fontFamily,

@@ -213,7 +213,7 @@ class _Row extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 color: bubbleBg,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(CIRadius.lg),
               ),
               alignment: Alignment.center,
               child: Icon(icon, size: 20, color: iconColor),

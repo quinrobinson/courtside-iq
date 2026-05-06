@@ -31,7 +31,7 @@ class BirthDateProfileBanner extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: _bannerBg,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(CIRadius.lg),
         ),
         padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
         child: const Row(

@@ -486,7 +486,7 @@ class _SectionHeader extends StatelessWidget {
                   height: 6,
                   decoration: BoxDecoration(
                     color: CIColors.ink,
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(CIRadius.xs),
                   ),
                 ),
               );
@@ -924,7 +924,7 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
       child: Container(
         decoration: BoxDecoration(
           color: CIColors.surface,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(CIRadius.lg),
           border: Border.all(color: CIColors.hairline),
         ),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),

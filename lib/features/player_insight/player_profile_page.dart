@@ -281,7 +281,7 @@ class _TabControl extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: _card,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(CIRadius.lg),
                     boxShadow: CIElevation.card,
                   ),
                 ),

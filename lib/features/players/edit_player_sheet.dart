@@ -182,7 +182,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
               height: 6,
               decoration: BoxDecoration(
                 color: _handleColor,
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),

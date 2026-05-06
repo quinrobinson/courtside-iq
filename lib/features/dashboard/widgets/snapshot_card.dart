@@ -51,7 +51,7 @@ class SnapshotCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: _bg,
-          borderRadius: BorderRadius.circular(14.5),
+          borderRadius: BorderRadius.circular(CIRadius.md),
         ),
         // Column stretches to fill the carousel height.
         child: Column(

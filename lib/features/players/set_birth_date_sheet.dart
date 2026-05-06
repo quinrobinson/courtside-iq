@@ -106,7 +106,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
               width: 34, height: 6,
               decoration: BoxDecoration(
                 color: _handleColor,
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),

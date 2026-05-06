@@ -261,7 +261,7 @@ class _GamesTabState extends State<GamesTab> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
         color: CIColors.canvas.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: Column(
         children: [
