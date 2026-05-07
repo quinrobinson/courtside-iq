@@ -619,7 +619,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                   Border.all(
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
-                                                                    .secondaryBackground,
+                                                                    .accent4,
                                                                 width: 1.0,
                                                               ),
                                                             ),
@@ -693,6 +693,10 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                     .primaryBackground,
                                                                 borderRadius:
                                                                     BorderRadius.circular(6.0),
+                                                                border: Border.all(
+                                                                  color: FlutterFlowTheme.of(context).accent4,
+                                                                  width: 1.0,
+                                                                ),
                                                               ),
                                                               child: Padding(
                                                                 padding: EdgeInsetsDirectional
@@ -877,7 +881,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                 color: FlutterFlowTheme.of(context).gray4,
                                                                                 borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                   width: 1.0,
                                                                                 ),
                                                                               ),
@@ -941,7 +945,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                 color: FlutterFlowTheme.of(context).gray4,
                                                                                 borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                 ),
                                                                               ),
                                                                               child: Align(
@@ -1003,7 +1007,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                 color: FlutterFlowTheme.of(context).gray4,
                                                                                 borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                 ),
                                                                               ),
                                                                               alignment: AlignmentDirectional(-1.0, -1.0),
@@ -1066,7 +1070,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                 color: FlutterFlowTheme.of(context).gray4,
                                                                                 borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                 ),
                                                                               ),
                                                                               alignment: AlignmentDirectional(-1.0, -1.0),
