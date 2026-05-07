@@ -377,7 +377,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                                       SizedBox(width: 12.0)),
                                                 ),
                                               ),
-                                            ].divide(SizedBox(height: 12.0)),
+                                            ].divide(SizedBox(height: 8.0)),
                                           ),
                                         ),
                                       ),

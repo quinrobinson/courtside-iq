@@ -178,7 +178,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            18.0, 0.0, 18.0, 0.0),
+                            12.0, 0.0, 12.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -505,7 +505,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                         ].divide(SizedBox(width: 12.0)),
                                       ),
                                     ),
-                                  ].divide(SizedBox(height: 12.0)),
+                                  ].divide(SizedBox(height: 8.0)),
                                 ),
                               ),
                             ),
@@ -552,7 +552,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                               scrollDirection: Axis.vertical,
                                               itemCount: playersVar.length,
                                               separatorBuilder: (_, __) =>
-                                                  SizedBox(height: 12.0),
+                                                  SizedBox(height: 8.0),
                                               itemBuilder:
                                                   (context, playersVarIndex) {
                                                 final playersVarItem =
@@ -694,9 +694,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                               child: Padding(
                                                                 padding: EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        18.0,
+                                                                        12.0,
                                                                         0.0,
-                                                                        18.0,
+                                                                        12.0,
                                                                         24.0),
                                                                 child: Column(
                                                                   mainAxisSize:

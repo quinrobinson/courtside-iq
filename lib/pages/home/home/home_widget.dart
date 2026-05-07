@@ -391,7 +391,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               ),
                                           ].divide(SizedBox(width: 12.0)),
                                         ),
-                                      ].divide(SizedBox(height: 12.0)),
+                                      ].divide(SizedBox(height: 8.0)),
                                     ),
                                   ),
                                 ),
@@ -1085,7 +1085,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  18.0, 0.0, 18.0, 0.0),
+                                                  12.0, 0.0, 12.0, 0.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
@@ -1253,7 +1253,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  18.0, 0.0, 18.0, 12.0),
+                                                  12.0, 0.0, 12.0, 12.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
@@ -2055,7 +2055,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   scrollDirection: Axis.vertical,
                                   itemCount: homeVar.length,
                                   separatorBuilder: (_, __) =>
-                                      SizedBox(height: 12.0),
+                                      SizedBox(height: 8.0),
                                   itemBuilder: (context, homeVarIndex) {
                                     final homeVarItem = homeVar[homeVarIndex];
                                     return InkWell(
@@ -2108,7 +2108,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                        18.0, 0.0, 18.0, 0.0),
+                                                        12.0, 0.0, 12.0, 0.0),
                                                 child: Container(
                                                   decoration: BoxDecoration(),
                                                   child: Padding(
@@ -2357,7 +2357,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               Expanded(
                                                 child: Padding(
                                                   padding: EdgeInsetsDirectional
-                                                      .fromSTEB(18.0, 0.0, 18.0,
+                                                      .fromSTEB(12.0, 0.0, 12.0,
                                                           12.0),
                                                   child: Row(
                                                     mainAxisSize:
@@ -3303,7 +3303,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                     .fromSTEB(
                                                                         12.0,
                                                                         6.0,
-                                                                        18.0,
+                                                                        12.0,
                                                                         6.0),
                                                             child: Row(
                                                               mainAxisSize:

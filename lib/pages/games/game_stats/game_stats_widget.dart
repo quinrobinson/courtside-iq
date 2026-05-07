@@ -163,7 +163,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                               child: Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                        18.0, 0.0, 18.0, 0.0),
+                                                        12.0, 0.0, 12.0, 0.0),
                                                 child: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
@@ -181,9 +181,9 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                             padding:
                                                                 EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        18.0,
+                                                                        12.0,
                                                                         0.0,
-                                                                        18.0,
+                                                                        12.0,
                                                                         0.0),
                                                             child: Row(
                                                               mainAxisSize:
@@ -469,9 +469,9 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         child:
                                                                             Padding(
                                                                           padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0,
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0),
                                                                           child:
                                                                               Text(
@@ -503,9 +503,9 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         child:
                                                                             Padding(
                                                                           padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0,
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0),
                                                                           child:
                                                                               Text(

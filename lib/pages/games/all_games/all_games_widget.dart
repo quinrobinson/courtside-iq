@@ -203,7 +203,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            18.0, 0.0, 18.0, 0.0),
+                            12.0, 0.0, 12.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -520,7 +520,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                         ].divide(SizedBox(width: 12.0)),
                                       ),
                                     ),
-                                  ].divide(SizedBox(height: 12.0)),
+                                  ].divide(SizedBox(height: 8.0)),
                                 ),
                               ),
                             ),
