@@ -569,11 +569,11 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                             color: valueOrDefault<Color>(
                                               !_model.allPlayers!
                                                   ? FlutterFlowTheme.of(context)
-                                                      .secondaryBackground
+                                                      .accent4
                                                   : FlutterFlowTheme.of(context)
                                                       .primaryButtonText,
                                               FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
+                                                  .accent4,
                                             ),
                                             width: 1.0,
                                           ),
@@ -663,12 +663,12 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                     !_model.playerOne!
                                                         ? FlutterFlowTheme.of(
                                                                 context)
-                                                            .secondaryBackground
+                                                            .accent4
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
+                                                        .accent4,
                                                   ),
                                                   width: 1.0,
                                                 ),
@@ -765,12 +765,12 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                     !_model.playerTwo!
                                                         ? FlutterFlowTheme.of(
                                                                 context)
-                                                            .secondaryBackground
+                                                            .accent4
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
+                                                        .accent4,
                                                   ),
                                                   width: 1.0,
                                                 ),
@@ -866,12 +866,12 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                     !_model.playerThree!
                                                         ? FlutterFlowTheme.of(
                                                                 context)
-                                                            .secondaryBackground
+                                                            .accent4
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
+                                                        .accent4,
                                                   ),
                                                   width: 1.0,
                                                 ),
@@ -1031,9 +1031,9 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                   ? FlutterFlowTheme.of(context)
                                                       .primaryText
                                                   : FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
+                                                      .accent4,
                                               FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
+                                                  .accent4,
                                             ),
                                             width: 1.0,
                                           ),
@@ -1278,7 +1278,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         border: Border.all(
                                                           color: FlutterFlowTheme
                                                                   .of(context)
-                                                              .secondaryBackground,
+                                                              .accent4,
                                                           width: 1.0,
                                                         ),
                                                       ),
@@ -1982,7 +1982,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                           elevation: 0.0,
                                           borderSide: BorderSide(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                           borderRadius:
