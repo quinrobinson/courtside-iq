@@ -688,9 +688,9 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                           child:
                                                                               Padding(
                                                                             padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                15.0,
+                                                                                12.0,
                                                                                 0.0,
-                                                                                15.0,
+                                                                                12.0,
                                                                                 0.0),
                                                                             child:
                                                                                 Text(
