@@ -1347,7 +1347,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     fontStyle:
@@ -1403,7 +1403,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -1436,7 +1436,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -1475,7 +1475,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
                                                               context)

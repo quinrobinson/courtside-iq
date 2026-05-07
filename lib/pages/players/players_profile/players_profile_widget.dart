@@ -422,10 +422,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
+                                                            fontSize: 14.0,
                                                             letterSpacing: 0.0,
                                                             fontWeight:
-                                                                FontWeight.w300,
+                                                                FontWeight.w400,
                                                             fontStyle:
                                                                 FlutterFlowTheme.of(
                                                                         context)
@@ -457,7 +457,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .titleMedium
                                             .override(
-                                              font: GoogleFonts.montserrat(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -1930,7 +1930,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         .labelMedium
                                                                         .override(
                                                                           font:
-                                                                              GoogleFonts.ibmPlexSans(
+                                                                              GoogleFonts.dmSans(
                                                                             fontWeight:
                                                                                 FontWeight.normal,
                                                                             fontStyle:
@@ -1991,7 +1991,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .labelMedium
                                                                               .override(
-                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                font: GoogleFonts.dmSans(
                                                                                   fontWeight: FontWeight.normal,
                                                                                   fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                 ),
@@ -2094,7 +2094,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2128,7 +2128,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2162,7 +2162,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2195,7 +2195,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2229,7 +2229,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2265,7 +2265,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2299,7 +2299,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2333,7 +2333,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2367,7 +2367,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2401,7 +2401,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2435,7 +2435,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2469,7 +2469,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2511,7 +2511,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.bold,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2538,7 +2538,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .bodyMedium
                                                                               .override(
-                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                font: GoogleFonts.dmSans(
                                                                                   fontWeight: FontWeight.w500,
                                                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                 ),

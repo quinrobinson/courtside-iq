@@ -189,7 +189,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                           style: FlutterFlowTheme.of(context)
                                               .headlineSmall
                                               .override(
-                                                font: GoogleFonts.montserrat(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w500,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -197,7 +197,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                           .headlineSmall
                                                           .fontStyle,
                                                 ),
-                                                fontSize: 24.0,
+                                                fontSize: 22.0,
                                                 letterSpacing: 0.0,
                                                 fontWeight: FontWeight.w500,
                                                 fontStyle:
@@ -479,7 +479,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                                     replacement: '…',
                                                                                   ),
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.normal,
                                                                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                         ),
@@ -1247,7 +1247,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                         .bodyMedium
                                                                         .override(
                                                                           font:
-                                                                              GoogleFonts.ibmPlexSans(
+                                                                              GoogleFonts.dmSans(
                                                                             fontWeight:
                                                                                 FontWeight.w500,
                                                                             fontStyle:
@@ -1274,7 +1274,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                         .bodyMedium
                                                                         .override(
                                                                           font:
-                                                                              GoogleFonts.ibmPlexSans(
+                                                                              GoogleFonts.dmSans(
                                                                             fontWeight:
                                                                                 FontWeight.normal,
                                                                             fontStyle:
@@ -1480,7 +1480,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                           color: FlutterFlowTheme
                                                                   .of(context)
                                                               .primaryBackground,
-                                                          fontSize: 18.0,
+                                                          fontSize: 17.0,
                                                           letterSpacing: 0.0,
                                                           fontWeight:
                                                               FontWeight.w500,

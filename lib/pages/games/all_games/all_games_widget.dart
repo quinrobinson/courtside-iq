@@ -223,14 +223,14 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .headlineSmall
                                             .override(
-                                              font: GoogleFonts.montserrat(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.normal,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineSmall
                                                         .fontStyle,
                                               ),
-                                              fontSize: 25.0,
+                                              fontSize: 22.0,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.normal,
                                               fontStyle:
@@ -303,7 +303,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleSmall
                                       .override(
-                                        font: GoogleFonts.ibmPlexSans(
+                                        font: GoogleFonts.dmSans(
                                           fontWeight: FontWeight.normal,
                                           fontStyle:
                                               FlutterFlowTheme.of(context)
@@ -589,7 +589,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w500,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -1416,7 +1416,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 child: Text(
                                                                                   '${allGamesVarItem.firstName}',
                                                                                   style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.bold,
                                                                                           fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
                                                                                         ),
@@ -1452,7 +1452,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                               'Event',
                                                                                             ),
                                                                                             style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                                  font: GoogleFonts.dmSans(
                                                                                                     fontWeight: FontWeight.normal,
                                                                                                     fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                                   ),
@@ -1493,7 +1493,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .labelMedium
                                                                               .override(
-                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                font: GoogleFonts.dmSans(
                                                                                   fontWeight: FontWeight.normal,
                                                                                   fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                 ),
@@ -1562,7 +1562,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'PTS',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1585,7 +1585,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1615,7 +1615,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'REB',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1638,7 +1638,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1668,7 +1668,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'AST',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1692,7 +1692,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                               ),
                                                                               textAlign: TextAlign.end,
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1722,7 +1722,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'BLK',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1745,7 +1745,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1775,7 +1775,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'STL',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1798,7 +1798,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1828,7 +1828,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'TOV',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1851,7 +1851,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1960,7 +1960,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                   context)
                                               .titleSmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(

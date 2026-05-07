@@ -514,7 +514,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
                                                                     .primaryText,
-                                                                fontSize: 34.0,
+                                                                fontSize: 28.0,
                                                                 letterSpacing:
                                                                     0.0,
                                                                 fontWeight:
@@ -555,7 +555,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
                                                                     .primaryText,
-                                                                fontSize: 34.0,
+                                                                fontSize: 28.0,
                                                                 letterSpacing:
                                                                     0.0,
                                                                 fontWeight:
@@ -2011,7 +2011,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       style: FlutterFlowTheme.of(context)
                                           .titleMedium
                                           .override(
-                                            font: GoogleFonts.montserrat(
+                                            font: GoogleFonts.dmSans(
                                               fontWeight: FontWeight.w600,
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
@@ -2236,7 +2236,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                               Text(
                                                                             '${homeVarItem.firstName}',
                                                                             style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
                                                                                   ),
@@ -2279,7 +2279,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                     'Event',
                                                                                   ),
                                                                                   style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.normal,
                                                                                           fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                         ),
@@ -3335,7 +3335,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                         .bodyMedium
                                                                         .override(
                                                                           font:
-                                                                              GoogleFonts.ibmPlexSans(
+                                                                              GoogleFonts.dmSans(
                                                                             fontWeight:
                                                                                 FontWeight.normal,
                                                                             fontStyle:
@@ -3423,7 +3423,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                   context)
                                               .titleSmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w500,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(

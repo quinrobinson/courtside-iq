@@ -200,14 +200,14 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .headlineSmall
                                             .override(
-                                              font: GoogleFonts.montserrat(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.normal,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineSmall
                                                         .fontStyle,
                                               ),
-                                              fontSize: 25.0,
+                                              fontSize: 22.0,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.normal,
                                               fontStyle:
@@ -286,7 +286,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                     textStyle: FlutterFlowTheme.of(context)
                                         .titleSmall
                                         .override(
-                                          font: GoogleFonts.ibmPlexSans(
+                                          font: GoogleFonts.dmSans(
                                             fontWeight: FontWeight.normal,
                                             fontStyle:
                                                 FlutterFlowTheme.of(context)
@@ -788,7 +788,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                                     child: Text(
                                                                                                       '${playersVarItem.playerFirstName}',
                                                                                                       style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                                            font: GoogleFonts.ibmPlexSans(
+                                                                                                            font: GoogleFonts.dmSans(
                                                                                                               fontWeight: FontWeight.w500,
                                                                                                               fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
                                                                                                             ),
@@ -894,7 +894,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -909,7 +909,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         'Games',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),
@@ -957,7 +957,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -971,7 +971,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         'FG%',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),
@@ -1020,7 +1020,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.montserrat(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -1034,7 +1034,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         'FT%',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),
@@ -1083,7 +1083,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -1097,7 +1097,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         '3PT%',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),

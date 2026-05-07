@@ -849,7 +849,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   style: FlutterFlowTheme.of(context)
                                       .titleMedium
                                       .override(
-                                        font: GoogleFonts.ibmPlexSans(
+                                        font: GoogleFonts.dmSans(
                                           fontWeight: FontWeight.normal,
                                           fontStyle:
                                               FlutterFlowTheme.of(context)
@@ -874,7 +874,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
-                                          font: GoogleFonts.ibmPlexSans(
+                                          font: GoogleFonts.dmSans(
                                             fontWeight: FontWeight.w300,
                                             fontStyle:
                                                 FlutterFlowTheme.of(context)
@@ -994,7 +994,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.bold,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1059,7 +1059,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1175,7 +1175,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1287,7 +1287,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1398,7 +1398,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1509,7 +1509,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1620,7 +1620,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1731,7 +1731,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1850,7 +1850,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodySmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -2059,7 +2059,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .titleSmall
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2117,7 +2117,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexMono(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -2154,7 +2154,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexMono(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     fontStyle:
@@ -2205,7 +2205,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2244,7 +2244,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexMono(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -2296,7 +2296,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexMono(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     fontStyle:
@@ -2347,7 +2347,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2386,7 +2386,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexMono(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -2438,7 +2438,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexMono(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     fontStyle:
@@ -2550,7 +2550,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2577,7 +2577,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -2717,7 +2717,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2741,7 +2741,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2839,7 +2839,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2863,7 +2863,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2954,7 +2954,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -2978,7 +2978,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -3057,7 +3057,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -3081,7 +3081,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -3160,7 +3160,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -3184,7 +3184,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -3319,7 +3319,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   .bodySmall
                                                   .override(
                                                     font:
-                                                        GoogleFonts.ibmPlexSans(
+                                                        GoogleFonts.dmSans(
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       fontStyle:
@@ -3444,7 +3444,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -3567,7 +3567,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -3690,7 +3690,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -3823,7 +3823,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -3945,7 +3945,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -4068,7 +4068,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -4191,7 +4191,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodySmall
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w600,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -4582,7 +4582,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleSmall
                                       .override(
-                                        font: GoogleFonts.ibmPlexSans(
+                                        font: GoogleFonts.dmSans(
                                           fontWeight: FontWeight.w500,
                                           fontStyle:
                                               FlutterFlowTheme.of(context)
@@ -4591,7 +4591,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         ),
                                         color: FlutterFlowTheme.of(context)
                                             .primaryBackground,
-                                        fontSize: 18.0,
+                                        fontSize: 17.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.w500,
                                         fontStyle: FlutterFlowTheme.of(context)
@@ -4755,7 +4755,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -4832,7 +4832,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.normal,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -5018,7 +5018,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
