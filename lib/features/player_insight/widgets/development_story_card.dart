@@ -1,16 +1,18 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '../models/player_insight.dart';
 import 'trend_pill.dart';
 
-const _purple = Color(0xFF7936FF);
-const _magenta = Color(0xFFD9005C);
-const _green = Color(0xFF2BC18C);
-const _text = Color(0xFF0F0F0F);
-const _text2 = Color(0xFF8A8A8A);
-const _border = Color(0xFFE6E6E6);
-const _track = Color(0xFFF5F5F5);
-const _skeleton = Color(0xFFE8E8E8);
+const _purple = CIColors.royal500;
+const _amber = CIColors.spark500;
+const _magenta = CIColors.rose500;
+const _green = CIColors.jade500;
+const _text = CIColors.ink;
+const _text2 = CIColors.ink3;
+const _border = CIColors.hairline;
+const _track = CIColors.surfaceAlt;
+const _skeleton = CIColors.canvasSunk;
 
 class DevelopmentStoryCard extends StatelessWidget {
   const DevelopmentStoryCard.eligible({
@@ -59,16 +61,9 @@ class DevelopmentStoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: CIColors.surface,
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       padding: const EdgeInsets.all(20),
       child: switch (_state) {
@@ -114,7 +109,7 @@ class _EligibleBody extends StatelessWidget {
           Text(
             insight.headline!,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: _text,
@@ -126,7 +121,7 @@ class _EligibleBody extends StatelessWidget {
           Text(
             legacyText,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 14,
               color: _text,
               height: 1.5,
@@ -185,7 +180,13 @@ class _AccentSection extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(width: 4, color: color),
+          Container(
+            width: 2,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(CIRadius.xs),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -194,7 +195,7 @@ class _AccentSection extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: color,
@@ -205,7 +206,7 @@ class _AccentSection extends StatelessWidget {
                 Text(
                   body,
                   style: const TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 13,
                     color: _text,
                     height: 1.45,
@@ -231,13 +232,13 @@ class _RetryChip extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(CIRadius.md),
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: _track,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(CIRadius.md),
               border: Border.all(color: _border),
             ),
             child: const Row(
@@ -246,7 +247,7 @@ class _RetryChip extends StatelessWidget {
                 Text(
                   '↻',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: _text2,
@@ -256,7 +257,7 @@ class _RetryChip extends StatelessWidget {
                 Text(
                   "Couldn't refresh · tap to retry",
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: _text2,
@@ -278,13 +279,10 @@ class _BelowBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (games / 5).clamp(0.0, 1.0);
     final remaining = (5 - games).clamp(0, 5);
-    final chipLabel = remaining == 1
-        ? '✦ 1 game to go'
-        : '✦ $remaining games to go';
+    final chipLabel = remaining == 1 ? '✦ 1 to go' : '✦ $remaining to go';
     final headline = remaining == 1
-        ? "$firstName's story opens next game"
+        ? "One more for $firstName's first story"
         : "$firstName's story is taking shape";
     final body = remaining == 1
         ? "You'll see where $firstName is shining, where there's room to grow, and what to watch for next."
@@ -296,16 +294,16 @@ class _BelowBody extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: _purple.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(6),
+            color: _amber.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: Text(
             chipLabel,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: _purple,
+              color: _amber,
             ),
           ),
         ),
@@ -313,7 +311,7 @@ class _BelowBody extends StatelessWidget {
         Text(
           headline,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: _text,
@@ -324,59 +322,64 @@ class _BelowBody extends StatelessWidget {
         Text(
           body,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 14,
             color: _text,
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 24),
+        _DotProgress(filled: games, total: 5),
+        const SizedBox(height: 8),
         Text(
-          '$games of 5 games',
+          '$games of 5 games logged',
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 12,
-            fontWeight: FontWeight.w600,
             color: _text2,
           ),
         ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 6,
-            backgroundColor: _track,
-            valueColor: const AlwaysStoppedAnimation(_purple),
-          ),
-        ),
-        const SizedBox(height: 22),
-        Opacity(
-          opacity: 0.4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _AccentSection(
-                color: _green,
-                label: 'BRIGHT SPOTS',
-                body: "Where $firstName's game is clicking",
-              ),
-              const SizedBox(height: 14),
-              const _AccentSection(
-                color: _magenta,
-                label: 'ROOM TO GROW',
-                body: 'The next layer of development',
-              ),
-              const SizedBox(height: 14),
-              const _AccentSection(
-                color: _purple,
-                label: 'WATCH FOR NEXT',
-                body: 'A real moment to watch next game',
-              ),
-            ],
+        const SizedBox(height: 16),
+        Text(
+          'Unlocks bright spots, room to grow, and what to watch for next',
+          style: TextStyle(
+            fontFamily: CIType.fontFamily,
+            fontSize: 12,
+            color: _text2.withValues(alpha: 0.7),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DotProgress extends StatelessWidget {
+  const _DotProgress({required this.filled, required this.total});
+  final int filled;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(total, (i) {
+        final isFilled = i < filled;
+        return Padding(
+          padding: EdgeInsets.only(right: i < total - 1 ? 8 : 0),
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isFilled ? _amber : Colors.transparent,
+              border: Border.all(
+                color: isFilled ? _amber : CIColors.hairline,
+                width: 1.5,
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
@@ -391,7 +394,7 @@ class _LoadingBody extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: _skeleton,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(CIRadius.sm),
           ),
         );
     return Column(
@@ -429,12 +432,12 @@ class _ErrorBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: _magenta.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: const Text(
             "Couldn't load",
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: _magenta,
@@ -445,7 +448,7 @@ class _ErrorBody extends StatelessWidget {
         Text(
           "We couldn't generate $firstName's story",
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: _text,
@@ -456,7 +459,7 @@ class _ErrorBody extends StatelessWidget {
         const Text(
           'Something went wrong reaching the insight service. Your data is safe. Try again in a moment.',
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: CIType.fontFamily,
             fontSize: 14,
             color: _text,
             height: 1.5,
@@ -470,12 +473,12 @@ class _ErrorBody extends StatelessWidget {
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
               backgroundColor: _text,
-              foregroundColor: Colors.white,
+              foregroundColor: CIColors.inkOnBrand,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(CIRadius.lg),
               ),
               textStyle: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),

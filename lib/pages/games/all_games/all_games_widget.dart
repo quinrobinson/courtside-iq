@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -148,13 +149,27 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header: title stub + button stub
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 100, height: 28),
+                        Spacer(),
+                        SkeletonBox(width: 80, height: 36, radius: 8),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    const SkeletonBox(width: double.infinity, height: 88),
+                    const SizedBox(height: 10),
+                    const SkeletonBox(width: double.infinity, height: 88),
+                    const SizedBox(height: 10),
+                    const SkeletonBox(width: double.infinity, height: 88),
+                  ],
                 ),
               ),
             ),
@@ -173,15 +188,6 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
                       0.0,
@@ -197,7 +203,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            18.0, 0.0, 18.0, 0.0),
+                            12.0, 0.0, 12.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -217,14 +223,14 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                         style: FlutterFlowTheme.of(context)
                                             .headlineSmall
                                             .override(
-                                              font: GoogleFonts.montserrat(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.normal,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineSmall
                                                         .fontStyle,
                                               ),
-                                              fontSize: 25.0,
+                                              fontSize: 22.0,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.normal,
                                               fontStyle:
@@ -297,7 +303,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleSmall
                                       .override(
-                                        font: GoogleFonts.ibmPlexSans(
+                                        font: GoogleFonts.dmSans(
                                           fontWeight: FontWeight.normal,
                                           fontStyle:
                                               FlutterFlowTheme.of(context)
@@ -314,7 +320,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(4.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ),
                           ].divide(SizedBox(width: 12.0)),
@@ -367,10 +373,10 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                     'assets/images/gradient-bg-black-b.png',
                                   ).image,
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(16.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,7 +520,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                         ].divide(SizedBox(width: 12.0)),
                                       ),
                                     ),
-                                  ].divide(SizedBox(height: 12.0)),
+                                  ].divide(SizedBox(height: 8.0)),
                                 ),
                               ),
                             ),
@@ -558,16 +564,16 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                 .primaryText,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: valueOrDefault<Color>(
                                               !_model.allPlayers!
                                                   ? FlutterFlowTheme.of(context)
-                                                      .secondaryBackground
+                                                      .accent4
                                                   : FlutterFlowTheme.of(context)
                                                       .primaryButtonText,
                                               FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
+                                                  .accent4,
                                             ),
                                             width: 1.0,
                                           ),
@@ -583,7 +589,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight: FontWeight.w500,
                                                     fontStyle:
                                                         FlutterFlowTheme.of(
@@ -651,18 +657,18 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         .primaryText
                                                     : Color(0x00000000),
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: valueOrDefault<Color>(
                                                     !_model.playerOne!
                                                         ? FlutterFlowTheme.of(
                                                                 context)
-                                                            .secondaryBackground
+                                                            .accent4
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
+                                                        .accent4,
                                                   ),
                                                   width: 1.0,
                                                 ),
@@ -753,18 +759,18 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         .primaryText
                                                     : Color(0x00000000),
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: valueOrDefault<Color>(
                                                     !_model.playerTwo!
                                                         ? FlutterFlowTheme.of(
                                                                 context)
-                                                            .secondaryBackground
+                                                            .accent4
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
+                                                        .accent4,
                                                   ),
                                                   width: 1.0,
                                                 ),
@@ -854,18 +860,18 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                         .primaryText
                                                     : Color(0x00000000),
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: valueOrDefault<Color>(
                                                     !_model.playerThree!
                                                         ? FlutterFlowTheme.of(
                                                                 context)
-                                                            .secondaryBackground
+                                                            .accent4
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
+                                                        .accent4,
                                                   ),
                                                   width: 1.0,
                                                 ),
@@ -996,7 +1002,10 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
                                         _model.selectedDate =
-                                            getUniqueDatesItem;
+                                            _model.selectedDate ==
+                                                    getUniqueDatesItem
+                                                ? null
+                                                : getUniqueDatesItem;
                                         safeSetState(() {});
                                       },
                                       child: Container(
@@ -1014,7 +1023,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                 .globalBackground,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: valueOrDefault<Color>(
                                               _model.selectedDate ==
@@ -1022,9 +1031,9 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                   ? FlutterFlowTheme.of(context)
                                                       .primaryText
                                                   : FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
+                                                      .accent4,
                                               FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
+                                                  .accent4,
                                             ),
                                             width: 1.0,
                                           ),
@@ -1265,12 +1274,11 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                 .of(context)
                                                             .primaryBackground,
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(18.0),
+                                                            BorderRadius.circular(6.0),
                                                         border: Border.all(
                                                           color: FlutterFlowTheme
                                                                   .of(context)
-                                                              .secondaryBackground,
+                                                              .accent4,
                                                           width: 1.0,
                                                         ),
                                                       ),
@@ -1316,8 +1324,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                               context)
                                                                           .secondaryBackground,
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              23.0),
+                                                                          BorderRadius.circular(9999.0),
                                                                     ),
                                                                     child: Row(
                                                                       mainAxisSize:
@@ -1329,7 +1336,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                       children: [
                                                                         ClipRRect(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(23.0),
+                                                                              BorderRadius.circular(9999.0),
                                                                           child:
                                                                               Image.network(
                                                                             allGamesVarItem.playerProfilePic!,
@@ -1360,8 +1367,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                               context)
                                                                           .gray4,
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              23.0),
+                                                                          BorderRadius.circular(9999.0),
                                                                     ),
                                                                     child: Row(
                                                                       mainAxisSize:
@@ -1410,7 +1416,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 child: Text(
                                                                                   '${allGamesVarItem.firstName}',
                                                                                   style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.bold,
                                                                                           fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
                                                                                         ),
@@ -1430,7 +1436,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                   Container(
                                                                                     height: 24.0,
                                                                                     decoration: BoxDecoration(
-                                                                                      color: FlutterFlowTheme.of(context).gray4,
+                                                                                      color: const Color(0x80E2E3E6),
                                                                                       borderRadius: BorderRadius.circular(6.0),
                                                                                     ),
                                                                                     alignment: AlignmentDirectional(0.0, 0.0),
@@ -1446,11 +1452,11 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                               'Event',
                                                                                             ),
                                                                                             style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                                  font: GoogleFonts.dmSans(
                                                                                                     fontWeight: FontWeight.normal,
                                                                                                     fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                                   ),
-                                                                                                  color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                                  color: const Color(0xFF52535D),
                                                                                                   fontSize: 13.0,
                                                                                                   letterSpacing: 0.0,
                                                                                                   fontWeight: FontWeight.normal,
@@ -1487,7 +1493,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .labelMedium
                                                                               .override(
-                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                font: GoogleFonts.dmSans(
                                                                                   fontWeight: FontWeight.normal,
                                                                                   fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                 ),
@@ -1516,10 +1522,10 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                       .only(
                                                                 bottomLeft: Radius
                                                                     .circular(
-                                                                        18.0),
+                                                                        5.0),
                                                                 bottomRight: Radius
                                                                     .circular(
-                                                                        17.0),
+                                                                        5.0),
                                                               ),
                                                             ),
                                                             child: Padding(
@@ -1556,7 +1562,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'PTS',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1579,7 +1585,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1609,7 +1615,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'REB',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1632,7 +1638,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1662,7 +1668,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'AST',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1686,7 +1692,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                               ),
                                                                               textAlign: TextAlign.end,
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1716,7 +1722,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'BLK',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1739,7 +1745,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1769,7 +1775,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'STL',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1792,7 +1798,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1822,7 +1828,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                           Text(
                                                                             'TOV',
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -1845,7 +1851,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                                 '0',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w500,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -1954,7 +1960,7 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                   context)
                                               .titleSmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -1976,11 +1982,11 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                           elevation: 0.0,
                                           borderSide: BorderSide(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                         ),
                                       ),
                                     ),

@@ -110,7 +110,7 @@ class _YourProfileWidgetState extends State<YourProfileWidget> {
                                     width: 140.0,
                                     height: 140.0,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(70.0),
+                                      borderRadius: BorderRadius.circular(9999.0),
                                       border: Border.all(
                                         color:
                                             FlutterFlowTheme.of(context).gray3,
@@ -167,14 +167,14 @@ class _YourProfileWidgetState extends State<YourProfileWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(11.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                     child: Container(
                                       height: 60.0,
                                       decoration: BoxDecoration(
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(11.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
@@ -378,14 +378,14 @@ class _YourProfileWidgetState extends State<YourProfileWidget> {
                                     ),
                                   ),
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                     child: Container(
                                       height: 60.0,
                                       decoration: BoxDecoration(
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
@@ -624,7 +624,7 @@ class _YourProfileWidgetState extends State<YourProfileWidget> {
                                               width: 1.0,
                                             ),
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(6.0),
                                           ),
                                           showLoadingIndicator: false,
                                         ),

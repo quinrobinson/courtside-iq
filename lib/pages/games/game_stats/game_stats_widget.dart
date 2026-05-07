@@ -1,5 +1,6 @@
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/features/player_insight/widgets/spark_icon.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -18,6 +19,8 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'game_stats_model.dart';
 export 'game_stats_model.dart';
+import '/flutter_flow/revenue_cat_util.dart' as revenue_cat;
+import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 
 class GameStatsWidget extends StatefulWidget {
   const GameStatsWidget({
@@ -71,6 +74,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
           foregroundColor: FlutterFlowTheme.of(context).primaryText,
           leading: IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
@@ -158,7 +163,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                               child: Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                        18.0, 0.0, 18.0, 0.0),
+                                                        12.0, 0.0, 12.0, 0.0),
                                                 child: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
@@ -176,9 +181,9 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                             padding:
                                                                 EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        18.0,
+                                                                        12.0,
                                                                         0.0,
-                                                                        18.0,
+                                                                        12.0,
                                                                         0.0),
                                                             child: Row(
                                                               mainAxisSize:
@@ -189,29 +194,21 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                       .center,
                                                               children: [
                                                                 Container(
+                                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
+                                                                        BorderRadius.circular(6.0),
                                                                     border:
                                                                         Border
                                                                             .all(
-                                                                      color: Color(
+                                                                      color: const Color(
                                                                           0x5A292928),
                                                                       width:
                                                                           1.0,
                                                                     ),
                                                                   ),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            12.0,
-                                                                            6.0,
-                                                                            12.0,
-                                                                            6.0),
-                                                                    child: Text(
+                                                                  child: Text(
                                                                       dateTimeFormat(
                                                                         "yMMMd",
                                                                         containerVPlayerGameStatsRow!
@@ -219,27 +216,12 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         locale:
                                                                             FFLocalizations.of(context).languageCode,
                                                                       ),
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            font:
-                                                                                GoogleFonts.ibmPlexSans(
-                                                                              fontWeight: FontWeight.w600,
-                                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                            ),
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primaryText,
-                                                                            fontSize:
-                                                                                12.0,
-                                                                            letterSpacing:
-                                                                                0.0,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                            fontStyle:
-                                                                                FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                          ),
-                                                                    ),
+                                                                      style: const TextStyle(
+                                                                        fontFamily: 'Inter',
+                                                                        fontSize: 11.0,
+                                                                        fontWeight: FontWeight.w500,
+                                                                        color: Color(0xFF52535D),
+                                                                      ),
                                                                   ),
                                                                 ),
                                                                 if (containerVPlayerGameStatsRow
@@ -249,50 +231,34 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             ?.eventName !=
                                                                         '')
                                                                   Container(
+                                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                                                     decoration:
                                                                         BoxDecoration(
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primaryText,
+                                                                      color: const Color(0x80E2E3E6),
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8.0),
+                                                                          BorderRadius.circular(6.0),
                                                                     ),
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                                                          12.0,
-                                                                          6.0,
-                                                                          12.0,
-                                                                          6.0),
-                                                                      child:
-                                                                          Text(
+                                                                    child: Text(
                                                                         valueOrDefault<
                                                                             String>(
                                                                           containerVPlayerGameStatsRow
                                                                               ?.eventName,
-                                                                          '[Event]',
+                                                                          '',
                                                                         ).maybeHandleOverflow(
                                                                           maxChars:
                                                                               20,
                                                                           replacement:
                                                                               '…',
                                                                         ),
-                                                                        style: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium
-                                                                            .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
-                                                                                fontWeight: FontWeight.w600,
-                                                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                              ),
-                                                                              color: FlutterFlowTheme.of(context).primaryBackground,
-                                                                              fontSize: 12.0,
-                                                                              letterSpacing: 0.0,
-                                                                              fontWeight: FontWeight.w600,
-                                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                                            ),
+                                                                        maxLines: 1,
+                                                                        overflow: TextOverflow.ellipsis,
+                                                                        style: const TextStyle(
+                                                                          fontFamily: 'Inter',
+                                                                          fontSize: 11.0,
+                                                                          fontWeight: FontWeight.w500,
+                                                                          color: Color(0xFF52535D),
+                                                                        ),
                                                                       ),
-                                                                    ),
                                                                   ),
                                                               ].divide(SizedBox(
                                                                   width: 6.0)),
@@ -371,7 +337,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 height: 80.0,
                                                                                 decoration: BoxDecoration(
                                                                                   color: FlutterFlowTheme.of(context).primaryBackground,
-                                                                                  borderRadius: BorderRadius.circular(45.0),
+                                                                                  borderRadius: BorderRadius.circular(9999.0),
                                                                                   border: Border.all(
                                                                                     color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                     width: 1.0,
@@ -395,13 +361,13 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 width: 80.0,
                                                                                 height: 80.0,
                                                                                 decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(45.0),
+                                                                                  borderRadius: BorderRadius.circular(9999.0),
                                                                                   border: Border.all(
                                                                                     color: Color(0x350F0F0F),
                                                                                   ),
                                                                                 ),
                                                                                 child: ClipRRect(
-                                                                                  borderRadius: BorderRadius.circular(45.0),
+                                                                                  borderRadius: BorderRadius.circular(9999.0),
                                                                                   child: Image.network(
                                                                                     containerVPlayerGameStatsRow!.playerProfilePic!,
                                                                                     width: 90.0,
@@ -444,7 +410,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             color:
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
-                                                                                BorderRadius.circular(45.0),
+                                                                                BorderRadius.circular(9999.0),
                                                                             border:
                                                                                 Border.all(
                                                                               color: FlutterFlowTheme.of(context).secondaryBackground,
@@ -498,14 +464,14 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(18.0),
+                                                                              BorderRadius.circular(6.0),
                                                                         ),
                                                                         child:
                                                                             Padding(
                                                                           padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0,
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0),
                                                                           child:
                                                                               Text(
@@ -513,7 +479,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             textAlign:
                                                                                 TextAlign.center,
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.normal,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -532,14 +498,14 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(18.0),
+                                                                              BorderRadius.circular(6.0),
                                                                         ),
                                                                         child:
                                                                             Padding(
                                                                           padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0,
-                                                                              18.0,
+                                                                              12.0,
                                                                               0.0),
                                                                           child:
                                                                               Text(
@@ -550,7 +516,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             textAlign:
                                                                                 TextAlign.center,
                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.normal,
                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                   ),
@@ -593,9 +559,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                       .of(context)
                                                                   .primaryBackground,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          18.0),
+                                                                  BorderRadius.circular(6.0),
                                                             ),
                                                             child: Padding(
                                                               padding:
@@ -630,19 +594,14 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             CrossAxisAlignment.center,
                                                                         children:
                                                                             [
-                                                                          Icon(
-                                                                            FFIcons.kaiSpark,
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).vividViolet,
-                                                                            size:
-                                                                                20.0,
-                                                                          ),
+                                                                          const SparkIcon(size: 16),
+                                                                          const SizedBox(width: 6),
                                                                           Expanded(
                                                                             child:
                                                                                 Text(
                                                                               'GAME INSIGHTS',
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.montserrat(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.w600,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -667,7 +626,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               children: [
                                                                                 Builder(
                                                                                   builder: (context) => FlutterFlowIconButton(
-                                                                                    borderRadius: 8.0,
+                                                                                    borderRadius: 6.0,
                                                                                     buttonSize: 40.0,
                                                                                     fillColor: FlutterFlowTheme.of(context).primaryBackground,
                                                                                     icon: Icon(
@@ -729,9 +688,9 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                           child:
                                                                               Padding(
                                                                             padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                15.0,
+                                                                                12.0,
                                                                                 0.0,
-                                                                                15.0,
+                                                                                12.0,
                                                                                 0.0),
                                                                             child:
                                                                                 Text(
@@ -740,7 +699,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 '[AI Insights]',
                                                                               ),
                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.normal,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                     ),
@@ -782,7 +741,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             decoration:
                                                                                 BoxDecoration(
                                                                               color: FlutterFlowTheme.of(context).primaryBackground,
-                                                                              borderRadius: BorderRadius.circular(12.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                               border: Border.all(
                                                                                 color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                 width: 1.0,
@@ -790,7 +749,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             ),
                                                                             child:
                                                                                 Padding(
-                                                                              padding: EdgeInsetsDirectional.fromSTEB(15.0, 12.0, 12.0, 12.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(12.0, 12.0, 12.0, 12.0),
                                                                               child: Row(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -806,7 +765,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             'Scoring Efficiency',
                                                                                             textAlign: TextAlign.start,
                                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                                  font: GoogleFonts.dmSans(
                                                                                                     fontWeight: FontWeight.w600,
                                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                   ),
@@ -829,7 +788,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             '#.#',
                                                                                           ),
                                                                                           style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w500,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                 ),
@@ -843,7 +802,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                         Text(
                                                                                           'Points per shot attempt',
                                                                                           style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.normal,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                 ),
@@ -874,7 +833,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                               child: Text(
                                                                                                 'Elite',
                                                                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                                      font: GoogleFonts.dmSans(
                                                                                                         fontWeight: FontWeight.w500,
                                                                                                         fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                       ),
@@ -899,7 +858,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             child: Text(
                                                                                               'Strong',
                                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                                    font: GoogleFonts.dmSans(
                                                                                                       fontWeight: FontWeight.w500,
                                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                     ),
@@ -923,7 +882,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             child: Text(
                                                                                               'Active',
                                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                                    font: GoogleFonts.dmSans(
                                                                                                       fontWeight: FontWeight.w500,
                                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                     ),
@@ -961,7 +920,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             decoration:
                                                                                 BoxDecoration(
                                                                               color: FlutterFlowTheme.of(context).primaryBackground,
-                                                                              borderRadius: BorderRadius.circular(12.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                               border: Border.all(
                                                                                 color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                 width: 1.0,
@@ -969,7 +928,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                             ),
                                                                             child:
                                                                                 Padding(
-                                                                              padding: EdgeInsetsDirectional.fromSTEB(15.0, 12.0, 12.0, 12.0),
+                                                                              padding: EdgeInsetsDirectional.fromSTEB(12.0, 12.0, 12.0, 12.0),
                                                                               child: Row(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -985,7 +944,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             'Playmaking + Ball Security',
                                                                                             textAlign: TextAlign.start,
                                                                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                                  font: GoogleFonts.dmSans(
                                                                                                     fontWeight: FontWeight.w600,
                                                                                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                   ),
@@ -1003,7 +962,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             '#:#',
                                                                                           ),
                                                                                           style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w500,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                 ),
@@ -1017,7 +976,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                         Text(
                                                                                           'Assist for every turnover',
                                                                                           style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.normal,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                 ),
@@ -1048,7 +1007,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                               child: Text(
                                                                                                 'Elite',
                                                                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                                      font: GoogleFonts.dmSans(
                                                                                                         fontWeight: FontWeight.w500,
                                                                                                         fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                       ),
@@ -1075,7 +1034,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                               child: Text(
                                                                                                 'Strong',
                                                                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                                      font: GoogleFonts.dmSans(
                                                                                                         fontWeight: FontWeight.w500,
                                                                                                         fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                       ),
@@ -1100,7 +1059,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             child: Text(
                                                                                               'Active',
                                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                                    font: GoogleFonts.dmSans(
                                                                                                       fontWeight: FontWeight.w500,
                                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                     ),
@@ -1176,14 +1135,14 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 width: double.infinity,
                                                                                 decoration: BoxDecoration(
                                                                                   color: FlutterFlowTheme.of(context).primaryBackground,
-                                                                                  borderRadius: BorderRadius.circular(12.0),
+                                                                                  borderRadius: BorderRadius.circular(6.0),
                                                                                   border: Border.all(
                                                                                     color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                     width: 1.0,
                                                                                   ),
                                                                                 ),
                                                                                 child: Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(15.0, 12.0, 12.0, 12.0),
+                                                                                  padding: EdgeInsetsDirectional.fromSTEB(12.0, 12.0, 12.0, 12.0),
                                                                                   child: Row(
                                                                                     mainAxisSize: MainAxisSize.max,
                                                                                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -1199,7 +1158,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 'Effort + Disruption',
                                                                                                 textAlign: TextAlign.start,
                                                                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                                      font: GoogleFonts.dmSans(
                                                                                                         fontWeight: FontWeight.w600,
                                                                                                         fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                       ),
@@ -1217,7 +1176,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 '#',
                                                                                               ),
                                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                                    font: GoogleFonts.dmSans(
                                                                                                       fontWeight: FontWeight.w500,
                                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                     ),
@@ -1231,7 +1190,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                             Text(
                                                                                               'Created extra possessions',
                                                                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                    font: GoogleFonts.ibmPlexSans(
+                                                                                                    font: GoogleFonts.dmSans(
                                                                                                       fontWeight: FontWeight.normal,
                                                                                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                     ),
@@ -1260,7 +1219,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 child: Text(
                                                                                                   'Elite',
                                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                                        font: GoogleFonts.dmSans(
                                                                                                           fontWeight: FontWeight.w500,
                                                                                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                         ),
@@ -1284,7 +1243,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 child: Text(
                                                                                                   'Strong',
                                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                                        font: GoogleFonts.dmSans(
                                                                                                           fontWeight: FontWeight.w500,
                                                                                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                         ),
@@ -1308,7 +1267,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                                 child: Text(
                                                                                                   'Active',
                                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                                        font: GoogleFonts.dmSans(
                                                                                                           fontWeight: FontWeight.w500,
                                                                                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                                         ),
@@ -1424,8 +1383,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                          BorderRadius.circular(6.0),
                                                                       border:
                                                                           Border
                                                                               .all(
@@ -1450,8 +1408,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(12.0),
-                                                                              topRight: Radius.circular(12.0),
+                                                                              topLeft: Radius.circular(6.0),
+                                                                              topRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -1472,12 +1430,12 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                   ),
                                                                                   textAlign: TextAlign.center,
                                                                                   style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.w500,
                                                                                           fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                         ),
                                                                                         color: FlutterFlowTheme.of(context).primaryText,
-                                                                                        fontSize: 18.0,
+                                                                                        fontSize: 17.0,
                                                                                         letterSpacing: 0.0,
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
@@ -1497,7 +1455,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                     )}%)',
                                                                                     textAlign: TextAlign.center,
                                                                                     style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                          font: GoogleFonts.ibmPlexSans(
+                                                                                          font: GoogleFonts.dmSans(
                                                                                             fontWeight: FontWeight.w500,
                                                                                             fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                           ),
@@ -1522,8 +1480,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 BoxDecoration(
                                                                               color: FlutterFlowTheme.of(context).gray4,
                                                                               borderRadius: BorderRadius.only(
-                                                                                bottomLeft: Radius.circular(11.0),
-                                                                                bottomRight: Radius.circular(11.0),
+                                                                                bottomLeft: Radius.circular(6.0),
+                                                                                bottomRight: Radius.circular(6.0),
                                                                               ),
                                                                             ),
                                                                             alignment:
@@ -1534,7 +1492,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               child: Text(
                                                                                 'FG',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -1558,8 +1516,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                          BorderRadius.circular(6.0),
                                                                       border:
                                                                           Border
                                                                               .all(
@@ -1584,8 +1541,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(12.0),
-                                                                              topRight: Radius.circular(12.0),
+                                                                              topLeft: Radius.circular(6.0),
+                                                                              topRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -1603,12 +1560,12 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                   '${'${containerVPlayerGameStatsRow?.ftMade?.toString()}/${containerVPlayerGameStatsRow?.ftAttempt?.toString()}'}',
                                                                                   textAlign: TextAlign.center,
                                                                                   style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.w500,
                                                                                           fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                         ),
                                                                                         color: FlutterFlowTheme.of(context).primaryText,
-                                                                                        fontSize: 18.0,
+                                                                                        fontSize: 17.0,
                                                                                         letterSpacing: 0.0,
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
@@ -1628,7 +1585,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                     )}%)',
                                                                                     textAlign: TextAlign.center,
                                                                                     style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                          font: GoogleFonts.ibmPlexSans(
+                                                                                          font: GoogleFonts.dmSans(
                                                                                             fontWeight: FontWeight.w500,
                                                                                             fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                           ),
@@ -1653,8 +1610,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).gray4,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              bottomLeft: Radius.circular(11.0),
-                                                                              bottomRight: Radius.circular(11.0),
+                                                                              bottomLeft: Radius.circular(6.0),
+                                                                              bottomRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           alignment: AlignmentDirectional(
@@ -1671,7 +1628,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 Text(
                                                                               'FT',
                                                                               style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                    font: GoogleFonts.montserrat(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.normal,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                     ),
@@ -1694,8 +1651,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                     decoration:
                                                                         BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              12.0),
+                                                                          BorderRadius.circular(6.0),
                                                                       border:
                                                                           Border
                                                                               .all(
@@ -1718,8 +1674,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).primaryBackground,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(12.0),
-                                                                              topRight: Radius.circular(12.0),
+                                                                              topLeft: Radius.circular(6.0),
+                                                                              topRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           child:
@@ -1737,12 +1693,12 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                   '${containerVPlayerGameStatsRow?.threeMade?.toString()}/${containerVPlayerGameStatsRow?.threeAttempt?.toString()}',
                                                                                   textAlign: TextAlign.center,
                                                                                   style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.w500,
                                                                                           fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                         ),
                                                                                         color: FlutterFlowTheme.of(context).primaryText,
-                                                                                        fontSize: 18.0,
+                                                                                        fontSize: 17.0,
                                                                                         letterSpacing: 0.0,
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
@@ -1760,7 +1716,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                   )}%)',
                                                                                   textAlign: TextAlign.center,
                                                                                   style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.w500,
                                                                                           fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                         ),
@@ -1784,8 +1740,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 FlutterFlowTheme.of(context).gray4,
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              bottomLeft: Radius.circular(11.0),
-                                                                              bottomRight: Radius.circular(11.0),
+                                                                              bottomLeft: Radius.circular(6.0),
+                                                                              bottomRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           alignment: AlignmentDirectional(
@@ -1802,7 +1758,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 Text(
                                                                               '3PT',
                                                                               style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                    font: GoogleFonts.montserrat(
+                                                                                    font: GoogleFonts.dmSans(
                                                                                       fontWeight: FontWeight.normal,
                                                                                       fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                     ),
@@ -1847,7 +1803,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -1873,7 +1829,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -1887,7 +1843,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'PTS',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -1909,7 +1865,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -1937,7 +1893,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -1951,7 +1907,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'DEF REB',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -1973,7 +1929,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2001,7 +1957,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2015,7 +1971,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'OFF REB',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2046,7 +2002,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2074,7 +2030,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2088,7 +2044,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'AST',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2110,7 +2066,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2138,7 +2094,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2152,7 +2108,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'BLK',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2174,7 +2130,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2202,7 +2158,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2216,7 +2172,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'STL',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2247,7 +2203,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2275,7 +2231,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2289,7 +2245,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'TOV',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2311,7 +2267,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2339,7 +2295,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2353,7 +2309,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'FOULS',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2375,7 +2331,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(12.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2403,7 +2359,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                                 ),
                                                                                 textAlign: TextAlign.center,
                                                                                 style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                      font: GoogleFonts.ibmPlexSans(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.w500,
                                                                                         fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                       ),
@@ -2417,7 +2373,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                               Text(
                                                                                 'EFF',
                                                                                 style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                      font: GoogleFonts.montserrat(
+                                                                                      font: GoogleFonts.dmSans(
                                                                                         fontWeight: FontWeight.normal,
                                                                                         fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                       ),
@@ -2457,6 +2413,31 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                           child: FFButtonWidget(
                                                             onPressed:
                                                                 () async {
+                                                              // Gate: subscribers only
+                                                              if (revenue_cat.activeEntitlementIds.isEmpty) {
+                                                                await showModalBottomSheet(
+                                                                  isScrollControlled: true,
+                                                                  backgroundColor: Colors.transparent,
+                                                                  context: context,
+                                                                  builder: (context) {
+                                                                    return GestureDetector(
+                                                                      onTap: () {
+                                                                        FocusScope.of(context).unfocus();
+                                                                        FocusManager.instance.primaryFocus?.unfocus();
+                                                                      },
+                                                                      child: Padding(
+                                                                        padding: MediaQuery.viewInsetsOf(context),
+                                                                        child: Container(
+                                                                          height: MediaQuery.sizeOf(context).height * 1.0,
+                                                                          child: PaywallWidget(),
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                ).then((value) => safeSetState(() {}));
+                                                                return;
+                                                              }
+
                                                               await showDialog(
                                                                 barrierColor:
                                                                     FlutterFlowTheme.of(
@@ -2605,9 +2586,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                 width: 1.0,
                                                               ),
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12.0),
+                                                                  BorderRadius.circular(6.0),
                                                             ),
                                                             showLoadingIndicator:
                                                                 false,
@@ -2648,8 +2627,8 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                       end: AlignmentDirectional(0, 1.0),
                                     ),
                                     borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(24.0),
-                                      bottomRight: Radius.circular(24.0),
+                                      bottomLeft: Radius.circular(6.0),
+                                      bottomRight: Radius.circular(6.0),
                                     ),
                                   ),
                                   alignment: AlignmentDirectional(0.0, 1.0),
@@ -2673,7 +2652,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                             borderColor:
                                                 FlutterFlowTheme.of(context)
                                                     .secondaryBackground,
-                                            borderRadius: 30.0,
+                                            borderRadius: 9999.0,
                                             borderWidth: 1.0,
                                             buttonSize: 60.0,
                                             fillColor:

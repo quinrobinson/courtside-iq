@@ -116,7 +116,7 @@ class _CustomSnackBarWidgetState extends State<CustomSnackBarWidget>
             ),
           )
         ],
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(6.0),
         border: Border.all(
           color: FlutterFlowTheme.of(context).secondaryBackground,
           width: 1.0,

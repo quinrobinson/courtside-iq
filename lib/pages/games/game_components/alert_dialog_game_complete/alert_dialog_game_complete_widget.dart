@@ -87,7 +87,7 @@ class _AlertDialogGameCompleteWidgetState
                   spreadRadius: 4.0,
                 )
               ],
-              borderRadius: BorderRadius.circular(24.0),
+              borderRadius: BorderRadius.circular(6.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),
@@ -197,7 +197,7 @@ class _AlertDialogGameCompleteWidgetState
                       child: Container(
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).primaryBackground,
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
@@ -368,7 +368,7 @@ class _AlertDialogGameCompleteWidgetState
                       child: Container(
                         decoration: BoxDecoration(
                           color: FlutterFlowTheme.of(context).primaryBackground,
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
@@ -519,7 +519,7 @@ class _AlertDialogGameCompleteWidgetState
                                         .secondaryBackground,
                                     width: 0.0,
                                   ),
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ),
                             ),
@@ -561,7 +561,7 @@ class _AlertDialogGameCompleteWidgetState
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ),
                             ),

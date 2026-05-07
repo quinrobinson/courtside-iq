@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courtside IQ — Design System v1</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =================================================================
+     COURTSIDE IQ — DESIGN SYSTEM v1.5
+     Built April 2026. Source of truth for tokens, components, and rules.
+     Token names map 1:1 to Figma Variables.
+     v1.1 — cool neutral surfaces, tightened radius scale (6px cards),
+            8px card-gap default.
+     v1.2 — tags now use radius-sm (4px), aligned with the system's
+            tight-corner rule. Identity is size + color + uppercase.
+     v1.3 — Hero numerals at weight 400 with bold labels above (the
+            inversion). Jade promoted to dominant brand color; Royal,
+            Steel, Rose, Spark demoted to moment-only accents.
+     v1.4 — Primary button moves from Jade to Ink (black) for decisive
+            affordance contrast. Secondary shifts to soft Canvas-Sunk
+            fill so it reads as a quiet peer. AI button reserved.
+     v1.5 — Card hierarchy. Five-tier emphasis ladder: white default,
+            Jade Glow, Royal Glow, Spark Glow, Hero (Royal+Spark dense).
+            Each tier maps to a specific kind of moment. Tier follows
+            meaning, not preference.
+     ================================================================= */
+
+  :root {
+    /* ----- COLOR / BRAND -------------------------------------------- */
+    --color-jade-50:   #E6F7F2;
+    --color-jade-100:  #C2EDDF;
+    --color-jade-200:  #8FDBC2;
+    --color-jade-500:  #0FA889;  /* Primary — actions, "Solid", live */
+    --color-jade-600:  #0C8C72;
+    --color-jade-700:  #0A7058;
+
+    --color-royal-50:  #EFE9FB;
+    --color-royal-100: #DCCEF6;
+    --color-royal-500: #6B35C9;  /* AI feature mark — insights, narrative */
+    --color-royal-600: #5827A8;
+
+    --color-steel-50:  #E7EEFA;
+    --color-steel-100: #C7D6F2;
+    --color-steel-500: #2558B8;  /* Info, change, neutral data */
+    --color-steel-600: #1D4595;
+
+    --color-rose-50:   #FCE9ED;
+    --color-rose-100:  #F7C9D2;
+    --color-rose-500:  #E04867;  /* Growth edge — "Room to Grow" */
+    --color-rose-600:  #B83954;
+
+    --color-spark-50:  #FDF1E0;
+    --color-spark-100: #FADFB7;
+    --color-spark-500: #F2A43A;  /* Elite / peak only — used sparingly */
+    --color-spark-600: #C9852A;
+
+    /* ----- COLOR / SURFACE ------------------------------------------ */
+    /* Cool neutral palette — matches construction/logistics dashboards.
+       Warm off-white reads premium-consumer; cool neutral reads
+       precise-technical. Courtside IQ is the latter. */
+    --color-canvas:       #EFEFF1;  /* Page background */
+    --color-canvas-sunk:  #E5E5E8;  /* Sunken sections, group containers */
+    --color-surface:      #FFFFFF;  /* Cards */
+    --color-surface-alt:  #F7F7F9;  /* Inner chips, sub-cards */
+    --color-hairline:     #E2E2E5;  /* 1px borders */
+
+    /* ----- COLOR / TEXT --------------------------------------------- */
+    --color-ink:        #1B1D24;  /* Primary */
+    --color-ink-2:      #4A4D56;  /* Secondary, body */
+    --color-ink-3:      #797B85;  /* Tertiary, captions */
+    --color-ink-4:      #ABADB5;  /* Disabled, placeholder */
+    --color-ink-onbrand: #FFFFFF; /* Text on jade/royal/steel */
+
+    /* ----- RADIUS --------------------------------------------------- */
+    /* Tight scale. Cards anchor at 6px. Nesting rule: child = parent − 2 to − 4.
+       Compressed from 6/10/14/18/24 to 2/4/6/8/12 to match reference shots
+       and lean into precise/technical feel over rounded/consumer. */
+    --radius-xs:    2px;   /* Micro-tags, status dots */
+    --radius-sm:    4px;   /* Tags, chips, inner pills */
+    --radius-md:    6px;   /* Default card. Buttons. Sub-cards. */
+    --radius-lg:    8px;   /* Group containers, larger cards */
+    --radius-xl:    12px;  /* Sheets, modals, hero containers */
+    --radius-full:  9999px;
+
+    /* ----- SPACING (4pt grid, 8pt rhythm) --------------------------- */
+    --space-1:  4px;
+    --space-2:  8px;
+    --space-3:  12px;
+    --space-4:  16px;
+    --space-5:  20px;
+    --space-6:  24px;
+    --space-8:  32px;
+    --space-10: 40px;
+    --space-12: 48px;
+
+    /* ----- ELEVATION ------------------------------------------------ */
+    /* Hairline is the workhorse. Shadow only for floating things. */
+    --elev-hairline: inset 0 0 0 1px var(--color-hairline);
+    --elev-card:     0 1px 2px rgba(27, 29, 36, 0.04), inset 0 0 0 1px var(--color-hairline);
+    --elev-pop:      0 8px 24px rgba(27, 29, 36, 0.10), 0 2px 6px rgba(27, 29, 36, 0.04);
+    --elev-modal:    0 24px 48px rgba(27, 29, 36, 0.16), 0 8px 16px rgba(27, 29, 36, 0.06);
+
+    /* ----- TYPOGRAPHY ----------------------------------------------- */
+    --font-sans:   'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono:   'JetBrains Mono', ui-monospace, monospace;
+
+    /* Numeral weight: light against bold labels = the inversion.
+       Hero numbers at 400, labels at 700. Contrast does the work. */
+    --weight-numeral: 400;
+    --weight-label:   700;
+
+    /* Display / Numerals — light weight, tabular figures */
+    --type-display-lg: 400 56px/1.0  var(--font-sans);  /* Page hero stat */
+    --type-display-md: 400 40px/1.05 var(--font-sans);  /* Card hero number */
+    --type-display-sm: 400 28px/1.1  var(--font-sans);  /* Section number, score */
+
+    /* Headings — heavy weight, anchors the layout */
+    --type-h1: 700 22px/1.25 var(--font-sans);  /* Screen title */
+    --type-h2: 700 17px/1.3  var(--font-sans);  /* Card title */
+    --type-h3: 600 14px/1.35 var(--font-sans);  /* Group label, sub-card title */
+
+    /* Body */
+    --type-body:   400 14px/1.5  var(--font-sans);
+    --type-body-strong: 500 14px/1.5 var(--font-sans);
+    --type-small:  400 13px/1.45 var(--font-sans);
+    --type-caption:500 11px/1.3  var(--font-sans);  /* Tags, eyebrow */
+    --type-eyebrow: 700 10px/1.2 var(--font-sans);  /* Uppercase, tracked */
+
+    /* Letter spacing */
+    --tracking-tight:  -0.02em;       /* Hero numerals */
+    --tracking-snug:   -0.015em;      /* Headings */
+    --tracking-eyebrow: 0.08em;
+  }
+
+  /* =================================================================
+     PAGE FRAME (this doc, not the app)
+     ================================================================= */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+  }
+
+  .doc {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-12) var(--space-8) var(--space-12);
+  }
+
+  /* ----- DOC HEADER ------------------------------------------------- */
+  .doc-head {
+    margin-bottom: var(--space-12);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .doc-head .brand {
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+
+  .doc-head .brand-mark {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--color-jade-500);
+    display: grid; place-items: center;
+    color: white; font-weight: 800; font-size: 16px;
+    letter-spacing: -0.04em;
+  }
+
+  .doc-head h1 {
+    font: var(--type-h1);
+    letter-spacing: var(--tracking-snug);
+    margin-bottom: 2px;
+  }
+
+  .doc-head p {
+    font: var(--type-small);
+    color: var(--color-ink-3);
+  }
+
+  .doc-head .version {
+    font: var(--type-caption);
+    color: var(--color-jade-700);
+    background: var(--color-jade-50);
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+  }
+
+  /* ----- SECTION SCAFFOLD ------------------------------------------ */
+  .section {
+    margin-bottom: var(--space-12);
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+    gap: var(--space-4);
+  }
+
+  .section-head h2 {
+    font: var(--type-h1);
+    letter-spacing: var(--tracking-snug);
+  }
+
+  .section-head .index {
+    font: var(--type-eyebrow);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+  }
+
+  .section-intro {
+    font: var(--type-body);
+    color: var(--color-ink-2);
+    max-width: 680px;
+    margin-bottom: var(--space-6);
+  }
+
+  .section-intro strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* ----- DOC GRID --------------------------------------------------- */
+  .grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-5 { grid-template-columns: repeat(5, 1fr); }
+  .grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+  /* =================================================================
+     DOC PRIMITIVES — used to display the system itself
+     ================================================================= */
+
+  .swatch {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elev-card);
+    overflow: hidden;
+  }
+
+  .swatch-color {
+    height: 88px;
+    position: relative;
+  }
+
+  .swatch-color .role {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    background: rgba(255,255,255,0.9);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font: var(--type-caption);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  .swatch-meta {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .swatch-meta .name {
+    font: var(--type-body-strong);
+    margin-bottom: 2px;
+  }
+
+  .swatch-meta .hex {
+    font: var(--type-caption);
+    font-family: var(--font-mono);
+    color: var(--color-ink-3);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .swatch-meta .desc {
+    font: var(--type-small);
+    color: var(--color-ink-2);
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  /* Token table for radius / spacing / typography */
+  .token-table {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elev-card);
+    overflow: hidden;
+  }
+
+  .token-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 80px 1fr;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-hairline);
+    gap: var(--space-4);
+  }
+
+  .token-row:last-child { border-bottom: none; }
+
+  .token-row .token-name {
+    font: var(--type-body-strong);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink);
+  }
+
+  .token-row .token-value {
+    font: var(--type-small);
+    font-family: var(--font-mono);
+    color: var(--color-ink-3);
+  }
+
+  .token-row .token-visual {
+    display: flex; align-items: center; gap: var(--space-2);
+  }
+
+  .token-row .token-desc {
+    font: var(--type-small);
+    color: var(--color-ink-2);
+  }
+
+  /* Demo block — used to showcase a component at rest */
+  .demo {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    min-height: 160px;
+  }
+
+  .demo-stack {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    width: 100%; max-width: 360px;
+  }
+
+  .demo-label {
+    font: var(--type-eyebrow);
+    color: var(--color-ink-3);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  /* Rule callouts */
+  .rule {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elev-card);
+    padding: var(--space-5);
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .rule-icon {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--color-jade-50);
+    color: var(--color-jade-700);
+    display: grid; place-items: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .rule.warn .rule-icon { background: var(--color-rose-50); color: var(--color-rose-600); }
+  .rule.info .rule-icon { background: var(--color-steel-50); color: var(--color-steel-600); }
+
+  .rule h4 {
+    font: var(--type-h3);
+    margin-bottom: var(--space-1);
+  }
+
+  .rule p {
+    font: var(--type-small);
+    color: var(--color-ink-2);
+  }
+
+  /* =================================================================
+     COMPONENT STYLES — these ARE the design system
+     ================================================================= */
+
+  /* ----- CARD ------------------------------------------------------- */
+  .ci-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    box-shadow: var(--elev-card);
+  }
+
+  .ci-card-tight  { padding: var(--space-4); }
+  .ci-card-roomy  { padding: var(--space-6); }
+
+  .ci-card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .ci-card-head .ci-card-title {
+    font: var(--type-h2);
+    letter-spacing: var(--tracking-snug);
+  }
+
+  .ci-card-head .ci-card-action {
+    width: 28px; height: 28px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-alt);
+    display: grid; place-items: center;
+    color: var(--color-ink-3);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .ci-card-head .ci-card-action:hover { background: var(--color-canvas-sunk); color: var(--color-ink); }
+
+  /* ----- STANDOUT CARD VARIANTS -----------------------------------
+     A four-tier ladder of card emphasis. White card (.ci-card) is
+     tier 1 — the default. The four below climb in intensity.
+     Each tier maps to a specific kind of moment. Don't apply
+     decoratively — apply when the moment justifies the volume.
+     ----------------------------------------------------------------- */
+
+  /* Tier 2 — Jade Glow · "encouraging, good progress noticed" */
+  .ci-card-jade {
+    background:
+      radial-gradient(120% 80% at 100% 0%,
+        rgba(15, 168, 137, 0.32) 0%,
+        rgba(15, 168, 137, 0.10) 35%,
+        rgba(15, 168, 137, 0)    70%),
+      var(--color-surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Tier 3 — Royal Glow · "AI surfaced something pattern-level" */
+  .ci-card-royal {
+    background:
+      radial-gradient(120% 80% at 100% 0%,
+        rgba(107, 53, 201, 0.30) 0%,
+        rgba(107, 53, 201, 0.10) 35%,
+        rgba(107, 53, 201, 0)    70%),
+      var(--color-surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Tier 4 — Spark Glow · "personal best, milestone, peak moment" */
+  .ci-card-spark {
+    background:
+      radial-gradient(120% 80% at 100% 0%,
+        rgba(242, 164, 58, 0.32) 0%,
+        rgba(242, 164, 58, 0.10) 35%,
+        rgba(242, 164, 58, 0)    70%),
+      var(--color-surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Tier 5 — Royal Dense · "hero takeover, headline moment"
+     White text on dark. The only card in the system with inverted
+     text — every use needs a dedicated content design pass. */
+  .ci-card-hero {
+    background:
+      radial-gradient(100% 120% at 100% 100%,
+        rgba(242, 164, 58, 0.28) 0%,
+        rgba(242, 164, 58, 0)    50%),
+      linear-gradient(135deg,
+        var(--color-royal-600) 0%,
+        var(--color-royal-500) 100%);
+    color: white;
+    box-shadow:
+      0 1px 2px rgba(27, 29, 36, 0.04),
+      0 8px 24px rgba(107, 53, 201, 0.18);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Inverted-text rules for hero card */
+  .ci-card-hero .ci-card-title { color: white; }
+  .ci-card-hero .ci-card-action {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .ci-card-hero .ci-card-action:hover {
+    background: rgba(255, 255, 255, 0.20);
+    color: white;
+  }
+
+  /* ----- METRIC TILE ----------------------------------------------- */
+  /* The single most important component. Used everywhere. */
+  .ci-metric {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    box-shadow: var(--elev-card);
+    display: flex; flex-direction: column; gap: var(--space-2);
+    min-height: 120px;
+    position: relative;
+  }
+
+  .ci-metric-label {
+    font: var(--type-caption);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+  }
+
+  .ci-metric-value {
+    font: var(--type-display-md);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .ci-metric-trend {
+    display: inline-flex; align-items: center; gap: 4px;
+    font: var(--type-caption);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ci-metric-trend.up   { color: var(--color-jade-600); }
+  .ci-metric-trend.down { color: var(--color-rose-500); }
+  .ci-metric-trend.flat { color: var(--color-ink-3); }
+
+  /* The corner badge for tier — not always present */
+  .ci-metric-tier {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .ci-metric-tier.solid { background: var(--color-steel-500); }
+  .ci-metric-tier.good  { background: var(--color-jade-500); }
+  .ci-metric-tier.elite { background: var(--color-spark-500); }
+  .ci-metric-tier.grow  { background: var(--color-rose-500); }
+
+  /* ----- TAG / TIER PILL ------------------------------------------- */
+  /* Sits at radius-sm (4px) — same as buttons. Tag identity comes from
+     size, color, and uppercase text, not corner shape. */
+  .ci-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font: var(--type-caption);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+  }
+
+  .ci-tag.solid { background: var(--color-steel-50); color: var(--color-steel-600); }
+  .ci-tag.good  { background: var(--color-jade-50);  color: var(--color-jade-700); }
+  .ci-tag.elite { background: var(--color-spark-50); color: var(--color-spark-600); }
+  .ci-tag.grow  { background: var(--color-rose-50);  color: var(--color-rose-600); }
+  .ci-tag.ai    { background: var(--color-royal-50); color: var(--color-royal-600); }
+  .ci-tag.muted { background: var(--color-canvas-sunk); color: var(--color-ink-3); }
+
+  /* ----- BUTTONS --------------------------------------------------- */
+  /* Primary is Ink (black). The most decisive thing on the screen.
+     Secondary sits on a soft fill so it reads as a quieter peer
+     against the black primary, not a stark inversion. */
+  .ci-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: var(--space-2);
+    height: 44px;
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-sm);
+    font: var(--type-body-strong);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .ci-btn-primary {
+    background: var(--color-ink);
+    color: var(--color-ink-onbrand);
+  }
+  .ci-btn-primary:hover { background: #2A2D35; }
+
+  .ci-btn-secondary {
+    background: var(--color-surface-alt);
+    color: var(--color-ink);
+    box-shadow: var(--elev-hairline);
+  }
+  .ci-btn-secondary:hover { background: var(--color-canvas-sunk); }
+
+  .ci-btn-ghost {
+    background: transparent;
+    color: var(--color-ink-2);
+  }
+  .ci-btn-ghost:hover { background: var(--color-canvas-sunk); color: var(--color-ink); }
+
+  /* Reserved — no current use case in the app. Kept defined so
+     when an AI affordance does need a button (e.g. manual regeneration
+     of a failed insight), the style is ready. */
+  .ci-btn-ai {
+    background: var(--color-royal-500);
+    color: var(--color-ink-onbrand);
+  }
+  .ci-btn-ai:hover { background: var(--color-royal-600); }
+
+  .ci-btn-sm { height: 32px; padding: 0 var(--space-3); font-size: 13px; }
+  .ci-btn-icon { width: 44px; padding: 0; }
+
+  /* ----- PLAYER CARD (header on dashboard) ------------------------- */
+  .ci-player-header {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    box-shadow: var(--elev-card);
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+
+  .ci-avatar {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-full);
+    background: var(--color-jade-100);
+    color: var(--color-jade-700);
+    display: grid; place-items: center;
+    font: var(--type-body-strong);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .ci-player-meta { flex: 1; min-width: 0; }
+  .ci-player-meta .name {
+    font: var(--type-h3);
+    font-size: 15px;
+    color: var(--color-ink);
+  }
+  .ci-player-meta .sub {
+    font: var(--type-small);
+    color: var(--color-ink-3);
+  }
+
+  /* ----- SUB-CARD (nested inside a card) --------------------------- */
+  .ci-subcard {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-hairline);
+  }
+
+  /* ----- DIVIDER --------------------------------------------------- */
+  .ci-divider {
+    height: 1px;
+    background: var(--color-hairline);
+    border: none;
+    margin: var(--space-4) 0;
+  }
+
+  /* ----- INSIGHT BLOCK (AI feature) -------------------------------- */
+  .ci-insight {
+    background: var(--color-royal-50);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    border: 1px solid var(--color-royal-100);
+    display: flex; gap: var(--space-3); align-items: flex-start;
+  }
+
+  .ci-insight-mark {
+    width: 28px; height: 28px;
+    border-radius: var(--radius-sm);
+    background: var(--color-royal-500);
+    color: white;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .ci-insight-body { flex: 1; min-width: 0; }
+  .ci-insight-body .label {
+    font: var(--type-eyebrow);
+    color: var(--color-royal-600);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+    margin-bottom: var(--space-1);
+  }
+  .ci-insight-body p {
+    font: var(--type-small);
+    color: var(--color-ink);
+    line-height: 1.55;
+  }
+
+  /* =================================================================
+     PHONE PREVIEW — anchor surface (Dashboard)
+     ================================================================= */
+  .phone-frame {
+    width: 392px;
+    height: 800px;
+    background: var(--color-canvas);
+    border-radius: 36px;
+    box-shadow:
+      0 0 0 10px #1B1D24,
+      0 0 0 11px #2A2D35,
+      0 32px 64px rgba(27, 29, 36, 0.18),
+      0 12px 24px rgba(27, 29, 36, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .phone-screen {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-6) var(--space-4) calc(var(--space-12) + var(--space-6));
+  }
+
+  .phone-screen::-webkit-scrollbar { display: none; }
+
+  .phone-statusbar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-6);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-ink);
+    flex-shrink: 0;
+    background: var(--color-canvas);
+  }
+
+  .phone-statusbar .icons {
+    display: flex; align-items: center; gap: 4px;
+    color: var(--color-ink-2);
+  }
+
+  .phone-tabbar {
+    position: absolute;
+    bottom: var(--space-3);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-ink);
+    border-radius: var(--radius-full);
+    padding: 6px;
+    display: flex;
+    gap: 2px;
+    box-shadow: 0 8px 24px rgba(27, 29, 36, 0.24);
+  }
+
+  .phone-tab {
+    width: 42px; height: 42px;
+    border-radius: var(--radius-full);
+    display: grid; place-items: center;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .phone-tab.active {
+    background: var(--color-jade-500);
+    color: white;
+  }
+
+  /* Dashboard layout inside phone */
+  .dash-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .dash-row {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .dash-row-2 { grid-template-columns: 1fr 1fr; }
+
+  .dash-eyebrow {
+    font: var(--type-eyebrow);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+    margin: var(--space-3) var(--space-1) var(--space-1);
+  }
+
+  /* Specific cards on dashboard */
+  .dash-greeting {
+    margin-bottom: var(--space-2);
+  }
+  .dash-greeting .hello {
+    font: var(--type-small);
+    color: var(--color-ink-3);
+    margin-bottom: 2px;
+  }
+  .dash-greeting .name {
+    font: var(--type-h1);
+    letter-spacing: var(--tracking-snug);
+  }
+
+  .dash-stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--color-hairline);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--elev-card);
+  }
+
+  .dash-stat-cell {
+    background: var(--color-surface);
+    padding: var(--space-4);
+    display: flex; flex-direction: column; gap: var(--space-1);
+  }
+
+  /* Last game card */
+  .last-game {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    box-shadow: var(--elev-card);
+  }
+
+  .last-game-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .last-game-title {
+    font: var(--type-h3);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+    font-size: 11px;
+  }
+
+  .last-game-result {
+    font: var(--type-display-sm);
+    letter-spacing: var(--tracking-tight);
+    margin-bottom: 2px;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .last-game-meta {
+    font: var(--type-small);
+    color: var(--color-ink-3);
+  }
+
+  .last-game-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .last-game-stats .cell {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+
+  .last-game-stats .num {
+    font-family: var(--font-sans);
+    font-weight: var(--weight-numeral);
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-ink);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .last-game-stats .lbl {
+    font: var(--type-caption);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+    font-size: 9px;
+  }
+
+  /* Sparkline (visual only — pure CSS) */
+  .sparkbar {
+    display: flex; align-items: flex-end; gap: 3px;
+    height: 32px;
+    margin-top: var(--space-2);
+  }
+
+  .sparkbar .bar {
+    flex: 1;
+    background: var(--color-jade-200);
+    border-radius: 2px;
+    min-height: 4px;
+  }
+  .sparkbar .bar.active { background: var(--color-jade-500); }
+  .sparkbar .bar.faded  { background: var(--color-canvas-sunk); }
+
+  /* ----- VALIDATION GRID (other surfaces) -------------------------- */
+  .validate {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+
+  .validate-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    box-shadow: var(--elev-card);
+  }
+
+  .validate-card h4 {
+    font: var(--type-h3);
+    margin-bottom: var(--space-2);
+  }
+
+  .validate-card p {
+    font: var(--type-small);
+    color: var(--color-ink-2);
+    margin-bottom: var(--space-4);
+  }
+
+  /* ----- MIGRATION TABLE ------------------------------------------- */
+  .migration {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elev-card);
+    overflow: hidden;
+  }
+
+  .mig-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-hairline);
+    gap: var(--space-4);
+  }
+
+  .mig-row.head {
+    background: var(--color-surface-alt);
+    font: var(--type-eyebrow);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+  }
+
+  .mig-row:last-child { border-bottom: none; }
+
+  .mig-row .from {
+    font: var(--type-body-strong);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--color-rose-500);
+  }
+
+  .mig-row .to {
+    font: var(--type-body-strong);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-jade-700);
+  }
+
+  .mig-row .why {
+    font: var(--type-small);
+    color: var(--color-ink-2);
+  }
+
+  /* ----- TWO-COLUMN LAYOUT FOR PREVIEW SECTION -------------------- */
+  .preview-layout {
+    display: grid;
+    grid-template-columns: 392px 1fr;
+    gap: var(--space-8);
+    align-items: flex-start;
+  }
+
+  .preview-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* ----- TOC -------------------------------------------------------- */
+  .toc {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elev-card);
+    padding: var(--space-5) var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+
+  .toc-title {
+    font: var(--type-eyebrow);
+    color: var(--color-ink-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+    margin-bottom: var(--space-3);
+  }
+
+  .toc-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    list-style: none;
+  }
+
+  .toc-list a {
+    color: var(--color-ink-2);
+    text-decoration: none;
+    font: var(--type-body);
+    padding: var(--space-2) 0;
+    display: flex; gap: var(--space-2);
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .toc-list a:hover {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-jade-500);
+  }
+
+  .toc-list .num {
+    color: var(--color-ink-4);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    width: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .doc { padding: var(--space-6) var(--space-4); }
+    .grid-3, .grid-4, .grid-5, .grid-6 { grid-template-columns: repeat(2, 1fr); }
+    .toc-list { grid-template-columns: 1fr; }
+    .preview-layout { grid-template-columns: 1fr; }
+    .validate { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+  <!-- ===== HEADER ===== -->
+  <header class="doc-head">
+    <div class="brand">
+      <div class="brand-mark">C</div>
+      <div>
+        <h1>Courtside IQ — Design System</h1>
+        <p>Tokens, components, and rules. Source of truth for design and FlutterFlow.</p>
+      </div>
+    </div>
+    <div class="version">v1.5 · April 2026</div>
+  </header>
+
+  <!-- ===== TOC ===== -->
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#principles"><span class="num">01</span> Principles</a></li>
+      <li><a href="#color"><span class="num">02</span> Color</a></li>
+      <li><a href="#typography"><span class="num">03</span> Typography</a></li>
+      <li><a href="#spacing"><span class="num">04</span> Spacing</a></li>
+      <li><a href="#radius"><span class="num">05</span> Radius</a></li>
+      <li><a href="#elevation"><span class="num">06</span> Elevation</a></li>
+      <li><a href="#components"><span class="num">07</span> Components</a></li>
+      <li><a href="#dashboard"><span class="num">08</span> Dashboard</a></li>
+      <li><a href="#validation"><span class="num">09</span> Validation</a></li>
+      <li><a href="#migration"><span class="num">10</span> Migration</a></li>
+      <li><a href="#figma"><span class="num">11</span> Figma Setup</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============================================================
+       01 — PRINCIPLES
+       ============================================================ -->
+  <section class="section" id="principles">
+    <div class="section-head">
+      <h2>Principles</h2>
+      <span class="index">01</span>
+    </div>
+    <p class="section-intro">
+      Five rules that govern every design decision. When two rules conflict, <strong>development-first messaging</strong> wins.
+    </p>
+
+    <div class="grid grid-2">
+      <div class="rule">
+        <div class="rule-icon">1</div>
+        <div>
+          <h4>Development-first, always</h4>
+          <p>Numbers earn their place by connecting to growth. Never surface a stat without a development frame around it. A 76% PPSA is not data — it's a "Solid scoring efficiency for a 14-year-old guard."</p>
+        </div>
+      </div>
+      <div class="rule info">
+        <div class="rule-icon">2</div>
+        <div>
+          <h4>Tight, modular spacing</h4>
+          <p>The signature of Courtside IQ's look is dense, deliberate spacing. Cards sit 8px apart, never 16. Inner padding is 16–20px. Generous gaps signal default Material; we are not Material.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="rule-icon">3</div>
+        <div>
+          <h4>Hairlines over shadows</h4>
+          <p>Every card carries a 1px hairline. Shadows are reserved for elements that genuinely float (modals, sheets, the tab bar). Drop shadows on every card create visual noise.</p>
+        </div>
+      </div>
+      <div class="rule warn">
+        <div class="rule-icon">4</div>
+        <div>
+          <h4>One hero color, four accents</h4>
+          <p>Jade is the dominant brand presence — actions, default fills, anywhere a screen needs life. Royal, Steel, Rose, and Spark are <em>moments</em>, used once per screen at most. The references work because they pick a single color personality per screen. We do the same.</p>
+        </div>
+      </div>
+      <div class="rule info">
+        <div class="rule-icon">5</div>
+        <div>
+          <h4>Nested radius rule</h4>
+          <p>A child element's corner radius is always 2–4px smaller than its parent. A 6px card contains 4px sub-pills, which contain 2px chips. Tighter scale, same architectural principle.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="rule-icon">6</div>
+        <div>
+          <h4>Tier hierarchy stays consistent</h4>
+          <p>Solid → Good → Elite, plus Room to Grow. Solid is entry-level, never negative. Removing one tier from any metric requires removing it from all. Color tokens for tiers are global.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       02 — COLOR
+       ============================================================ -->
+  <section class="section" id="color">
+    <div class="section-head">
+      <h2>Color</h2>
+      <span class="index">02</span>
+    </div>
+    <p class="section-intro">
+      <strong>One hero color, four accents.</strong> Jade is the dominant brand presence — actions, default chart fills, brand mark, "Solid" tier. The other four brand colors (Royal, Steel, Rose, Spark) are reserved for <em>moments</em>: AI blocks, growth edges, peak performances. Each accent gets one job and one job only. The references work because they pick a single color personality per screen — ours does the same.
+    </p>
+
+    <!-- Color usage rules -->
+    <div style="background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--elev-card); padding: var(--space-5); margin-bottom: var(--space-6); display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
+      <div>
+        <div style="font: var(--type-eyebrow); color: var(--color-jade-700); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-2);">Hero color usage</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;"><strong>Jade can appear anywhere.</strong> It's the default for primary buttons, brand mark, default trend-up indicator, default chart fill, "Solid" tier, and any neutral affordance. If a screen needs color and the meaning is just "alive," use Jade.</p>
+      </div>
+      <div>
+        <div style="font: var(--type-eyebrow); color: var(--color-rose-600); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-2);">Accent color limits</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;"><strong>Accents appear once per screen, max.</strong> One Royal block (the AI insight). One Spark moment (when something is genuinely Elite). Rose is for growth-edge framing, applied with restraint. Steel is the <em>backup</em> color when Jade is already used elsewhere on the same chart.</p>
+      </div>
+    </div>
+
+    <h3 style="font: var(--type-h3); margin: var(--space-6) 0 var(--space-3);">Hero</h3>
+    <div class="grid grid-3" style="margin-bottom: var(--space-6);">
+
+      <div class="swatch" style="grid-column: span 1;">
+        <div class="swatch-color" style="background: var(--color-jade-500); height: 140px;">
+          <span class="role">Hero · primary</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Jade 500</div>
+          <div class="hex">#0FA889</div>
+          <div class="desc">The dominant brand color. Primary actions, "Solid" tier, app brand mark, default chart and trend color, default sparkline. When in doubt, use Jade.</div>
+        </div>
+      </div>
+
+      <div class="swatch" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+        <div style="display: flex; flex-direction: column;">
+          <div class="swatch-color" style="background: var(--color-jade-50); height: 70px;"></div>
+          <div class="swatch-meta">
+            <div class="name" style="font-size: 13px;">Jade 50</div>
+            <div class="hex">#E6F7F2</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; border-left: 1px solid var(--color-hairline);">
+          <div class="swatch-color" style="background: var(--color-jade-700); height: 70px;"></div>
+          <div class="swatch-meta">
+            <div class="name" style="font-size: 13px;">Jade 700</div>
+            <div class="hex">#0A7058</div>
+          </div>
+        </div>
+        <div style="grid-column: span 2; padding: var(--space-3) var(--space-4) var(--space-4); border-top: 1px solid var(--color-hairline);">
+          <p style="font: var(--type-small); color: var(--color-ink-2); margin: 0; line-height: 1.5;">Jade 50 for tag backgrounds and subtle fills. Jade 700 for tag text and borders that need to read as Jade without going full saturation.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font: var(--type-h3); margin: var(--space-6) 0 var(--space-3);">Accents</h3>
+    <div class="grid grid-4">
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-royal-500);">
+          <span class="role">AI · 1×/screen</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Royal 500</div>
+          <div class="hex">#6B35C9</div>
+          <div class="desc">AI insight blocks only. One per screen. Sparkle icons elsewhere stay subtle.</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-spark-500);">
+          <span class="role">Elite · rare</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Spark 500</div>
+          <div class="hex">#F2A43A</div>
+          <div class="desc">Elite tier only. Peak performances. Most restricted color in the system.</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-rose-500);">
+          <span class="role">Grow · sparing</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Rose 500</div>
+          <div class="hex">#E04867</div>
+          <div class="desc">"Room to Grow" framing. Use sparingly so it stays encouraging, not alarming.</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-steel-500);">
+          <span class="role">Backup data</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Steel 500</div>
+          <div class="hex">#2558B8</div>
+          <div class="desc">Secondary chart series when Jade is already used. Comparison data. "Solid" tier dot.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font: var(--type-h3); margin: var(--space-6) 0 var(--space-3);">Surface &amp; Ink</h3>
+    <div class="grid grid-4">
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-canvas); border-bottom: 1px solid var(--color-hairline);">
+          <span class="role">Page bg</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Canvas</div>
+          <div class="hex">#EFEFF1</div>
+          <div class="desc">App background. Cool neutral. Reads precise and dashboard-like.</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-surface); border-bottom: 1px solid var(--color-hairline);">
+          <span class="role">Card</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Surface</div>
+          <div class="hex">#FFFFFF</div>
+          <div class="desc">Default card background. Always carries a hairline.</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-canvas-sunk);">
+          <span class="role">Sunken</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Canvas Sunk</div>
+          <div class="hex">#E5E5E8</div>
+          <div class="desc">Sub-grouping inside cards. Tracks, sliders, hover states.</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-color" style="background: var(--color-ink);">
+          <span class="role">Primary text</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="name">Ink</div>
+          <div class="hex">#1B1D24</div>
+          <div class="desc">Primary text. Numbers, headlines, body copy.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       03 — TYPOGRAPHY
+       ============================================================ -->
+  <section class="section" id="typography">
+    <div class="section-head">
+      <h2>Typography</h2>
+      <span class="index">03</span>
+    </div>
+    <p class="section-intro">
+      DM Sans across the system. <strong>The inversion is the system's signature</strong>: hero numerals at weight 400, labels at weight 700. Numbers feel light <em>relative to bold labels</em> — the contrast does the work, not the thinness. Numerals also use <code style="font-family: var(--font-mono); font-size: 12px; background: var(--color-canvas-sunk); padding: 2px 6px; border-radius: 4px;">font-variant-numeric: tabular-nums</code> so columns line up.
+    </p>
+
+    <div class="token-table">
+      <div class="token-row">
+        <div class="token-name">type/display/lg</div>
+        <div class="token-value">400 · 56/1.0</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-display-lg); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">76%</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/display/md</div>
+        <div class="token-value">400 · 40/1.05</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-display-md); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">1.08</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/display/sm</div>
+        <div class="token-value">400 · 28/1.1</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-display-sm); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">42 — 38</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/h1</div>
+        <div class="token-value">700 · 22/1.25</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-h1); letter-spacing: var(--tracking-snug);">Player Profile</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/h2</div>
+        <div class="token-value">700 · 17/1.3</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-h2); letter-spacing: var(--tracking-snug);">Last Game</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/h3</div>
+        <div class="token-value">600 · 14/1.35</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-h3);">Effort + Disruption</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/body</div>
+        <div class="token-value">400 · 14/1.5</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-body);">Solid scoring efficiency for a U14 guard.</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/small</div>
+        <div class="token-value">400 · 13/1.45</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-small); color: var(--color-ink-2);">Tap to see this game in detail</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/caption</div>
+        <div class="token-value">500 · 11/1.3</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-caption); color: var(--color-ink-3);">Mar 14 · Home win</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">type/eyebrow</div>
+        <div class="token-value">700 · 10/1.2</div>
+        <div class="token-visual"></div>
+        <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow);">Last 5 games</div>
+      </div>
+    </div>
+
+    <!-- The inversion in action -->
+    <div style="background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-md); box-shadow: var(--elev-card); margin-top: var(--space-4); display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); align-items: center;">
+      <div>
+        <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-2);">The inversion in action</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;">Bold label, light number. The label anchors, the number breathes. This is the rhythm that runs through every reference dashboard — when applied consistently, it's what makes the system feel designed rather than defaulted.</p>
+      </div>
+      <div style="background: var(--color-surface-alt); border-radius: var(--radius-sm); padding: var(--space-5); border: 1px solid var(--color-hairline);">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-ink-2); margin-bottom: var(--space-2);">Scoring (PPSA)</div>
+        <div style="font: var(--type-display-md); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums; line-height: 1;">1.08</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       04 — SPACING
+       ============================================================ -->
+  <section class="section" id="spacing">
+    <div class="section-head">
+      <h2>Spacing</h2>
+      <span class="index">04</span>
+    </div>
+    <p class="section-intro">
+      4px base, 8px rhythm. The two values that define the Courtside IQ feel: <strong>8px gap between cards</strong> and <strong>16–20px inner card padding</strong>. Outside these defaults, reach for the named scale below.
+    </p>
+
+    <div class="token-table">
+      <div class="token-row">
+        <div class="token-name">space/1</div>
+        <div class="token-value">4px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 4px;"></div></div>
+        <div class="token-desc">Icon-to-text gaps inside tags</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/2</div>
+        <div class="token-value">8px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-500); height: 12px; width: 8px;"></div></div>
+        <div class="token-desc"><strong>Default card-to-card gap. The signature of the system.</strong></div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/3</div>
+        <div class="token-value">12px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 12px;"></div></div>
+        <div class="token-desc">Roomier card gap when sections need to breathe</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/4</div>
+        <div class="token-value">16px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 16px;"></div></div>
+        <div class="token-desc">Default card inner padding (tight)</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/5</div>
+        <div class="token-value">20px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 20px;"></div></div>
+        <div class="token-desc">Default card inner padding (standard)</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/6</div>
+        <div class="token-value">24px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 24px;"></div></div>
+        <div class="token-desc">Section breaks within a screen</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/8</div>
+        <div class="token-value">32px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 32px;"></div></div>
+        <div class="token-desc">Major section breaks, roomy hero padding</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/10</div>
+        <div class="token-value">40px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 40px;"></div></div>
+        <div class="token-desc">Top-of-screen padding above hero</div>
+      </div>
+      <div class="token-row">
+        <div class="token-name">space/12</div>
+        <div class="token-value">48px</div>
+        <div class="token-visual"><div style="background: var(--color-jade-200); height: 12px; width: 48px;"></div></div>
+        <div class="token-desc">Bottom safe-area + tab bar offset</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       05 — RADIUS
+       ============================================================ -->
+  <section class="section" id="radius">
+    <div class="section-head">
+      <h2>Radius</h2>
+      <span class="index">05</span>
+    </div>
+    <p class="section-intro">
+      Six radius values, one nesting rule. <strong>Child radius is always parent radius minus 2–4px.</strong> A 6px card contains 4px sub-pills, which contain 2px chips. The scale is deliberately tight — this product wants to feel precise and dashboard-like, not rounded and consumer-app-like.
+    </p>
+
+    <div class="grid grid-3">
+      <div style="background: var(--color-surface); padding: var(--space-5); border-radius: var(--radius-md); box-shadow: var(--elev-card);">
+        <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-3);">Default card</div>
+        <div style="background: var(--color-canvas); border-radius: var(--radius-md); height: 80px; margin-bottom: var(--space-2);"></div>
+        <div style="font: var(--type-body-strong); font-family: var(--font-mono); font-size: 12px;">radius/md · 6px</div>
+      </div>
+      <div style="background: var(--color-surface); padding: var(--space-5); border-radius: var(--radius-md); box-shadow: var(--elev-card);">
+        <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-3);">Inner pill</div>
+        <div style="background: var(--color-canvas); border-radius: var(--radius-sm); height: 80px; margin-bottom: var(--space-2);"></div>
+        <div style="font: var(--type-body-strong); font-family: var(--font-mono); font-size: 12px;">radius/sm · 4px</div>
+      </div>
+      <div style="background: var(--color-surface); padding: var(--space-5); border-radius: var(--radius-md); box-shadow: var(--elev-card);">
+        <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-3);">Tag / chip</div>
+        <div style="background: var(--color-canvas); border-radius: var(--radius-xs); height: 80px; margin-bottom: var(--space-2);"></div>
+        <div style="font: var(--type-body-strong); font-family: var(--font-mono); font-size: 12px;">radius/xs · 2px</div>
+      </div>
+    </div>
+
+    <div style="margin-top: var(--space-4); background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-lg); box-shadow: var(--elev-card);">
+      <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-3);">Nesting Rule — visual proof</div>
+      <div style="background: var(--color-surface-alt); border: 1px solid var(--color-hairline); border-radius: var(--radius-lg); padding: var(--space-4); display: flex; gap: var(--space-3); align-items: center;">
+        <div style="background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: var(--space-3); display: flex; gap: var(--space-2); align-items: center;">
+          <div class="ci-tag good">Good</div>
+          <span style="font: var(--type-small); color: var(--color-ink-2);">PPSA: 1.08</span>
+        </div>
+        <span style="font: var(--type-caption); color: var(--color-ink-3); font-family: var(--font-mono);">8 → 6 → 4 → 2</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       06 — ELEVATION
+       ============================================================ -->
+  <section class="section" id="elevation">
+    <div class="section-head">
+      <h2>Elevation</h2>
+      <span class="index">06</span>
+    </div>
+    <p class="section-intro">
+      Hairlines do most of the work. Shadows are reserved for things that genuinely float — modals, sheets, the tab bar. Cards do not float. They sit.
+    </p>
+
+    <div class="grid grid-3">
+      <div style="background: var(--color-canvas); padding: var(--space-8); border-radius: var(--radius-lg);">
+        <div style="background: var(--color-surface); padding: var(--space-4); border-radius: var(--radius-md); box-shadow: var(--elev-hairline); margin-bottom: var(--space-3);">
+          <div style="font: var(--type-h3);">Hairline only</div>
+          <div style="font: var(--type-small); color: var(--color-ink-3);">Inputs, sub-cards, list rows</div>
+        </div>
+        <div style="font: var(--type-caption); font-family: var(--font-mono); color: var(--color-ink-3);">elev/hairline</div>
+      </div>
+      <div style="background: var(--color-canvas); padding: var(--space-8); border-radius: var(--radius-lg);">
+        <div style="background: var(--color-surface); padding: var(--space-4); border-radius: var(--radius-md); box-shadow: var(--elev-card); margin-bottom: var(--space-3);">
+          <div style="font: var(--type-h3);">Card</div>
+          <div style="font: var(--type-small); color: var(--color-ink-3);">Default for every card on every screen</div>
+        </div>
+        <div style="font: var(--type-caption); font-family: var(--font-mono); color: var(--color-ink-3);">elev/card</div>
+      </div>
+      <div style="background: var(--color-canvas); padding: var(--space-8); border-radius: var(--radius-lg);">
+        <div style="background: var(--color-surface); padding: var(--space-4); border-radius: var(--radius-md); box-shadow: var(--elev-pop); margin-bottom: var(--space-3);">
+          <div style="font: var(--type-h3);">Popover / sheet</div>
+          <div style="font: var(--type-small); color: var(--color-ink-3);">Bottom sheets, tooltips, dropdowns</div>
+        </div>
+        <div style="font: var(--type-caption); font-family: var(--font-mono); color: var(--color-ink-3);">elev/pop</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       07 — COMPONENTS
+       ============================================================ -->
+  <section class="section" id="components">
+    <div class="section-head">
+      <h2>Components</h2>
+      <span class="index">07</span>
+    </div>
+    <p class="section-intro">
+      The vocabulary. Every screen in Courtside IQ is built from these. New components only get added when an existing one genuinely cannot serve.
+    </p>
+
+    <!-- Cards -->
+    <div class="demo-label" style="margin-top: var(--space-6);">Card · Tier 1 (default)</div>
+    <div class="demo">
+      <div style="width: 100%; max-width: 460px;">
+        <div class="ci-card">
+          <div class="ci-card-head">
+            <div class="ci-card-title">Last Game</div>
+            <div class="ci-card-action">↗</div>
+          </div>
+          <div style="font: var(--type-display-sm); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">42 — 38</div>
+          <div style="font: var(--type-small); color: var(--color-ink-3); margin-top: 2px;">Mar 14 · vs. Eagles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================
+         CARD HIERARCHY — tiered emphasis ladder
+         ================================================= -->
+    <div style="margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--color-hairline);">
+      <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-2);">Card hierarchy</div>
+      <h3 style="font: var(--type-h2); letter-spacing: var(--tracking-snug); margin-bottom: var(--space-2);">A five-tier emphasis ladder</h3>
+      <p style="font: var(--type-body); color: var(--color-ink-2); max-width: 720px; line-height: 1.6; margin-bottom: var(--space-6);">
+        Cards aren't all created equal. The default white card (Tier 1) handles 90% of the app. The four tiers below climb in visual emphasis, and each one is reserved for a specific kind of moment. <strong>The rule for moving up the ladder is "how big is this moment?"</strong> — not "how much do I want to decorate this card?" Routine pattern → Jade. AI insight → Royal Glow. Genuine peak → Spark. Whole-feature highlight → Hero.
+      </p>
+
+      <!-- Tier 2: Jade Glow -->
+      <div class="demo-label" style="margin-top: var(--space-6); display: flex; align-items: baseline; justify-content: space-between;">
+        <span>Tier 2 · Jade Glow</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-3); text-transform: none; letter-spacing: 0;">.ci-card.ci-card-jade</span>
+      </div>
+      <div class="demo">
+        <div style="width: 100%; max-width: 460px;">
+          <div class="ci-card ci-card-jade">
+            <div style="font: var(--type-eyebrow); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); color: var(--color-jade-700); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-jade-500);"></span>
+              This week's pattern
+            </div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: var(--tracking-snug); color: var(--color-ink); margin-bottom: var(--space-2); line-height: 1.3;">Jada's scoring efficiency is climbing</div>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55; margin-bottom: var(--space-4);">Across her last three games, the shots she's choosing are higher-percentage looks. That's growth, not luck.</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-3); border-top: 1px solid rgba(27,29,36,0.08);">
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span style="font-size: 22px; font-weight: var(--weight-numeral); letter-spacing: var(--tracking-tight); color: var(--color-ink); font-variant-numeric: tabular-nums;">+18%</span>
+                <span style="font-size: 11px; color: var(--color-ink-3); font-weight: 500;">PPSA vs prior 3</span>
+              </div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--color-ink);">See breakdown →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--color-surface-alt); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin-top: var(--space-2); max-width: 720px;">
+        <div style="font: var(--type-caption); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: 2px;">When to use</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.5;">"This week's pattern" cards. Weekly recap moments. Default standout treatment when something good is happening but it's not at Elite tier. The encouraging-tone callout.</p>
+      </div>
+
+      <!-- Tier 3: Royal Glow -->
+      <div class="demo-label" style="margin-top: var(--space-8); display: flex; align-items: baseline; justify-content: space-between;">
+        <span>Tier 3 · Royal Glow</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-3); text-transform: none; letter-spacing: 0;">.ci-card.ci-card-royal</span>
+      </div>
+      <div class="demo">
+        <div style="width: 100%; max-width: 460px;">
+          <div class="ci-card ci-card-royal">
+            <div style="font: var(--type-eyebrow); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); color: var(--color-royal-600); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-royal-500);"></span>
+              ✦ Development insight
+            </div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: var(--tracking-snug); color: var(--color-ink); margin-bottom: var(--space-2); line-height: 1.3;">A multi-game pattern is forming</div>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55; margin-bottom: var(--space-4);">Jada's playmaking has stepped up across the last 5 games. AST/TOV is now sitting in the Good tier with a clear upward trend.</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-3); border-top: 1px solid rgba(27,29,36,0.08);">
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span style="font-size: 22px; font-weight: var(--weight-numeral); letter-spacing: var(--tracking-tight); color: var(--color-ink); font-variant-numeric: tabular-nums;">2.4</span>
+                <span style="font-size: 11px; color: var(--color-ink-3); font-weight: 500;">AST/TOV · last 5</span>
+              </div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--color-ink);">Read story →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--color-surface-alt); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin-top: var(--space-2); max-width: 720px;">
+        <div style="font: var(--type-caption); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: 2px;">When to use</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.5;">The development narrative card on Player Profile. Per-game AI insights when they surface a pattern across games. Replaces the flat-Royal insight panel for "this is bigger than one game" moments.</p>
+      </div>
+
+      <!-- Tier 4: Spark Glow -->
+      <div class="demo-label" style="margin-top: var(--space-8); display: flex; align-items: baseline; justify-content: space-between;">
+        <span>Tier 4 · Spark Glow</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-3); text-transform: none; letter-spacing: 0;">.ci-card.ci-card-spark</span>
+      </div>
+      <div class="demo">
+        <div style="width: 100%; max-width: 460px;">
+          <div class="ci-card ci-card-spark">
+            <div style="font: var(--type-eyebrow); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); color: var(--color-spark-600); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-spark-500);"></span>
+              Personal best
+            </div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: var(--tracking-snug); color: var(--color-ink); margin-bottom: var(--space-2); line-height: 1.3;">Jada's highest-scoring game ever</div>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55; margin-bottom: var(--space-4);">14 points against the Hawks — her best game on record. Efficiency held at 1.24 PPSA, well into Elite for U14.</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-3); border-top: 1px solid rgba(27,29,36,0.08);">
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span style="font-size: 22px; font-weight: var(--weight-numeral); letter-spacing: var(--tracking-tight); color: var(--color-ink); font-variant-numeric: tabular-nums;">14</span>
+                <span style="font-size: 11px; color: var(--color-ink-3); font-weight: 500;">points · Mar 21</span>
+              </div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--color-ink);">See game →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--color-surface-alt); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin-top: var(--space-2); max-width: 720px;">
+        <div style="font: var(--type-caption); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: 2px;">When to use</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.5;">Personal-best announcements. Elite-tier game callouts. Streak milestones. Same restraint rules as Spark color: most restricted of the three single-color glows. Don't apply to anything that isn't a genuine peak.</p>
+      </div>
+
+      <!-- Tier 5: Hero -->
+      <div class="demo-label" style="margin-top: var(--space-8); display: flex; align-items: baseline; justify-content: space-between;">
+        <span>Tier 5 · Hero</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-3); text-transform: none; letter-spacing: 0;">.ci-card.ci-card-hero</span>
+      </div>
+      <div class="demo">
+        <div style="width: 100%; max-width: 460px;">
+          <div class="ci-card ci-card-hero">
+            <div style="font: var(--type-eyebrow); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); color: rgba(255,255,255,0.8); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-spark-500);"></span>
+              Development snapshot
+            </div>
+            <div style="font-size: 19px; font-weight: 700; letter-spacing: var(--tracking-snug); color: white; margin-bottom: var(--space-2); line-height: 1.3;">Jada is logging her best month yet</div>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.55; margin-bottom: var(--space-4);">Scoring efficiency, playmaking, and effort are all trending up over the last 6 games. The clearest progress we've seen this season.</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-3); border-top: 1px solid rgba(255,255,255,0.18);">
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span style="font-size: 22px; font-weight: var(--weight-numeral); letter-spacing: var(--tracking-tight); color: white; font-variant-numeric: tabular-nums;">3 of 4</span>
+                <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500;">metrics climbing</span>
+              </div>
+              <span style="font-size: 12px; font-weight: 600; color: white;">See full story →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background: var(--color-surface-alt); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin-top: var(--space-2); max-width: 720px;">
+        <div style="font: var(--type-caption); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: 2px;">When to use</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.5;">The development snapshot on the dashboard. Season summaries. Onboarding hero moments. <strong>One per screen, max — usually zero.</strong> White text on Royal gradient with Spark accent: the only card with inverted text, so every use needs a dedicated content design pass.</p>
+      </div>
+
+      <!-- Hierarchy rules -->
+      <div style="margin-top: var(--space-8); background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--elev-card); padding: var(--space-5);">
+        <div style="font: var(--type-eyebrow); color: var(--color-ink-3); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-3);">Hierarchy rules</div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
+          <div>
+            <h4 style="font: var(--type-h3); margin-bottom: 4px;">One climb per screen</h4>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;">A screen with two Tier 2+ cards starts to feel decorated. Pick the most important moment and elevate it; the rest stay default. The Hero tier especially: one per screen, often zero.</p>
+          </div>
+          <div>
+            <h4 style="font: var(--type-h3); margin-bottom: 4px;">Tier follows meaning, not preference</h4>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;">Don't pick a tier because the card "needs" pop. Pick it because the moment justifies the volume. A Royal Glow on a routine stat reads as inflation — and dilutes the tier when it's actually needed.</p>
+          </div>
+          <div>
+            <h4 style="font: var(--type-h3); margin-bottom: 4px;">Hero is not a Royal card</h4>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;">Tier 5 looks like Royal but it isn't an "AI moment" — it's a feature-level headline. The Royal is providing weight, not meaning. Use it for things like the development snapshot, season summary, or onboarding hero.</p>
+          </div>
+          <div>
+            <h4 style="font: var(--type-h3); margin-bottom: 4px;">Glows don't change card structure</h4>
+            <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.55;">Same 6px radius, same 16–20px padding, same hairline (or shadow on Hero). Glow cards are the regular card with a treatment, not a different component. A Tier 2 card next to a Tier 1 card should still feel like the same family.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ===== End Card Hierarchy ===== -->
+
+    <!-- Tags -->
+    <div class="demo-label" style="margin-top: var(--space-6);">Tier tags</div>
+    <div class="demo">
+      <span class="ci-tag solid">Solid</span>
+      <span class="ci-tag good">Good</span>
+      <span class="ci-tag elite">Elite</span>
+      <span class="ci-tag grow">Room to Grow</span>
+      <span class="ci-tag ai">AI Insight</span>
+      <span class="ci-tag muted">Not yet rated</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="demo-label" style="margin-top: var(--space-6);">Buttons</div>
+    <div class="demo">
+      <button class="ci-btn ci-btn-primary">Log Game</button>
+      <button class="ci-btn ci-btn-secondary">Edit Profile</button>
+      <button class="ci-btn ci-btn-ghost">Cancel</button>
+    </div>
+
+    <!-- Reserved AI button -->
+    <div class="demo-label" style="margin-top: var(--space-6);">Reserved · AI button</div>
+    <div class="demo" style="flex-direction: column; align-items: flex-start; gap: var(--space-4);">
+      <button class="ci-btn ci-btn-ai">✦ Generate Insight</button>
+      <div style="background: var(--color-royal-50); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-royal-100); max-width: 480px;">
+        <div style="font: var(--type-eyebrow); color: var(--color-royal-600); text-transform: uppercase; letter-spacing: var(--tracking-eyebrow); margin-bottom: var(--space-1);">No current use case</div>
+        <p style="font: var(--type-small); color: var(--color-ink-2); line-height: 1.5;">Per-game insights and development narratives generate automatically server-side. There's no manual trigger in the current app. This style is held in reserve for future AI affordances — for example, a "Regenerate" action when an insight fails to load. If a use case never materializes, this button is removed in v2.</p>
+      </div>
+    </div>
+
+    <!-- Metric tiles -->
+    <div class="demo-label" style="margin-top: var(--space-6);">Metric tile</div>
+    <div class="demo">
+      <div style="display: grid; grid-template-columns: repeat(2, 180px); gap: var(--space-2); width: auto;">
+        <div class="ci-metric">
+          <div class="ci-metric-tier good"></div>
+          <div class="ci-metric-label">Scoring (PPSA)</div>
+          <div class="ci-metric-value">1.08</div>
+          <span class="ci-tag good" style="align-self: flex-start;">Good</span>
+        </div>
+        <div class="ci-metric">
+          <div class="ci-metric-tier elite"></div>
+          <div class="ci-metric-label">Effort + Disruption</div>
+          <div class="ci-metric-value">14</div>
+          <span class="ci-tag elite" style="align-self: flex-start;">Elite</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player header -->
+    <div class="demo-label" style="margin-top: var(--space-6);">Player header</div>
+    <div class="demo">
+      <div style="width: 100%; max-width: 460px;">
+        <div class="ci-player-header">
+          <div class="ci-avatar">JR</div>
+          <div class="ci-player-meta">
+            <div class="name">Jada Robinson</div>
+            <div class="sub">Guard · U14 · 6 games this season</div>
+          </div>
+          <button class="ci-btn ci-btn-secondary ci-btn-sm">Switch</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI insight -->
+    <div class="demo-label" style="margin-top: var(--space-6);">AI insight block</div>
+    <div class="demo">
+      <div style="width: 100%; max-width: 460px;">
+        <div class="ci-insight">
+          <div class="ci-insight-mark">✦</div>
+          <div class="ci-insight-body">
+            <div class="label">Development insight</div>
+            <p>Jada's scoring efficiency held steady this game even as her shot volume climbed. That kind of composure is what Solid scoring looks like for a U14 guard. Watch for assists next time — she had two near-misses on weak-side reads.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       08 — DASHBOARD ANCHOR
+       ============================================================ -->
+  <section class="section" id="dashboard">
+    <div class="section-head">
+      <h2>Dashboard — anchor surface</h2>
+      <span class="index">08</span>
+    </div>
+    <p class="section-intro">
+      The dashboard is where the system has to feel right. If the rules don't survive here, they don't ship. Every component on this screen is the system applied — no one-off styles.
+    </p>
+
+    <div class="preview-layout">
+      <!-- Phone frame with dashboard -->
+      <div class="phone-frame">
+        <div class="phone-statusbar">
+          <span>9:41</span>
+          <span class="icons">●●●●● ●●● ▮</span>
+        </div>
+        <div class="phone-screen">
+          <div class="dash-stack">
+
+            <!-- Greeting -->
+            <div class="dash-greeting">
+              <div class="hello">Tuesday morning</div>
+              <div class="name">Jada is logging her best month yet.</div>
+            </div>
+
+            <!-- Player header -->
+            <div class="ci-player-header">
+              <div class="ci-avatar">JR</div>
+              <div class="ci-player-meta">
+                <div class="name">Jada Robinson</div>
+                <div class="sub">Guard · U14 · 6 games</div>
+              </div>
+              <div class="ci-card-action">⇅</div>
+            </div>
+
+            <!-- Stat row -->
+            <div class="dash-stat-row">
+              <div class="dash-stat-cell">
+                <div class="ci-metric-label">Avg points</div>
+                <div style="font: var(--type-display-md); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">11.4</div>
+                <span class="ci-metric-trend up">▲ 2.1 vs last 5</span>
+              </div>
+              <div class="dash-stat-cell">
+                <div class="ci-metric-label">Win rate</div>
+                <div style="font: var(--type-display-md); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">67%</div>
+                <span class="ci-metric-trend flat">— same</span>
+              </div>
+            </div>
+
+            <!-- Last game -->
+            <div class="last-game">
+              <div class="last-game-head">
+                <div>
+                  <div class="last-game-title">Last game</div>
+                  <div class="last-game-result">42 — 38</div>
+                  <div class="last-game-meta">Mar 14 · vs. Eagles · Home win</div>
+                </div>
+                <span class="ci-tag good">Good</span>
+              </div>
+              <div class="last-game-stats">
+                <div class="cell"><div class="num">12</div><div class="lbl">PTS</div></div>
+                <div class="cell"><div class="num">4</div><div class="lbl">REB</div></div>
+                <div class="cell"><div class="num">3</div><div class="lbl">AST</div></div>
+                <div class="cell"><div class="num">2</div><div class="lbl">STL</div></div>
+              </div>
+            </div>
+
+            <!-- AI insight -->
+            <div class="ci-insight">
+              <div class="ci-insight-mark">✦</div>
+              <div class="ci-insight-body">
+                <div class="label">This week's pattern</div>
+                <p>Scoring efficiency is climbing across her last three games. The shots she's choosing are higher-percentage looks — that's growth, not luck.</p>
+              </div>
+            </div>
+
+            <!-- Trend -->
+            <div class="ci-card">
+              <div class="ci-card-head">
+                <div class="ci-card-title">Last 5 games</div>
+                <div class="ci-card-action">↗</div>
+              </div>
+              <div class="ci-metric-label">Points per game</div>
+              <div style="display: flex; align-items: baseline; gap: var(--space-3);">
+                <div style="font: var(--type-display-sm); letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums;">11.4</div>
+                <span class="ci-metric-trend up">▲ 18%</span>
+              </div>
+              <div class="sparkbar">
+                <div class="bar" style="height: 30%;"></div>
+                <div class="bar" style="height: 50%;"></div>
+                <div class="bar" style="height: 65%;"></div>
+                <div class="bar active" style="height: 80%;"></div>
+                <div class="bar active" style="height: 95%;"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab bar -->
+        <div class="phone-tabbar">
+          <div class="phone-tab active">⌂</div>
+          <div class="phone-tab">◐</div>
+          <div class="phone-tab">✦</div>
+          <div class="phone-tab">☰</div>
+        </div>
+      </div>
+
+      <!-- Annotation column -->
+      <div class="preview-notes">
+        <div class="ci-card ci-card-tight">
+          <div class="ci-card-title" style="font-size: 14px; margin-bottom: var(--space-2);">Why 8px gaps</div>
+          <p style="font: var(--type-small); color: var(--color-ink-2);">Cards sit 8px apart vertically. Material defaults to 16–24, which makes a dashboard feel like a settings screen. The tighter gap is what reads as "designed."</p>
+        </div>
+        <div class="ci-card ci-card-tight">
+          <div class="ci-card-title" style="font-size: 14px; margin-bottom: var(--space-2);">Stat row, not stat cards</div>
+          <p style="font: var(--type-small); color: var(--color-ink-2);">Two metrics that should be compared share a single card with a 1px hairline divider. Not two separate cards. Comparison is the meaning, the container should reflect it.</p>
+        </div>
+        <div class="ci-card ci-card-tight">
+          <div class="ci-card-title" style="font-size: 14px; margin-bottom: var(--space-2);">One Royal block per screen</div>
+          <p style="font: var(--type-small); color: var(--color-ink-2);">Royal (purple) signals AI. One block per screen, max. Two starts to feel like a feature dump and dilutes the meaning.</p>
+        </div>
+        <div class="ci-card ci-card-tight">
+          <div class="ci-card-title" style="font-size: 14px; margin-bottom: var(--space-2);">Tier tag = card temperature</div>
+          <p style="font: var(--type-small); color: var(--color-ink-2);">A tier pill in the corner of a card colors the read of everything inside it. Use sparingly — only when the card is summarizing a single rated performance.</p>
+        </div>
+        <div class="ci-card ci-card-tight">
+          <div class="ci-card-title" style="font-size: 14px; margin-bottom: var(--space-2);">Floating tab bar</div>
+          <p style="font: var(--type-small); color: var(--color-ink-2);">Pill tab bar floats on Ink, not Canvas. The shadow is real here — it's the only thing on screen that genuinely floats, so the elev/pop shadow earns its place.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       09 — VALIDATION
+       ============================================================ -->
+  <section class="section" id="validation">
+    <div class="section-head">
+      <h2>Validation — denser surfaces</h2>
+      <span class="index">09</span>
+    </div>
+    <p class="section-intro">
+      The dashboard rules have to hold up on the hardest screens. Below: how the same tokens compose into Player Profile and Game Log. Same vocabulary, same gaps, same nesting — just more density.
+    </p>
+
+    <div class="validate">
+
+      <!-- Player Profile excerpt -->
+      <div class="validate-card">
+        <h4>Player Profile · Averages tab</h4>
+        <p>Four metric tiles in a 2×2 grid. Each carries a tier dot and tag. The grid uses 12px gap — same as dashboard.</p>
+        <div style="background: var(--color-canvas); padding: var(--space-4); border-radius: var(--radius-md);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+            <div class="ci-metric">
+              <div class="ci-metric-tier good"></div>
+              <div class="ci-metric-label">Scoring</div>
+              <div class="ci-metric-value">1.08</div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <span class="ci-tag good">Good</span>
+                <span class="ci-metric-trend up">▲ 0.12</span>
+              </div>
+            </div>
+            <div class="ci-metric">
+              <div class="ci-metric-tier solid"></div>
+              <div class="ci-metric-label">Playmaking</div>
+              <div class="ci-metric-value">2.4</div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <span class="ci-tag solid">Solid</span>
+                <span class="ci-metric-trend flat">—</span>
+              </div>
+            </div>
+            <div class="ci-metric">
+              <div class="ci-metric-tier elite"></div>
+              <div class="ci-metric-label">Effort</div>
+              <div class="ci-metric-value">14</div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <span class="ci-tag elite">Elite</span>
+                <span class="ci-metric-trend up">▲ 3</span>
+              </div>
+            </div>
+            <div class="ci-metric">
+              <div class="ci-metric-tier grow"></div>
+              <div class="ci-metric-label">Defensive</div>
+              <div class="ci-metric-value">7</div>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <span class="ci-tag grow">Grow</span>
+                <span class="ci-metric-trend down">▼ 1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Log excerpt -->
+      <div class="validate-card">
+        <h4>Player Profile · Games tab</h4>
+        <p>List of game rows. Each row is a sub-card with hairline dividers, tier tag, AI insight badge when present.</p>
+        <div style="background: var(--color-canvas); padding: var(--space-4); border-radius: var(--radius-md);">
+          <div style="background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--elev-card); overflow: hidden;">
+            <div style="padding: var(--space-4); border-bottom: 1px solid var(--color-hairline); display: flex; align-items: center; gap: var(--space-3);">
+              <div style="flex: 1;">
+                <div style="font: var(--type-h3); margin-bottom: 2px;">vs. Eagles</div>
+                <div style="font: var(--type-caption); color: var(--color-ink-3);">Mar 14 · 12 PTS · 4 REB · 3 AST</div>
+              </div>
+              <span class="ci-tag good">Good</span>
+              <span class="ci-tag ai" style="padding: 4px 8px;">✦</span>
+            </div>
+            <div style="padding: var(--space-4); border-bottom: 1px solid var(--color-hairline); display: flex; align-items: center; gap: var(--space-3);">
+              <div style="flex: 1;">
+                <div style="font: var(--type-h3); margin-bottom: 2px;">vs. Hawks</div>
+                <div style="font: var(--type-caption); color: var(--color-ink-3);">Mar 7 · 14 PTS · 6 REB · 5 AST</div>
+              </div>
+              <span class="ci-tag elite">Elite</span>
+              <span class="ci-tag ai" style="padding: 4px 8px;">✦</span>
+            </div>
+            <div style="padding: var(--space-4); display: flex; align-items: center; gap: var(--space-3);">
+              <div style="flex: 1;">
+                <div style="font: var(--type-h3); margin-bottom: 2px;">vs. Wolves</div>
+                <div style="font: var(--type-caption); color: var(--color-ink-3);">Feb 28 · 8 PTS · 3 REB · 1 AST</div>
+              </div>
+              <span class="ci-tag solid">Solid</span>
+              <span class="ci-tag ai" style="padding: 4px 8px;">✦</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       10 — MIGRATION
+       ============================================================ -->
+  <section class="section" id="migration">
+    <div class="section-head">
+      <h2>Migration map</h2>
+      <span class="index">10</span>
+    </div>
+    <p class="section-intro">
+      Every legacy v2 token has a destination. Use this when refactoring existing screens. Anything not on this list stays — most of the v2 work survives, this is targeted cleanup.
+    </p>
+
+    <div class="migration">
+      <div class="mig-row head">
+        <div>From (v2)</div>
+        <div>To (v1 system)</div>
+        <div>Why</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--teal-500</div>
+        <div class="to">--color-jade-500</div>
+        <div class="why">Renamed to canonical April 2026 palette. Same primary role.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--purple</div>
+        <div class="to">--color-royal-500</div>
+        <div class="why">AI feature mark. New value (#6B35C9) is warmer and reads better on warm Canvas.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--neutral-100..900 (9 stops)</div>
+        <div class="to">--color-ink, ink-2, ink-3, ink-4 + canvas/surface</div>
+        <div class="why">UI-kit-style ramps create decision fatigue. Four ink stops + three surfaces is the entire vocabulary.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">background: #E8ECF0</div>
+        <div class="to">background: var(--color-canvas) · #EFEFF1</div>
+        <div class="why">Stay in the cool neutral family. Reference dashboards (construction, logistics) sit here — it reads precise and technical, which is the right register for a development tool.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--radius-md: 14px (cards)</div>
+        <div class="to">--radius-md: 6px (cards)</div>
+        <div class="why">Tightened scale matches reference shots. Crisper corners read as dashboard, not consumer app.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--radius-sm: 6px (buttons)</div>
+        <div class="to">--radius-sm: 4px (buttons)</div>
+        <div class="why">Buttons sit one nesting level inside cards. 4px keeps the parent-minus-2 rule consistent.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">tag radius: full pill (9999px)</div>
+        <div class="to">tag radius: 4px (--radius-sm)</div>
+        <div class="why">Tags now follow the same tight-corner rule as the rest of the system. Identity comes from size, color, and uppercase text — not pill shape. No conflict with buttons because buttons are 32–44px tall and tags are 18–20px.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--shadow-card (existing)</div>
+        <div class="to">--elev-card</div>
+        <div class="why">Same recipe, renamed for Figma. Hairline + soft shadow stays.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--warning-dark / --error</div>
+        <div class="to">--color-rose-500 / --color-spark-500</div>
+        <div class="why">No "warning" or "error" semantic in this product. Rose = grow, Spark = elite. Repurpose intentionally.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">card gap: 16–24px</div>
+        <div class="to">card gap: 8px (--space-2)</div>
+        <div class="why">The single most important change. This is what makes the layout feel modular vs spaced-out.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">--type-display-*: 700 weight</div>
+        <div class="to">--type-display-*: 400 weight</div>
+        <div class="why">The inversion. Hero numerals at 400 with bold (700) labels. Numbers feel light <em>relative to labels</em> — the contrast does the work, not the thinness. This is what the references are actually doing.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">No tabular numerals</div>
+        <div class="to">font-variant-numeric: tabular-nums</div>
+        <div class="why">Numbers in stat rows, score cards, and metric tiles now use tabular figures so columns line up. Required for any number that appears in a list with other numbers.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">5 brand colors at equal weight</div>
+        <div class="to">Jade hero · 4 accents (Royal, Steel, Rose, Spark)</div>
+        <div class="why">Jade can appear anywhere. Royal/Steel/Rose/Spark are reserved for moments — once per screen, max. The references work because they pick one color personality per screen.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">Steel as primary "info" color</div>
+        <div class="to">Steel as backup data color</div>
+        <div class="why">Default chart fills, default trend indicators, and default data series use Jade. Steel only when Jade is already in use elsewhere on the same chart (multi-series comparisons).</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">Primary button: Jade fill</div>
+        <div class="to">Primary button: Ink (black) fill</div>
+        <div class="why">Black is the most decisive thing on the screen. Jade-as-primary meant every screen had a Jade button just by default — Jade now gets reserved for moments where it earns presence (charts, brand mark, "Solid" tier, success states).</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">Secondary button: white + hairline</div>
+        <div class="to">Secondary button: Canvas-Sunk fill + hairline</div>
+        <div class="why">Black primary + white secondary creates two extremes fighting for attention. Soft-fill secondary reads as a quieter peer, lets primary command without competition.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">AI button: in primary lineup</div>
+        <div class="to">AI button: reserved · documented use case</div>
+        <div class="why">No screen currently has a manual AI trigger — insights generate server-side. Style held in reserve for future regeneration affordance. Removed in v2 if no use case emerges.</div>
+      </div>
+      <div class="mig-row">
+        <div class="from">One card style (white)</div>
+        <div class="to">Five-tier card hierarchy</div>
+        <div class="why">White default + Jade Glow / Royal Glow / Spark Glow / Hero. Tier follows meaning of the moment, not designer preference. White card stays the default for 90% of cards. Glows are reserved for development snapshots, milestones, AI patterns, and weekly recaps — not decoration.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       11 — FIGMA SETUP
+       ============================================================ -->
+  <section class="section" id="figma">
+    <div class="section-head">
+      <h2>Figma setup</h2>
+      <span class="index">11</span>
+    </div>
+    <p class="section-intro">
+      Token names in this doc map 1:1 to Figma Variables. Create one collection per category, then use them across components and styles. Recommended order below.
+    </p>
+
+    <div class="grid grid-2">
+      <div class="ci-card">
+        <div class="ci-card-title" style="margin-bottom: var(--space-3);">Collections to create</div>
+        <ol style="font: var(--type-body); color: var(--color-ink-2); padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2);">
+          <li><strong style="color: var(--color-ink);">color/brand</strong> · jade, royal, steel, rose, spark (50–700 stops)</li>
+          <li><strong style="color: var(--color-ink);">color/surface</strong> · canvas, canvas-sunk, surface, surface-alt, hairline</li>
+          <li><strong style="color: var(--color-ink);">color/text</strong> · ink, ink-2, ink-3, ink-4, ink-onbrand</li>
+          <li><strong style="color: var(--color-ink);">radius</strong> · xs, sm, md, lg, xl, full</li>
+          <li><strong style="color: var(--color-ink);">space</strong> · 1, 2, 3, 4, 5, 6, 8, 10, 12</li>
+          <li><strong style="color: var(--color-ink);">elevation</strong> · hairline, card, pop, modal (effect styles)</li>
+          <li><strong style="color: var(--color-ink);">type</strong> · 10 text styles (display lg/md/sm, h1, h2, h3, body, small, caption, eyebrow)</li>
+        </ol>
+      </div>
+
+      <div class="ci-card">
+        <div class="ci-card-title" style="margin-bottom: var(--space-3);">Components to build (in order)</div>
+        <ol style="font: var(--type-body); color: var(--color-ink-2); padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2);">
+          <li><strong style="color: var(--color-ink);">Card</strong> · base + tight/standard/roomy <em>+ 4 standout variants (Jade/Royal/Spark/Hero)</em></li>
+          <li><strong style="color: var(--color-ink);">Tier tag</strong> · solid/good/elite/grow/ai/muted</li>
+          <li><strong style="color: var(--color-ink);">Metric tile</strong> · with/without tier dot, with/without trend</li>
+          <li><strong style="color: var(--color-ink);">Button</strong> · primary/secondary/ghost · sm/md/icon · <em>(AI variant held in reserve)</em></li>
+          <li><strong style="color: var(--color-ink);">Player header</strong> · with/without action</li>
+          <li><strong style="color: var(--color-ink);">AI insight block</strong> · single variant</li>
+          <li><strong style="color: var(--color-ink);">Tab bar</strong> · 4-tab pill, floating</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="ci-card" style="margin-top: var(--space-4);">
+      <div class="ci-card-title" style="margin-bottom: var(--space-3);">FlutterFlow handoff</div>
+      <p style="font: var(--type-body); color: var(--color-ink-2); margin-bottom: var(--space-3);">
+        Once tokens are locked in Figma, mirror them in your FlutterFlow theme: <strong style="color: var(--color-ink);">App Properties → Theme Settings → Custom Colors</strong>. Use the same names (<code style="font-family: var(--font-mono); font-size: 12px; background: var(--color-canvas-sunk); padding: 2px 6px; border-radius: 4px;">colorJade500</code>, <code style="font-family: var(--font-mono); font-size: 12px; background: var(--color-canvas-sunk); padding: 2px 6px; border-radius: 4px;">colorInk</code>) so design and code stay aligned.
+      </p>
+      <p style="font: var(--type-small); color: var(--color-ink-3);">
+        Spacing and radius can't be FF theme tokens directly, so create <code style="font-family: var(--font-mono); font-size: 12px; background: var(--color-canvas-sunk); padding: 2px 6px; border-radius: 4px;">app_constants.dart</code> in <code style="font-family: var(--font-mono); font-size: 12px; background: var(--color-canvas-sunk); padding: 2px 6px; border-radius: 4px;">lib/courtside_iq/</code> with const doubles for each value. Reference from custom widgets.
+      </p>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>

@@ -94,10 +94,10 @@ class _EditPlayerPositionWidgetState extends State<EditPlayerPositionWidget> {
                         Container(
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).gray4,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
+                                  .accent4,
                               width: 1.0,
                             ),
                           ),
@@ -187,8 +187,7 @@ class _EditPlayerPositionWidgetState extends State<EditPlayerPositionWidget> {
                                                             .teal
                                                         : Color(0x00000000),
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            12.0),
+                                                        BorderRadius.circular(6.0),
                                                   ),
                                                   alignment:
                                                       AlignmentDirectional(
@@ -318,7 +317,7 @@ class _EditPlayerPositionWidgetState extends State<EditPlayerPositionWidget> {
                                           .fontStyle,
                                     ),
                                 elevation: 0.0,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 disabledColor: FlutterFlowTheme.of(context)
                                     .secondaryBackground,
                                 disabledTextColor:

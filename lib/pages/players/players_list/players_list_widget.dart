@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -82,13 +83,69 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header: title stub + button stub
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 100, height: 28),
+                        Spacer(),
+                        SkeletonBox(width: 80, height: 36, radius: 8),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    // Player row 1
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 44, height: 44, radius: 22),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 80, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    // Player row 2
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 44, height: 44, radius: 22),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 80, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    // Player row 3
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 44, height: 44, radius: 22),
+                        SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 80, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -107,15 +164,6 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
                       0.0,
@@ -130,7 +178,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
-                            18.0, 0.0, 18.0, 0.0),
+                            12.0, 0.0, 12.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -152,14 +200,14 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .headlineSmall
                                             .override(
-                                              font: GoogleFonts.montserrat(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.normal,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .headlineSmall
                                                         .fontStyle,
                                               ),
-                                              fontSize: 25.0,
+                                              fontSize: 22.0,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.normal,
                                               fontStyle:
@@ -238,7 +286,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                     textStyle: FlutterFlowTheme.of(context)
                                         .titleSmall
                                         .override(
-                                          font: GoogleFonts.ibmPlexSans(
+                                          font: GoogleFonts.dmSans(
                                             fontWeight: FontWeight.normal,
                                             fontStyle:
                                                 FlutterFlowTheme.of(context)
@@ -256,7 +304,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                   .fontStyle,
                                         ),
                                     elevation: 0.0,
-                                    borderRadius: BorderRadius.circular(4.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                 ),
                               ),
@@ -310,10 +358,10 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                     'assets/images/gradient-bg-black-b.png',
                                   ).image,
                                 ),
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(16.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,7 +505,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                         ].divide(SizedBox(width: 12.0)),
                                       ),
                                     ),
-                                  ].divide(SizedBox(height: 12.0)),
+                                  ].divide(SizedBox(height: 8.0)),
                                 ),
                               ),
                             ),
@@ -504,7 +552,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                               scrollDirection: Axis.vertical,
                                               itemCount: playersVar.length,
                                               separatorBuilder: (_, __) =>
-                                                  SizedBox(height: 12.0),
+                                                  SizedBox(height: 8.0),
                                               itemBuilder:
                                                   (context, playersVarIndex) {
                                                 final playersVarItem =
@@ -566,16 +614,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                       .of(context)
                                                                   .gray4,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12.0),
-                                                              border:
-                                                                  Border.all(
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                width: 1.0,
-                                                              ),
+                                                                  BorderRadius.circular(6.0),
                                                             ),
                                                             alignment:
                                                                 AlignmentDirectional(
@@ -646,16 +685,18 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                         context)
                                                                     .primaryBackground,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12.0),
+                                                                    BorderRadius.circular(6.0),
+                                                                border: Border.all(
+                                                                  color: FlutterFlowTheme.of(context).accent4,
+                                                                  width: 1.0,
+                                                                ),
                                                               ),
                                                               child: Padding(
                                                                 padding: EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        18.0,
+                                                                        16.0,
                                                                         0.0,
-                                                                        18.0,
+                                                                        16.0,
                                                                         24.0),
                                                                 child: Column(
                                                                   mainAxisSize:
@@ -697,17 +738,17 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                         width: 46.0,
                                                                                         height: 46.0,
                                                                                         decoration: BoxDecoration(
-                                                                                          color: FlutterFlowTheme.of(context).gray4,
-                                                                                          borderRadius: BorderRadius.circular(23.0),
+                                                                                          color: const Color(0xFFE8E8E8),
+                                                                                          borderRadius: BorderRadius.circular(9999.0),
                                                                                         ),
                                                                                         child: Row(
                                                                                           mainAxisSize: MainAxisSize.max,
                                                                                           mainAxisAlignment: MainAxisAlignment.center,
                                                                                           children: [
                                                                                             Icon(
-                                                                                              Icons.person,
-                                                                                              color: FlutterFlowTheme.of(context).gray2,
-                                                                                              size: 24.0,
+                                                                                              Icons.person_rounded,
+                                                                                              color: const Color(0xFF6A6A6A),
+                                                                                              size: 28.0,
                                                                                             ),
                                                                                           ],
                                                                                         ),
@@ -718,10 +759,10 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                         height: 46.0,
                                                                                         decoration: BoxDecoration(
                                                                                           color: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                          borderRadius: BorderRadius.circular(23.0),
+                                                                                          borderRadius: BorderRadius.circular(9999.0),
                                                                                         ),
                                                                                         child: ClipRRect(
-                                                                                          borderRadius: BorderRadius.circular(23.0),
+                                                                                          borderRadius: BorderRadius.circular(9999.0),
                                                                                           child: Image.network(
                                                                                             playersVarItem.playerProfilePic!,
                                                                                             width: 46.0,
@@ -747,7 +788,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                                     child: Text(
                                                                                                       '${playersVarItem.playerFirstName}',
                                                                                                       style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                                            font: GoogleFonts.ibmPlexSans(
+                                                                                                            font: GoogleFonts.dmSans(
                                                                                                               fontWeight: FontWeight.w500,
                                                                                                               fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
                                                                                                             ),
@@ -768,8 +809,8 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                                   ),
                                                                                                 if (FFAppState().isUserPremium == false)
                                                                                                   FlutterFlowIconButton(
-                                                                                                    borderColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                                    borderRadius: 12.0,
+                                                                                                    borderColor: FlutterFlowTheme.of(context).accent4,
+                                                                                                    borderRadius: 6.0,
                                                                                                     borderWidth: 1.0,
                                                                                                     buttonSize: 40.0,
                                                                                                     fillColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -831,9 +872,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(12.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                   width: 1.0,
                                                                                 ),
                                                                               ),
@@ -853,7 +894,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -868,7 +909,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         'Games',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),
@@ -895,9 +936,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(12.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                 ),
                                                                               ),
                                                                               child: Align(
@@ -916,7 +957,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -930,7 +971,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         'FG%',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),
@@ -957,9 +998,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(12.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                 ),
                                                                               ),
                                                                               alignment: AlignmentDirectional(-1.0, -1.0),
@@ -979,7 +1020,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.montserrat(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -993,7 +1034,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         'FT%',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),
@@ -1020,9 +1061,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(12.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                                                  color: FlutterFlowTheme.of(context).accent4,
                                                                                 ),
                                                                               ),
                                                                               alignment: AlignmentDirectional(-1.0, -1.0),
@@ -1042,7 +1083,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                           ),
                                                                                           textAlign: TextAlign.center,
                                                                                           style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                                font: GoogleFonts.dmSans(
                                                                                                   fontWeight: FontWeight.w600,
                                                                                                   fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
                                                                                                 ),
@@ -1056,7 +1097,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                       Text(
                                                                                         '3PT%',
                                                                                         style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.montserrat(
+                                                                                              font: GoogleFonts.dmSans(
                                                                                                 fontWeight: FontWeight.normal,
                                                                                                 fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
                                                                                               ),

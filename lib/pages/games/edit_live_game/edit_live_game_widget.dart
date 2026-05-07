@@ -476,7 +476,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).globalBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context)
                                   .secondaryBackground,
@@ -1482,7 +1482,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .globalBackground,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -1599,7 +1599,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .globalBackground,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -1697,7 +1697,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .globalBackground,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -1804,7 +1804,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -1915,7 +1915,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -2026,7 +2026,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -2142,7 +2142,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -2247,7 +2247,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -2352,7 +2352,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                           decoration: BoxDecoration(
                             color:
                                 FlutterFlowTheme.of(context).primaryBackground,
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -2457,7 +2457,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -2548,7 +2548,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -2639,7 +2639,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -2730,7 +2730,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -2821,7 +2821,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -2912,7 +2912,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -3003,7 +3003,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -3094,7 +3094,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Padding(
                       padding:
@@ -3295,7 +3295,7 @@ class _EditLiveGameWidgetState extends State<EditLiveGameWidget>
                                             ),
                                         elevation: 0.0,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(6.0),
                                       ),
                                     ),
                                   ),

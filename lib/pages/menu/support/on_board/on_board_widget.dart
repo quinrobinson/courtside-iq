@@ -58,7 +58,7 @@ class _OnBoardWidgetState extends State<OnBoardWidget> {
         body: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(6.0),
               child: Image.asset(
                 'assets/images/Profile_Gradient.png',
                 width: double.infinity,
@@ -884,7 +884,7 @@ class _OnBoardWidgetState extends State<OnBoardWidget> {
                                         .fontStyle,
                                   ),
                               elevation: 0.0,
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: BorderRadius.circular(6.0),
                             ),
                           ),
                         ),

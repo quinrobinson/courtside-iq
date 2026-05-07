@@ -1,17 +1,18 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/skeleton_widget.dart';
 
-const _card = Colors.white;
-const _cardBorder = Color(0xFFE2E0DF);
-const _tile = Color(0xFFF3F3F3);
-const _ink = Color(0xFF0F0F0F);
-const _sub = Color(0xFF6A6A6A);
-const _hint = Color(0xFF8E8E8E);
-const _green = Color(0xFF2BC18C);
-const _greenBg = Color(0xFFE6F7EF);
-const _red = Color(0xFFD9005C);
-const _redBg = Color(0xFFFBE5EE);
+const _card = CIColors.surface;
+const _cardBorder = CIColors.hairline;
+const _ink = CIColors.ink;
+const _sub = CIColors.ink3;
+const _hint = CIColors.ink3;
+const _green = CIColors.jade500;
+const _greenBg = CIColors.jade50;
+const _red = CIColors.rose500;
+const _redBg = CIColors.rose50;
 
 class AveragesTab extends StatefulWidget {
   const AveragesTab({super.key, required this.playerId});
@@ -75,8 +76,15 @@ class _AveragesTabState extends State<AveragesTab> {
     }
     if (_profile == null || _recent == null) {
       return const Padding(
-        padding: EdgeInsets.all(40),
-        child: Center(child: CircularProgressIndicator()),
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SkeletonBox(width: double.infinity, height: 172),
+            SizedBox(height: 10),
+            SkeletonBox(width: double.infinity, height: 140),
+          ],
+        ),
       );
     }
     final p = _profile!;
@@ -87,7 +95,7 @@ class _AveragesTabState extends State<AveragesTab> {
         child: Text(
           'No games logged yet.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: _sub, fontFamily: 'Inter'),
+          style: TextStyle(color: _sub, fontFamily: CIType.fontFamily),
         ),
       );
     }
@@ -145,7 +153,7 @@ class _AveragesTabState extends State<AveragesTab> {
     return Container(
       decoration: BoxDecoration(
         color: _card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _cardBorder, width: 1),
       ),
       padding: const EdgeInsets.all(14),
@@ -155,7 +163,7 @@ class _AveragesTabState extends State<AveragesTab> {
           const Text(
             'Per-game averages',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: _ink,
@@ -165,7 +173,7 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             'Based on $games ${games == 1 ? 'game' : 'games'}',
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 11,
               color: _sub,
             ),
@@ -200,7 +208,7 @@ class _AveragesTabState extends State<AveragesTab> {
     return Container(
       decoration: BoxDecoration(
         color: _card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _cardBorder, width: 1),
       ),
       padding: const EdgeInsets.all(14),
@@ -210,7 +218,7 @@ class _AveragesTabState extends State<AveragesTab> {
           const Text(
             'Shooting',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: _ink,
@@ -221,7 +229,7 @@ class _AveragesTabState extends State<AveragesTab> {
               padding: EdgeInsets.only(top: 2),
               child: Text(
                 'Last 5 vs lifetime',
-                style: TextStyle(fontFamily: 'Inter', fontSize: 11, color: _sub),
+                style: TextStyle(fontFamily: CIType.fontFamily, fontSize: 11, color: _sub),
               ),
             ),
           const SizedBox(height: 10),
@@ -241,17 +249,18 @@ class _AveragesTabState extends State<AveragesTab> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
-        color: _tile,
-        borderRadius: BorderRadius.circular(10),
+        color: CIColors.canvas.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: Column(
         children: [
           Text(
             value,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
+              fontFeatures: const [FontFeature.tabularFigures()],
               color: _ink,
             ),
           ),
@@ -259,7 +268,7 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             label,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: _hint,
@@ -281,20 +290,20 @@ class _AveragesTabState extends State<AveragesTab> {
     } else if (delta < -0.5) {
       fg = _red; bg = _redBg; tag = '↓ ${delta.toStringAsFixed(1)}';
     } else {
-      fg = _sub; bg = Colors.white; border = const Color(0xFFD9D9D9); tag = '±0';
+      fg = _sub; bg = CIColors.surface; border = CIColors.hairline; tag = '±0';
     }
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: _tile,
-        borderRadius: BorderRadius.circular(10),
+        color: CIColors.canvas.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: Column(
         children: [
           Text(
             label,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: _hint,
@@ -305,16 +314,17 @@ class _AveragesTabState extends State<AveragesTab> {
           Text(
             '${pct.toStringAsFixed(1)}%',
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: CIType.fontFamily,
               fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
+              fontFeatures: const [FontFeature.tabularFigures()],
               color: _ink,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             '$made / $att',
-            style: const TextStyle(fontFamily: 'Inter', fontSize: 10, color: _hint),
+            style: const TextStyle(fontFamily: CIType.fontFamily, fontSize: 10, color: _hint),
           ),
           if (showTrend && att > 0) ...[
             const SizedBox(height: 6),
@@ -322,13 +332,13 @@ class _AveragesTabState extends State<AveragesTab> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: bg,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(CIRadius.full),
                 border: border == null ? null : Border.all(color: border, width: 1),
               ),
               child: Text(
                 tag,
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: fg,

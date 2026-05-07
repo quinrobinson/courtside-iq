@@ -1,18 +1,19 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '../players/edit_player_sheet.dart';
 import 'widgets/averages_tab.dart';
 import 'widgets/development_tab.dart';
 import 'widgets/games_tab.dart';
 import 'widgets/profile_photo_sheet.dart';
 
-const _bg = Color(0xFFF0F0F0);
-const _text = Color(0xFF0F0F0F);
-const _text2 = Color(0xFF8A8A8A);
-const _card = Colors.white;
-const _track = Color(0xFFF5F5F5);
-const _pillInk = Color(0xFF1A1A1A);
+const _bg = CIColors.canvas;
+const _text = CIColors.ink;
+const _text2 = CIColors.ink3;
+const _card = CIColors.surface;
+const _track = CIColors.canvasSunk;
 
 class PlayerProfilePageV2 extends StatefulWidget {
   const PlayerProfilePageV2({super.key, required this.playerId});
@@ -65,6 +66,8 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         foregroundColor: _text,
         centerTitle: true,
         leading: IconButton(
@@ -76,7 +79,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
             : Text(
                 firstName,
                 style: const TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: _text,
@@ -98,8 +101,11 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
               ? const Center(child: CircularProgressIndicator())
               : Stack(
                   children: [
-                    const _TopGradient(),
                     _buildBody(_player!),
+                    const Align(
+                      alignment: Alignment.bottomCenter,
+                      child: CustomNavBarWidget(page: 'Players'),
+                    ),
                   ],
                 ),
     );
@@ -116,33 +122,39 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
       child: Padding(
         padding: EdgeInsets.only(top: kToolbarHeight + MediaQuery.of(context).padding.top - 14),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 110),
           child: Column(
             children: [
               if (position != null)
                 Text(
                   position,
                   style: const TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: CIType.fontFamily,
                     fontSize: 14,
                     color: _text,
                   ),
                 ),
               if (ageBand != null) ...[
                 const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _pillInk,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    ageBand,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: 0.2,
+                IntrinsicWidth(
+                  child: Container(
+                    height: 26,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(CIRadius.md),
+                      border: Border.all(color: _text, width: 1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      ageBand,
+                      style: const TextStyle(
+                        fontFamily: CIType.fontFamily,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: _text,
+                        letterSpacing: 0.2,
+                      ),
                     ),
                   ),
                 ),
@@ -214,6 +226,7 @@ class _PlayerProfilePageV2State extends State<PlayerProfilePageV2> {
         return DevelopmentTab(
           playerId: widget.playerId,
           firstName: firstName,
+          gamesCount: _gamesCount,
         );
       case 1:
         return AveragesTab(playerId: widget.playerId);
@@ -246,35 +259,29 @@ class _TabControl extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final trackW = c.maxWidth;
-        final tabW = (trackW - 8) / 3;
+        const padding = 4.0;
+        final tabW = (trackW - padding * 2) / 3;
         return SizedBox(
-          height: 44,
+          height: 48,
           child: Stack(
             children: [
               Container(
                 decoration: BoxDecoration(
                   color: _track,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(CIRadius.xl),
                 ),
               ),
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOut,
-                left: 4 + index * tabW,
-                top: 4,
+                left: padding + index * tabW,
+                top: padding,
                 width: tabW,
-                height: 36,
+                height: 40,
                 child: Container(
                   decoration: BoxDecoration(
                     color: _card,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.circular(CIRadius.lg),
                   ),
                 ),
               ),
@@ -289,7 +296,7 @@ class _TabControl extends StatelessWidget {
                         child: Text(
                           labels[i],
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: CIType.fontFamily,
                             fontSize: 13,
                             fontWeight:
                                 active ? FontWeight.w600 : FontWeight.w500,
@@ -317,8 +324,8 @@ class _ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const size = 88.0;
-    const badgeSize = 30.0;
+    const size = 120.0;
+    const badgeSize = 40.0;
     final hasPhoto = pic != null && pic!.isNotEmpty;
 
     return GestureDetector(
@@ -339,7 +346,7 @@ class _ProfileAvatar extends StatelessWidget {
                 height: size,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: hasPhoto ? Colors.white : const Color(0xFFE6E6E6),
+                  color: CIColors.surface,
                   image: hasPhoto
                       ? DecorationImage(
                           image: NetworkImage(pic!),
@@ -351,8 +358,8 @@ class _ProfileAvatar extends StatelessWidget {
                     ? null
                     : const Icon(
                         Icons.person,
-                        size: 52,
-                        color: Color(0xFFC3BFBB),
+                        size: 68,
+                        color: CIColors.ink4,
                       ),
               ),
             ),
@@ -365,21 +372,13 @@ class _ProfileAvatar extends StatelessWidget {
                 height: badgeSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF0F0F0F),
-                  border: Border.all(color: Colors.white, width: 2.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: CIColors.ink,
                 ),
                 alignment: Alignment.center,
                 child: const Icon(
                   Icons.photo_camera,
-                  size: 16,
-                  color: Colors.white,
+                  size: 20,
+                  color: CIColors.inkOnBrand,
                 ),
               ),
             ),
@@ -390,41 +389,3 @@ class _ProfileAvatar extends StatelessWidget {
   }
 }
 
-class _TopGradient extends StatelessWidget {
-  const _TopGradient();
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: SizedBox(
-        height: 360,
-        width: double.infinity,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              'assets/images/profile_v2_gradient.png',
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-            ),
-            // Fade to page bg at the bottom so the gradient blends cleanly
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    _bg.withValues(alpha: 0),
-                    _bg.withValues(alpha: 0),
-                    _bg,
-                  ],
-                  stops: const [0.0, 0.75, 1.0],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

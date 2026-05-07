@@ -96,7 +96,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
             return Container(
               decoration: BoxDecoration(
                 color: FlutterFlowTheme.of(context).primaryBackground,
-                borderRadius: BorderRadius.circular(18.0),
+                borderRadius: BorderRadius.circular(6.0),
               ),
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(24.0, 6.0, 24.0, 24.0),
@@ -112,7 +112,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                           height: 2.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).secondaryText,
-                            borderRadius: BorderRadius.circular(3.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                         ),
                       ],
@@ -153,7 +153,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                               ),
                             ),
                             FlutterFlowIconButton(
-                              borderRadius: 8.0,
+                              borderRadius: 6.0,
                               buttonSize: 48.0,
                               icon: Icon(
                                 Icons.close,
@@ -177,7 +177,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                           Container(
                             decoration: BoxDecoration(
                               color: FlutterFlowTheme.of(context).gray4,
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: BorderRadius.circular(6.0),
                               border: Border.all(
                                 color: FlutterFlowTheme.of(context)
                                     .secondaryBackground,
@@ -196,7 +196,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context).gray4,
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Container(
                                     height: 159.0,
@@ -263,8 +263,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                                                             ? Color(0x400F0F0F)
                                                             : Color(0x00000000),
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
+                                                            BorderRadius.circular(6.0),
                                                       ),
                                                       alignment:
                                                           AlignmentDirectional(
@@ -343,8 +342,8 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                                                     0, 1.0),
                                               ),
                                               borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(8.0),
-                                                topRight: Radius.circular(8.0),
+                                                topLeft: Radius.circular(6.0),
+                                                topRight: Radius.circular(6.0),
                                               ),
                                             ),
                                           ),
@@ -370,9 +369,9 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                                               ),
                                               borderRadius: BorderRadius.only(
                                                 bottomLeft:
-                                                    Radius.circular(8.0),
+                                                    Radius.circular(6.0),
                                                 bottomRight:
-                                                    Radius.circular(8.0),
+                                                    Radius.circular(6.0),
                                               ),
                                             ),
                                             child: Visibility(
@@ -460,7 +459,7 @@ class _TeamSelectionWidgetState extends State<TeamSelectionWidget> {
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ),
                             ),

@@ -1,31 +1,32 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Four-point rounded sparkle, matching assets/images/spark.svg.
 /// Reference path is 14x14; scaled to [size].
+/// Always rendered with the Spark gradient: royal500 → spark500.
 class SparkIcon extends StatelessWidget {
-  const SparkIcon({
-    super.key,
-    this.size = 14,
-    this.color = const Color(0xFF7936FF),
-  });
+  const SparkIcon({super.key, this.size = 14});
 
   final double size;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: _SparkPainter(color)),
+      child: CustomPaint(painter: _SparkPainter()),
     );
   }
 }
 
 class _SparkPainter extends CustomPainter {
-  _SparkPainter(this.color);
+  _SparkPainter();
 
-  final Color color;
+  static const _gradient = LinearGradient(
+    colors: [CIColors.royal500, CIColors.spark500],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -68,9 +69,11 @@ class _SparkPainter extends CustomPainter {
       )
       ..close();
 
-    canvas.drawPath(path, Paint()..color = color);
+    final paint = Paint()
+      ..shader = _gradient.createShader(Offset.zero & size);
+    canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _SparkPainter old) => old.color != color;
+  bool shouldRepaint(covariant _SparkPainter old) => false;
 }

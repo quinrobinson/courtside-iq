@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -77,13 +78,37 @@ class _MenuWidgetState extends State<MenuWidget> {
         if (!snapshot.hasData) {
           return Scaffold(
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
-            body: Center(
-              child: SizedBox(
-                width: 30.0,
-                height: 30.0,
-                child: SpinKitFadingFour(
-                  color: FlutterFlowTheme.of(context).teal,
-                  size: 30.0,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 24, 12, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Account header: avatar + name + email
+                    Row(
+                      children: const [
+                        SkeletonBox(width: 48, height: 48, radius: 24),
+                        SizedBox(width: 14),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 130, height: 16),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 180, height: 12),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    // Menu rows
+                    const SkeletonBox(width: double.infinity, height: 52),
+                    const SizedBox(height: 8),
+                    const SkeletonBox(width: double.infinity, height: 52),
+                    const SizedBox(height: 8),
+                    const SkeletonBox(width: double.infinity, height: 52),
+                    const SizedBox(height: 8),
+                    const SkeletonBox(width: double.infinity, height: 52),
+                  ],
                 ),
               ),
             ),
@@ -104,15 +129,6 @@ class _MenuWidgetState extends State<MenuWidget> {
             backgroundColor: FlutterFlowTheme.of(context).globalBackground,
             body: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Align(
                   alignment: AlignmentDirectional(0.0, -1.0),
                   child: Padding(
@@ -190,10 +206,10 @@ class _MenuWidgetState extends State<MenuWidget> {
                                             ).image,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                         ),
                                         child: Padding(
-                                          padding: EdgeInsets.all(12.0),
+                                          padding: EdgeInsets.all(16.0),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             crossAxisAlignment:
@@ -361,7 +377,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                                       SizedBox(width: 12.0)),
                                                 ),
                                               ),
-                                            ].divide(SizedBox(height: 12.0)),
+                                            ].divide(SizedBox(height: 8.0)),
                                           ),
                                         ),
                                       ),
@@ -414,7 +430,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                             color: FlutterFlowTheme.of(context)
                                                 .primaryBackground,
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(6.0),
                                             border: Border.all(
                                               color:
                                                   FlutterFlowTheme.of(context)
@@ -493,7 +509,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsets.all(12.0),
+                                                  padding: EdgeInsets.all(16.0),
                                                   child: Row(
                                                     mainAxisSize:
                                                         MainAxisSize.max,
@@ -625,7 +641,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                         color: FlutterFlowTheme.of(context)
                                             .primaryBackground,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryBackground,
@@ -645,7 +661,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryText,
                                                 borderRadius:
-                                                    BorderRadius.circular(4.0),
+                                                    BorderRadius.circular(6.0),
                                               ),
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
@@ -763,7 +779,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -1288,7 +1304,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -1331,7 +1347,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
-                                                  font: GoogleFonts.ibmPlexSans(
+                                                  font: GoogleFonts.dmSans(
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     fontStyle:
@@ -1387,7 +1403,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -1420,7 +1436,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
-                                              font: GoogleFonts.ibmPlexSans(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -1459,7 +1475,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
                                                               context)

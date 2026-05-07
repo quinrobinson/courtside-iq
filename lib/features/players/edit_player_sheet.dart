@@ -1,18 +1,16 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
 import 'picker_sheet.dart';
 
-// Design tokens — mirror AddPlayerSheet so the two sheets feel like siblings.
-const _sheetBg      = Color(0xFFFFFFFF);
-const _fieldBg      = Color(0xFFF0F0F0);
-const _labelColor   = Color(0xFF1A1A1A);
-const _hintColor    = Color(0xFFAAAAAA);
-const _saveDisabled = Color(0xFFE8E8E8);
-const _saveEnabled  = Color(0xFF1A1A1A);
-const _handleColor  = Color(0xFFC7C7C7);
+const _sheetBg      = CIColors.surface;
+const _fieldBg      = CIColors.surfaceAlt;
+const _labelColor   = CIColors.ink;
+const _hintColor    = CIColors.ink4;
+const _saveDisabled = CIColors.canvasSunk;
+const _saveEnabled  = CIColors.ink;
+const _handleColor  = CIColors.ink4;
 
-const _fontMontserrat  = 'Montserrat';
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 const _months = [
   'January', 'February', 'March', 'April',
@@ -171,7 +169,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: _sheetBg,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       padding: EdgeInsets.fromLTRB(24, 12, 24, 48 + bottomInset),
       child: Column(
@@ -184,7 +182,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
               height: 6,
               decoration: BoxDecoration(
                 color: _handleColor,
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),
@@ -196,7 +194,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
               const Text(
                 'Edit Player',
                 style: TextStyle(
-                  fontFamily: _fontMontserrat,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 24,
                   fontWeight: FontWeight.w400,
                   color: _labelColor,
@@ -207,7 +205,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
                 child: const Text(
                   '×',
                   style: TextStyle(
-                    fontFamily: _fontMontserrat,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 24,
                     color: _labelColor,
                   ),
@@ -223,14 +221,14 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
             child: TextField(
               controller: _nameController,
               style: const TextStyle(
-                fontFamily: _fontIBMPlexSans,
+                fontFamily: CIType.fontFamily,
                 fontSize: 16,
                 color: _labelColor,
               ),
               decoration: const InputDecoration(
                 hintText: 'Enter player name...',
                 hintStyle: TextStyle(
-                  fontFamily: _fontIBMPlexSans,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 16,
                   color: _hintColor,
                 ),
@@ -302,7 +300,7 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
           const Text(
             'Used to give your player age-appropriate ratings.',
             style: TextStyle(
-              fontFamily: _fontIBMPlexSans,
+              fontFamily: CIType.fontFamily,
               fontSize: 13,
               color: _hintColor,
             ),
@@ -317,11 +315,11 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: _canSave ? _saveEnabled : _saveDisabled,
                 disabledBackgroundColor: _saveDisabled,
-                foregroundColor: Colors.white,
+                foregroundColor: CIColors.inkOnBrand,
                 disabledForegroundColor: _hintColor,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(CIRadius.lg),
                 ),
               ),
               child: _saving
@@ -330,13 +328,13 @@ class _EditPlayerSheetState extends State<EditPlayerSheet> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: CIColors.inkOnBrand,
                       ),
                     )
                   : const Text(
                       'Save',
                       style: TextStyle(
-                        fontFamily: _fontIBMPlexSans,
+                        fontFamily: CIType.fontFamily,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -358,7 +356,7 @@ class _Label extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(
-        fontFamily: _fontIBMPlexSans,
+        fontFamily: CIType.fontFamily,
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 1.2,
@@ -378,7 +376,7 @@ class _FieldCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: _fieldBg,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: child,
     );

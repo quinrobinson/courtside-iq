@@ -1,10 +1,10 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'set_birth_date_sheet.dart';
 
-const _bannerBg   = Color(0xFFE0F7F4);
-const _bannerText = Color(0xFF108A7C);
+const _bannerBg   = CIColors.jade50;
+const _bannerText = CIColors.jade700;
 
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 class BirthDateProfileBanner extends StatelessWidget {
   const BirthDateProfileBanner({
@@ -31,7 +31,7 @@ class BirthDateProfileBanner extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: _bannerBg,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(CIRadius.lg),
         ),
         padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
         child: const Row(
@@ -40,7 +40,7 @@ class BirthDateProfileBanner extends StatelessWidget {
               child: Text(
                 'Set birth year for age-appropriate ratings',
                 style: TextStyle(
-                  fontFamily: _fontIBMPlexSans,
+                  fontFamily: CIType.fontFamily,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: _bannerText,

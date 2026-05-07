@@ -157,7 +157,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   child: custom_widgets.BirthDatePromptGate(),
                 ),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(6.0),
                   child: Image.asset(
                     'assets/images/Profile_Gradient.png',
                     width: double.infinity,
@@ -229,10 +229,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         'assets/images/gradient-bg-black-b.png',
                                       ).image,
                                     ),
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Padding(
-                                    padding: EdgeInsets.all(12.0),
+                                    padding: EdgeInsets.all(16.0),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
@@ -391,7 +391,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               ),
                                           ].divide(SizedBox(width: 12.0)),
                                         ),
-                                      ].divide(SizedBox(height: 12.0)),
+                                      ].divide(SizedBox(height: 8.0)),
                                     ),
                                   ),
                                 ),
@@ -411,15 +411,15 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
+                                              .accent4,
                                           width: 1.0,
                                         ),
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsets.all(12.0),
+                                        padding: EdgeInsets.all(16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
@@ -514,7 +514,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
                                                                     .primaryText,
-                                                                fontSize: 34.0,
+                                                                fontSize: 28.0,
                                                                 letterSpacing:
                                                                     0.0,
                                                                 fontWeight:
@@ -555,7 +555,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                 color: FlutterFlowTheme.of(
                                                                         context)
                                                                     .primaryText,
-                                                                fontSize: 34.0,
+                                                                fontSize: 28.0,
                                                                 letterSpacing:
                                                                     0.0,
                                                                 fontWeight:
@@ -579,7 +579,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                         FlutterFlowTheme.of(
                                                                 context)
                                                             .secondaryBackground,
-                                                    borderRadius: 8.0,
+                                                    borderRadius: 6.0,
                                                     buttonSize: 40.0,
                                                     fillColor:
                                                         FlutterFlowTheme.of(
@@ -759,15 +759,15 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
                                         child: Padding(
-                                          padding: EdgeInsets.all(12.0),
+                                          padding: EdgeInsets.all(16.0),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
@@ -937,7 +937,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                             FlutterFlowTheme.of(
                                                                     context)
                                                                 .secondaryBackground,
-                                                        borderRadius: 8.0,
+                                                        borderRadius: 6.0,
                                                         borderWidth: 1.0,
                                                         buttonSize: 40.0,
                                                         icon: Icon(
@@ -1067,10 +1067,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                     border: Border.all(
                                       color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+                                          .accent4,
                                       width: 1.0,
                                     ),
                                   ),
@@ -1085,7 +1085,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  18.0, 0.0, 18.0, 0.0),
+                                                  12.0, 0.0, 12.0, 0.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
@@ -1222,8 +1222,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                       height: 24.0,
                                                       decoration: BoxDecoration(
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(16.0),
+                                                            BorderRadius.circular(6.0),
                                                       ),
                                                       alignment:
                                                           AlignmentDirectional(
@@ -1254,7 +1253,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  18.0, 0.0, 18.0, 12.0),
+                                                  12.0, 0.0, 12.0, 12.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
@@ -2012,7 +2011,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       style: FlutterFlowTheme.of(context)
                                           .titleMedium
                                           .override(
-                                            font: GoogleFonts.montserrat(
+                                            font: GoogleFonts.dmSans(
                                               fontWeight: FontWeight.w600,
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
@@ -2056,7 +2055,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   scrollDirection: Axis.vertical,
                                   itemCount: homeVar.length,
                                   separatorBuilder: (_, __) =>
-                                      SizedBox(height: 12.0),
+                                      SizedBox(height: 8.0),
                                   itemBuilder: (context, homeVarIndex) {
                                     final homeVarItem = homeVar[homeVarIndex];
                                     return InkWell(
@@ -2090,10 +2089,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -2109,7 +2108,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
-                                                        18.0, 0.0, 18.0, 0.0),
+                                                        12.0, 0.0, 12.0, 0.0),
                                                 child: Container(
                                                   decoration: BoxDecoration(),
                                                   child: Padding(
@@ -2237,7 +2236,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                               Text(
                                                                             '${homeVarItem.firstName}',
                                                                             style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                  font: GoogleFonts.ibmPlexSans(
+                                                                                  font: GoogleFonts.dmSans(
                                                                                     fontWeight: FontWeight.w600,
                                                                                     fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
                                                                                   ),
@@ -2280,7 +2279,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                     'Event',
                                                                                   ),
                                                                                   style: FlutterFlowTheme.of(context).labelMedium.override(
-                                                                                        font: GoogleFonts.ibmPlexSans(
+                                                                                        font: GoogleFonts.dmSans(
                                                                                           fontWeight: FontWeight.normal,
                                                                                           fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                         ),
@@ -2358,7 +2357,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               Expanded(
                                                 child: Padding(
                                                   padding: EdgeInsetsDirectional
-                                                      .fromSTEB(18.0, 0.0, 18.0,
+                                                      .fromSTEB(12.0, 0.0, 12.0,
                                                           12.0),
                                                   child: Row(
                                                     mainAxisSize:
@@ -2428,10 +2427,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                             ],
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(4.0),
-                                                                              topRight: Radius.circular(4.0),
-                                                                              bottomLeft: Radius.circular(4.0),
-                                                                              bottomRight: Radius.circular(4.0),
+                                                                              topLeft: Radius.circular(6.0),
+                                                                              topRight: Radius.circular(6.0),
+                                                                              bottomLeft: Radius.circular(6.0),
+                                                                              bottomRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           alignment: AlignmentDirectional(
@@ -2579,7 +2578,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -2726,7 +2725,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -2873,7 +2872,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -3020,7 +3019,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -3167,7 +3166,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -3304,7 +3303,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                     .fromSTEB(
                                                                         12.0,
                                                                         6.0,
-                                                                        18.0,
+                                                                        12.0,
                                                                         6.0),
                                                             child: Row(
                                                               mainAxisSize:
@@ -3336,7 +3335,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                         .bodyMedium
                                                                         .override(
                                                                           font:
-                                                                              GoogleFonts.ibmPlexSans(
+                                                                              GoogleFonts.dmSans(
                                                                             fontWeight:
                                                                                 FontWeight.normal,
                                                                             fontStyle:
@@ -3424,7 +3423,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                   context)
                                               .titleSmall
                                               .override(
-                                                font: GoogleFonts.ibmPlexSans(
+                                                font: GoogleFonts.dmSans(
                                                   fontWeight: FontWeight.w500,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -3450,7 +3449,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                             width: 1.0,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                         ),
                                       ),
                                     ),

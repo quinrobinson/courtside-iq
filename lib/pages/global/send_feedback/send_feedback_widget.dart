@@ -152,7 +152,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                   FlutterFlowIconButton(
                                     borderColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    borderRadius: 27.0,
+                                    borderRadius: 9999.0,
                                     buttonSize: 54.0,
                                     fillColor: valueOrDefault<Color>(
                                       _model.rateStatus == 'Struggling'
@@ -184,7 +184,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                   FlutterFlowIconButton(
                                     borderColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    borderRadius: 27.0,
+                                    borderRadius: 9999.0,
                                     buttonSize: 54.0,
                                     fillColor: valueOrDefault<Color>(
                                       _model.rateStatus == 'Developing'
@@ -216,7 +216,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                   FlutterFlowIconButton(
                                     borderColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    borderRadius: 27.0,
+                                    borderRadius: 9999.0,
                                     buttonSize: 54.0,
                                     fillColor: valueOrDefault<Color>(
                                       _model.rateStatus == 'Solid'
@@ -248,7 +248,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                   FlutterFlowIconButton(
                                     borderColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    borderRadius: 27.0,
+                                    borderRadius: 9999.0,
                                     buttonSize: 54.0,
                                     fillColor: valueOrDefault<Color>(
                                       _model.rateStatus == 'Strong'
@@ -280,7 +280,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                   FlutterFlowIconButton(
                                     borderColor: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    borderRadius: 27.0,
+                                    borderRadius: 9999.0,
                                     buttonSize: 54.0,
                                     fillColor: valueOrDefault<Color>(
                                       _model.rateStatus == 'Elite'
@@ -350,7 +350,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                     height: 140.0,
                                     decoration: BoxDecoration(
                                       color: FlutterFlowTheme.of(context).gray4,
-                                      borderRadius: BorderRadius.circular(12.0),
+                                      borderRadius: BorderRadius.circular(6.0),
                                       border: Border.all(
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
@@ -503,13 +503,13 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                     ].divide(SizedBox(width: 3.0)),
                                   ),
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(12.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
@@ -702,7 +702,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                                         ),
                                                 elevation: 0.0,
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(6.0),
                                                 disabledColor:
                                                     FlutterFlowTheme.of(context)
                                                         .secondaryBackground,

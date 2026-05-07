@@ -1,16 +1,15 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import 'birth_date_prompt_service.dart';
 import 'set_birth_date_sheet.dart';
 
-const _modalBg     = Color(0xFFFFFFFF);
-const _titleColor  = Color(0xFF1A1A1A);
-const _bodyColor   = Color(0xFF787878);
-const _btnBg       = Color(0xFF1A1A1A);
-const _btnText     = Color(0xFFFFFFFF);
-const _linkColor   = Color(0xFF787878);
+const _modalBg     = CIColors.surface;
+const _titleColor  = CIColors.ink;
+const _bodyColor   = CIColors.ink3;
+const _btnBg       = CIColors.ink;
+const _btnText     = CIColors.inkOnBrand;
+const _linkColor   = CIColors.ink3;
 
-const _fontMontserrat  = 'Montserrat';
-const _fontIBMPlexSans = 'IBM Plex Sans';
 
 Future<void> showBirthDatePromptModal(
   BuildContext context, {
@@ -66,14 +65,8 @@ class BirthDatePromptModal extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: _modalBg,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(CIRadius.xl),
+          boxShadow: CIElevation.pop,
         ),
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
         child: Column(
@@ -83,7 +76,7 @@ class BirthDatePromptModal extends StatelessWidget {
             Text(
               "Help us improve $playerFirstName's ratings",
               style: const TextStyle(
-                fontFamily: _fontMontserrat,
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: _titleColor,
@@ -94,7 +87,7 @@ class BirthDatePromptModal extends StatelessWidget {
             Text(
               "Add $playerFirstName's birth year so Courtside IQ can give age-appropriate ratings compared to players in the same age group.",
               style: const TextStyle(
-                fontFamily: _fontIBMPlexSans,
+                fontFamily: CIType.fontFamily,
                 fontSize: 14,
                 color: _bodyColor,
                 height: 1.43,
@@ -110,13 +103,13 @@ class BirthDatePromptModal extends StatelessWidget {
                   foregroundColor: _btnText,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(CIRadius.lg),
                   ),
                 ),
                 child: const Text(
                   'Set birth year',
                   style: TextStyle(
-                    fontFamily: _fontIBMPlexSans,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -133,7 +126,7 @@ class BirthDatePromptModal extends StatelessWidget {
                   'Remind me later',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: _fontIBMPlexSans,
+                    fontFamily: CIType.fontFamily,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: _linkColor,

@@ -19,6 +19,7 @@ import 'serialization_util.dart';
 
 import '/index.dart';
 import '/features/player_insight/player_profile_page.dart';
+import '/features/dashboard/dashboard_page.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
     as $lock_orientation_library_opafp4;
 
@@ -94,13 +95,17 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
     refreshListenable: appStateNotifier,
     navigatorKey: appNavigatorKey,
     errorBuilder: (context, state) =>
-        appStateNotifier.loggedIn ? HomeWidget() : OnBoardWidget(),
+        appStateNotifier.loggedIn
+            ? (kUseDashboardV2 ? const DashboardPage() : HomeWidget())
+            : OnBoardWidget(),
     routes: [
       FFRoute(
         name: '_initialize',
         path: '/',
         builder: (context, _) =>
-            appStateNotifier.loggedIn ? HomeWidget() : OnBoardWidget(),
+            appStateNotifier.loggedIn
+                ? (kUseDashboardV2 ? const DashboardPage() : HomeWidget())
+                : OnBoardWidget(),
       ),
       FFRoute(
         name: PlayersListWidget.routeName,
@@ -172,7 +177,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: HomeWidget.routeName,
         path: HomeWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => HomeWidget(),
+        builder: (context, params) =>
+            kUseDashboardV2 ? const DashboardPage() : HomeWidget(),
       ),
       FFRoute(
         name: EditNameWidget.routeName,

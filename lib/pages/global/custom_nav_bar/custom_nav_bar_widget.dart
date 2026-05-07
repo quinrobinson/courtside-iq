@@ -65,7 +65,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
       child: Container(
         height: 60.0,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
+          borderRadius: BorderRadius.circular(9999.0),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -81,23 +81,23 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                     width: 330.0,
                     height: 60.0,
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryText,
-                      boxShadow: [
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6.0),
+                      border: Border.all(
+                        color: Color(0xFFE0E1E5),
+                        width: 1.0,
+                      ),
+                      boxShadow: const [
                         BoxShadow(
-                          blurRadius: 4.0,
-                          color: Color(0x330F0F0F),
-                          offset: Offset(
-                            0.0,
-                            0.0,
-                          ),
-                          spreadRadius: 2.0,
-                        )
+                          color: Color(0x14000000),
+                          blurRadius: 16.0,
+                          offset: Offset(0.0, 4.0),
+                          spreadRadius: 0.0,
+                        ),
                       ],
-                      borderRadius: BorderRadius.circular(18.0),
                     ),
                     child: Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(7.0, 6.0, 7.0, 6.0),
+                      padding: EdgeInsetsDirectional.fromSTEB(7.0, 6.0, 7.0, 6.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -125,10 +125,9 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   color: widget!.page == 'Home'
-                                      ? FlutterFlowTheme.of(context).primaryText
-                                      : FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                  borderRadius: BorderRadius.circular(18.0),
+                                      ? const Color(0xFF0F0F0F)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -136,15 +135,10 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   children: [
                                     Icon(
                                       Icons.grid_view_rounded,
-                                      color: valueOrDefault<Color>(
-                                        widget!.page == 'Home'
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .disableText,
-                                        FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                      ),
+                                      color: widget!.page == 'Home'
+                                          ? Colors.white
+                                          : FlutterFlowTheme.of(context)
+                                              .disableText,
                                       size: 26.0,
                                     ),
                                   ],
@@ -174,10 +168,9 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   color: widget!.page == 'Players'
-                                      ? FlutterFlowTheme.of(context).primaryText
-                                      : FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                  borderRadius: BorderRadius.circular(18.0),
+                                      ? const Color(0xFF0F0F0F)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -185,15 +178,10 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   children: [
                                     Icon(
                                       Icons.person_rounded,
-                                      color: valueOrDefault<Color>(
-                                        widget!.page == 'Players'
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .disableText,
-                                        FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                      ),
+                                      color: widget!.page == 'Players'
+                                          ? Colors.white
+                                          : FlutterFlowTheme.of(context)
+                                              .disableText,
                                       size: 26.0,
                                     ),
                                   ],
@@ -203,13 +191,13 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                           ),
                           if (FFAppState().isUserPremium)
                             FlutterFlowIconButton(
-                              borderColor: FlutterFlowTheme.of(context).teal,
-                              borderRadius: 12.0,
-                              borderWidth: 2.0,
+                              borderColor: Colors.transparent,
+                              borderRadius: 6.0,
+                              borderWidth: 0.0,
                               buttonSize: 40.0,
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.add_rounded,
-                                color: FlutterFlowTheme.of(context).teal,
+                                color: Color(0xFF0F0F0F),
                                 size: 24.0,
                               ),
                               onPressed: () async {
@@ -253,10 +241,9 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   color: widget!.page == 'Games'
-                                      ? FlutterFlowTheme.of(context).primaryText
-                                      : FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                  borderRadius: BorderRadius.circular(18.0),
+                                      ? const Color(0xFF0F0F0F)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -264,15 +251,10 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   children: [
                                     Icon(
                                       Icons.scoreboard_rounded,
-                                      color: valueOrDefault<Color>(
-                                        widget!.page == 'Games'
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .disableText,
-                                        FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                      ),
+                                      color: widget!.page == 'Games'
+                                          ? Colors.white
+                                          : FlutterFlowTheme.of(context)
+                                              .disableText,
                                       size: 26.0,
                                     ),
                                   ],
@@ -301,11 +283,10 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                               child: Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
-                                  color: widget!.page == 'Games'
-                                      ? FlutterFlowTheme.of(context).primaryText
-                                      : FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                  borderRadius: BorderRadius.circular(18.0),
+                                  color: widget!.page == 'Menu'
+                                      ? const Color(0xFF0F0F0F)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -313,15 +294,10 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                                   children: [
                                     Icon(
                                       Icons.menu_rounded,
-                                      color: valueOrDefault<Color>(
-                                        widget!.page == 'Menu'
-                                            ? FlutterFlowTheme.of(context)
-                                                .primaryBackground
-                                            : FlutterFlowTheme.of(context)
-                                                .disableText,
-                                        FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                      ),
+                                      color: widget!.page == 'Menu'
+                                          ? Colors.white
+                                          : FlutterFlowTheme.of(context)
+                                              .disableText,
                                       size: 26.0,
                                     ),
                                   ],

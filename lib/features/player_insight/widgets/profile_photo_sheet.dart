@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
@@ -22,13 +23,13 @@ enum _SheetAction { camera, library, remove }
 ///
 /// Returns [ProfilePhotoResult] when the row changed, or null on cancel.
 class ProfilePhotoEditor {
-  static const _purpleBubble = Color(0xFFF5F2FF);
-  static const _purpleIcon = Color(0xFF7936FF);
-  static const _destructiveBubble = Color(0xFFFFEEF2);
-  static const _destructive = Color(0xFFE52B6C);
-  static const _text = Color(0xFF0F0F0F);
-  static const _muted = Color(0xFF8A8A8A);
-  static const _border = Color(0xFFE6E6E6);
+  static const _purpleBubble = CIColors.surfaceAlt;
+  static const _purpleIcon = CIColors.ink3;
+  static const _destructiveBubble = CIColors.rose50;
+  static const _destructive = CIColors.rose500;
+  static const _text = CIColors.ink;
+  static const _muted = CIColors.ink3;
+  static const _border = CIColors.hairline;
 
   static Future<ProfilePhotoResult?> present(
     BuildContext context, {
@@ -106,8 +107,8 @@ class _Sheet extends StatelessWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: CIColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       padding: EdgeInsets.only(bottom: 12 + bottomInset),
       child: Column(
@@ -121,7 +122,7 @@ class _Sheet extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: ProfilePhotoEditor._border,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),
@@ -131,7 +132,7 @@ class _Sheet extends StatelessWidget {
             child: Text(
               'Profile photo',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: ProfilePhotoEditor._text,
@@ -139,20 +140,20 @@ class _Sheet extends StatelessWidget {
             ),
           ),
           _Row(
-            icon: Icons.photo_camera_outlined,
+            icon: Icons.photo_camera,
             label: 'Take photo',
             topDivider: false,
             onTap: () => Navigator.of(context).pop(_SheetAction.camera),
           ),
           _Row(
-            icon: Icons.photo_library_outlined,
+            icon: Icons.photo_library,
             label: 'Choose from library',
             topDivider: true,
             onTap: () => Navigator.of(context).pop(_SheetAction.library),
           ),
           if (hasPhoto)
             _Row(
-              icon: Icons.delete_outline,
+              icon: Icons.delete,
               label: 'Remove photo',
               topDivider: true,
               destructive: true,
@@ -212,7 +213,7 @@ class _Row extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 color: bubbleBg,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(CIRadius.lg),
               ),
               alignment: Alignment.center,
               child: Icon(icon, size: 20, color: iconColor),
@@ -222,7 +223,7 @@ class _Row extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: CIType.fontFamily,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: fg,

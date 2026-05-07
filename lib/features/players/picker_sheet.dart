@@ -1,3 +1,4 @@
+import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 
 /// Shared picker model used by AddPlayerSheet and EditPlayerSheet.
@@ -8,13 +9,13 @@ import 'package:flutter/material.dart';
 /// selected state. Keeps both flows visually consistent and avoids the
 /// stock Material dropdown menu that feels disconnected from our sheets.
 
-const _fieldBg = Color(0xFFF0F0F0);
-const _labelColor = Color(0xFF1A1A1A);
-const _hintColor = Color(0xFFAAAAAA);
-const _purple = Color(0xFF7936FF);
-const _border = Color(0xFFE6E6E6);
-const _handle = Color(0xFFC7C7C7);
-const _fontIBMPlexSans = 'IBM Plex Sans';
+const _fieldBg = CIColors.surfaceAlt;
+const _labelColor = CIColors.ink;
+const _hintColor = CIColors.ink4;
+const _purple = CIColors.royal500;
+const _border = CIColors.hairline;
+const _handle = CIColors.ink4;
+
 
 /// Shows the picker sheet and returns the chosen option, or null on dismiss.
 /// Drops keyboard focus first so the sheet doesn't get shoved up by
@@ -66,11 +67,11 @@ class PickerField<T> extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: _fieldBg,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(CIRadius.lg),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 12, 0),
           child: SizedBox(
@@ -83,7 +84,7 @@ class PickerField<T> extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: _fontIBMPlexSans,
+                      fontFamily: CIType.fontFamily,
                       fontSize: 16,
                       color: isPlaceholder ? _hintColor : _labelColor,
                     ),
@@ -124,8 +125,8 @@ class PickerSheet<T> extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(maxHeight: maxH + bottomInset + 80),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: CIColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(CIRadius.xl)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -138,7 +139,7 @@ class PickerSheet<T> extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: _handle,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(CIRadius.xs),
               ),
             ),
           ),
@@ -148,7 +149,7 @@ class PickerSheet<T> extends StatelessWidget {
             child: Text(
               title,
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: _labelColor,
@@ -183,7 +184,7 @@ class PickerSheet<T> extends StatelessWidget {
                           child: Text(
                             labelOf(opt),
                             style: TextStyle(
-                              fontFamily: 'Inter',
+                              fontFamily: CIType.fontFamily,
                               fontSize: 15,
                               fontWeight:
                                   selected ? FontWeight.w600 : FontWeight.w500,

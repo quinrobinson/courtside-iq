@@ -209,15 +209,6 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                       ),
                     ),
                   ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    'assets/images/Profile_Gradient.png',
-                    width: double.infinity,
-                    height: 200.0,
-                    fit: BoxFit.fill,
-                  ),
-                ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(
                       0.0,
@@ -313,11 +304,11 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                             height: 140.0,
                                             decoration: BoxDecoration(
                                               borderRadius:
-                                                  BorderRadius.circular(70.0),
+                                                  BorderRadius.circular(9999.0),
                                             ),
                                             child: ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(70.0),
+                                                  BorderRadius.circular(9999.0),
                                               child: Image.network(
                                                 playersProfilePlayerProfileViewRow!
                                                     .playerProfilePic!,
@@ -346,7 +337,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                   FlutterFlowTheme.of(context)
                                                       .secondaryBackground,
                                               borderRadius:
-                                                  BorderRadius.circular(70.0),
+                                                  BorderRadius.circular(9999.0),
                                             ),
                                             alignment:
                                                 AlignmentDirectional(0.0, 0.0),
@@ -431,10 +422,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
+                                                            fontSize: 14.0,
                                                             letterSpacing: 0.0,
                                                             fontWeight:
-                                                                FontWeight.w300,
+                                                                FontWeight.w400,
                                                             fontStyle:
                                                                 FlutterFlowTheme.of(
                                                                         context)
@@ -466,7 +457,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                         style: FlutterFlowTheme.of(context)
                                             .titleMedium
                                             .override(
-                                              font: GoogleFonts.montserrat(
+                                              font: GoogleFonts.dmSans(
                                                 fontWeight: FontWeight.w600,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
@@ -500,11 +491,11 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                             color: FlutterFlowTheme.of(context)
                                                 .primaryBackground,
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(6.0),
                                             border: Border.all(
                                               color:
                                                   FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
+                                                      .accent4,
                                               width: 1.0,
                                             ),
                                           ),
@@ -714,10 +705,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -862,9 +853,9 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                   borderRadius:
                                                       BorderRadius.only(
                                                     bottomLeft:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(6.0),
                                                     bottomRight:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(6.0),
                                                   ),
                                                 ),
                                                 child: Padding(
@@ -916,10 +907,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1064,9 +1055,9 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                   borderRadius:
                                                       BorderRadius.only(
                                                     bottomLeft:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(6.0),
                                                     bottomRight:
-                                                        Radius.circular(12.0),
+                                                        Radius.circular(6.0),
                                                   ),
                                                 ),
                                                 child: Padding(
@@ -1121,10 +1112,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1215,10 +1206,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1311,10 +1302,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1410,10 +1401,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1504,10 +1495,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                           ),
                                         ),
                                         child: Padding(
@@ -1597,10 +1588,10 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(12.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1841,7 +1832,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(12.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -1939,7 +1930,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         .labelMedium
                                                                         .override(
                                                                           font:
-                                                                              GoogleFonts.ibmPlexSans(
+                                                                              GoogleFonts.dmSans(
                                                                             fontWeight:
                                                                                 FontWeight.normal,
                                                                             fontStyle:
@@ -1970,9 +1961,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                   height: 24.0,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .gray4,
+                                                                    color: const Color(0xFFD0F4FC),
                                                                     borderRadius:
                                                                         BorderRadius.circular(
                                                                             6.0),
@@ -2002,11 +1991,11 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .labelMedium
                                                                               .override(
-                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                font: GoogleFonts.dmSans(
                                                                                   fontWeight: FontWeight.normal,
                                                                                   fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
                                                                                 ),
-                                                                                color: FlutterFlowTheme.of(context).secondaryText,
+                                                                                color: const Color(0xFF0DC1EF),
                                                                                 fontSize: 13.0,
                                                                                 letterSpacing: 0.0,
                                                                                 fontWeight: FontWeight.normal,
@@ -2105,7 +2094,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2139,7 +2128,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2173,7 +2162,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2206,7 +2195,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2240,7 +2229,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2276,7 +2265,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2310,7 +2299,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2344,7 +2333,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2378,7 +2367,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2412,7 +2401,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2446,7 +2435,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           .bodyMedium
                                                                           .override(
                                                                             font:
-                                                                                GoogleFonts.ibmPlexSans(
+                                                                                GoogleFonts.dmSans(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                             ),
@@ -2480,7 +2469,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.w500,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2500,9 +2489,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                 decoration:
                                                                     BoxDecoration(
                                                                   borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              4.0),
+                                                                      BorderRadius.circular(6.0),
                                                                 ),
                                                                 child: Padding(
                                                                   padding: EdgeInsetsDirectional
@@ -2524,7 +2511,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                         style: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .override(
-                                                                              font: GoogleFonts.ibmPlexSans(
+                                                                              font: GoogleFonts.dmSans(
                                                                                 fontWeight: FontWeight.bold,
                                                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                               ),
@@ -2551,7 +2538,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                                                           style: FlutterFlowTheme.of(context)
                                                                               .bodyMedium
                                                                               .override(
-                                                                                font: GoogleFonts.ibmPlexSans(
+                                                                                font: GoogleFonts.dmSans(
                                                                                   fontWeight: FontWeight.w500,
                                                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                                                 ),
