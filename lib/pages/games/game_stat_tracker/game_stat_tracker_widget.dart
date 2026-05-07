@@ -980,7 +980,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           end: AlignmentDirectional(0, 1.0),
                                         ),
                                         borderRadius:
-                                            BorderRadius.circular(4.0),
+                                            BorderRadius.circular(6.0),
                                       ),
                                     ),
                                     Align(
@@ -1032,7 +1032,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                         child: Container(
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).gray4,
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(6.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context)
                                   .secondaryBackground,
@@ -2041,7 +2041,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context).gray4,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -2187,7 +2187,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context).gray4,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -2329,7 +2329,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context).gray4,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .secondaryBackground,
@@ -2539,7 +2539,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context).teal,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -2706,7 +2706,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context).teal,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -2828,7 +2828,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context).teal,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -2943,7 +2943,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   decoration: BoxDecoration(
                                     color:
                                         FlutterFlowTheme.of(context).secondary,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -3046,7 +3046,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   decoration: BoxDecoration(
                                     color:
                                         FlutterFlowTheme.of(context).secondary,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -3149,7 +3149,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   decoration: BoxDecoration(
                                     color:
                                         FlutterFlowTheme.of(context).secondary,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -3279,7 +3279,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -3410,7 +3410,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -3533,7 +3533,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -3656,7 +3656,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -3789,7 +3789,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -3912,7 +3912,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                   ),
@@ -4034,7 +4034,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -4157,7 +4157,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context).gray3,
                                     width: 1.0,
@@ -4599,7 +4599,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ).animateOnActionTrigger(
                                   animationsMap[

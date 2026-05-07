@@ -103,7 +103,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -196,7 +196,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                                                 height: 24.0,
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(6.0),
                                                 ),
                                                 child: Icon(
                                                   Icons.check_circle,
@@ -233,7 +233,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -328,7 +328,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                                                 height: 24.0,
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(6.0),
                                                 ),
                                                 child: Icon(
                                                   Icons.check_circle,
@@ -365,7 +365,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context)
                                     .primaryBackground,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 border: Border.all(
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
@@ -459,7 +459,7 @@ class _AppAppearanceWidgetState extends State<AppAppearanceWidget> {
                                                 height: 24.0,
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(6.0),
                                                 ),
                                                 child: Icon(
                                                   Icons.check_circle,

@@ -370,7 +370,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                             context)
                                                                         .primaryBackground,
                                                                     borderRadius:
-                                                                        BorderRadius.circular(8.0),
+                                                                        BorderRadius.circular(6.0),
                                                                     border:
                                                                         Border
                                                                             .all(
@@ -549,7 +549,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                   .of(context)
                                                               .primaryBackground,
                                                           borderRadius:
-                                                              BorderRadius.circular(8.0),
+                                                              BorderRadius.circular(6.0),
                                                           border: Border.all(
                                                             color: FlutterFlowTheme
                                                                     .of(context)
@@ -707,7 +707,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                     height: 56.0,
                                                                     decoration: BoxDecoration(
                                                                       color: Colors.white,
-                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                      borderRadius: BorderRadius.circular(6.0),
                                                                       border: Border.all(
                                                                         color: const Color(0xFFE0E1E5),
                                                                         width: 1.0,
@@ -982,7 +982,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                           BoxDecoration(
                                                                         color: Colors.white,
                                                                         borderRadius:
-                                                                            BorderRadius.circular(8.0),
+                                                                            BorderRadius.circular(6.0),
                                                                         border: Border.all(
                                                                           color: const Color(0xFFE0E1E5),
                                                                           width: 1.0,
@@ -1126,7 +1126,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -1202,7 +1202,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                       .of(context)
                                                                   .gray4,
                                                               borderRadius:
-                                                                  BorderRadius.circular(8.0),
+                                                                  BorderRadius.circular(6.0),
                                                             ),
                                                             alignment:
                                                                 AlignmentDirectional(
@@ -1492,7 +1492,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                         ),
                                                     elevation: 0.0,
                                                     borderRadius:
-                                                        BorderRadius.circular(8.0),
+                                                        BorderRadius.circular(6.0),
                                                     disabledColor:
                                                         const Color(0xFFDADBDE),
                                                     disabledTextColor:

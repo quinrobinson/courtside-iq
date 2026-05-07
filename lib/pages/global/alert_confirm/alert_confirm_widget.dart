@@ -72,7 +72,7 @@ class _AlertConfirmWidgetState extends State<AlertConfirmWidget> {
                   spreadRadius: 4.0,
                 )
               ],
-              borderRadius: BorderRadius.circular(12.0),
+              borderRadius: BorderRadius.circular(6.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),
@@ -181,7 +181,7 @@ class _AlertConfirmWidgetState extends State<AlertConfirmWidget> {
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(12.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ),
                             ),

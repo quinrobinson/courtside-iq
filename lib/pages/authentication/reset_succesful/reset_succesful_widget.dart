@@ -54,7 +54,7 @@ class _ResetSuccesfulWidgetState extends State<ResetSuccesfulWidget> {
           child: Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(6.0),
                 child: Image.asset(
                   'assets/images/Profile_Gradient.png',
                   width: double.infinity,

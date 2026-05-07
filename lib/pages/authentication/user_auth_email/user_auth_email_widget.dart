@@ -89,7 +89,7 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
         body: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(6.0),
               child: Image.asset(
                 'assets/images/Profile_Gradient.png',
                 width: double.infinity,
@@ -207,7 +207,7 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                         color: FlutterFlowTheme.of(context)
                                             .primaryBackground,
                                         borderRadius:
-                                            BorderRadius.circular(8.0),
+                                            BorderRadius.circular(6.0),
                                       ),
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -358,13 +358,13 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                           [
                                                                         ClipRRect(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(8.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           child:
                                                                               Container(
                                                                             decoration:
                                                                                 BoxDecoration(
                                                                               color: FlutterFlowTheme.of(context).gray4,
-                                                                              borderRadius: BorderRadius.circular(8.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             child:
                                                                                 Padding(
@@ -441,13 +441,13 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                         ),
                                                                         ClipRRect(
                                                                           borderRadius:
-                                                                              BorderRadius.circular(8.0),
+                                                                              BorderRadius.circular(6.0),
                                                                           child:
                                                                               Container(
                                                                             decoration:
                                                                                 BoxDecoration(
                                                                               color: FlutterFlowTheme.of(context).gray4,
-                                                                              borderRadius: BorderRadius.circular(8.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             child:
                                                                                 Padding(
@@ -594,7 +594,7 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                                     fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
                                                                                   ),
                                                                               elevation: 0.0,
-                                                                              borderRadius: BorderRadius.circular(8.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                               disabledColor: FlutterFlowTheme.of(context).secondaryBackground,
                                                                               disabledTextColor: FlutterFlowTheme.of(context).gray3,
                                                                             ),
@@ -709,10 +709,10 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                           children:
                                                                               [
                                                                             ClipRRect(
-                                                                              borderRadius: BorderRadius.circular(8.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                               child: Container(
                                                                                 decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(8.0),
+                                                                                  borderRadius: BorderRadius.circular(6.0),
                                                                                 ),
                                                                                 child: TextFormField(
                                                                                   controller: _model.newEmailAddressTextController,
@@ -777,10 +777,10 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                               ),
                                                                             ),
                                                                             ClipRRect(
-                                                                              borderRadius: BorderRadius.circular(8.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                               child: Container(
                                                                                 decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(8.0),
+                                                                                  borderRadius: BorderRadius.circular(6.0),
                                                                                 ),
                                                                                 child: TextFormField(
                                                                                   controller: _model.newPasswordTextController,
@@ -855,10 +855,10 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                               ),
                                                                             ),
                                                                             ClipRRect(
-                                                                              borderRadius: BorderRadius.circular(8.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                               child: Container(
                                                                                 decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(8.0),
+                                                                                  borderRadius: BorderRadius.circular(6.0),
                                                                                 ),
                                                                                 child: TextFormField(
                                                                                   controller: _model.newPasswordConfirmTextController,
@@ -1049,7 +1049,7 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
                                                                                             fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
                                                                                           ),
                                                                                       elevation: 0.0,
-                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                      borderRadius: BorderRadius.circular(6.0),
                                                                                       disabledColor: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                       disabledTextColor: FlutterFlowTheme.of(context).gray3,
                                                                                     ),

@@ -98,11 +98,11 @@ class _EditEmailWidgetState extends State<EditEmailWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
+                          borderRadius: BorderRadius.circular(6.0),
                           child: Container(
                             decoration: BoxDecoration(
                               color: FlutterFlowTheme.of(context).gray4,
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(6.0),
                               border: Border.all(
                                 color: FlutterFlowTheme.of(context).gray4,
                               ),
@@ -287,7 +287,7 @@ class _EditEmailWidgetState extends State<EditEmailWidget> {
                                           .fontStyle,
                                     ),
                                 elevation: 0.0,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 disabledColor: FlutterFlowTheme.of(context)
                                     .secondaryBackground,
                                 disabledTextColor:

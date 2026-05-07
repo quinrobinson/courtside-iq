@@ -84,7 +84,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
         body: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(6.0),
               child: Image.asset(
                 'assets/images/Profile_Gradient.png',
                 width: double.infinity,
@@ -313,7 +313,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                                                           width: 1.0,
                                                         ),
                                                         borderRadius:
-                                                            BorderRadius.circular(8.0),
+                                                            BorderRadius.circular(6.0),
                                                       ),
                                                     ),
                                             ),
@@ -413,7 +413,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                                                     width: 1.0,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(6.0),
                                                 ),
                                               ),
                                             ),
@@ -504,7 +504,7 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                                                     width: 1.0,
                                                   ),
                                                   borderRadius:
-                                                      BorderRadius.circular(8.0),
+                                                      BorderRadius.circular(6.0),
                                                 ),
                                               ),
                                             ),

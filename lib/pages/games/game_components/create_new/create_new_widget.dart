@@ -133,7 +133,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                               color: Colors.transparent,
                               elevation: 1.0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Container(
                                 width: double.infinity,
@@ -141,7 +141,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,
@@ -239,7 +239,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                               color: Colors.transparent,
                               elevation: 1.0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Container(
                                 width: double.infinity,
@@ -247,7 +247,7 @@ class _CreateNewWidgetState extends State<CreateNewWidget>
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   border: Border.all(
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,

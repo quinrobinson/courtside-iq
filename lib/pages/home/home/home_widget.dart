@@ -157,7 +157,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   child: custom_widgets.BirthDatePromptGate(),
                 ),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(6.0),
                   child: Image.asset(
                     'assets/images/Profile_Gradient.png',
                     width: double.infinity,
@@ -229,7 +229,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         'assets/images/gradient-bg-black-b.png',
                                       ).image,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Padding(
                                     padding: EdgeInsets.all(12.0),
@@ -411,7 +411,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(8.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryBackground,
@@ -579,7 +579,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                         FlutterFlowTheme.of(
                                                                 context)
                                                             .secondaryBackground,
-                                                    borderRadius: 8.0,
+                                                    borderRadius: 6.0,
                                                     buttonSize: 40.0,
                                                     fillColor:
                                                         FlutterFlowTheme.of(
@@ -759,7 +759,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -937,7 +937,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                             FlutterFlowTheme.of(
                                                                     context)
                                                                 .secondaryBackground,
-                                                        borderRadius: 8.0,
+                                                        borderRadius: 6.0,
                                                         borderWidth: 1.0,
                                                         buttonSize: 40.0,
                                                         icon: Icon(
@@ -1067,7 +1067,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context)
                                         .primaryBackground,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                     border: Border.all(
                                       color: FlutterFlowTheme.of(context)
                                           .secondaryBackground,
@@ -1222,7 +1222,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                       height: 24.0,
                                                       decoration: BoxDecoration(
                                                         borderRadius:
-                                                            BorderRadius.circular(8.0),
+                                                            BorderRadius.circular(6.0),
                                                       ),
                                                       alignment:
                                                           AlignmentDirectional(
@@ -2089,7 +2089,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -2427,10 +2427,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                             ],
                                                                             borderRadius:
                                                                                 BorderRadius.only(
-                                                                              topLeft: Radius.circular(4.0),
-                                                                              topRight: Radius.circular(4.0),
-                                                                              bottomLeft: Radius.circular(4.0),
-                                                                              bottomRight: Radius.circular(4.0),
+                                                                              topLeft: Radius.circular(6.0),
+                                                                              topRight: Radius.circular(6.0),
+                                                                              bottomLeft: Radius.circular(6.0),
+                                                                              bottomRight: Radius.circular(6.0),
                                                                             ),
                                                                           ),
                                                                           alignment: AlignmentDirectional(
@@ -2578,7 +2578,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -2725,7 +2725,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -2872,7 +2872,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -3019,7 +3019,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -3166,7 +3166,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                                                                   ),
                                                                                 )
                                                                               ],
-                                                                              borderRadius: BorderRadius.circular(4.0),
+                                                                              borderRadius: BorderRadius.circular(6.0),
                                                                             ),
                                                                             alignment:
                                                                                 AlignmentDirectional(0.0, 1.0),
@@ -3449,7 +3449,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                             width: 1.0,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                         ),
                                       ),
                                     ),

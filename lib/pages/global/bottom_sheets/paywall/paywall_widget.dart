@@ -84,7 +84,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                           'assets/images/gradient-bg-black-b.png',
                         ).image,
                       ),
-                      borderRadius: BorderRadius.circular(8.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
@@ -98,7 +98,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               FlutterFlowIconButton(
-                                borderRadius: 8.0,
+                                borderRadius: 6.0,
                                 buttonSize: 40.0,
                                 icon: Icon(
                                   Icons.close_sharp,
@@ -116,7 +116,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(6.0),
                             ),
                             child: Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
@@ -164,8 +164,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                       height: 19.0,
                                                       decoration: BoxDecoration(
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(4.0),
+                                                            BorderRadius.circular(6.0),
                                                         border: Border.all(
                                                           color: FlutterFlowTheme
                                                                   .of(context)
@@ -235,7 +234,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                         width: double.infinity,
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                         ),
                                         child: Padding(
                                           padding:
@@ -293,12 +292,12 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                     color: Colors.transparent,
                                     elevation: 0.0,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(6.0),
                                     ),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                            BorderRadius.circular(8.0),
+                                            BorderRadius.circular(6.0),
                                       ),
                                       child: Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -809,7 +808,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                             Container(
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(6.0),
                                               ),
                                               child: Padding(
                                                 padding: EdgeInsetsDirectional
@@ -1034,7 +1033,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .primaryBackground,
@@ -1124,7 +1123,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(8.0),
+                                                                        BorderRadius.circular(6.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1144,7 +1143,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(8.0),
+                                                                        BorderRadius.circular(6.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1335,7 +1334,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                           color: FlutterFlowTheme.of(context)
                                               .primaryBackground,
                                           borderRadius:
-                                              BorderRadius.circular(8.0),
+                                              BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
                                                 .primaryBackground,
@@ -1422,7 +1421,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(8.0),
+                                                                        BorderRadius.circular(6.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1442,7 +1441,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(8.0),
+                                                                        BorderRadius.circular(6.0),
                                                                   ),
                                                                   child: Icon(
                                                                     Icons
@@ -1550,7 +1549,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                   Container(
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primaryBackground,
-                      borderRadius: BorderRadius.circular(8.0),
+                      borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
@@ -2137,7 +2136,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                                           .fontStyle,
                                     ),
                                 elevation: 0.0,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 disabledColor: FlutterFlowTheme.of(context)
                                     .secondaryBackground,
                                 disabledTextColor:

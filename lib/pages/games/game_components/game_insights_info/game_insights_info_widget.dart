@@ -74,7 +74,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                   spreadRadius: 4.0,
                 )
               ],
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(6.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).secondaryBackground,
               ),
@@ -155,7 +155,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                         color: FlutterFlowTheme.of(context)
                                             .primaryBackground,
                                         borderRadius:
-                                            BorderRadius.circular(8.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .vividViolet,
@@ -359,7 +359,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -902,7 +902,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -1445,7 +1445,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                     FlutterFlowTheme.of(context)
                                                         .primaryBackground,
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(6.0),
                                                 border: Border.all(
                                                   color: FlutterFlowTheme.of(
                                                           context)
@@ -2011,7 +2011,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                         .secondaryBackground,
                                     width: 1.0,
                                   ),
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                 ),
                               ),
                             ),

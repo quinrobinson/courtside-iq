@@ -63,13 +63,13 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
           color: Colors.transparent,
           elevation: 1.0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(6.0),
           ),
           child: Container(
             height: 460.0,
             decoration: BoxDecoration(
               color: FlutterFlowTheme.of(context).primaryBackground,
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(6.0),
               border: Border.all(
                 color: FlutterFlowTheme.of(context).gray4,
                 width: 1.0,
@@ -90,7 +90,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                           height: 2.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).secondaryText,
-                            borderRadius: BorderRadius.circular(2.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                         ),
                       ],
@@ -127,7 +127,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                             ),
                           ),
                           FlutterFlowIconButton(
-                            borderRadius: 8.0,
+                            borderRadius: 6.0,
                             buttonSize: 48.0,
                             icon: Icon(
                               Icons.close,
@@ -155,7 +155,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                               height: 60.0,
                               decoration: BoxDecoration(
                                 color: FlutterFlowTheme.of(context).gray4,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
@@ -254,7 +254,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                             height: 208.0,
                             decoration: BoxDecoration(
                               color: FlutterFlowTheme.of(context).gray4,
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(6.0),
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
@@ -293,7 +293,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                                     decoration: BoxDecoration(
                                       color: FlutterFlowTheme.of(context)
                                           .primaryBackground,
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(6.0),
                                       border: Border.all(
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryBackground,
@@ -385,9 +385,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                                                               : Color(
                                                                   0x00000000),
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      8.0),
+                                                              BorderRadius.circular(6.0),
                                                         ),
                                                         child: Padding(
                                                           padding:
@@ -465,9 +463,9 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                                                 ),
                                                 borderRadius: BorderRadius.only(
                                                   bottomLeft:
-                                                      Radius.circular(8.0),
+                                                      Radius.circular(6.0),
                                                   bottomRight:
-                                                      Radius.circular(8.0),
+                                                      Radius.circular(6.0),
                                                 ),
                                               ),
                                               child: Icon(
@@ -554,7 +552,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                                           .fontStyle,
                                     ),
                                 elevation: 0.0,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 disabledColor: FlutterFlowTheme.of(context)
                                     .secondaryBackground,
                                 disabledTextColor:

@@ -304,7 +304,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                   .fontStyle,
                                         ),
                                     elevation: 0.0,
-                                    borderRadius: BorderRadius.circular(4.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                 ),
                               ),
@@ -358,7 +358,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                     'assets/images/gradient-bg-black-b.png',
                                   ).image,
                                 ),
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Padding(
                                 padding: EdgeInsets.all(12.0),
@@ -614,9 +614,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                       .of(context)
                                                                   .gray4,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12.0),
+                                                                  BorderRadius.circular(6.0),
                                                               border:
                                                                   Border.all(
                                                                 color: FlutterFlowTheme.of(
@@ -694,9 +692,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                         context)
                                                                     .primaryBackground,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12.0),
+                                                                    BorderRadius.circular(6.0),
                                                               ),
                                                               child: Padding(
                                                                 padding: EdgeInsetsDirectional
@@ -817,7 +813,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                                                 if (FFAppState().isUserPremium == false)
                                                                                                   FlutterFlowIconButton(
                                                                                                     borderColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                                    borderRadius: 8.0,
+                                                                                                    borderRadius: 6.0,
                                                                                                     borderWidth: 1.0,
                                                                                                     buttonSize: 40.0,
                                                                                                     fillColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -879,7 +875,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
                                                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                   width: 1.0,
@@ -943,7 +939,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
                                                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                 ),
@@ -1005,7 +1001,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
                                                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                 ),
@@ -1068,7 +1064,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                               ),
                                                                               decoration: BoxDecoration(
                                                                                 color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                                borderRadius: BorderRadius.circular(6.0),
                                                                                 border: Border.all(
                                                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                                                 ),

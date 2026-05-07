@@ -75,7 +75,7 @@ class _CustomAccordionWidgetState extends State<CustomAccordionWidget> {
                 : FlutterFlowTheme.of(context).gray4,
             Color(0x3F22D3EE),
           ),
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(6.0),
         ),
         child: Padding(
           padding: EdgeInsets.all(12.0),

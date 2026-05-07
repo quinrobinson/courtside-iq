@@ -25,7 +25,7 @@
 // PRINCIPLES (do not violate without updating the system)
 // -------------------------------------------------------
 // 1. Cards sit 8px apart (CISpacing.s2). Never 16+.
-// 2. Cards have 6px radius (CIRadius.md). Tags/buttons have 4px (CIRadius.sm).
+// 2. All non-circular elements use 6px radius (CIRadius.md). Circles/pills use CIRadius.full.
 // 3. Hero numerals: weight 400. Labels: weight 700. The inversion is the rule.
 // 4. Numbers in columns use tabular figures: TextStyle(fontFeatures: [FontFeature.tabularFigures()]).
 // 5. Jade is hero. Royal/Steel/Rose/Spark are accents (one per screen, max).
@@ -167,11 +167,11 @@ class CISpacing {
 class CIRadius {
   CIRadius._();
 
-  static const double xs = 2.0;   // Status dots, micro-tags
-  static const double sm = 4.0;   // Tags, chips, BUTTONS, inner pills
-  static const double md = 6.0;   // DEFAULT card. Sub-cards.
-  static const double lg = 8.0;   // Group containers, larger cards
-  static const double xl = 12.0;  // Sheets, modals, hero containers
+  static const double xs = 6.0;   // (unified — all non-circular elements use 6px)
+  static const double sm = 6.0;   // (unified — all non-circular elements use 6px)
+  static const double md = 6.0;   // Universal non-circular radius
+  static const double lg = 6.0;   // (unified — all non-circular elements use 6px)
+  static const double xl = 6.0;   // (unified — all non-circular elements use 6px)
 
   // For circular elements (avatars, tab bar pill, status dots)
   static const double full = 9999.0;

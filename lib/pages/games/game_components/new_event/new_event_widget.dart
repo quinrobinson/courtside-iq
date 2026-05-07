@@ -72,12 +72,12 @@ class _NewEventWidgetState extends State<NewEventWidget> {
             color: Colors.transparent,
             elevation: 1.0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(6.0),
             ),
             child: Container(
               decoration: BoxDecoration(
                 color: FlutterFlowTheme.of(context).primaryBackground,
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(6.0),
                 border: Border.all(
                   color: FlutterFlowTheme.of(context).gray4,
                   width: 1.0,
@@ -97,7 +97,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
                           height: 2.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).secondaryText,
-                            borderRadius: BorderRadius.circular(2.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                         ),
                       ],
@@ -142,7 +142,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
                                 ),
                               ),
                               FlutterFlowIconButton(
-                                borderRadius: 8.0,
+                                borderRadius: 6.0,
                                 buttonSize: 48.0,
                                 icon: Icon(
                                   Icons.close,
@@ -171,13 +171,13 @@ class _NewEventWidgetState extends State<NewEventWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 12.0),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(6.0),
                                 child: Container(
                                   width: double.infinity,
                                   height: 62.0,
                                   decoration: BoxDecoration(
                                     color: FlutterFlowTheme.of(context).gray4,
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
@@ -636,7 +636,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
                                             .fontStyle,
                                       ),
                                   elevation: 0.0,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(6.0),
                                   disabledColor: FlutterFlowTheme.of(context)
                                       .secondaryBackground,
                                   disabledTextColor:

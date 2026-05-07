@@ -49,7 +49,7 @@ class _MenuListEmptyStateWidgetState extends State<MenuListEmptyStateWidget> {
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: BorderRadius.circular(6.0),
         ),
         alignment: AlignmentDirectional(0.0, 0.0),
         child: Row(

@@ -350,7 +350,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                     height: 140.0,
                                     decoration: BoxDecoration(
                                       color: FlutterFlowTheme.of(context).gray4,
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(6.0),
                                       border: Border.all(
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
@@ -503,13 +503,13 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                     ].divide(SizedBox(width: 3.0)),
                                   ),
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6.0),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color:
                                             FlutterFlowTheme.of(context).gray4,
                                         borderRadius:
-                                            BorderRadius.circular(8.0),
+                                            BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
                                               .gray4,
@@ -702,7 +702,7 @@ class _SendFeedbackWidgetState extends State<SendFeedbackWidget> {
                                                         ),
                                                 elevation: 0.0,
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(6.0),
                                                 disabledColor:
                                                     FlutterFlowTheme.of(context)
                                                         .secondaryBackground,
