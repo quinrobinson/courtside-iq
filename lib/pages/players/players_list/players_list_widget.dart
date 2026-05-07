@@ -361,7 +361,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                 borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(16.0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -694,9 +694,9 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                               child: Padding(
                                                                 padding: EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        12.0,
+                                                                        16.0,
                                                                         0.0,
-                                                                        12.0,
+                                                                        16.0,
                                                                         24.0),
                                                                 child: Column(
                                                                   mainAxisSize:

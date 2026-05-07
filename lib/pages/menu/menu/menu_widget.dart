@@ -209,7 +209,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                               BorderRadius.circular(6.0),
                                         ),
                                         child: Padding(
-                                          padding: EdgeInsets.all(12.0),
+                                          padding: EdgeInsets.all(16.0),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             crossAxisAlignment:
@@ -509,7 +509,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                                                   ),
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsets.all(12.0),
+                                                  padding: EdgeInsets.all(16.0),
                                                   child: Row(
                                                     mainAxisSize:
                                                         MainAxisSize.max,
