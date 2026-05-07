@@ -1462,7 +1462,7 @@ class _NewGameWidgetState extends State<NewGameWidget> {
                                                                 0.0, 0.0),
                                                     color: FlutterFlowTheme.of(
                                                             context)
-                                                        .primaryButtonText,
+                                                        .primaryText,
                                                     textStyle: FlutterFlowTheme
                                                             .of(context)
                                                         .titleSmall

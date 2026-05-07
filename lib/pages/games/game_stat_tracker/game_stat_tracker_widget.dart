@@ -2942,7 +2942,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color:
-                                        FlutterFlowTheme.of(context).secondary,
+                                        Color(0xFFE04867),
                                     borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
@@ -3045,7 +3045,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color:
-                                        FlutterFlowTheme.of(context).secondary,
+                                        Color(0xFFE04867),
                                     borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
@@ -3148,7 +3148,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     color:
-                                        FlutterFlowTheme.of(context).secondary,
+                                        Color(0xFFE04867),
                                     borderRadius: BorderRadius.circular(6.0),
                                   ),
                                   child: Column(
@@ -3309,7 +3309,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                               Icons.plus_one,
                                               color:
                                                   FlutterFlowTheme.of(context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                               size: 22.0,
                                             ),
                                             Text(
@@ -3330,7 +3330,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                     ),
                                                     color: FlutterFlowTheme.of(
                                                             context)
-                                                        .primaryButtonText,
+                                                        .primaryText,
                                                     fontSize: 12.0,
                                                     letterSpacing: 0.0,
                                                     fontWeight: FontWeight.w600,
@@ -3436,7 +3436,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -3454,7 +3454,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
@@ -3559,7 +3559,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -3577,7 +3577,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
@@ -3682,7 +3682,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -3700,7 +3700,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
@@ -3815,7 +3815,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -3833,7 +3833,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
@@ -3937,7 +3937,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -3955,7 +3955,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
@@ -4060,7 +4060,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -4078,7 +4078,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
@@ -4183,7 +4183,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                           Icon(
                                             Icons.plus_one,
                                             color: FlutterFlowTheme.of(context)
-                                                .primaryButtonText,
+                                                .primaryText,
                                             size: 22.0,
                                           ),
                                           Text(
@@ -4201,7 +4201,7 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                                   ),
                                                   color: FlutterFlowTheme.of(
                                                           context)
-                                                      .primaryButtonText,
+                                                      .primaryText,
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
