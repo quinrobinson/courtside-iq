@@ -559,9 +559,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                                                                       .of(context)
                                                                   .primaryBackground,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          18.0),
+                                                                  BorderRadius.circular(6.0),
                                                             ),
                                                             child: Padding(
                                                               padding:
