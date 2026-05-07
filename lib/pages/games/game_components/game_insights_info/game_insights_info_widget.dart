@@ -63,20 +63,10 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
             width: double.infinity,
             decoration: BoxDecoration(
               color: FlutterFlowTheme.of(context).primaryBackground,
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 10.0,
-                  color: Color(0x26000000),
-                  offset: Offset(
-                    0.0,
-                    6.0,
-                  ),
-                  spreadRadius: 4.0,
-                )
-              ],
               borderRadius: BorderRadius.circular(6.0),
               border: Border.all(
-                color: FlutterFlowTheme.of(context).secondaryBackground,
+                color: FlutterFlowTheme.of(context).accent4,
+                width: 1.0,
               ),
             ),
             child: Padding(

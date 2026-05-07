@@ -414,7 +414,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                             BorderRadius.circular(6.0),
                                         border: Border.all(
                                           color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
+                                              .accent4,
                                           width: 1.0,
                                         ),
                                       ),
@@ -762,7 +762,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1070,7 +1070,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                     borderRadius: BorderRadius.circular(6.0),
                                     border: Border.all(
                                       color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+                                          .accent4,
                                       width: 1.0,
                                     ),
                                   ),
@@ -2092,7 +2092,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),

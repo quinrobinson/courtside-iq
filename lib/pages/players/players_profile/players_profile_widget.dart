@@ -495,7 +495,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                             border: Border.all(
                                               color:
                                                   FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
+                                                      .accent4,
                                               width: 1.0,
                                             ),
                                           ),
@@ -708,7 +708,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -910,7 +910,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1115,7 +1115,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1209,7 +1209,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1305,7 +1305,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1404,7 +1404,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),
@@ -1498,7 +1498,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                           ),
                                         ),
                                         child: Padding(
@@ -1591,7 +1591,7 @@ class _PlayersProfileWidgetState extends State<PlayersProfileWidget> {
                                               BorderRadius.circular(6.0),
                                           border: Border.all(
                                             color: FlutterFlowTheme.of(context)
-                                                .secondaryBackground,
+                                                .accent4,
                                             width: 1.0,
                                           ),
                                         ),

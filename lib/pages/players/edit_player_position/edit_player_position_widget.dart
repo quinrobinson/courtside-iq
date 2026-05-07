@@ -97,7 +97,7 @@ class _EditPlayerPositionWidgetState extends State<EditPlayerPositionWidget> {
                             borderRadius: BorderRadius.circular(6.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context)
-                                  .secondaryBackground,
+                                  .accent4,
                               width: 1.0,
                             ),
                           ),

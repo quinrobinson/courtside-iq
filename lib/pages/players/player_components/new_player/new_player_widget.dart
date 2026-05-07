@@ -296,7 +296,7 @@ class _NewPlayerWidgetState extends State<NewPlayerWidget> {
                                       borderRadius: BorderRadius.circular(6.0),
                                       border: Border.all(
                                         color: FlutterFlowTheme.of(context)
-                                            .secondaryBackground,
+                                            .accent4,
                                         width: 1.0,
                                       ),
                                     ),

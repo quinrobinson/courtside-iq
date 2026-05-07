@@ -64,7 +64,6 @@ class DevelopmentStoryCard extends StatelessWidget {
         color: CIColors.surface,
         borderRadius: BorderRadius.circular(CIRadius.lg),
         border: Border.all(color: _border),
-        boxShadow: CIElevation.card,
       ),
       padding: const EdgeInsets.all(20),
       child: switch (_state) {
