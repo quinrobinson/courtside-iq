@@ -615,13 +615,6 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                                   .gray4,
                                                               borderRadius:
                                                                   BorderRadius.circular(6.0),
-                                                              border:
-                                                                  Border.all(
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .accent4,
-                                                                width: 1.0,
-                                                              ),
                                                             ),
                                                             alignment:
                                                                 AlignmentDirectional(
