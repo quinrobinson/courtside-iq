@@ -1522,10 +1522,10 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                       .only(
                                                                 bottomLeft: Radius
                                                                     .circular(
-                                                                        18.0),
+                                                                        5.0),
                                                                 bottomRight: Radius
                                                                     .circular(
-                                                                        17.0),
+                                                                        5.0),
                                                               ),
                                                             ),
                                                             child: Padding(
