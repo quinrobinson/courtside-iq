@@ -13,7 +13,7 @@ const _bg = CIColors.canvas;
 const _text = CIColors.ink;
 const _text2 = CIColors.ink3;
 const _card = CIColors.surface;
-const _track = CIColors.canvasSunk;
+const _track = Color(0xFFF2F2F4); // canvasSunk lightened 50%
 
 class PlayerProfilePageV2 extends StatefulWidget {
   const PlayerProfilePageV2({super.key, required this.playerId});
