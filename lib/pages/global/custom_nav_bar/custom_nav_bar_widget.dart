@@ -77,16 +77,12 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
               children: [
                 Align(
                   alignment: AlignmentDirectional(0.0, 1.0),
+                  // Outer container carries the shadow (can't be inside ClipRRect)
                   child: Container(
                     width: 330.0,
                     height: 60.0,
                     decoration: BoxDecoration(
-                      color: Colors.white,
                       borderRadius: BorderRadius.circular(6.0),
-                      border: Border.all(
-                        color: Color(0xFFE0E1E5),
-                        width: 1.0,
-                      ),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x14000000),
@@ -96,7 +92,20 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                         ),
                       ],
                     ),
-                    child: Padding(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6.0),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(6.0),
+                            border: Border.all(
+                              color: Color(0xFFE0E1E5),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(7.0, 6.0, 7.0, 6.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
@@ -308,9 +317,12 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                         ].divide(SizedBox(width: 6.0)),
                       ),
                     ),
-                  ),
-                ),
-              ].divide(SizedBox(width: 12.0)),
+                  ),        // frosted Container
+                ),          // BackdropFilter
+              ),            // ClipRRect
+            ),              // outer Container (shadow)
+              ),            // Align
+            ].divide(SizedBox(width: 12.0)),
             ),
           ],
         ),
