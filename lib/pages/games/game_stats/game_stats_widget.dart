@@ -406,14 +406,31 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         children: [
-          // Avatar row: player · VS · opponent
+          // Avatar + name columns, VS divider
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _playerAvatar(row.playerProfilePic, 64),
-              const SizedBox(width: 16),
-              const SizedBox(
-                width: 32,
+              // ── Player side ───────────────────────────────────────────
+              Expanded(
+                child: Column(
+                  children: [
+                    _playerAvatar(row.playerProfilePic, 64),
+                    const SizedBox(height: 8),
+                    Text(
+                      row.firstName ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: CIType.fontFamily,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: CIColors.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // ── VS divider ────────────────────────────────────────────
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   'VS',
                   textAlign: TextAlign.center,
@@ -426,51 +443,35 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
-              // Opponent icon
-              Container(
-                width: 64,
-                height: 64,
-                decoration: const BoxDecoration(
-                  color: CIColors.canvasSunk,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.groups_rounded,
-                  color: CIColors.ink3,
-                  size: 28,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Names beneath avatars
-          Row(
-            children: [
+              // ── Opponent side ─────────────────────────────────────────
               Expanded(
-                child: Text(
-                  row.firstName ?? '',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: CIColors.ink,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 64), // spacer matching VS area
-              Expanded(
-                child: Text(
-                  valueOrDefault<String>(row.opponentTeam, 'Opponent'),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: CIColors.ink,
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: const BoxDecoration(
+                        color: CIColors.canvasSunk,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.groups_rounded,
+                        color: CIColors.ink3,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      valueOrDefault<String>(row.opponentTeam, 'Opponent'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: CIType.fontFamily,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: CIColors.ink,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
