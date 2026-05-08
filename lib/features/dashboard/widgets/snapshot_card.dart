@@ -4,16 +4,15 @@ import 'package:flutter/material.dart';
 import '../../player_insight/models/player_insight.dart';
 import 'dashboard_avatar.dart';
 
-const _bg = CIColors.surface;
-const _text = CIColors.ink;
-const _sub = CIColors.ink3;
-const _divider = CIColors.hairline;
+// Tier 5 · Hero card colors (inverted — white on royal gradient)
+const _textPrimary   = CIColors.inkOnBrand;                       // white
+const _textSecondary = Color(0xBFFFFFFF);                         // white 75%
+const _dividerColor  = Color(0x26FFFFFF);                         // white 15%
 
 /// A single card in the Development Snapshots carousel.
 ///
-/// Shows the player's avatar, name, and a one-paragraph snapshot of their
-/// most recent development narrative. The card fills the full carousel height
-/// so the lavender body always extends to the bottom edge.
+/// Tier 5 · Hero — royal gradient background with spark accent,
+/// white text, royal-tinted elevation shadow.
 class SnapshotCard extends StatelessWidget {
   const SnapshotCard({
     super.key,
@@ -40,93 +39,114 @@ class SnapshotCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
+        // Royal linear gradient — 135°
         gradient: const LinearGradient(
-          colors: [CIColors.royal500, CIColors.spark500],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [CIColors.royal600, CIColors.royal500],
         ),
         borderRadius: BorderRadius.circular(CIRadius.lg),
+        boxShadow: CIElevation.hero,
       ),
-      padding: const EdgeInsets.all(1.5),
-      child: Container(
-        decoration: BoxDecoration(
-          color: _bg,
-          borderRadius: BorderRadius.circular(5.0), // inner card nesting
-        ),
-        // Column stretches to fill the carousel height.
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          // ── Header ──────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-            child: Row(
-              children: [
-                DashboardAvatar(
-                  profilePic: profilePic,
-                  size: 44,
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      fullName,
-                      style: const TextStyle(
-                        fontFamily: CIType.fontFamily,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: _text,
-                      ),
-                    ),
-                    Text(
-                      'Last $gameLabel',
-                      style: const TextStyle(
-                        fontFamily: CIType.fontFamily,
-                        fontSize: 12,
-                        color: _sub,
-                      ),
-                    ),
+          // ── Spark radial accent — bottom-right corner ───────────────
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 160,
+              height: 120,
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.bottomRight,
+                  radius: 1.0,
+                  colors: [
+                    Color(0x47F2A43A), // spark500 @ 28%
+                    Color(0x00F2A43A), // spark500 @ 0%
                   ],
+                  stops: [0.0, 1.0],
                 ),
-              ],
+              ),
             ),
           ),
 
-          // ── Hairline divider ──────────────────────────────────────────────
-          const Divider(height: 22, thickness: 1, color: _divider),
+          // ── Card content ────────────────────────────────────────────
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Header ────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                child: Row(
+                  children: [
+                    DashboardAvatar(
+                      profilePic: profilePic,
+                      size: 44,
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          fullName,
+                          style: const TextStyle(
+                            fontFamily: CIType.fontFamily,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        ),
+                        Text(
+                          'Last $gameLabel',
+                          style: const TextStyle(
+                            fontFamily: CIType.fontFamily,
+                            fontSize: 12,
+                            color: _textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
 
-          // ── Narrative body ────────────────────────────────────────────────
-          if (body != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text(
-                body,
-                style: const TextStyle(
-                  fontFamily: CIType.fontFamily,
-                  fontSize: 13,
-                  color: _text,
-                  height: 1.55,
+              // ── Hairline divider ────────────────────────────────────
+              const Divider(height: 22, thickness: 1, color: _dividerColor),
+
+              // ── Narrative body ──────────────────────────────────────
+              if (body != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(
+                    body,
+                    style: const TextStyle(
+                      fontFamily: CIType.fontFamily,
+                      fontSize: 13,
+                      color: _textPrimary,
+                      height: 1.55,
+                    ),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(
+                    "Log more games to see $firstName's development story.",
+                    style: const TextStyle(
+                      fontFamily: CIType.fontFamily,
+                      fontSize: 13,
+                      color: _textSecondary,
+                      height: 1.55,
+                    ),
+                  ),
                 ),
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text(
-                "Log more games to see $firstName's development story.",
-                style: const TextStyle(
-                  fontFamily: CIType.fontFamily,
-                  fontSize: 13,
-                  color: _sub,
-                  height: 1.55,
-                ),
-              ),
-            ),
+            ],
+          ),
         ],
-        ),
       ),
     );
   }

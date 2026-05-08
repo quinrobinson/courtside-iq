@@ -271,10 +271,7 @@ class _Body extends StatelessWidget {
                     // ── Header bar: logo · badge · account avatar ─────
                     Padding(
                       padding: EdgeInsets.fromLTRB(20, top + 14, 20, 0),
-                      child: _DashboardHeader(
-                        playerCount: data.playerCount,
-                        totalGames: data.totalGames,
-                      ),
+                      child: const _DashboardHeader(),
                     ),
 
                     // ── Live game callout (paused game) ───────────────
@@ -395,50 +392,6 @@ class _Body extends StatelessWidget {
           child: CustomNavBarWidget(page: 'Home'),
         ),
       ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stats badge — "N players · N games tracked", transparent bg + 1px border
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _StatsBadge extends StatelessWidget {
-  const _StatsBadge({
-    required this.playerCount,
-    required this.totalGames,
-  });
-
-  final int playerCount;
-  final int totalGames;
-
-  @override
-  Widget build(BuildContext context) {
-    final playerLabel =
-        playerCount == 1 ? '1 player' : '$playerCount players';
-    final gameLabel =
-        totalGames == 1 ? '1 game tracked' : '$totalGames games tracked';
-
-    return IntrinsicWidth(
-      child: Container(
-        height: 26,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(CIRadius.md),
-          border: Border.all(color: CIColors.ink),
-        ),
-        child: Text(
-          '$playerLabel · $gameLabel',
-          style: const TextStyle(
-            fontFamily: CIType.fontFamily,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: CIColors.ink,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -678,13 +631,7 @@ class _UpgradeBanner extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _DashboardHeader extends StatelessWidget {
-  const _DashboardHeader({
-    required this.playerCount,
-    required this.totalGames,
-  });
-
-  final int playerCount;
-  final int totalGames;
+  const _DashboardHeader();
 
   @override
   Widget build(BuildContext context) {
@@ -698,18 +645,7 @@ class _DashboardHeader extends StatelessWidget {
           height: 32,
           fit: BoxFit.contain,
         ),
-        // Stats badge — centered between mark and avatar
-        if (playerCount > 0)
-          Expanded(
-            child: Center(
-              child: _StatsBadge(
-                playerCount: playerCount,
-                totalGames: totalGames,
-              ),
-            ),
-          )
-        else
-          const Spacer(),
+        const Spacer(),
         // Account avatar — taps to Menu
         GestureDetector(
           onTap: () => context.pushNamed(MenuWidget.routeName),
@@ -1053,7 +989,7 @@ class _LiveStat extends StatelessWidget {
                 fontFamily: CIType.fontFamily,
                 fontSize: 18,
                 fontWeight: FontWeight.w400,
-                fontFeatures: const [FontFeature.tabularFigures()],
+                fontFeatures: [FontFeature.tabularFigures()],
                 color: CIColors.ink,
               ),
             ),
