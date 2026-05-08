@@ -313,7 +313,7 @@ class _Body extends StatelessWidget {
             if (data.recentGames.isNotEmpty) ...[
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 24, 20, 12),
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
                   child: Text(
                     'RECENT GAMES',
                     style: TextStyle(
