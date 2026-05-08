@@ -84,7 +84,7 @@ class CIColors {
   // ---- SURFACE -------------------------------------------------------------
 
   /// Page background. Cool neutral. Reads precise and dashboard-like.
-  static const Color canvas = Color(0xFFEFEFF1);
+  static const Color canvas = Color(0xFFF3F3F5);
 
   /// Sub-grouping inside cards. Tracks, sliders, hover states.
   static const Color canvasSunk = Color(0xFFE5E5E8);

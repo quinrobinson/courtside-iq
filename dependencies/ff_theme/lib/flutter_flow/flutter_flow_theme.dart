@@ -179,7 +179,7 @@ class LightModeTheme extends FlutterFlowTheme {
   late Color zeroStatBG = const Color(0x00F0F0F0);        // transparent — unchanged
   late Color violet4550 = const Color(0x726B35C9);        // royal500 @ 45% opacity
   late Color violet1520 = const Color(0x0E6B35C9);        // royal500 @ 5% opacity
-  late Color globalBackground = const Color(0xFFEFEFF1);  // canvas (exact value)
+  late Color globalBackground = const Color(0xFFF3F3F5);  // canvas (exact value)
   late Color techBlue = const Color(0xFF023BFF);          // no v1.5 mapping
   late Color crispCyan = const Color(0xFF22D3EE);         // no v1.5 mapping
   late Color imperial = const Color(0xFFFB3640);          // no v1.5 mapping
