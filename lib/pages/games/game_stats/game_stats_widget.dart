@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'game_stats_model.dart';
 export 'game_stats_model.dart';
-import '/flutter_flow/revenue_cat_util.dart' as revenue_cat;
 
 class GameStatsWidget extends StatefulWidget {
   const GameStatsWidget({
@@ -251,7 +250,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
               const SizedBox(height: 32),
 
               // Remove game button — subscribers only (hidden for free users)
-              if (revenue_cat.activeEntitlementIds.isNotEmpty)
+              if (FFAppState().isUserPremium)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Builder(
