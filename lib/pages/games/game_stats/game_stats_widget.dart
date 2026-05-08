@@ -137,10 +137,10 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
               // Royal Glow insight card (Tier 3) — only when insight exists
               if ((row.gameInsights ?? '').trim().isNotEmpty) ...[
                 _insightCard(context, row.gameInsights!.trim()),
-                const SizedBox(height: 8),
               ],
 
               // ── STATS section ─────────────────────────────────────────
+              const SizedBox(height: 16),
               _sectionHeader('Stats'),
               const SizedBox(height: 8),
               _statsGrid(context, row),
