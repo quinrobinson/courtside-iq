@@ -416,6 +416,9 @@ enum CICardTier {
   /// Personal best, milestone, peak moment.
   sparkGlow,
 
+  /// Elite-level performance. Best-in-tier metric result.
+  steelGlow,
+
   /// Headline takeover. Development snapshot. ONE per screen, often zero.
   hero,
 }
