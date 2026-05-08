@@ -17,7 +17,6 @@ import 'package:share_plus/share_plus.dart';
 import 'game_stats_model.dart';
 export 'game_stats_model.dart';
 import '/flutter_flow/revenue_cat_util.dart' as revenue_cat;
-import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 
 class GameStatsWidget extends StatefulWidget {
   const GameStatsWidget({
@@ -141,12 +140,18 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
                 const SizedBox(height: 8),
               ],
 
-              // Stats grid: PTS / REB / AST / TO / STL / BLK
+              // ── STATS section ─────────────────────────────────────────
+              _sectionHeader('Stats'),
+              const SizedBox(height: 8),
               _statsGrid(context, row),
               const SizedBox(height: 8),
-
-              // Shooting card: FG / FT / 3PT
               _shootingCard(context, row),
+
+              // ── DEVELOPMENT METRICS section (only when ≥1 metric active)
+              if (hasPpsa || hasAst2tov || hasDisrupt) ...[
+                const SizedBox(height: 16),
+                _sectionHeader('Development'),
+              ],
 
               // Metric cards (conditional on data thresholds)
               if (hasPpsa) ...[
@@ -245,34 +250,13 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
 
               const SizedBox(height: 32),
 
-              // Remove game button
+              // Remove game button — subscribers only (hidden for free users)
+              if (revenue_cat.activeEntitlementIds.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Builder(
                   builder: (context) => FFButtonWidget(
                     onPressed: () async {
-                      // Gate: subscribers only
-                      if (revenue_cat.activeEntitlementIds.isEmpty) {
-                        await showModalBottomSheet(
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          builder: (context) => GestureDetector(
-                            onTap: () {
-                              FocusScope.of(context).unfocus();
-                              FocusManager.instance.primaryFocus?.unfocus();
-                            },
-                            child: Padding(
-                              padding: MediaQuery.viewInsetsOf(context),
-                              child: SizedBox(
-                                height: MediaQuery.sizeOf(context).height,
-                                child: const PaywallWidget(),
-                              ),
-                            ),
-                          ),
-                        ).then((_) => safeSetState(() {}));
-                        return;
-                      }
                       await showDialog(
                         barrierColor:
                             FlutterFlowTheme.of(context).bottomSheetBg,
@@ -516,6 +500,24 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Section header ────────────────────────────────────────────────────────
+
+  Widget _sectionHeader(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          fontFamily: CIType.fontFamily,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: CIColors.ink3,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
