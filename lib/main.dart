@@ -30,6 +30,7 @@ const _lightModeStatusBar = SystemUiOverlayStyle(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(_lightModeStatusBar);
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
