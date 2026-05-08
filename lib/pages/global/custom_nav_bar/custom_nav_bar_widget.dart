@@ -98,7 +98,7 @@ class _CustomNavBarWidgetState extends State<CustomNavBarWidget> {
                         filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.65),
+                            color: Colors.white.withValues(alpha: 0.45),
                             borderRadius: BorderRadius.circular(6.0),
                             border: Border.all(
                               color: Color(0xFFE0E1E5),
