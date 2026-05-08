@@ -487,9 +487,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .gray4,
+                                                    color: const Color(0xFFFDF1E0), // spark50 — amber
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -525,9 +523,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .gray2,
+                                                                color: const Color(0xFFF2A43A), // spark500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -565,9 +561,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .gray2,
+                                                                color: const Color(0xFFF2A43A), // spark500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -588,7 +582,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Color(0x27E5A500),
+                                                    color: const Color(0xFFE6F7F2), // jade50 — green
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -624,9 +618,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .tertiary,
+                                                                color: const Color(0xFF209D6E), // jade500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -664,9 +656,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .tertiary,
+                                                                color: const Color(0xFF209D6E), // jade500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -687,7 +677,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Color(0x272BC18C),
+                                                    color: const Color(0xFFE7EEFA), // steel50 — blue
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -723,9 +713,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .teal,
+                                                                color: const Color(0xFF2558B8), // steel500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -763,9 +751,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .teal,
+                                                                color: const Color(0xFF2558B8), // steel500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1030,9 +1016,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .gray4,
+                                                    color: const Color(0xFFFDF1E0), // spark50 — amber
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -1068,9 +1052,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .gray2,
+                                                                color: const Color(0xFFF2A43A), // spark500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1108,9 +1090,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .gray2,
+                                                                color: const Color(0xFFF2A43A), // spark500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1131,7 +1111,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Color(0x27E5A500),
+                                                    color: const Color(0xFFE6F7F2), // jade50 — green
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -1167,9 +1147,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .tertiary,
+                                                                color: const Color(0xFF209D6E), // jade500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1207,9 +1185,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .tertiary,
+                                                                color: const Color(0xFF209D6E), // jade500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1230,7 +1206,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Color(0x272BC18C),
+                                                    color: const Color(0xFFE7EEFA), // steel50 — blue
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -1266,9 +1242,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .teal,
+                                                                color: const Color(0xFF2558B8), // steel500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1306,9 +1280,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .teal,
+                                                                color: const Color(0xFF2558B8), // steel500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1573,9 +1545,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .gray4,
+                                                    color: const Color(0xFFFDF1E0), // spark50 — amber
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -1611,9 +1581,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .gray2,
+                                                                color: const Color(0xFFF2A43A), // spark500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1651,9 +1619,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .gray2,
+                                                                color: const Color(0xFFF2A43A), // spark500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1674,7 +1640,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Color(0x27E5A500),
+                                                    color: const Color(0xFFE6F7F2), // jade50 — green
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -1710,9 +1676,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .tertiary,
+                                                                color: const Color(0xFF209D6E), // jade500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1750,9 +1714,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .tertiary,
+                                                                color: const Color(0xFF209D6E), // jade500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1773,7 +1735,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                               Expanded(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                    color: Color(0x272BC18C),
+                                                    color: const Color(0xFFE7EEFA), // steel50 — blue
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             6.0),
@@ -1809,9 +1771,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .teal,
+                                                                color: const Color(0xFF2558B8), // steel500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,
@@ -1849,9 +1809,7 @@ class _GameInsightsInfoWidgetState extends State<GameInsightsInfoWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .teal,
+                                                                color: const Color(0xFF2558B8), // steel500
                                                                 fontSize: 12.0,
                                                                 letterSpacing:
                                                                     0.0,

@@ -916,7 +916,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
           padding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
-            color: CIColors.jade50,
+            color: CIColors.steel50,
             borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: const Text(
@@ -925,7 +925,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
               fontFamily: CIType.fontFamily,
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: CIColors.jade500,
+              color: CIColors.steel500,
             ),
           ),
         );
@@ -935,7 +935,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
           padding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
-            color: CIColors.spark50,
+            color: CIColors.jade50,
             borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: const Text(
@@ -944,7 +944,7 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
               fontFamily: CIType.fontFamily,
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: CIColors.spark500,
+              color: CIColors.jade500,
             ),
           ),
         );
@@ -954,16 +954,16 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
           padding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
-            color: CIColors.canvasSunk,
+            color: CIColors.spark50,
             borderRadius: BorderRadius.circular(CIRadius.md),
           ),
           child: const Text(
-            'Solid',
+            'Active',
             style: TextStyle(
               fontFamily: CIType.fontFamily,
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: CIColors.ink3,
+              color: CIColors.spark500,
             ),
           ),
         );
