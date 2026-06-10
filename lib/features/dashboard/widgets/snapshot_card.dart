@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import '../../player_insight/models/player_insight.dart';
 import 'dashboard_avatar.dart';
 
-// Tier 5 · Hero card colors (inverted — white on royal gradient)
-const _textPrimary   = CIColors.inkOnBrand;                       // white
-const _textSecondary = Color(0xBFFFFFFF);                         // white 75%
-const _dividerColor  = Color(0x26FFFFFF);                         // white 15%
+// Tier 3 · Surface card colors — white surface with royal burst accent
+const _textPrimary   = CIColors.ink;
+const _textSecondary = CIColors.ink3;
+const _dividerColor  = CIColors.hairline;
 
 /// A single card in the Development Snapshots carousel.
 ///
-/// Tier 5 · Hero — royal gradient background with spark accent,
-/// white text, royal-tinted elevation shadow.
+/// White surface with a royal radial burst from the bottom-right corner,
+/// hairline border, and standard card elevation.
 class SnapshotCard extends StatelessWidget {
   const SnapshotCard({
     super.key,
@@ -39,32 +39,28 @@ class SnapshotCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        // Royal linear gradient — 135°
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [CIColors.royal600, CIColors.royal500],
-        ),
+        color: CIColors.surface,
         borderRadius: BorderRadius.circular(CIRadius.lg),
-        boxShadow: CIElevation.hero,
+        border: Border.all(color: CIColors.hairline, width: 1.0),
+        boxShadow: CIElevation.card,
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          // ── Spark radial accent — bottom-right corner ───────────────
+          // ── Royal radial burst — bottom-right corner ────────────────
           Positioned(
             right: 0,
             bottom: 0,
             child: Container(
-              width: 160,
-              height: 120,
+              width: 200,
+              height: 150,
               decoration: const BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment.bottomRight,
                   radius: 1.0,
                   colors: [
-                    Color(0x47F2A43A), // spark500 @ 28%
-                    Color(0x00F2A43A), // spark500 @ 0%
+                    Color(0x386B35C9), // royal500 @ 22%
+                    Color(0x006B35C9), // royal500 @ 0%
                   ],
                   stops: [0.0, 1.0],
                 ),
