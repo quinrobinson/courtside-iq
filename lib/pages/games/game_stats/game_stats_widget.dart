@@ -972,103 +972,64 @@ class _GameStatsWidgetState extends State<GameStatsWidget> {
     }
 
     // Tier accent: Active→spark, Good→jade, Elite→steel, none→null
-    final Color? accent = isElite
-        ? CIColors.steel500
-        : isGood
-            ? CIColors.jade500
-            : isSolid
-                ? CIColors.spark500
-                : null;
-
-    final Widget cardContent = Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    color: CIColors.ink3,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w400,
-                    color: CIColors.ink,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  sublabel,
-                  style: const TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                    color: CIColors.ink3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          badge(),
-        ],
-      ),
-    );
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: accent != null
-              ? BoxDecoration(
-                  color: CIColors.surface,
-                  borderRadius: BorderRadius.circular(CIRadius.md),
-                  border: Border.all(color: accent.withValues(alpha: 0.20)),
-                )
-              : BoxDecoration(
-                  color: CIColors.surface,
-                  borderRadius: BorderRadius.circular(CIRadius.md),
-                  border: Border.all(color: CIColors.hairline),
-                ),
-          child: accent != null
-              ? Stack(
-                  children: [
-                    Positioned.fill(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                            center: Alignment.topRight,
-                            radius: 1.4,
-                            colors: [
-                              accent.withValues(alpha: 0.22),
-                              accent.withValues(alpha: 0.07),
-                              accent.withValues(alpha: 0.0),
-                            ],
-                            stops: const [0.0, 0.40, 0.85],
-                          ),
+          decoration: BoxDecoration(
+            color: CIColors.surface,
+            borderRadius: BorderRadius.circular(CIRadius.md),
+            border: Border.all(color: CIColors.hairline),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label.toUpperCase(),
+                        style: const TextStyle(
+                          fontFamily: CIType.fontFamily,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: CIColors.ink3,
+                          letterSpacing: 0.8,
                         ),
                       ),
-                    ),
-                    cardContent,
-                  ],
-                )
-              : cardContent,
+                      const SizedBox(height: 6),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontFamily: CIType.fontFamily,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w400,
+                          color: CIColors.ink,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        sublabel,
+                        style: const TextStyle(
+                          fontFamily: CIType.fontFamily,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          color: CIColors.ink3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                badge(),
+              ],
+            ),
+          ),
         ),
       ),
     );
