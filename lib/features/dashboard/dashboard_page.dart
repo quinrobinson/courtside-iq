@@ -646,12 +646,22 @@ class _DashboardHeader extends StatelessWidget {
           fit: BoxFit.contain,
         ),
         const Spacer(),
-        // Account avatar — taps to Menu
+        // Account button — taps to Menu
         GestureDetector(
           onTap: () => context.pushNamed(MenuWidget.routeName),
-          child: _AccountAvatar(
-            photoUrl: currentUserPhoto,
-            displayName: currentUserDisplayName,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: CIColors.canvasSunk,
+              borderRadius: BorderRadius.circular(CIRadius.md),
+            ),
+            alignment: Alignment.center,
+            child: const Icon(
+              Icons.person_rounded,
+              size: 20,
+              color: CIColors.ink3,
+            ),
           ),
         ),
       ],
@@ -659,92 +669,6 @@ class _DashboardHeader extends StatelessWidget {
   }
 }
 
-// ── Account avatar — bordered circle, photo / initials / icon ──────────────
-
-class _AccountAvatar extends StatelessWidget {
-  const _AccountAvatar({
-    required this.photoUrl,
-    required this.displayName,
-  });
-
-  final String photoUrl;
-  final String displayName;
-
-  @override
-  Widget build(BuildContext context) {
-    const double size = 32;
-    const border = BorderSide(color: CIColors.ink, width: 1);
-
-    Widget inner;
-
-    if (photoUrl.isNotEmpty) {
-      inner = ClipOval(
-        child: Image.network(
-          photoUrl,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) =>
-              _avatarContent(displayName, size),
-        ),
-      );
-    } else {
-      inner = _avatarContent(displayName, size);
-    }
-
-    // Wrap with a bordered circle that has no fill
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.fromBorderSide(border),
-      ),
-      alignment: Alignment.center,
-      child: ClipOval(child: inner),
-    );
-  }
-
-  static Widget _avatarContent(String displayName, double size) {
-    final initials = _getInitials(displayName);
-    if (initials.isNotEmpty) {
-      return SizedBox(
-        width: size,
-        height: size,
-        child: Center(
-          child: Text(
-            initials,
-            style: TextStyle(
-              fontFamily: CIType.fontFamily,
-              fontSize: size * 0.33,
-              fontWeight: FontWeight.w600,
-              color: CIColors.ink,
-            ),
-          ),
-        ),
-      );
-    }
-    // Fallback: person icon
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Icon(
-        Icons.person_rounded,
-        size: size * 0.6,
-        color: CIColors.ink,
-      ),
-    );
-  }
-
-  static String _getInitials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    final first = parts.first.isNotEmpty ? parts.first[0] : '';
-    final last = parts.last.isNotEmpty ? parts.last[0] : '';
-    return '$first$last'.toUpperCase();
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Loading + error states
