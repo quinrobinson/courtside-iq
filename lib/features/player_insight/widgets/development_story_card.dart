@@ -6,8 +6,8 @@ import 'trend_pill.dart';
 
 const _purple = CIColors.royal500;
 const _amber = CIColors.spark500;
+const _amberLight = Color(0xFFFFCB6B); // top stop of the Bright Spots sparkle gradient
 const _magenta = CIColors.rose500;
-const _green = CIColors.jade500;
 const _text = CIColors.ink;
 const _text2 = CIColors.ink3;
 const _border = CIColors.hairline;
@@ -94,9 +94,16 @@ class _EligibleBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasSplit = insight.hasSplitNarrative;
+    // Bright Spots body falls back to the legacy `text` field for insights
+    // generated before the split-narrative migration.
+    final whatsWorking = insight.whatsWorking;
     final legacyText = insight.text;
-    final showLegacy = !hasSplit && legacyText != null && legacyText.trim().isNotEmpty;
+    final String? brightBody =
+        (whatsWorking != null && whatsWorking.trim().isNotEmpty)
+            ? whatsWorking
+            : (legacyText != null && legacyText.trim().isNotEmpty
+                ? legacyText
+                : null);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,31 +123,14 @@ class _EligibleBody extends StatelessWidget {
               height: 1.3,
             ),
           ),
-        if (showLegacy) ...[
-          const SizedBox(height: 10),
-          Text(
-            legacyText,
-            style: const TextStyle(
-              fontFamily: CIType.fontFamily,
-              fontSize: 14,
-              color: _text,
-              height: 1.5,
-            ),
-          ),
-        ],
-        if (insight.whatsWorking != null &&
-            insight.whatsWorking!.trim().isNotEmpty) ...[
-          const SizedBox(height: 22),
-          _AccentSection(
-            color: _green,
-            label: 'BRIGHT SPOTS',
-            body: insight.whatsWorking!,
-          ),
+        if (brightBody != null) ...[
+          const SizedBox(height: 16),
+          _BrightSpotsBlock(body: brightBody),
         ],
         if (insight.needsDevelopment != null &&
             insight.needsDevelopment!.trim().isNotEmpty) ...[
           const SizedBox(height: 18),
-          _AccentSection(
+          _FilledAccentBlock(
             color: _magenta,
             label: 'ROOM TO GROW',
             body: insight.needsDevelopment!,
@@ -148,7 +138,7 @@ class _EligibleBody extends StatelessWidget {
         ],
         if (insight.growthEdge != null) ...[
           const SizedBox(height: 18),
-          _AccentSection(
+          _FilledAccentBlock(
             color: _purple,
             label: 'WATCH FOR NEXT',
             body: insight.growthEdge!,
@@ -163,8 +153,66 @@ class _EligibleBody extends StatelessWidget {
   }
 }
 
-class _AccentSection extends StatelessWidget {
-  const _AccentSection({
+class _BrightSpotsBlock extends StatelessWidget {
+  const _BrightSpotsBlock({required this.body});
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ShaderMask(
+              blendMode: BlendMode.srcIn,
+              shaderCallback: (bounds) => const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [_amberLight, _amber],
+              ).createShader(bounds),
+              child: const Text(
+                '✦',
+                style: TextStyle(
+                  fontFamily: CIType.fontFamily,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white, // masked by ShaderMask
+                  height: 1.0,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Text(
+              'BRIGHT SPOTS',
+              style: TextStyle(
+                fontFamily: CIType.fontFamily,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: _amber,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          body,
+          style: const TextStyle(
+            fontFamily: CIType.fontFamily,
+            fontSize: 15,
+            color: _text,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FilledAccentBlock extends StatelessWidget {
+  const _FilledAccentBlock({
     required this.color,
     required this.label,
     required this.body,
@@ -176,43 +224,33 @@ class _AccentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(CIRadius.md),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 2,
-            decoration: BoxDecoration(
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: CIType.fontFamily,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
               color: color,
-              borderRadius: BorderRadius.circular(CIRadius.xs),
+              letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  body,
-                  style: const TextStyle(
-                    fontFamily: CIType.fontFamily,
-                    fontSize: 13,
-                    color: _text,
-                    height: 1.45,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 6),
+          Text(
+            body,
+            style: const TextStyle(
+              fontFamily: CIType.fontFamily,
+              fontSize: 13,
+              color: _text,
+              height: 1.45,
             ),
           ),
         ],
