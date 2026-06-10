@@ -1,4 +1,5 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/design_tokens.dart';
 import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
@@ -11,7 +12,6 @@ import '/pages/global/custom_snack_bar/custom_snack_bar_widget.dart';
 import '/pages/global/empty_states/empty_game_list/empty_game_list_widget.dart';
 import '/pages/global/informational_dialog/informational_dialog_widget.dart';
 import '/features/players/add_player_sheet.dart';
-import 'dart:math';
 import 'dart:ui';
 import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
@@ -20,10 +20,7 @@ import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_blurhash/flutter_blurhash.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:octo_image/octo_image.dart';
 import 'package:provider/provider.dart';
 import 'all_games_model.dart';
 export 'all_games_model.dart';
@@ -1512,30 +1509,17 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                             ),
                                                           ),
                                                           Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .gray4,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .only(
-                                                                bottomLeft: Radius
-                                                                    .circular(
-                                                                        5.0),
-                                                                bottomRight: Radius
-                                                                    .circular(
-                                                                        5.0),
-                                                              ),
-                                                            ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          12.0,
-                                                                          6.0,
-                                                                          12.0,
-                                                                          6.0),
+                                                            height: 1.0,
+                                                            color: CIColors.hairline,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        12.0,
+                                                                        8.0,
+                                                                        12.0,
+                                                                        8.0),
                                                               child: Row(
                                                                 mainAxisSize:
                                                                     MainAxisSize
@@ -1871,7 +1855,6 @@ class _AllGamesWidgetState extends State<AllGamesWidget>
                                                                         12.0)),
                                                               ),
                                                             ),
-                                                          ),
                                                         ],
                                                       ),
                                                     ),
