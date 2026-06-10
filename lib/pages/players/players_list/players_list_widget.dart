@@ -1,7 +1,7 @@
 import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/design_tokens.dart';
 import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
@@ -11,15 +11,11 @@ import '/pages/global/empty_states/empty_players_list/empty_players_list_widget.
 import '/pages/global/informational_dialog/informational_dialog_widget.dart';
 import '/features/players/add_player_sheet.dart';
 import 'dart:ui';
-import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_blurhash/flutter_blurhash.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:octo_image/octo_image.dart';
 import 'package:provider/provider.dart';
 import 'players_list_model.dart';
 export 'players_list_model.dart';
@@ -557,575 +553,180 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                                                   (context, playersVarIndex) {
                                                 final playersVarItem =
                                                     playersVar[playersVarIndex];
+                                                // ── Compute per-game averages ──
+                                                final int _games = (playersVarItem.totalGames ?? 0).toInt();
+                                                final String _ptsStr = _games > 0
+                                                    ? ((playersVarItem.totalPoints ?? 0) / _games).toStringAsFixed(1)
+                                                    : '--';
+                                                final String _rebStr = _games > 0
+                                                    ? (((playersVarItem.totalOffReb ?? 0) + (playersVarItem.totalDefReb ?? 0)) / _games).toStringAsFixed(1)
+                                                    : '--';
+                                                final String _astStr = _games > 0
+                                                    ? ((playersVarItem.totalAssist ?? 0) / _games).toStringAsFixed(1)
+                                                    : '--';
+                                                final String _fullName =
+                                                    '${playersVarItem.playerFirstName ?? ''} ${playersVarItem.playerLastName ?? ''}'.trim();
+                                                final String? _position = playersVarItem.playerPosition;
+                                                final String? _ageBand = playersVarItem.ageBand;
+                                                final String _picRaw = playersVarItem.playerProfilePic ?? '';
+                                                final bool _hasPhoto = _picRaw.isNotEmpty;
+                                                final List<String> _pillParts = [
+                                                  if (_position != null && _position.isNotEmpty) _position,
+                                                  if (_ageBand != null && _ageBand.isNotEmpty) _ageBand,
+                                                ];
+                                                final String? _pillText = _pillParts.isEmpty ? null : _pillParts.join(' · ');
+
                                                 return Container(
-                                                  decoration: BoxDecoration(),
+                                                  decoration: BoxDecoration(
+                                                    color: CIColors.surface,
+                                                    borderRadius: BorderRadius.circular(CIRadius.md),
+                                                    border: Border.all(color: CIColors.hairline, width: 1.0),
+                                                    boxShadow: CIElevation.card,
+                                                  ),
                                                   child: InkWell(
-                                                    splashColor:
-                                                        Colors.transparent,
-                                                    focusColor:
-                                                        Colors.transparent,
-                                                    hoverColor:
-                                                        Colors.transparent,
-                                                    highlightColor:
-                                                        Colors.transparent,
+                                                    splashColor: Colors.transparent,
+                                                    focusColor: Colors.transparent,
+                                                    hoverColor: Colors.transparent,
+                                                    highlightColor: Colors.transparent,
+                                                    borderRadius: BorderRadius.circular(CIRadius.md),
                                                     onTap: () async {
-                                                      if (FFAppState()
-                                                              .isUserPremium ==
-                                                          true) {
+                                                      if (FFAppState().isUserPremium == true) {
                                                         context.pushNamed(
-                                                          PlayersProfileWidget
-                                                              .routeName,
+                                                          PlayersProfileWidget.routeName,
                                                           queryParameters: {
-                                                            'playerID':
-                                                                serializeParam(
-                                                              playersVarItem
-                                                                  .playerId,
+                                                            'playerID': serializeParam(
+                                                              playersVarItem.playerId,
                                                               ParamType.String,
                                                             ),
                                                           }.withoutNulls,
-                                                          extra: <String,
-                                                              dynamic>{
-                                                            '__transition_info__':
-                                                                TransitionInfo(
-                                                              hasTransition:
-                                                                  true,
-                                                              transitionType:
-                                                                  PageTransitionType
-                                                                      .fade,
-                                                              duration: Duration(
-                                                                  milliseconds:
-                                                                      0),
+                                                          extra: <String, dynamic>{
+                                                            '__transition_info__': TransitionInfo(
+                                                              hasTransition: true,
+                                                              transitionType: PageTransitionType.fade,
+                                                              duration: Duration(milliseconds: 0),
                                                             ),
                                                           },
                                                         );
                                                       }
                                                     },
-                                                    child: Container(
-                                                      height: 180.0,
-                                                      child: Stack(
-                                                        alignment:
-                                                            AlignmentDirectional(
-                                                                -1.0, 1.0),
-                                                        children: [
-                                                          Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .gray4,
-                                                              borderRadius:
-                                                                  BorderRadius.circular(6.0),
-                                                            ),
-                                                            alignment:
-                                                                AlignmentDirectional(
-                                                                    -1.0, 0.0),
-                                                            child: Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          6.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
-                                                              child: Text(
-                                                                valueOrDefault<
-                                                                    String>(
-                                                                  functions.getIndexPlusOne(
-                                                                      valueOrDefault<
-                                                                          int>(
-                                                                    playersVarIndex,
-                                                                    0,
-                                                                  )),
-                                                                  '0',
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        // ── Header: avatar + name/meta (padded) ──
+                                                        Padding(
+                                                          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 14.0),
+                                                          child: Row(
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              // 56px circular avatar
+                                                              Container(
+                                                                width: 56.0,
+                                                                height: 56.0,
+                                                                decoration: BoxDecoration(
+                                                                  shape: BoxShape.circle,
+                                                                  color: CIColors.surfaceAlt,
+                                                                  image: _hasPhoto
+                                                                      ? DecorationImage(
+                                                                          image: NetworkImage(_picRaw),
+                                                                          fit: BoxFit.cover,
+                                                                        )
+                                                                      : null,
                                                                 ),
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .override(
-                                                                      font: GoogleFonts
-                                                                          .montserrat(
-                                                                        fontWeight:
-                                                                            FontWeight.w800,
-                                                                        fontStyle:
-                                                                            FontStyle.italic,
+                                                                child: _hasPhoto
+                                                                    ? null
+                                                                    : const Icon(
+                                                                        Icons.person_rounded,
+                                                                        size: 32.0,
+                                                                        color: CIColors.ink4,
                                                                       ),
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primaryText,
-                                                                      fontSize:
-                                                                          120.0,
-                                                                      letterSpacing:
-                                                                          0.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
-                                                                      fontStyle:
-                                                                          FontStyle
-                                                                              .italic,
-                                                                    ),
                                                               ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        48.0,
-                                                                        1.0,
-                                                                        1.0,
-                                                                        1.0),
-                                                            child: Container(
-                                                              width: double
-                                                                  .infinity,
-                                                              height: double
-                                                                  .infinity,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .primaryBackground,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(6.0),
-                                                                border: Border.all(
-                                                                  color: FlutterFlowTheme.of(context).accent4,
-                                                                  width: 1.0,
-                                                                ),
-                                                              ),
-                                                              child: Padding(
-                                                                padding: EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        16.0,
-                                                                        0.0,
-                                                                        16.0,
-                                                                        24.0),
+                                                              const SizedBox(width: 12.0),
+                                                              // Name + position pill + games count
+                                                              Expanded(
                                                                 child: Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .max,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                                   children: [
                                                                     Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children:
-                                                                          [
+                                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                                      children: [
                                                                         Expanded(
-                                                                          child:
-                                                                              Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
-                                                                                0.0,
-                                                                                7.0,
-                                                                                0.0,
-                                                                                0.0),
-                                                                            child:
-                                                                                Container(
-                                                                              decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(6.0),
-                                                                              ),
-                                                                              child: Padding(
-                                                                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 12.0),
-                                                                                child: Row(
-                                                                                  mainAxisSize: MainAxisSize.max,
-                                                                                  children: [
-                                                                                    if (playersVarItem.playerProfilePic == null || playersVarItem.playerProfilePic == '')
-                                                                                      Container(
-                                                                                        width: 46.0,
-                                                                                        height: 46.0,
-                                                                                        decoration: BoxDecoration(
-                                                                                          color: const Color(0xFFE8E8E8),
-                                                                                          borderRadius: BorderRadius.circular(9999.0),
-                                                                                        ),
-                                                                                        child: Row(
-                                                                                          mainAxisSize: MainAxisSize.max,
-                                                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                                                          children: [
-                                                                                            Icon(
-                                                                                              Icons.person_rounded,
-                                                                                              color: const Color(0xFF6A6A6A),
-                                                                                              size: 28.0,
-                                                                                            ),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ),
-                                                                                    if (playersVarItem.playerProfilePic != null && playersVarItem.playerProfilePic != '')
-                                                                                      Container(
-                                                                                        width: 46.0,
-                                                                                        height: 46.0,
-                                                                                        decoration: BoxDecoration(
-                                                                                          color: FlutterFlowTheme.of(context).secondaryBackground,
-                                                                                          borderRadius: BorderRadius.circular(9999.0),
-                                                                                        ),
-                                                                                        child: ClipRRect(
-                                                                                          borderRadius: BorderRadius.circular(9999.0),
-                                                                                          child: Image.network(
-                                                                                            playersVarItem.playerProfilePic!,
-                                                                                            width: 46.0,
-                                                                                            height: 46.0,
-                                                                                            fit: BoxFit.cover,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    Expanded(
-                                                                                      child: Padding(
-                                                                                        padding: EdgeInsetsDirectional.fromSTEB(6.0, 0.0, 0.0, 0.0),
-                                                                                        child: Column(
-                                                                                          mainAxisSize: MainAxisSize.max,
-                                                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                          children: [
-                                                                                            Row(
-                                                                                              mainAxisSize: MainAxisSize.max,
-                                                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                                                              children: [
-                                                                                                Expanded(
-                                                                                                  child: Padding(
-                                                                                                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 12.0, 0.0),
-                                                                                                    child: Text(
-                                                                                                      '${playersVarItem.playerFirstName}',
-                                                                                                      style: FlutterFlowTheme.of(context).titleMedium.override(
-                                                                                                            font: GoogleFonts.dmSans(
-                                                                                                              fontWeight: FontWeight.w500,
-                                                                                                              fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
-                                                                                                            ),
-                                                                                                            color: FlutterFlowTheme.of(context).primaryText,
-                                                                                                            fontSize: 16.0,
-                                                                                                            letterSpacing: 0.0,
-                                                                                                            fontWeight: FontWeight.w500,
-                                                                                                            fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
-                                                                                                          ),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                                if (FFAppState().isUserPremium == true)
-                                                                                                  Icon(
-                                                                                                    Icons.arrow_outward,
-                                                                                                    color: FlutterFlowTheme.of(context).primaryText,
-                                                                                                    size: 20.0,
-                                                                                                  ),
-                                                                                                if (FFAppState().isUserPremium == false)
-                                                                                                  FlutterFlowIconButton(
-                                                                                                    borderColor: FlutterFlowTheme.of(context).accent4,
-                                                                                                    borderRadius: 6.0,
-                                                                                                    borderWidth: 1.0,
-                                                                                                    buttonSize: 40.0,
-                                                                                                    fillColor: FlutterFlowTheme.of(context).primaryBackground,
-                                                                                                    icon: Icon(
-                                                                                                      Icons.edit_note,
-                                                                                                      color: FlutterFlowTheme.of(context).primaryText,
-                                                                                                      size: 26.0,
-                                                                                                    ),
-                                                                                                    onPressed: () async {
-                                                                                                      context.pushNamed(
-                                                                                                        EditPlayerWidget.routeName,
-                                                                                                        queryParameters: {
-                                                                                                          'playerID': serializeParam(
-                                                                                                            playersVarItem.playerId,
-                                                                                                            ParamType.String,
-                                                                                                          ),
-                                                                                                        }.withoutNulls,
-                                                                                                        extra: <String, dynamic>{
-                                                                                                          '__transition_info__': TransitionInfo(
-                                                                                                            hasTransition: true,
-                                                                                                            transitionType: PageTransitionType.rightToLeft,
-                                                                                                            duration: Duration(milliseconds: 400),
-                                                                                                          ),
-                                                                                                        },
-                                                                                                      );
-                                                                                                    },
-                                                                                                  ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ].divide(SizedBox(width: 6.0)),
-                                                                                ),
-                                                                              ),
+                                                                          child: Text(
+                                                                            _fullName.isEmpty ? 'Player' : _fullName,
+                                                                            style: const TextStyle(
+                                                                              fontFamily: CIType.fontFamily,
+                                                                              fontSize: 16.0,
+                                                                              fontWeight: FontWeight.w600,
+                                                                              color: CIColors.ink,
+                                                                              height: 1.25,
                                                                             ),
                                                                           ),
                                                                         ),
-                                                                      ].divide(SizedBox(
-                                                                              width: 12.0)),
+                                                                        if (_pillText != null) ...[
+                                                                          const SizedBox(width: 8.0),
+                                                                          Container(
+                                                                            padding: const EdgeInsets.symmetric(
+                                                                              horizontal: 8.0,
+                                                                              vertical: 3.0,
+                                                                            ),
+                                                                            decoration: BoxDecoration(
+                                                                              color: CIColors.canvasSunk,
+                                                                              borderRadius: BorderRadius.circular(CIRadius.md),
+                                                                            ),
+                                                                            child: Text(
+                                                                              _pillText,
+                                                                              style: const TextStyle(
+                                                                                fontFamily: CIType.fontFamily,
+                                                                                fontSize: 11.0,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                color: CIColors.ink3,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ],
                                                                     ),
-                                                                    Container(
-                                                                      decoration:
-                                                                          BoxDecoration(),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.max,
-                                                                        children:
-                                                                            [
-                                                                          Expanded(
-                                                                            child:
-                                                                                Container(
-                                                                              width: double.infinity,
-                                                                              height: 70.0,
-                                                                              constraints: BoxConstraints(
-                                                                                maxWidth: 115.0,
-                                                                              ),
-                                                                              decoration: BoxDecoration(
-                                                                                color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(6.0),
-                                                                                border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).accent4,
-                                                                                  width: 1.0,
-                                                                                ),
-                                                                              ),
-                                                                              child: Align(
-                                                                                alignment: AlignmentDirectional(0.0, 0.0),
-                                                                                child: Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 6.0),
-                                                                                  child: Column(
-                                                                                    mainAxisSize: MainAxisSize.max,
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Expanded(
-                                                                                        child: Text(
-                                                                                          valueOrDefault<String>(
-                                                                                            playersVarItem.totalGames?.toString(),
-                                                                                            '0',
-                                                                                          ),
-                                                                                          textAlign: TextAlign.center,
-                                                                                          style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.dmSans(
-                                                                                                  fontWeight: FontWeight.w600,
-                                                                                                  fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                                ),
-                                                                                                color: FlutterFlowTheme.of(context).primaryText,
-                                                                                                fontSize: 20.0,
-                                                                                                letterSpacing: 0.0,
-                                                                                                fontWeight: FontWeight.w600,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                              ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Text(
-                                                                                        'Games',
-                                                                                        style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.dmSans(
-                                                                                                fontWeight: FontWeight.normal,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                              ),
-                                                                                              color: FlutterFlowTheme.of(context).gray1,
-                                                                                              fontSize: 12.0,
-                                                                                              letterSpacing: 0.0,
-                                                                                              fontWeight: FontWeight.normal,
-                                                                                              fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                            ),
-                                                                                      ),
-                                                                                    ].divide(SizedBox(height: 3.0)),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Expanded(
-                                                                            child:
-                                                                                Container(
-                                                                              width: double.infinity,
-                                                                              height: 70.0,
-                                                                              constraints: BoxConstraints(
-                                                                                maxWidth: 115.0,
-                                                                              ),
-                                                                              decoration: BoxDecoration(
-                                                                                color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(6.0),
-                                                                                border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).accent4,
-                                                                                ),
-                                                                              ),
-                                                                              child: Align(
-                                                                                alignment: AlignmentDirectional(0.0, 0.0),
-                                                                                child: Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 6.0),
-                                                                                  child: Column(
-                                                                                    mainAxisSize: MainAxisSize.max,
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Expanded(
-                                                                                        child: Text(
-                                                                                          valueOrDefault<String>(
-                                                                                            functions.calculatePlayerFGPercent(playersVarItem.totalFgMade, playersVarItem.totalFgAttempt).toString(),
-                                                                                            '0',
-                                                                                          ),
-                                                                                          textAlign: TextAlign.center,
-                                                                                          style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.dmSans(
-                                                                                                  fontWeight: FontWeight.w600,
-                                                                                                  fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                                ),
-                                                                                                fontSize: 20.0,
-                                                                                                letterSpacing: 0.0,
-                                                                                                fontWeight: FontWeight.w600,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                              ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Text(
-                                                                                        'FG%',
-                                                                                        style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.dmSans(
-                                                                                                fontWeight: FontWeight.normal,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                              ),
-                                                                                              color: FlutterFlowTheme.of(context).gray1,
-                                                                                              fontSize: 12.0,
-                                                                                              letterSpacing: 1.0,
-                                                                                              fontWeight: FontWeight.normal,
-                                                                                              fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                            ),
-                                                                                      ),
-                                                                                    ].divide(SizedBox(height: 3.0)),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Expanded(
-                                                                            child:
-                                                                                Container(
-                                                                              width: double.infinity,
-                                                                              height: 70.0,
-                                                                              constraints: BoxConstraints(
-                                                                                maxWidth: 115.0,
-                                                                              ),
-                                                                              decoration: BoxDecoration(
-                                                                                color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(6.0),
-                                                                                border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).accent4,
-                                                                                ),
-                                                                              ),
-                                                                              alignment: AlignmentDirectional(-1.0, -1.0),
-                                                                              child: Align(
-                                                                                alignment: AlignmentDirectional(0.0, 0.0),
-                                                                                child: Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 6.0),
-                                                                                  child: Column(
-                                                                                    mainAxisSize: MainAxisSize.max,
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Expanded(
-                                                                                        child: Text(
-                                                                                          valueOrDefault<String>(
-                                                                                            functions.calculatePlayerFTPercent(playersVarItem.totalFtMade, playersVarItem.totalFtAttempt).toString(),
-                                                                                            '0',
-                                                                                          ),
-                                                                                          textAlign: TextAlign.center,
-                                                                                          style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.dmSans(
-                                                                                                  fontWeight: FontWeight.w600,
-                                                                                                  fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                                ),
-                                                                                                fontSize: 20.0,
-                                                                                                letterSpacing: 0.0,
-                                                                                                fontWeight: FontWeight.w600,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                              ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Text(
-                                                                                        'FT%',
-                                                                                        style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.dmSans(
-                                                                                                fontWeight: FontWeight.normal,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                              ),
-                                                                                              color: FlutterFlowTheme.of(context).gray1,
-                                                                                              fontSize: 12.0,
-                                                                                              letterSpacing: 0.0,
-                                                                                              fontWeight: FontWeight.normal,
-                                                                                              fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                            ),
-                                                                                      ),
-                                                                                    ].divide(SizedBox(height: 3.0)),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Expanded(
-                                                                            child:
-                                                                                Container(
-                                                                              width: double.infinity,
-                                                                              height: 70.0,
-                                                                              constraints: BoxConstraints(
-                                                                                maxWidth: 115.0,
-                                                                              ),
-                                                                              decoration: BoxDecoration(
-                                                                                color: FlutterFlowTheme.of(context).gray4,
-                                                                                borderRadius: BorderRadius.circular(6.0),
-                                                                                border: Border.all(
-                                                                                  color: FlutterFlowTheme.of(context).accent4,
-                                                                                ),
-                                                                              ),
-                                                                              alignment: AlignmentDirectional(-1.0, -1.0),
-                                                                              child: Align(
-                                                                                alignment: AlignmentDirectional(0.0, 0.0),
-                                                                                child: Padding(
-                                                                                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 6.0),
-                                                                                  child: Column(
-                                                                                    mainAxisSize: MainAxisSize.max,
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Expanded(
-                                                                                        child: Text(
-                                                                                          valueOrDefault<String>(
-                                                                                            functions.calculatePlayerThreePointPercent(playersVarItem.totalThreeMade, playersVarItem.totalThreeAttempt).toString(),
-                                                                                            '0',
-                                                                                          ),
-                                                                                          textAlign: TextAlign.center,
-                                                                                          style: FlutterFlowTheme.of(context).headlineSmall.override(
-                                                                                                font: GoogleFonts.dmSans(
-                                                                                                  fontWeight: FontWeight.w600,
-                                                                                                  fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                                ),
-                                                                                                fontSize: 20.0,
-                                                                                                letterSpacing: 0.0,
-                                                                                                fontWeight: FontWeight.w600,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).headlineSmall.fontStyle,
-                                                                                              ),
-                                                                                        ),
-                                                                                      ),
-                                                                                      Text(
-                                                                                        '3PT%',
-                                                                                        style: FlutterFlowTheme.of(context).bodySmall.override(
-                                                                                              font: GoogleFonts.dmSans(
-                                                                                                fontWeight: FontWeight.normal,
-                                                                                                fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                              ),
-                                                                                              color: FlutterFlowTheme.of(context).gray1,
-                                                                                              fontSize: 12.0,
-                                                                                              letterSpacing: 0.0,
-                                                                                              fontWeight: FontWeight.normal,
-                                                                                              fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
-                                                                                            ),
-                                                                                      ),
-                                                                                    ].divide(SizedBox(height: 3.0)),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ].divide(SizedBox(width: 6.0)),
+                                                                    const SizedBox(height: 4.0),
+                                                                    Text(
+                                                                      _games == 1 ? '1 game logged' : '$_games games logged',
+                                                                      style: const TextStyle(
+                                                                        fontFamily: CIType.fontFamily,
+                                                                        fontSize: 12.0,
+                                                                        fontWeight: FontWeight.w400,
+                                                                        color: CIColors.ink3,
                                                                       ),
                                                                     ),
-                                                                  ].divide(SizedBox(
-                                                                      height:
-                                                                          6.0)),
+                                                                  ],
                                                                 ),
                                                               ),
-                                                            ),
+                                                            ],
                                                           ),
-                                                        ],
-                                                      ),
+                                                        ),
+                                                        // ── Horizontal rule (edge-to-edge) ──
+                                                        Container(height: 1.0, color: CIColors.hairline),
+                                                        // ── Stats row: PTS AVG / REB AVG / AST AVG ──
+                                                        // Vertical rules span full row height via IntrinsicHeight
+                                                        IntrinsicHeight(
+                                                          child: Row(
+                                                            children: [
+                                                              Expanded(child: Padding(
+                                                                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                                                                child: _statCell('PTS AVG', _ptsStr),
+                                                              )),
+                                                              Container(width: 1.0, color: CIColors.hairline),
+                                                              Expanded(child: Padding(
+                                                                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                                                                child: _statCell('REB AVG', _rebStr),
+                                                              )),
+                                                              Container(width: 1.0, color: CIColors.hairline),
+                                                              Expanded(child: Padding(
+                                                                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                                                                child: _statCell('AST AVG', _astStr),
+                                                              )),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 );
@@ -1230,6 +831,37 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
           ),
         );
       },
+    );
+  }
+
+  // ── Player card stat cell ──────────────────────────────────────────────────
+  static Widget _statCell(String label, String value) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontFamily: CIType.fontFamily,
+            fontSize: 22.0,
+            fontWeight: FontWeight.w400,
+            color: CIColors.ink,
+            height: 1.1,
+            fontFeatures: [FontFeature.tabularFigures()],
+          ),
+        ),
+        const SizedBox(height: 4.0),
+        Text(
+          label,
+          style: const TextStyle(
+            fontFamily: CIType.fontFamily,
+            fontSize: 9.0,
+            fontWeight: FontWeight.w700,
+            color: CIColors.ink3,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
     );
   }
 }
