@@ -59,15 +59,6 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6.0),
-              child: Image.asset(
-                'assets/images/Profile_Gradient.png',
-                width: double.infinity,
-                height: 200.0,
-                fit: BoxFit.fill,
-              ),
-            ),
             Positioned.fill(
               child: Container(
               decoration: BoxDecoration(),
@@ -130,10 +121,10 @@ class _UserAuthWidgetState extends State<UserAuthWidget> {
                       Expanded(
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 80.0, 0.0, 80.0),
+                              0.0, 40.0, 0.0, 0.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(0.0),
