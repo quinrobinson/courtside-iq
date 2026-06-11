@@ -72,9 +72,10 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            // Release builds are signed with the upload key in android/key.properties
+            // (kept out of source control). Play App Signing re-signs with the app
+            // signing key on Google's side.
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
