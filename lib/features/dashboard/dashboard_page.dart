@@ -21,7 +21,7 @@ const bool kUseDashboardV2 = true;
 
 // Dev-only: set to true to hide the upgrade banner during development.
 // Flip to false before App Store submission.
-const bool _kDevPremiumOverride = true;
+const bool _kDevPremiumOverride = false;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data models
