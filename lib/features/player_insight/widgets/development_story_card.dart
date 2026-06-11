@@ -6,7 +6,6 @@ import 'trend_pill.dart';
 
 const _purple = CIColors.royal500;
 const _amber = CIColors.spark500;
-const _amberLight = Color(0xFFFFCB6B); // top stop of the Bright Spots sparkle gradient
 const _magenta = CIColors.rose500;
 const _text = CIColors.ink;
 const _text2 = CIColors.ink3;
@@ -124,8 +123,16 @@ class _EligibleBody extends StatelessWidget {
             ),
           ),
         if (brightBody != null) ...[
-          const SizedBox(height: 16),
-          _BrightSpotsBlock(body: brightBody),
+          const SizedBox(height: 10),
+          Text(
+            brightBody,
+            style: const TextStyle(
+              fontFamily: CIType.fontFamily,
+              fontSize: 15,
+              color: _text,
+              height: 1.5,
+            ),
+          ),
         ],
         if (insight.needsDevelopment != null &&
             insight.needsDevelopment!.trim().isNotEmpty) ...[
@@ -148,64 +155,6 @@ class _EligibleBody extends StatelessWidget {
           const SizedBox(height: 22),
           _RetryChip(onTap: onRetry!),
         ],
-      ],
-    );
-  }
-}
-
-class _BrightSpotsBlock extends StatelessWidget {
-  const _BrightSpotsBlock({required this.body});
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ShaderMask(
-              blendMode: BlendMode.srcIn,
-              shaderCallback: (bounds) => const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [_amberLight, _amber],
-              ).createShader(bounds),
-              child: const Text(
-                '✦',
-                style: TextStyle(
-                  fontFamily: CIType.fontFamily,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white, // masked by ShaderMask
-                  height: 1.0,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            const Text(
-              'BRIGHT SPOTS',
-              style: TextStyle(
-                fontFamily: CIType.fontFamily,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: _amber,
-                letterSpacing: 0.8,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          body,
-          style: const TextStyle(
-            fontFamily: CIType.fontFamily,
-            fontSize: 15,
-            color: _text,
-            height: 1.5,
-          ),
-        ),
       ],
     );
   }
