@@ -1,5 +1,12 @@
 -- Phase 0.2 + 0.3: Add game_insights jsonb to player_game_stats,
--- migrate legacy text insights, rebuild v_player_game_stats, drop player_game_insights.
+-- migrate legacy text insights, rebuild v_player_game_stats.
+--
+-- NOTE (release/1.4.0): the legacy player_game_insights table is intentionally
+-- NOT dropped here. The live v1.3.2 app still reads/writes it, so dropping it
+-- would break insight display for users who haven't updated. The backfill below
+-- copies all historical insights into the new jsonb path; the legacy table is
+-- left in place and should be dropped in a later cleanup migration once v1.3.2
+-- is sunset.
 
 -- 1. Drop view before altering the column type it exposes.
 DROP VIEW IF EXISTS v_player_game_stats;
@@ -70,5 +77,6 @@ JOIN players p ON p.id = s.player_id
 JOIN games g ON g.id = s.game_id
 LEFT JOIN users u ON u.id = p.user_id;
 
--- 5. Drop player_game_insights (FK constraints dropped automatically with the table).
-DROP TABLE player_game_insights;
+-- 5. Legacy player_game_insights is intentionally retained for v1.3.2 backward
+--    compatibility (see header note). Deferred cleanup:
+-- DROP TABLE player_game_insights;
