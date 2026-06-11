@@ -119,9 +119,11 @@ class VPlayerGameStatsRow extends SupabaseDataRow {
   set gameInsights(String? value) => setField<String>('game_insights', value);
 
   /// Full jsonb payload, used by widgets that need fields beyond `text`
-  /// (e.g. `highlight_metric`).
+  /// (e.g. `highlight_metric`). The view exposes this as a separate
+  /// `game_insights_json` column; `game_insights` itself stays text for
+  /// backward compatibility with the live v1.3.2 app.
   Map<String, dynamic>? get gameInsightsJson {
-    final raw = data['game_insights'];
+    final raw = data['game_insights_json'] ?? data['game_insights'];
     if (raw is Map) return Map<String, dynamic>.from(raw);
     if (raw is String && raw.isNotEmpty) {
       try {

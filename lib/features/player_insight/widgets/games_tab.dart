@@ -40,7 +40,7 @@ class _GamesTabState extends State<GamesTab> {
           .from('v_player_game_stats')
           .select(
             'game_id, created_at, opponent_team, player_team_name, event_name, '
-            'points, off_reb, def_reb, assist, game_insights',
+            'points, off_reb, def_reb, assist, game_insights_json',
           )
           .eq('player_id', widget.playerId)
           .order('created_at', ascending: false);
@@ -173,7 +173,7 @@ class _GamesTabState extends State<GamesTab> {
     final pts = ((g['points'] as num?) ?? 0).toInt();
     final reb = (((g['off_reb'] as num?) ?? 0) + ((g['def_reb'] as num?) ?? 0)).toInt();
     final ast = ((g['assist'] as num?) ?? 0).toInt();
-    final insights = g['game_insights'];
+    final insights = g['game_insights_json'];
     final highlightMetric = insights is Map
         ? insights['highlight_metric'] as String?
         : null;

@@ -71,7 +71,11 @@ SELECT
   s.block,
   s.off_foul,
   s.def_foul,
-  s.game_insights
+  -- game_insights stays TEXT for backward compatibility with the live v1.3.2
+  -- app (its getter reads this column as a string). game_insights_json carries
+  -- the full structured payload for v1.4.0 (highlight_metric, tier_context, …).
+  (s.game_insights ->> 'text') AS game_insights,
+  s.game_insights              AS game_insights_json
 FROM player_game_stats s
 JOIN players p ON p.id = s.player_id
 JOIN games g ON g.id = s.game_id
