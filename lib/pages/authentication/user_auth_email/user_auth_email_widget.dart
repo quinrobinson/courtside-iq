@@ -88,15 +88,6 @@ class _UserAuthEmailWidgetState extends State<UserAuthEmailWidget>
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6.0),
-              child: Image.asset(
-                'assets/images/Profile_Gradient.png',
-                width: double.infinity,
-                height: 200.0,
-                fit: BoxFit.fill,
-              ),
-            ),
             Container(
               height: double.infinity,
               decoration: BoxDecoration(),

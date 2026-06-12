@@ -57,15 +57,6 @@ class _OnBoardWidgetState extends State<OnBoardWidget> {
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6.0),
-              child: Image.asset(
-                'assets/images/Profile_Gradient.png',
-                width: double.infinity,
-                height: 220.0,
-                fit: BoxFit.fill,
-              ),
-            ),
             Column(
               mainAxisSize: MainAxisSize.max,
               children: [
