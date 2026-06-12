@@ -542,12 +542,7 @@ class _UpgradeBanner extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: CIColors.jade500,
-          image: DecorationImage(
-            fit: BoxFit.fitWidth,
-            alignment: AlignmentDirectional.bottomCenter,
-            image: Image.asset('assets/images/gradient-bg-black-b.png').image,
-          ),
+          color: Colors.black,
           borderRadius: BorderRadius.circular(CIRadius.xl),
         ),
         padding: const EdgeInsets.all(12),

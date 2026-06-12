@@ -56,7 +56,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: FlutterFlowTheme.of(context).primaryBackground,
+            color: Colors.black,
             borderRadius: BorderRadius.circular(0.0),
           ),
           child: Padding(
@@ -77,13 +77,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryText,
-                      image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: Image.asset(
-                          'assets/images/gradient-bg-black-b.png',
-                        ).image,
-                      ),
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Column(

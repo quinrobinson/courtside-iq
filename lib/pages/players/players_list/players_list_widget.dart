@@ -346,14 +346,7 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).teal,
-                                image: DecorationImage(
-                                  fit: BoxFit.fitWidth,
-                                  alignment: AlignmentDirectional(0.0, 1.0),
-                                  image: Image.asset(
-                                    'assets/images/gradient-bg-black-b.png',
-                                  ).image,
-                                ),
+                                color: Colors.black,
                                 borderRadius: BorderRadius.circular(6.0),
                               ),
                               child: Padding(
