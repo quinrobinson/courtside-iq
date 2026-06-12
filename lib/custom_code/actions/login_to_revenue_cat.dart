@@ -19,10 +19,12 @@ Future<bool> loginToRevenueCat(String userId) async {
       return false;
     }
 
-    LogInResult result = await Purchases.logIn(userId);
+    final result = await Purchases.logIn(userId);
 
-    debugPrint('RevenueCat login successful');
-    return true;
+    // Premium = the user actually holds the `premium_users` entitlement.
+    // Previously this returned `true` whenever login merely succeeded (which
+    // is always), silently granting premium to every account.
+    return result.customerInfo.entitlements.active.containsKey('premium_users');
   } catch (e) {
     debugPrint('RevenueCat login error: $e');
     return false;

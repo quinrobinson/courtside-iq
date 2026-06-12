@@ -8,6 +8,7 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/custom_code/actions/index.dart' as actions;
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import '../player_insight/models/player_insight.dart';
@@ -98,8 +99,22 @@ class _DashboardPageState extends State<DashboardPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         FFAppState().isUserPremium = true;
       });
+    } else {
+      // Production: sync premium status from RevenueCat's real entitlement.
+      _syncPremiumStatus();
     }
     _dataFuture = _loadData();
+  }
+
+  // Logs the user into RevenueCat and sets isUserPremium from the actual
+  // `premium_users` entitlement. The V2 dashboard previously never synced
+  // premium state (it relied on the dev override), so real subscribers went
+  // unrecognized and the gating flag was whatever happened to be persisted.
+  Future<void> _syncPremiumStatus() async {
+    final uid = currentUserUid;
+    if (uid.isEmpty) return;
+    final isPremium = await actions.loginToRevenueCat(uid);
+    if (mounted) FFAppState().isUserPremium = isPremium;
   }
 
   Future<_DashboardData> _loadData() async {

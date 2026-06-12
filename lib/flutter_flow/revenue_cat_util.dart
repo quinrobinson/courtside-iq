@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
+import '/app_state.dart';
 
 export 'package:purchases_flutter/purchases_flutter.dart'
     show Package, Offering;
@@ -63,6 +64,10 @@ Future initialize(
 
     Purchases.addCustomerInfoUpdateListener((info) {
       customerInfo = info;
+      // Keep the app-wide premium flag in lockstep with RevenueCat so it
+      // self-corrects on renewal, expiry, purchase, and restore.
+      FFAppState().isUserPremium =
+          info.entitlements.active.containsKey('premium_users');
     });
   } on Exception catch (e) {
     print("RevenueCat initialization failed: $e");
