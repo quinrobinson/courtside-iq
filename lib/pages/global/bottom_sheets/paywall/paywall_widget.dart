@@ -56,7 +56,7 @@ class _PaywallWidgetState extends State<PaywallWidget> {
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: FlutterFlowTheme.of(context).primaryBackground,
             borderRadius: BorderRadius.circular(0.0),
           ),
           child: Padding(
