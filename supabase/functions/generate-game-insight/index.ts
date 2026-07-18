@@ -13,6 +13,7 @@ import {
   getAgeBand,
 } from "../_shared/metrics.ts";
 import { PPSA_MIN_ATTEMPTS } from "../_shared/metrics_config.ts";
+import { logAiUsage, withinDailyLimit, type ClaudeUsage } from "../_shared/ai_usage.ts";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -109,6 +110,7 @@ async function callClaude(userPrompt: string): Promise<{
   text: string;
   highlight_metric: string | null;
   tier_context: string | null;
+  usage: ClaudeUsage | null;
 }> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -148,6 +150,7 @@ async function callClaude(userPrompt: string): Promise<{
     text,
     highlight_metric: parsed.highlight_metric ?? null,
     tier_context: parsed.tier_context ?? null,
+    usage: body.usage ?? null,
   };
 }
 
@@ -182,7 +185,7 @@ Deno.serve(async (req) => {
       fg_attempt, ft_attempt, assist, turnover,
       steal, block, off_reb, def_reb,
       game_insights,
-      players:player_id ( id, first_name, birth_date, player_position )
+      players:player_id ( id, user_id, first_name, birth_date, player_position )
     `)
     .eq("game_id", gameId)
     .maybeSingle();
@@ -253,13 +256,51 @@ Deno.serve(async (req) => {
     disruptTierLabel,
   });
 
+  // Circuit breaker: bound the blast radius of a retry loop or client bug.
+  if (!(await withinDailyLimit(player?.user_id ?? null))) {
+    await logAiUsage({
+      function_name: "generate-game-insight",
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
+      user_id: player?.user_id ?? null,
+      player_id: stats.player_id ?? null,
+      game_id: stats.game_id ?? null,
+      succeeded: false,
+      error_kind: "throttled",
+    });
+    return json({ error: "rate_limited" }, 429);
+  }
+
   let claudeResp;
   try {
     claudeResp = await callClaude(userPrompt);
   } catch (e) {
     console.error("claude_error", e);
+    // Log the failed attempt too, so error rate is visible alongside spend.
+    // A failed call still burned input tokens on Anthropic's side in some
+    // cases, and a silent absence would read as "no usage" rather than "broke".
+    await logAiUsage({
+      function_name: "generate-game-insight",
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
+      user_id: player?.user_id ?? null,
+      player_id: stats.player_id ?? null,
+      game_id: stats.game_id ?? null,
+      succeeded: false,
+      error_kind: e instanceof Error ? e.message.slice(0, 120) : "unknown",
+    });
     return json({ error: "insight_unavailable" }, 502);
   }
+
+  await logAiUsage({
+    function_name: "generate-game-insight",
+    model: MODEL,
+    prompt_version: PROMPT_VERSION,
+    usage: claudeResp.usage,
+    user_id: player?.user_id ?? null,
+    player_id: stats.player_id ?? null,
+    game_id: stats.game_id ?? null,
+  });
 
   // Deterministic fallback: if Claude omits highlight_metric, pick the
   // metric with the strongest tier so the game-row tag never silently
