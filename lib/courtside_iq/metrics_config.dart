@@ -51,3 +51,75 @@ const int kDisruptSolidMax = 5;
 const int kDisruptGoodMin = 6;
 const int kDisruptGoodMax = 12;
 const int kDisruptEliteMin = 13;
+
+// ---------------------------------------------------------------------------
+// Growth IQ (Phase 4.1)
+//
+// One number for how a player is developing:
+//   growthIq = 70% age-normalized ability + 30% improvement
+// displayed on a 40-99 scale.
+//
+// Ability = equal thirds of Scoring Efficiency (PPSA), Playmaking (AST/TOV),
+// and Disruption. Improvement = movement in that composite over the last 5
+// games vs the prior window, and is what supplies the Building / Steady /
+// Rising qualifier and the delta.
+//
+// It is NEVER a rank or percentile against other players. Age normalization
+// is invisible plumbing, not a leaderboard.
+// ---------------------------------------------------------------------------
+
+const double kGrowthIqAbilityWeight = 0.70;
+const double kGrowthIqImprovementWeight = 0.30;
+
+// Equal thirds. Multiple honest paths up: a weak scorer can still earn a
+// strong number through playmaking or defense.
+const double kGrowthIqScoringWeight = 1 / 3;
+const double kGrowthIqPlaymakingWeight = 1 / 3;
+const double kGrowthIqDisruptionWeight = 1 / 3;
+
+// Display scale. The 40 floor exists so no parent opens the app to a number
+// that reads like a failing grade. Ordering stays truthful (better play always
+// scores higher) - it is a scale choice, not a distortion. Same reasoning as
+// FICO starting at 300 rather than 0.
+const int kGrowthIqDisplayMin = 40;
+const int kGrowthIqDisplayMax = 99;
+
+// Locked until the player has this many games. Below it, show the designed
+// locked state - never a provisional number.
+const int kGrowthIqMinGames = 5;
+
+// Rolling window used for both the ability composite and the improvement
+// comparison (last N vs the N before that).
+const int kGrowthIqWindowGames = 5;
+
+// Qualifier cutoffs, in normalized composite points (0-1 scale) of movement
+// between the current and prior window.
+const double kGrowthIqRisingMin = 0.03;
+const double kGrowthIqBuildingMax = -0.03;
+
+// --- Normalization anchors ---------------------------------------------------
+//
+// Each metric family is mapped to 0-1 by piecewise-linear interpolation across
+// its EXISTING approved tier thresholds:
+//   0.0 at zero, kGrowthIqSolidAnchor at solidMin, kGrowthIqGoodAnchor at
+//   goodMin, 1.0 at eliteMin, clamped above.
+// This reuses cutoffs already signed off rather than inventing a curve.
+
+const double kGrowthIqSolidAnchor = 1 / 3;
+const double kGrowthIqGoodAnchor = 2 / 3;
+
+// KNOWN LIMITATION (accepted 2026-07-18):
+// Only PPSA has age-banded thresholds (see kPpsaThresholds). AST/TOV and
+// Disruption use flat cutoffs, so those two components are currently
+// band-invariant - they are NOT age-normalized.
+//
+// This is deliberate. Inventing per-band cutoffs for playmaking and disruption
+// would mean fabricating youth benchmarks with no data behind them, which would
+// then silently drive every Growth IQ number in the app. Scoring efficiency is
+// also where age matters most, so PPSA-only normalization captures the bulk of
+// the real effect.
+//
+// FIX LATER: derive per-band AST/TOV and Disruption cutoffs from observed
+// distributions once there is enough real data to do it honestly.
+const bool kGrowthIqAgeNormalizesPlaymaking = false;
+const bool kGrowthIqAgeNormalizesDisruption = false;
