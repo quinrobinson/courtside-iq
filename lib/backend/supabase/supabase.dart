@@ -9,7 +9,7 @@ export 'storage/storage.dart';
 // the live App Store / Play Store app. Flip to `false` before submitting to
 // the app stores. Using an explicit const (not kDebugMode) so `--release`
 // local builds also hit test.
-const bool _kUseTestSupabase = false;
+const bool _kUseTestSupabase = true;
 
 const _kProdSupabaseUrl = 'https://ejwgxsszmfabujdqxxdz.supabase.co';
 const _kProdSupabaseAnonKey =
