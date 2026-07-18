@@ -697,3 +697,292 @@ Natural first pull request:
 - PPSA edge case fix
 
 That's a cohesive foundation PR that doesn't ship any user-facing change yet but unblocks everything else.
+
+---
+
+# Phase 4 — Courtside IQ 2.0 (new UI + Growth IQ)
+
+**Release strategy:** built incrementally behind flags, shipped publicly as a single **version 2.0.0**. Each sub-phase merges to `main` on its own PR and is safe to sit unreleased; nothing user-visible turns on until 4E flips the flags.
+
+**Design source of truth:** Figma `uvHb6HXvIVFwzSSXPtEVoc` (Screens page, organized as flow sections). Product decisions are locked in memory `product-decisions-2-0`. No screen gets built before its frame is approved.
+
+**Definition of Done — every item carries all three:**
+`[ ] built` · `[ ] wired` (reachable from a real call site) · `[ ] device-verified` (`fvm flutter run --release`)
+
+**Environment rule for the whole phase:** all work targets **test** (`yihmccmyijtyrffpzstb`). `_kUseTestSupabase = true` on every 2.0 branch. Prod is read-only until 4E.
+
+**Standing design rule for the whole phase:** if we reach a screen, state, or dialog that has no approved 2.0 Figma frame, **stop coding**. Design it in Figma on the Screens page (placed in its flow section, wired with a connector from its entry point), review it, get approval, and only then implement. No UI gets improvised at the keyboard, and no v1 screen gets carried forward "temporarily" because a 2.0 frame is missing.
+
+**End state:** by 4E there are **no v1 screens left**. `lib/pages/` is deleted, not deprecated. A 2.0 release that still routes to a FlutterFlow dialog is not done.
+
+---
+
+## Phase 4.0 — Screen coverage audit (runs first)
+
+### 4.0 Reconcile every v1 screen and state against Figma
+
+**Problem:** v1 has 35 screen/component directories under `lib/pages/`. The 2.0 Figma file covers the main journeys well, but edge cases (password reset, rate prompt, feedback, snackbars, informational dialogs, permission-denied, offline, expired states) may have no frame. Discovering a missing frame mid-build stalls that PR and invites improvised UI.
+
+**Action:**
+- Enumerate every v1 route in `lib/pages/` **and every reachable state within it** — empty, loading, error, offline, permission-denied, expired, first-run, below-threshold.
+- Map each to a Figma frame on the 2.0 Screens page.
+- Classify each: **designed** (frame exists + approved) / **needs design** (gap) / **deliberately cut** (e.g. App Appearance, per prior decision).
+- Commit the result as `docs/2-0-screen-coverage.md` — a living checklist, updated as gaps close.
+- Everything marked *needs design* becomes a Figma backlog worked **before** its 4C screen PR starts.
+
+**Known candidates for *needs design*** (to confirm, not assume): `forgot_password`, `reset_password`, `reset_succesful`, `alert_rate`, `send_feedback`, `custom_snack_bar`, `informational_dialog`, `empty_states`, `menu_list_empty_state`, `support`, `your_profile`, `user_account`, `edit_player_position`, `edit_live_game`.
+
+**Design implication:** Turns edge-case risk into a known, sized backlog at the start of the phase instead of a series of mid-PR surprises. This is the item that protects the 4C schedule.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## Phase 4A — Foundations (no user-visible change)
+
+Everything in 4A is invisible to users and unblocks everything after it. This is the natural first PR set.
+
+### 4.1 Growth IQ into config
+
+**Decision:** 70% age-normalized ability + 30% improvement, on a 40–99 display scale. Ability = equal thirds of PPSA, AST/TOV, Disruption. Improvement = last-5 vs prior window; supplies the Building/Steady/Rising qualifier and the delta. Locked until 5 games. Never a rank or percentile.
+
+**Action:**
+- Extend `lib/courtside_iq/metrics_config.dart` with Growth IQ weights, band normalization, scale floor/ceiling, and the 5-game lock.
+- Mirror in `supabase/functions/_shared/metrics_config.ts`. Client and server must not drift.
+- Pure Dart function `growthIq(...)` in `lib/courtside_iq/` with unit tests covering: below-threshold, floor clamp, decline lowers score, age-band change freeze.
+- Age-band transition: freeze earned ratings for display, normalize trend series underneath.
+
+**Design implication:** DotGauge renders this directly. Every 2.0 screen showing a number depends on it.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.2 AI usage telemetry
+
+**Problem:** AI cost is currently estimated, not measured. Model and throttle decisions need evidence.
+
+**Action:**
+- `ai_usage` table, service-role only (RLS on, no policies). FKs `on delete set null` so cost history survives record deletion.
+- `_shared/ai_usage.ts` writer; failures swallowed so telemetry can never break insight generation.
+- Log from both Edge Functions, success and failure paths.
+- Rollup queries: spend per user per month, per game, per model.
+- Set a spend cap in the Anthropic console.
+
+**Design implication:** None user-facing. Enables the model-tier decisions in 4.3.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.3 Per-user AI throttle
+
+**Action:** Cap generations per user per day in both Edge Functions. Set the limit from one week of real 4.2 data, not a guess. Costs don't explode from growth, they explode from retry loops.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.4 Server-side entitlement
+
+**Problem:** premium currently trusts client state. A bug once gave everyone free premium.
+
+**Action:**
+- RevenueCat webhook → Edge Function → `subscriptions` table. Server becomes source of truth.
+- Enforce free-tier limits (1 player / 3 games) in **RLS**, not UI.
+- Distinguish billing-issue from expired (the lapsed states are already designed).
+- Pull prices from RevenueCat Offerings instead of the hardcoded $5.99/$1.99.
+
+**Design implication:** Makes the Lapsed and Locked screens truthful rather than cosmetic.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.5 Offline-first live tracking
+
+**Problem:** gyms have poor or no wifi; live tracking must not lose a game.
+
+**Action:**
+- Client-generated UUIDs + upsert so retries can't duplicate.
+- Hive outbox queue; flush on reconnect.
+- Add `connectivity_plus` (**new dependency — flag before adding**).
+- Visible sync state in the tracker UI (designed: "offline scoring + deferred sync").
+
+**Design implication:** Removes the single biggest failure mode in the core loop.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.6 Migration hygiene
+
+**Problem:** `players`, `games`, `player_game_stats` were created outside migrations, so there is no from-scratch reproducible schema. Test also carries two migrations absent from the repo (`revert_player_profile_view_age_band`, a duplicate `add_birth_date_to_player_profile_view`).
+
+**Action:**
+- Dump prod schema (structure only) → commit as `20260101000000_baseline_schema.sql`.
+- Reconcile the two test-only migrations into the repo.
+- Verify a blank project can be stood up from `supabase/migrations/` alone.
+
+**Design implication:** None. Prerequisite for trusting the 4E prod promotion.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.6b Flutter / Dart SDK upgrade
+
+**Problem:** the project is pinned to Flutter 3.35.0 / Dart 3.9.0 (Aug 2025). Current stable is
+**Flutter 3.44.6 / Dart 3.12.2** (2026-07-09) — nine minor versions and ~11 months behind. The
+original reason for the pin was FlutterFlow regenerating `pubspec.yaml`; **FlutterFlow is retired,
+so that constraint is gone.**
+
+**Why before 4B/4C, not after:** those phases write thousands of lines of new UI. Building them on
+3.9 and upgrading later means verifying every 2.0 screen twice. Upgrade once, then build on the SDK
+we actually ship. Shipping a 2.0.0 major release on an 11-month-old SDK is also a poor combination
+as app store minimum requirements move.
+
+**Action** (validated by the spike below — follow in order):
+- Confirm the target stable at upgrade time (it moves; 3.44.6 as of 2026-07-18).
+- `.fvmrc` → target version; `pubspec.yaml` sdk constraint `>=3.0.0 <4.0.0` → `>=3.9.0 <4.0.0`.
+- Bump `font_awesome_flutter` to `^11.0.0` and `page_transition` to `^2.2.1` **in both**
+  `pubspec.yaml` and `dependencies/lock_orientation_library_opafp4/pubspec.yaml`.
+- Fix the three `FaIconData` call sites listed below.
+- `flutter analyze` clean, `flutter test` green, full device pass on iOS + Android in `--release`.
+
+### Spike results (2026-07-18, throwaway worktree on 3.44.6 / Dart 3.12.2)
+
+Measured, not estimated. **The upgrade is small — roughly half a day including a device pass.**
+
+| Check | Result |
+|---|---|
+| `flutter pub get` | ✅ resolved, zero version conflicts |
+| `flutter analyze` | ✅ **0 errors** — 993 warnings, 2311 infos, none blocking |
+| Compile | ❌ 3 call-site errors, all downstream of two package bumps |
+
+**Two packages block it:**
+
+1. `font_awesome_flutter` **10.7.0 → ^11.0.0**. It extends `IconData`, now a `final class`.
+   10.12 is NOT enough; the 11.x major is required.
+2. `page_transition` **2.1.0 → ^2.2.1**. References the removed `CupertinoPageTransitionsBuilder`
+   constructor.
+
+**The font_awesome 11 bump changes `FaIcon` to take `FaIconData` instead of `IconData`**, which
+cascades into exactly three call sites:
+
+- `lib/flutter_flow/flutter_flow_widgets.dart:215`
+- `lib/flutter_flow/flutter_flow_icon_button.dart:67`
+- `dependencies/lock_orientation_library_opafp4/lib/flutter_flow/flutter_flow_widgets.dart:215`
+
+**GOTCHA — the vendored package must be bumped in lockstep.** `dependencies/lock_orientation_library_opafp4/pubspec.yaml`
+mirrors the app's dependency pins. Bumping only the root `pubspec.yaml` fails resolution with a
+misleading `"... from path is forbidden"` error. Every version bump goes in **both** files.
+
+**Not verified by the spike:** no full iOS/Android release build, and the app was never launched on
+a device. Compile-clean is not runs-correctly, especially for the FlutterFlow UI layer.
+
+**ORDERING DECISION — RESOLVED: keep the plan order, do NOT pull 4.24 forward.** The concern was
+that the cascade would land in `lib/pages/` (doomed code). It largely does for *warnings* — 865 of
+993, and 731 of those are just unused imports — but warnings do not block a build. The only three
+hard errors are in `lib/flutter_flow/`, and patching three call sites in soon-to-be-deleted files
+is a trivial cost, not grounds for reshuffling the phase.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+> Numbered `4.6b` rather than renumbering 4.7-4.24. The cascade of edits that would cause across an
+> already-reviewed document is a worse trade than one irregular label.
+
+---
+
+## Phase 4B — Design system in code
+
+### 4.7 Tokens and primitives
+Colors (ink/white, lime/orange), Hanken Grotesk type scale, radius scale (chip 6 / control 10 / sheet 14 / dialog 18 / pill 999), spacing. Ported from Figma variables.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.8 Shared components
+DotGauge, DotBurst, Chip (filter), underline TabBar (navigation), Avatar, stat grid with vertical seams, edge-to-edge hairline, delta chip (direction-aware by meaning), Field, pill button.
+**Rules:** chips are filters, tabs are navigation; hairlines always full-bleed; content on lime or orange is always ink.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## Phase 4C — Screens, in journey order
+
+Built against approved Figma frames, in `lib/features/`. **Decision: new screens live alongside the FlutterFlow pages *during development only*.** Routing switches per-screen behind the 2.0 flag so any screen can fall back to its v1 page if it regresses mid-phase. This coexistence is a scaffold with an expiry date — see 4.24, which removes it entirely before ship. No screen may enter 4C without an approved Figma frame (see 4.0).
+
+| # | Flow | Screens |
+|---|---|---|
+| 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Email auth, sign-in/sign-up chips |
+| 4.10 | Home/Today | Today feed, empty + first-run states |
+| 4.11 | Players | Players list, Player Profile, Averages, Games, Full Breakdown, About Growth IQ |
+| 4.12 | Games | Games list, filters, skeleton, live-in-progress, no-games |
+| 4.13 | New Game | Create → Setup → Live Tracker → Complete |
+| 4.14 | Game Detail | Hero, stat rows, shooting blocks, scoring mix, insight card, remove game |
+| 4.15 | Menu/Account | Menu, subscription, settings |
+| 4.16 | Premium/Paywall | Carousel ×3 + Loading / Processing / Error / Already-Premium |
+| 4.17 | Locked & lapsed | Development locked, Profile locked, Players lapsed, Age-band transition |
+
+Each carries `[ ] built` · `[ ] wired` · `[ ] device-verified`.
+
+**Watch item:** paywall/onboarding snapshots are static clones of real screens. Fixing a source screen does **not** update them — re-clone on change.
+
+---
+
+## Phase 4D — Verification
+
+### 4.18 End-to-end passes
+Full journey on iOS and Android in `--release`. Offline tracking with wifi disabled mid-game. Entitlement: fresh / premium / lapsed / billing-issue. Growth IQ: <5 games, exactly 5, decline, age-band crossing.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.19 Copy audit
+No em dashes. Solid → Good → Elite ordering correct. Lowercase "app store". No screen displays a player attribute with no capture field.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## Phase 4E — Cutover to 2.0.0
+
+**Nothing here happens without explicit approval at the time.**
+
+### 4.20 Promote schema to prod
+Apply 4A migrations to prod in order. Requires 4.6 complete. Backup first.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.21 Deploy Edge Functions to prod
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.22 Flip flags and ship
+`_kUseTestSupabase = false`. 2.0 routing flag on. Version `2.0.0`, build number above live. Local release pipeline (JDK 17 + FF keystore for Android, Transporter for iOS).
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.23 Store assets
+New screenshots, release notes, updated listing copy for the 2.0 UI.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.24 Retire all v1 screens
+
+**Decision:** 2.0 ships with **zero** v1 screens. The old FlutterFlow UI does not align with the new look and feel, so a partial migration is not an acceptable end state.
+
+**Action:**
+- Confirm every entry in `docs/2-0-screen-coverage.md` is *designed + built* or *deliberately cut*. Nothing may still be *needs design*.
+- Remove the per-screen 2.0 routing flags — 2.0 becomes the only path, not the default path.
+- **Delete `lib/pages/`.** Remove its routes, imports, and any now-orphaned FlutterFlow widgets.
+- `flutter analyze` clean; grep for lingering `pages/` imports.
+- Full journey re-run on device after deletion — this is where a missed route surfaces as a crash rather than a stale screen.
+
+**Gate:** this item blocks 4.22. Do not cut the 2.0.0 build until `lib/pages/` is gone and the app still passes 4.18.
+
+**Design implication:** The visual inconsistency risk (a v1 dialog appearing inside a 2.0 flow) is eliminated by construction rather than by inspection.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## Phase 4 sequencing
+
+**PR 0 (audit):** 4.0 screen coverage audit → `docs/2-0-screen-coverage.md`. Read-only, no code. Produces the Figma design backlog.
+**PR 1 (foundations):** 4.1 Growth IQ + 4.2 telemetry + 4.6 migration hygiene. No user-visible change.
+**PR 2:** 4.4 entitlement + 4.3 throttle.
+**PR 3:** 4.5 offline tracking.
+**PR 3.5:** 4.6b Flutter/Dart SDK upgrade — on its own, never mixed with feature work. An SDK bump
+plus a dependency cascade is hard enough to review without unrelated changes in the diff. Scope is
+known from the spike: two package bumps, three call sites, ~half a day. Ordering question resolved
+(keep this position).
+**PR 4:** 4.7 + 4.8 design system.
+**PR 5–13:** one per screen flow (4.9–4.17). Each is gated on its frames being *designed* in the coverage doc.
+**PR 14:** 4.18 + 4.19 verification fixes.
+**PR 15:** 4.24 v1 retirement — delete `lib/pages/`, re-verify.
+**PR 16:** 4E cutover and 2.0.0 ship.
+
+**Figma design work runs in parallel** from PR 0 onward: every gap the audit finds gets designed and approved before its screen PR opens. Design is never the thing a code PR waits on mid-flight.
+
+**Start with PR 0, then PR 1.** The audit is cheap, read-only, and sizes the unknown — it tells us how much Figma work Phase 4 actually contains before we commit to a schedule. Then Growth IQ, which is the hard dependency: every 2.0 screen shows the number, so nothing above it can be honestly built or verified until the formula is real and tested.
