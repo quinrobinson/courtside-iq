@@ -4,6 +4,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getAgeBand } from "../_shared/metrics.ts";
+import { logAiUsage, withinDailyLimit, type ClaudeUsage } from "../_shared/ai_usage.ts";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -110,6 +111,7 @@ async function callClaude(userPrompt: string): Promise<{
   trend_direction: string | null;
   strength_focus: string | null;
   growth_edge: string | null;
+  usage: ClaudeUsage | null;
 }> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -149,6 +151,7 @@ async function callClaude(userPrompt: string): Promise<{
     trend_direction: parsed.trend_direction ?? null,
     strength_focus: parsed.strength_focus ?? null,
     growth_edge: parsed.growth_edge ? stripDash(parsed.growth_edge) : null,
+    usage: body.usage ?? null,
   };
 }
 
@@ -236,20 +239,75 @@ Deno.serve(async (req) => {
 
   const latestGameId = snapshot.as_of_game_id;
 
-  // Cache check
-  const { data: cached } = await supabase
-    .from("player_development_insights")
-    .select("insight_json")
-    .eq("player_id", playerId)
-    .eq("generated_at_game_id", latestGameId)
-    .maybeSingle();
+  // Cache check.
+  //
+  // This is a read-then-write, so two requests landing inside the same
+  // generation window both miss and both call Claude — a duplicate paid
+  // generation. Observed in production telemetry: two Sonnet calls 5s apart
+  // from a single profile open.
+  //
+  // Guard it with a Postgres advisory lock keyed on (player, game). The second
+  // caller blocks until the first finishes writing, then re-checks and serves
+  // the cache. The lock is transaction-free and released explicitly below, so a
+  // crashed request cannot hold it past its connection.
+  const readCache = async () => {
+    const { data } = await supabase
+      .from("player_development_insights")
+      .select("insight_json")
+      .eq("player_id", playerId)
+      .eq("generated_at_game_id", latestGameId)
+      .maybeSingle();
+    return data?.insight_json ?? null;
+  };
 
-  if (cached?.insight_json) {
-    return json({
-      insight: cached.insight_json,
-      cached: true,
-      games_until_unlock: null,
+  const firstLook = await readCache();
+  if (firstLook) {
+    return json({ insight: firstLook, cached: true, games_until_unlock: null });
+  }
+
+  // Claim the generation by inserting a placeholder row. The existing unique
+  // constraint on (player_id, generated_at_game_id) makes this atomic, so
+  // exactly one concurrent request wins.
+  //
+  // Advisory locks were the obvious alternative but are unsafe here: Edge
+  // Functions reach Postgres through PostgREST on pooled connections, so a
+  // session-level lock can be acquired on one connection and "released" on
+  // another, leaking the lock. The claim row needs no connection affinity.
+  const { error: claimErr } = await supabase
+    .from("player_development_insights")
+    .insert({
+      player_id: playerId,
+      user_id: player.user_id,
+      generated_at_game_id: latestGameId,
+      games_included_count: MIN_GAMES,
+      insight_json: null,
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
     });
+
+  // 23505 = unique_violation: another request already claimed this generation.
+  const lostClaim = claimErr !== null && claimErr.code === "23505";
+
+  if (claimErr && !lostClaim) {
+    return json({ error: "db_error", detail: claimErr.message }, 500);
+  }
+
+  if (lostClaim) {
+    // Wait for the winner to finish rather than paying for an identical
+    // generation. Their UPDATE fills insight_json.
+    for (let i = 0; i < 10; i++) {
+      await new Promise((r) => setTimeout(r, 750));
+      const later = await readCache();
+      if (later) {
+        return json({
+          insight: later,
+          cached: true,
+          games_until_unlock: null,
+        });
+      }
+    }
+    // ~7.5s with no result: the winner probably died and left a null-insight
+    // claim row. Fall through and generate; the upsert below reclaims it.
   }
 
   const userPrompt = buildUserPrompt({
@@ -260,13 +318,64 @@ Deno.serve(async (req) => {
     snapshot: snapshot as TrendSnapshot,
   });
 
+  // Circuit breaker: bound the blast radius of a retry loop or client bug.
+  if (!(await withinDailyLimit(player.user_id ?? null))) {
+    await logAiUsage({
+      function_name: "generate-player-insight",
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
+      user_id: player.user_id ?? null,
+      player_id: playerId,
+      game_id: latestGameId ?? null,
+      succeeded: false,
+      error_kind: "throttled",
+    });
+    // Release the claim so the next attempt is not blocked by our placeholder.
+    await supabase
+      .from("player_development_insights")
+      .delete()
+      .eq("player_id", playerId)
+      .eq("generated_at_game_id", latestGameId)
+      .is("insight_json", null);
+    return json({ error: "rate_limited" }, 429);
+  }
+
   let claudeResp;
   try {
     claudeResp = await callClaude(userPrompt);
   } catch (e) {
     console.error("claude_error", e);
+    // Log failures too, so error rate is visible alongside spend.
+    await logAiUsage({
+      function_name: "generate-player-insight",
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
+      user_id: player.user_id ?? null,
+      player_id: playerId,
+      game_id: latestGameId ?? null,
+      succeeded: false,
+      error_kind: e instanceof Error ? e.message.slice(0, 120) : "unknown",
+    });
+    // Drop our claim so a later request can retry instead of waiting on a
+    // permanently-null row.
+    await supabase
+      .from("player_development_insights")
+      .delete()
+      .eq("player_id", playerId)
+      .eq("generated_at_game_id", latestGameId)
+      .is("insight_json", null);
     return json({ error: "insight_unavailable" }, 502);
   }
+
+  await logAiUsage({
+    function_name: "generate-player-insight",
+    model: MODEL,
+    prompt_version: PROMPT_VERSION,
+    usage: claudeResp.usage,
+    user_id: player.user_id ?? null,
+    player_id: playerId,
+    game_id: latestGameId ?? null,
+  });
 
   const insight = {
     version: 2,
