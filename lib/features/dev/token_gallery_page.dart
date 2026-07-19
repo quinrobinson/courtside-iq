@@ -21,6 +21,8 @@ import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/components/ci_segment_bar.dart';
 import '/courtside_iq/design/components/ci_stat_tile.dart';
 import '/courtside_iq/design/components/ci_stepper.dart';
+import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_field.dart';
 
 class TokenGalleryPage extends StatefulWidget {
   const TokenGalleryPage({super.key});
@@ -54,6 +56,7 @@ class _TokenGalleryPageState extends State<TokenGalleryPage> {
                     child: ListView(
                       padding: const EdgeInsets.only(bottom: CiSpace.s16),
                       children: const [
+                        _FormsSection(),
                         _StatsSection(),
                         _ControlsSection(),
                         _ComponentSection(),
@@ -847,6 +850,155 @@ class _StatsSectionState extends State<_StatsSection> {
               const SizedBox(height: CiSpace.s3),
               Text('minus disables at zero - there is no minus-one rebound',
                   style: CiType.caption.copyWith(color: c.textFaint)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+// --- Fields / chips / avatars ------------------------------------------------
+
+class _FormsSection extends StatefulWidget {
+  const _FormsSection();
+
+  @override
+  State<_FormsSection> createState() => _FormsSectionState();
+}
+
+class _FormsSectionState extends State<_FormsSection> {
+  int _chip = 0;
+  int _player = 0;
+  bool _showPassword = false;
+  bool _showPasswordDark = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _SectionTitle('Fields'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CiField(
+                  label: 'Email address', placeholder: 'you@email.com'),
+              const SizedBox(height: CiSpace.s5),
+              CiField(
+                label: 'Password',
+                placeholder: '••••••••',
+                obscure: !_showPassword,
+                trailing: _showPassword ? 'Hide' : 'Show',
+                onTrailingTap: () =>
+                    setState(() => _showPassword = !_showPassword),
+              ),
+              const SizedBox(height: CiSpace.s5),
+              const CiField(
+                label: 'Email address',
+                placeholder: 'you@email.com',
+                errorText: 'Enter a valid email address',
+              ),
+              const SizedBox(height: CiSpace.s5),
+              Text('the same three fields in the dark theme',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              Container(
+                color: CiPalette.inkDefault,
+                padding: const EdgeInsets.all(CiSpace.s4),
+                child: Theme(
+                  data: CiTheme.dark(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const CiField(
+                          label: 'Email address',
+                          placeholder: 'you@email.com'),
+                      const SizedBox(height: CiSpace.s5),
+                      CiField(
+                        label: 'Password',
+                        placeholder: '••••••••',
+                        obscure: !_showPasswordDark,
+                        trailing: _showPasswordDark ? 'Hide' : 'Show',
+                        onTrailingTap: () => setState(
+                            () => _showPasswordDark = !_showPasswordDark),
+                      ),
+                      const SizedBox(height: CiSpace.s5),
+                      const CiField(
+                        label: 'Email address',
+                        placeholder: 'you@email.com',
+                        errorText: 'Enter a valid email address',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const _SectionTitle('Chips'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CiChipBar(
+                labels: const ['Sign in', 'Sign up'],
+                index: _chip,
+                onChanged: (i) => setState(() => _chip = i),
+              ),
+              const SizedBox(height: CiSpace.s3),
+              CiChipBar(
+                labels: const ['All dates', 'Last 5', 'Last 10', 'Season'],
+                index: 1,
+                onChanged: (_) {},
+              ),
+              const SizedBox(height: CiSpace.s3),
+              Text('chips are FILTERS and toggles; tabs are navigation',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+            ],
+          ),
+        ),
+        const _SectionTitle('Avatars'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CiPlayerSwitcher(
+                names: const ['Jada White', 'Jordan Carter'],
+                index: _player,
+                onSelected: (i) => setState(() => _player = i),
+                onAdd: () {},
+              ),
+              const SizedBox(height: CiSpace.s4),
+              Row(children: const [
+                CiAvatar(name: 'Jada White', size: 56),
+                SizedBox(width: CiSpace.s3),
+                CiAvatar(name: 'Jordan', size: 40),
+                SizedBox(width: CiSpace.s3),
+                CiAvatar(name: '', size: 40),
+              ]),
+              const SizedBox(height: CiSpace.s2),
+              Text('single name -> one letter; empty name -> "?" rather than '
+                  'an empty circle',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s4),
+              Row(children: [
+                CiIconButton(icon: Icons.share_outlined, onPressed: () {}),
+                const SizedBox(width: CiSpace.s3),
+                CiIconButton(
+                    icon: Icons.delete_outline, onPressed: () {}),
+                const SizedBox(width: CiSpace.s3),
+                const CiIconButton(icon: Icons.share_outlined),
+              ]),
             ],
           ),
         ),

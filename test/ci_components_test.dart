@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_avatar.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_field.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_segment_bar.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_stat_tile.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_stepper.dart';
@@ -249,6 +251,130 @@ void main() {
         );
         expect(tester.getSize(box.first).height, greaterThanOrEqualTo(44));
       }
+    });
+  });
+
+  group('CiField', () {
+    testWidgets('does not paint the theme fill inside its own container',
+        (tester) async {
+      // The app theme sets filled:true with a surfaceSunk fill. Left on, the
+      // TextField painted a grey box INSIDE the field - visible as a grey
+      // rectangle around the text on the dark auth screens.
+      await _pump(tester, const CiField(label: 'Email address'));
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.decoration!.filled, isFalse);
+    });
+
+    testWidgets('border turns to the focus ring and thickens on focus',
+        (tester) async {
+      await _pump(tester, const CiField(label: 'Email address'));
+
+      BoxDecoration decoOf() {
+        final container = tester.widget<Container>(
+          find
+              .descendant(
+                  of: find.byType(CiField), matching: find.byType(Container))
+              .first,
+        );
+        return container.decoration! as BoxDecoration;
+      }
+
+      final before = decoOf().border! as Border;
+      expect(before.top.width, 1);
+      expect(before.top.color, CiColors.light.border);
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+
+      final after = decoOf().border! as Border;
+      expect(after.top.color, CiColors.light.focusRing);
+      // Thickness changes too, so focus does not depend on colour alone.
+      expect(after.top.width, 2);
+    });
+
+    testWidgets('error border wins over focus', (tester) async {
+      await _pump(
+        tester,
+        const CiField(label: 'Email address', errorText: 'Enter a valid email'),
+      );
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+
+      final container = tester.widget<Container>(
+        find
+            .descendant(of: find.byType(CiField), matching: find.byType(Container))
+            .first,
+      );
+      final border = (container.decoration! as BoxDecoration).border! as Border;
+      expect(border.top.color, CiColors.light.accentEnergy);
+      expect(find.text('Enter a valid email'), findsOneWidget);
+    });
+
+    testWidgets('fill follows the theme: black on dark, sunk grey on light',
+        (tester) async {
+      Color fillOf(WidgetTester t) {
+        final container = t.widget<Container>(
+          find
+              .descendant(
+                  of: find.byType(CiField), matching: find.byType(Container))
+              .first,
+        );
+        return (container.decoration! as BoxDecoration).color!;
+      }
+
+      await _pump(tester, const CiField(label: 'Email address'));
+      expect(fillOf(tester), CiColors.light.surfaceSunk);
+
+      // Dark screens use pure black, DEEPER than the #0F0F0F background. This
+      // used to be an onDeepSurface flag every call site had to remember to
+      // pass, which meant one forgotten argument produced a field on the wrong
+      // surface. The theme decides now.
+      await _pump(
+        tester,
+        Theme(
+          data: CiTheme.dark(),
+          child: const CiField(label: 'Email address'),
+        ),
+      );
+      expect(fillOf(tester), CiColors.dark.surfaceDeep);
+      expect(fillOf(tester), isNot(CiColors.dark.surfaceSunk));
+    });
+
+    testWidgets('label renders above the input, uppercased', (tester) async {
+      await _pump(tester, const CiField(label: 'Email address'));
+      expect(find.text('EMAIL ADDRESS'), findsOneWidget);
+      final labelY = tester.getTopLeft(find.text('EMAIL ADDRESS')).dy;
+      final inputY = tester.getTopLeft(find.byType(TextField)).dy;
+      expect(labelY, lessThan(inputY), reason: 'label must sit above input');
+    });
+  });
+
+  group('CiAvatar initials', () {
+    test('derives initials, and never renders empty', () {
+      expect(CiAvatar.initialsOf('Jada White'), 'JW');
+      expect(CiAvatar.initialsOf('Jordan'), 'J');
+      expect(CiAvatar.initialsOf('  jada   white  '), 'JW');
+      expect(CiAvatar.initialsOf('Mary Jo Carter'), 'MJ');
+      // An empty circle looks broken; '?' looks intentional.
+      expect(CiAvatar.initialsOf(''), '?');
+      expect(CiAvatar.initialsOf('   '), '?');
+    });
+  });
+
+  group('CiChip', () {
+    testWidgets('hugs its label rather than filling the parent',
+        (tester) async {
+      await _pump(
+        tester,
+        const SizedBox(
+          width: 400,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [CiChip(label: 'Last 5', selected: true)],
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byType(CiChip)).width, lessThan(140));
     });
   });
 }
