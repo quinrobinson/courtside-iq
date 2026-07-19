@@ -49,6 +49,16 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="webapp" android:host="courtsideiq.app" />
             </intent-filter>
+            <!-- Password recovery deep link: courtsideiq://reset-password
+                 Distinct from the generic "webapp" scheme above, which another
+                 app could plausibly claim - and a collision on a recovery link
+                 would open someone's password reset in the wrong app. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="courtsideiq" />
+            </intent-filter>
 
         </activity>
 

@@ -52,11 +52,18 @@ void main() {
       expect(find.text('Back to sign in'), findsOneWidget);
     });
 
-    test('the recovery redirect is a named constant, not inlined', () {
+    test('the recovery redirect is the deep link, not the hosted page', () {
       // Where this points decides whether a parent can get back into their
-      // account. It is still the FlutterFlow-hosted page: emails already sent
-      // point there, so it has to keep working until the deep link lands.
-      expect(kPasswordResetRedirect,
+      // account. It must be the custom scheme registered in Info.plist and
+      // AndroidManifest, or the link opens a browser and recovery dead-ends.
+      expect(kPasswordResetRedirect, 'courtsideiq://reset-password');
+      expect(kPasswordResetRedirect, startsWith('courtsideiq://'));
+    });
+
+    test('the retired URL is recorded, since it must stay alive a while', () {
+      // Emails already sent still point here, and older installs still send
+      // it. The page cannot be switched off the day the deep link ships.
+      expect(kLegacyPasswordResetRedirect,
           'https://courtside-iq.flutterflow.app/resetPassword');
     });
   });

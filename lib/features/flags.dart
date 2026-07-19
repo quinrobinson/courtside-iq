@@ -37,7 +37,11 @@ const bool kUseAuth2 = true;
 const bool kUseAuthLanding2 = true;
 
 /// Forgot Password, Reset Password, Reset Successful.
-const bool kUsePasswordReset2 = false;
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Needs a real recovery email opening the
+/// app via courtsideiq://reset-password. Turn back off if the link does not
+/// open the app - a half-working recovery flow is worse than none.
+const bool kUsePasswordReset2 = true;
 
 /// Splash (Dot Burst) and Onboarding x3.
 const bool kUseEntry2 = false;

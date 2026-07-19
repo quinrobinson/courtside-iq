@@ -27,12 +27,18 @@ import 'widgets/auth_scaffold.dart';
 
 /// Where the recovery link lands.
 ///
-/// STILL THE FLUTTERFLOW-HOSTED PAGE, deliberately unchanged for now. Emails
-/// already in inboxes point here, so this page has to keep working through any
-/// transition regardless. Part A of 4.9 replaces this with a `courtsideiq://`
-/// deep link and moves reset into the app; changing it here alone would break
-/// recovery, since the app cannot yet receive that link.
-const kPasswordResetRedirect =
+/// A `courtsideiq://` deep link, so reset happens in the app rather than on a
+/// FlutterFlow-hosted web page that outlived the service it came from.
+///
+/// THE OLD URL HAS TO KEEP WORKING ANYWAY. Every recovery email already sent
+/// points at it, and older app versions still in the wild keep sending it. The
+/// FlutterFlow page cannot be retired the day this ships - only once those
+/// links have expired and those installs have updated.
+const kPasswordResetRedirect = 'courtsideiq://reset-password';
+
+/// The address this replaced. Kept as a record of what still has to stay
+/// alive, not used anywhere.
+const kLegacyPasswordResetRedirect =
     'https://courtside-iq.flutterflow.app/resetPassword';
 
 class ForgotPasswordPage extends StatefulWidget {
