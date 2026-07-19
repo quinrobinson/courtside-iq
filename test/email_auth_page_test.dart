@@ -217,4 +217,26 @@ void main() {
       expect(fieldIn('Confirm password').obscureText, isTrue);
     });
   });
+
+  group('forgot password link', () {
+    testWidgets('is wired, not a stub', (tester) async {
+      // It shipped as an empty handler because the Forgot Password screen did
+      // not exist yet, and stayed empty after it did. A tap that does nothing
+      // is indistinguishable from a broken app to the parent tapping it.
+      await _pump(tester);
+      final gesture = tester.widget<GestureDetector>(
+        find
+            .ancestor(
+                of: find.text('Forgot password?'),
+                matching: find.byType(GestureDetector))
+            .first,
+      );
+      expect(gesture.onTap, isNotNull);
+    });
+
+    testWidgets('is not offered on sign up', (tester) async {
+      await _pump(tester, mode: AuthMode.signUp);
+      expect(find.text('Forgot password?'), findsNothing);
+    });
+  });
 }

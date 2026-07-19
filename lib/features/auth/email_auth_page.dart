@@ -263,8 +263,18 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
   }
 
   void _openForgotPassword() {
-    // Wired in the Forgot Password step of 4.9. Routing lands with that screen
-    // so this file does not depend on a route that does not exist yet.
+    // pushNamed, not goNamed: back from Forgot Password returns to whatever
+    // the parent had already typed here.
+    context.pushNamed(
+      ForgotPasswordWidget.routeName,
+      extra: <String, dynamic>{
+        '__transition_info__': const TransitionInfo(
+          hasTransition: true,
+          transitionType: PageTransitionType.fade,
+          duration: Duration(milliseconds: 400),
+        ),
+      },
+    );
   }
 }
 
