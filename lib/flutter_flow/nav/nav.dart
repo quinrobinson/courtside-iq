@@ -20,6 +20,8 @@ import 'serialization_util.dart';
 import '/index.dart';
 import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
+import '/features/auth/email_auth_page.dart';
+import '/features/flags.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
     as $lock_orientation_library_opafp4;
 
@@ -312,7 +314,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: UserAuthEmailWidget.routeName,
         path: UserAuthEmailWidget.routePath,
-        builder: (context, params) => UserAuthEmailWidget(),
+        // 4.9: the 2.0 screen keeps the v1 route name and path, so every
+        // existing navigation call reaches it unchanged and flipping the flag
+        // back is a one-line revert rather than a routing change.
+        builder: (context, params) =>
+            kUseAuth2 ? const EmailAuthPage() : UserAuthEmailWidget(),
       ),
       FFRoute(
         name: SendFeedbackWidget.routeName,

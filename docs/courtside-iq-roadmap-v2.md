@@ -944,9 +944,27 @@ Built against approved Figma frames, in `lib/features/`. **Decision: new screens
 
 | # | Flow | Screens |
 |---|---|---|
-| 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Email auth, sign-in/sign-up chips |
+| 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Auth Landing, Email auth (sign-in/sign-up chips + validation error), Forgot Password, Reset Password, Reset Successful |
 | 4.10 | Home/Today | Today feed, empty + first-run states |
 | 4.11 | Players | Players list, Player Profile, Averages, Games, Full Breakdown, About Growth IQ |
+
+**4.9 scope was widened on 2026-07-19.** Auth Landing and the Forgot / Reset /
+Reset Successful trio had approved Figma frames and live v1 equivalents, but no
+phase item owned them. An unowned screen means either a v1 page survives into
+2.0 or password reset breaks at cutover, so they now belong to 4.9 explicitly.
+
+**4.9 progress:**
+
+- Screen flags moved to `lib/features/flags.dart` (one registry, deleted whole
+  in 4.24). `kUseDashboardV2` moved there too.
+- Email Auth built and routed behind `kUseAuth2`, keeping the v1 route name and
+  path so every existing navigation call reaches it unchanged.
+  `[x] built` · `[x] wired` · `[ ] device-verified`
+- **Design note:** the Validation Error frame draws the sign-in/sign-up control
+  as underline tabs while the other two frames use chips. Decided in favour of
+  chips, since a second tab idiom would undercut the real navigation tabs.
+  **The Figma frame is stale and should be updated.**
+- Remaining: Auth Landing, Forgot/Reset/Reset Successful, Splash, Onboarding x3.
 
 **Carry-over defects for 4.11 — verify these do not return in the rebuild:**
 

@@ -1,4 +1,5 @@
 import '/courtside_iq/design_tokens.dart';
+import '/features/flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,10 +16,8 @@ import '../player_insight/models/player_insight.dart';
 import 'widgets/snapshot_card.dart';
 import 'widgets/game_feed_card.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Feature flag — set to false to revert to the FF-generated HomeWidget.
-// ─────────────────────────────────────────────────────────────────────────────
-const bool kUseDashboardV2 = true;
+// The kUseDashboardV2 flag moved to lib/features/flags.dart in 4.9, where every
+// 2.0 screen flag now lives so 4.24 can delete them in one pass.
 
 // Dev-only: set to true to hide the upgrade banner during development.
 // Flip to false before App Store submission.
