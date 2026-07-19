@@ -803,7 +803,22 @@ Everything in 4A is invisible to users and unblocks everything after it. This is
 
 **Design implication:** Removes the single biggest failure mode in the core loop.
 
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] built` · `[x] wired` · `[x] device-verified` — **DONE 2026-07-19** (commit `9342dc1`)
+
+**Scope was narrower than this item assumed.** Live tracking was ALREADY safe: every stat setter
+writes through to `FlutterSecureStorage`, so a crash or dead battery mid-game loses nothing. The
+real gap was only the final save, which fired two inserts with no retry.
+
+Verified on device: tracked a game, airplane mode on, saved (reported success), airplane mode off,
+game synced unattended. Database confirmed exactly one game row and one stats row.
+
+**CARRY-OVER GAP for 4.13 / 4.14:** a game queued offline never receives its AI insight. Generation
+needs a server row so it is skipped while offline, and the later sync uploads the rows without
+triggering it. The 2.0 tracker rebuild should generate the insight after a successful sync.
+
+**Still unbuilt: the UI surface.** The "Offline Scoring + Deferred Sync" frame exists in Figma but
+was drawn for the 2.0 tracker, so it was deliberately not retrofitted onto the FlutterFlow screen.
+`gameSyncQueue.pendingCount` streams the queue depth for whatever renders it in 4C.
 
 ### 4.6 Migration hygiene
 
