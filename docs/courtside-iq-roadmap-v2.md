@@ -916,12 +916,25 @@ to ignore test output.
 
 ### 4.7 Tokens and primitives
 Colors (ink/white, lime/orange), Hanken Grotesk type scale, radius scale (chip 6 / control 10 / sheet 14 / dialog 18 / pill 999), spacing. Ported from Figma variables.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] built` · `[ ] wired` · `[x] device-verified`
 
 ### 4.8 Shared components
 DotGauge, DotBurst, Chip (filter), underline TabBar (navigation), Avatar, stat grid with vertical seams, edge-to-edge hairline, delta chip (direction-aware by meaning), Field, pill button.
 **Rules:** chips are filters, tabs are navigation; hairlines always full-bleed; content on lime or orange is always ink.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] built` · `[ ] wired` · `[x] device-verified`
+
+**`wired` stays unchecked deliberately.** Every component here is device-verified
+in the token gallery, but the gallery is not a call site. Nothing in the shipping
+app imports these yet, so by our own Definition of Done 4B is not complete - it is
+*built and proven*, waiting on 4C to consume it. This is the AddPlayerSheet failure
+mode, and the box is what keeps it visible. **4B closes when 4C's screens land, not
+before.**
+
+Known gaps to settle when the first screen consumes these:
+- Light-mode field fill is `surfaceSunk`, inferred from the token system rather
+  than verified against a Figma light-mode auth frame. Dark mode is measured.
+- `CiAvatar` renders `Image.network` with no cache or placeholder. Fine for the
+  gallery, likely not for a scrolling players list.
 
 ---
 
