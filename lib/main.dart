@@ -11,6 +11,7 @@ import 'auth/supabase_auth/auth_util.dart';
 
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/game_sync/supabase_game_uploader.dart';
+import '/features/dev/token_gallery_page.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
@@ -28,6 +29,10 @@ const _lightModeStatusBar = SystemUiOverlayStyle(
   statusBarIconBrightness: Brightness.dark, // Android
   statusBarBrightness: Brightness.light,    // iOS
 );
+
+/// Dev-only: boot into the design-token gallery instead of the app.
+/// Never commit this as true.
+const bool kShowTokenGallery = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +60,17 @@ void main() async {
     debugLogEnabled: false,
     loadDataAfterLaunch: true,
   );
+
+  // Phase 4.7 dev switch: boot straight into the design-token gallery to
+  // review tokens visually. MUST be false for any real build - it replaces
+  // the entire app. Delete this block once 4B is signed off.
+  if (kShowTokenGallery) {
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const TokenGalleryPage(),
+    ));
+    return;
+  }
 
   runApp(MultiProvider(
     providers: [
