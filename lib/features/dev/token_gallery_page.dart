@@ -13,6 +13,8 @@ import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/design/components/dot_burst.dart';
+import '/courtside_iq/design/components/dot_gauge.dart';
 
 class TokenGalleryPage extends StatefulWidget {
   const TokenGalleryPage({super.key});
@@ -46,6 +48,7 @@ class _TokenGalleryPageState extends State<TokenGalleryPage> {
                     child: ListView(
                       padding: const EdgeInsets.only(bottom: CiSpace.s16),
                       children: const [
+                        _ComponentSection(),
                         _ColorSection(),
                         _TypeSection(),
                         _RadiusSection(),
@@ -485,6 +488,112 @@ class _RuleSection extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+
+// --- Components --------------------------------------------------------------
+
+class _ComponentSection extends StatefulWidget {
+  const _ComponentSection();
+
+  @override
+  State<_ComponentSection> createState() => _ComponentSectionState();
+}
+
+class _ComponentSectionState extends State<_ComponentSection> {
+  double _v = 0.833; // the value the Figma component renders: 25/30 and 20/24
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final score = (40 + _v * 59).round(); // Growth IQ display scale
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _SectionTitle('DotGauge'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            children: [
+              Center(
+                child: DotGauge(
+                  value: _v,
+                  size: 168,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('$score',
+                          style: CiType.statMd.copyWith(color: c.text)),
+                      Text('GROWTH IQ',
+                          style: CiType.label.copyWith(color: c.textMuted)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: CiSpace.s5),
+              Row(children: [
+                Text('${(_v * 100).round()}%',
+                    style: CiType.caption.copyWith(color: c.textMuted)),
+                Expanded(
+                  child: Slider(
+                    value: _v,
+                    activeColor: c.accentGood,
+                    onChanged: (x) => setState(() => _v = x),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: CiSpace.s4),
+              // Small inline sizes, to check it still reads when shrunk.
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  DotGauge(value: _v, size: 72),
+                  DotGauge(
+                      value: _v, size: 56, rings: DotGaugeRings.compact),
+                  DotGauge(
+                      value: _v, size: 44, rings: DotGaugeRings.compact),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const _SectionTitle('DotBurst'),
+        const _Hairline(),
+        Container(
+          height: 300,
+          color: c.bg,
+          alignment: Alignment.center,
+          child: DotBurst(
+            size: 300,
+            innerRadius: 52,
+            ringGap: 26,
+            child: Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: c.surfaceDeep,
+                borderRadius: CiRadius.pillR,
+              ),
+              alignment: Alignment.center,
+              child: Text('CIQ',
+                  style: CiType.labelStrong.copyWith(color: c.accentGood)),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              CiSpace.screen, CiSpace.s3, CiSpace.screen, CiSpace.s2),
+          child: Text(
+              'Ring sizes and opacities are measured from Splash and exact. '
+              'Ring RADII are tuned by eye - compare against the Figma frame '
+              'and adjust innerRadius / ringGap if the spread looks wrong.',
+              style: CiType.bodyXs.copyWith(color: c.textFaint)),
         ),
       ],
     );
