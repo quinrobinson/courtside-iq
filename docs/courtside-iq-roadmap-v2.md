@@ -959,10 +959,28 @@ phase item owned them. An unowned screen means either a v1 page survives into
   in 4.24). `kUseDashboardV2` moved there too.
 - Email Auth built and routed behind `kUseAuth2`, keeping the v1 route name and
   path so every existing navigation call reaches it unchanged. Flag is ON.
-  `[x] built` · `[x] wired` · `[x] device-verified (sign IN only)`
-- **Sign UP is still unverified on device.** Same code path, but account
-  creation is the one action here that cannot be undone, so it is not signed
-  off. Verify before 4E cutover.
+  `[x] built` · `[x] wired` · `[x] device-verified` (sign in AND sign up)
+
+**Test now diverges from prod on email confirmation. Remember this at 4E.**
+
+`Confirm email` was turned OFF on the test project (`yihmccmyijtyrffpzstb`) on
+2026-07-19, because Supabase's built-in email service is throttled to a few
+messages an hour and it was blocking every signup attempt. **Prod still has
+confirmation ON.**
+
+Consequences:
+- The signup flow verified on test is NOT the one a real parent gets. On prod
+  they receive a confirmation email and are not signed in until they click it.
+  The post-signup navigation to Home was verified against the confirmation-off
+  path only.
+- Before cutover, either verify signup on a project with confirmation ON, or
+  design the "check your email" state that prod signup requires. **There is no
+  Figma frame for that state today** - it is a genuine gap in 4.9's coverage,
+  not just an unverified path.
+
+Test accounts on test: `testuser@mail.com` (2 players) and `testuser2@gmail.com`
+(created 2026-07-19, zero players). Keep the second one: a user with no players
+is what the free-tier RLS limit needs in order to be exercised at all.
 - **Two regressions caught on device, both worth remembering:**
   - *Dead sign-in button.* The screen called authManager but never navigated.
     Sign-in succeeded and left the parent sitting on the auth screen. The v1
