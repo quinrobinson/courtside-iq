@@ -7,7 +7,7 @@ import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
 
 Future<void> _pump(WidgetTester tester, Widget child) => tester.pumpWidget(
       MaterialApp(
-        theme: CiTheme.dark(),
+        theme: CiTheme.ink(),
         home: Scaffold(body: Center(child: child)),
       ),
     );

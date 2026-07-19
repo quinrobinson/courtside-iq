@@ -1,6 +1,11 @@
 // Courtside IQ 2.0 — theme wiring (Phase 4.7)
 //
-// Binds the design tokens into a ThemeData for each mode. Widgets should read
+// ONE theme, two grounds. 2.0 is not a light/dark mode pair the user toggles:
+// it is a single hybrid black-and-white design where a white Today feed and a
+// dark auth screen coexist in the same build. So there is one [CiTheme.base],
+// and any region that sits on ink wraps itself in [CiSurface.ink].
+//
+// Binds the design tokens into a ThemeData. Widgets should read
 // tokens through `CiColors.of(context)` and `CiType.*` rather than Material's
 // colorScheme, which cannot express this system (two meaning-carrying accents,
 // a separate "deep" surface, wash tints). ThemeData is populated mainly so
@@ -13,8 +18,12 @@ import 'tokens/ci_metrics.dart';
 import 'tokens/ci_type.dart';
 
 abstract final class CiTheme {
-  static ThemeData light() => _build(CiColors.light, Brightness.light);
-  static ThemeData dark() => _build(CiColors.dark, Brightness.dark);
+  /// The app theme. Light ground - the default for most screens.
+  static ThemeData base() => _build(CiColors.onLight, Brightness.light);
+
+  /// Ink ground. Not an app theme: [CiSurface.ink] applies this to a REGION.
+  /// Exposed for tests and the token gallery.
+  static ThemeData ink() => _build(CiColors.onInk, Brightness.dark);
 
   static ThemeData _build(CiColors c, Brightness brightness) {
     final textTheme = TextTheme(
@@ -86,7 +95,7 @@ abstract final class CiTheme {
       // Label ABOVE the field, never placeholder-as-label: no labelText here.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: c.surfaceSunk,
+        fillColor: c.fieldFill,
         hintStyle: CiType.body.copyWith(color: c.textFaint),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: CiSpace.s4,
@@ -148,5 +157,40 @@ abstract final class CiTheme {
 
       extensions: <ThemeExtension<dynamic>>[c],
     );
+  }
+}
+
+/// Puts a region on ink ground.
+///
+/// Wrap any subtree that sits on a dark background - auth, first-run, premium
+/// callouts - and every CiColors read inside it resolves to [CiColors.onInk].
+/// This replaces swapping a global theme, which 2.0 does not have.
+///
+/// Paints [CiColors.onInk.bg] by default so the ground and the tokens can
+/// never disagree; pass `paint: false` if the caller already painted it.
+class CiSurface extends StatelessWidget {
+  const CiSurface._(
+      {super.key, required this.child, required this.onInk, this.paint = true});
+
+  /// The dark ground: auth, onboarding, premium callouts.
+  const CiSurface.ink({Key? key, required Widget child, bool paint = true})
+      : this._(key: key, child: child, onInk: true, paint: paint);
+
+  /// The light ground. Rarely needed at the top level, but necessary to return
+  /// a subtree to light ground from inside an ink region.
+  const CiSurface.light({Key? key, required Widget child, bool paint = true})
+      : this._(key: key, child: child, onInk: false, paint: paint);
+
+  final Widget child;
+  final bool onInk;
+  final bool paint;
+
+  CiColors get colors => onInk ? CiColors.onInk : CiColors.onLight;
+
+  @override
+  Widget build(BuildContext context) {
+    final themed =
+        Theme(data: onInk ? CiTheme.ink() : CiTheme.base(), child: child);
+    return paint ? ColoredBox(color: colors.bg, child: themed) : themed;
   }
 }

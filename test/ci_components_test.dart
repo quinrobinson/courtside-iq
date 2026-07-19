@@ -13,7 +13,7 @@ import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 
 Future<void> _pump(WidgetTester tester, Widget child) => tester.pumpWidget(
       MaterialApp(
-        theme: CiTheme.light(),
+        theme: CiTheme.base(),
         home: Scaffold(body: child),
       ),
     );
@@ -157,7 +157,7 @@ void main() {
         (tester) async {
       late CiColors c;
       await tester.pumpWidget(MaterialApp(
-        theme: CiTheme.light(),
+        theme: CiTheme.base(),
         home: Builder(builder: (context) {
           c = CiColors.of(context);
           return Scaffold(
@@ -281,13 +281,13 @@ void main() {
 
       final before = decoOf().border! as Border;
       expect(before.top.width, 1);
-      expect(before.top.color, CiColors.light.border);
+      expect(before.top.color, CiColors.onLight.border);
 
       await tester.tap(find.byType(TextField));
       await tester.pumpAndSettle();
 
       final after = decoOf().border! as Border;
-      expect(after.top.color, CiColors.light.focusRing);
+      expect(after.top.color, CiColors.onLight.focusRing);
       // Thickness changes too, so focus does not depend on colour alone.
       expect(after.top.width, 2);
     });
@@ -306,11 +306,11 @@ void main() {
             .first,
       );
       final border = (container.decoration! as BoxDecoration).border! as Border;
-      expect(border.top.color, CiColors.light.accentEnergy);
+      expect(border.top.color, CiColors.onLight.accentEnergy);
       expect(find.text('Enter a valid email'), findsOneWidget);
     });
 
-    testWidgets('fill follows the theme: black on dark, sunk grey on light',
+    testWidgets('fill comes from the ground, not from the component',
         (tester) async {
       Color fillOf(WidgetTester t) {
         final container = t.widget<Container>(
@@ -323,21 +323,19 @@ void main() {
       }
 
       await _pump(tester, const CiField(label: 'Email address'));
-      expect(fillOf(tester), CiColors.light.surfaceSunk);
+      expect(fillOf(tester), CiColors.onLight.fieldFill);
 
-      // Dark screens use pure black, DEEPER than the #0F0F0F background. This
-      // used to be an onDeepSurface flag every call site had to remember to
-      // pass, which meant one forgotten argument produced a field on the wrong
-      // surface. The theme decides now.
+      // Ink ground uses pure black, DEEPER than the #0F0F0F background. This
+      // has been wrong twice: first an onDeepSurface flag every call site had
+      // to remember, then a check on theme brightness - which only makes sense
+      // if light and ink are modes a user toggles, and they are not. The
+      // palette carries the answer now.
       await _pump(
         tester,
-        Theme(
-          data: CiTheme.dark(),
-          child: const CiField(label: 'Email address'),
-        ),
+        const CiSurface.ink(child: CiField(label: 'Email address')),
       );
-      expect(fillOf(tester), CiColors.dark.surfaceDeep);
-      expect(fillOf(tester), isNot(CiColors.dark.surfaceSunk));
+      expect(fillOf(tester), CiColors.onInk.fieldFill);
+      expect(fillOf(tester), isNot(CiColors.onInk.surfaceSunk));
     });
 
     testWidgets('label renders above the input, uppercased', (tester) async {
@@ -375,6 +373,57 @@ void main() {
         ),
       );
       expect(tester.getSize(find.byType(CiChip)).width, lessThan(140));
+    });
+  });
+
+  group('CiSurface', () {
+    testWidgets('ink swaps the palette for everything beneath it',
+        (tester) async {
+      late CiColors outer;
+      late CiColors inner;
+      await _pump(
+        tester,
+        Builder(builder: (context) {
+          outer = CiColors.of(context);
+          return CiSurface.ink(
+            child: Builder(builder: (context) {
+              inner = CiColors.of(context);
+              return const SizedBox.shrink();
+            }),
+          );
+        }),
+      );
+      expect(outer.text, CiColors.onLight.text);
+      expect(inner.text, CiColors.onInk.text);
+    });
+
+    testWidgets('light returns a subtree to light ground from inside ink',
+        (tester) async {
+      // A white card sitting on a dark screen. Without this the card's
+      // contents inherit ink tokens and render white-on-white.
+      late CiColors nested;
+      await _pump(
+        tester,
+        CiSurface.ink(
+          child: CiSurface.light(
+            child: Builder(builder: (context) {
+              nested = CiColors.of(context);
+              return const SizedBox.shrink();
+            }),
+          ),
+        ),
+      );
+      expect(nested.text, CiColors.onLight.text);
+    });
+
+    testWidgets('paints its own ground so tokens and background agree',
+        (tester) async {
+      await _pump(tester, const CiSurface.ink(child: SizedBox.shrink()));
+      final box = tester.widget<ColoredBox>(
+        find.descendant(
+            of: find.byType(CiSurface), matching: find.byType(ColoredBox)),
+      );
+      expect(box.color, CiColors.onInk.bg);
     });
   });
 }

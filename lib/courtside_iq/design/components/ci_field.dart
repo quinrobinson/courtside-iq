@@ -4,8 +4,8 @@
 //   Field   350x72, label ABOVE the input with an 8px gap
 //   LABEL   Medium 12, uppercase, muted
 //   input   h48, radius 6, 16px horizontal padding, 1px border
-//           on dark screens the fill is #000000 - surfaceDeep, sitting
-//           DEEPER than the #0F0F0F background
+//           on ink ground the fill is #000000, sitting DEEPER than the
+//           #0F0F0F background; on light ground it is the sunk grey
 //   chip    h32, pill radius, 14px padding, Regular 14
 //           active white + ink, inactive sunk + muted
 //
@@ -86,15 +86,8 @@ class _CiFieldState extends State<CiField> {
     final w = widget;
     final hasError = w.errorText != null && w.errorText!.isNotEmpty;
 
-    // The fill follows the theme, not a per-call-site flag. On dark screens the
-    // input is pure black, sitting DEEPER than the #0F0F0F background - that is
-    // the auth and first-run treatment and there is no dark screen that wants a
-    // field on the lighter inkSoft. On light screens it is the sunk grey.
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final fill = dark ? c.surfaceDeep : c.surfaceSunk;
-
     // Error wins over focus: a field that is both must show the problem.
-    // Otherwise focus reads as the strong border - white on dark, ink on
+    // Otherwise focus reads as the strong border - white on ink, ink on
     // light - so the active field is unmistakable while typing.
     final borderColor = hasError
         ? c.accentEnergy
@@ -117,7 +110,10 @@ class _CiFieldState extends State<CiField> {
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: CiSpace.s4),
             decoration: BoxDecoration(
-              color: fill,
+              // The ground decides the fill, and the palette already knows
+              // which ground it is on, so nothing is derived here. See
+              // CiColors.fieldFill for why this had to become a token.
+              color: c.fieldFill,
               borderRadius: CiRadius.chipR,
               border: Border.all(
                 color: borderColor,
@@ -140,10 +136,10 @@ class _CiFieldState extends State<CiField> {
                         .copyWith(color: c.text, fontWeight: CiWeight.regular),
                     cursorColor: c.accentGood,
                     decoration: InputDecoration(
-                      // The app theme sets `filled: true` with a surfaceSunk
-                      // fill. Left on, the TextField paints its own grey box
-                      // INSIDE this container - visible as a grey rectangle
-                      // around the text on the dark auth fields.
+                      // The app theme sets `filled: true` with its own fill.
+                      // Left on, the TextField paints a second box INSIDE this
+                      // container - visible as a grey rectangle around the
+                      // text on the ink auth fields.
                       filled: false,
                       isDense: true,
                       border: InputBorder.none,

@@ -35,32 +35,32 @@ void main() {
   group('locked design rules', () {
     test('content on an accent is ALWAYS ink, in both modes', () {
       // Never white on lime or orange. Locked decision.
-      expect(CiColors.light.onAccent, CiPalette.inkDefault);
-      expect(CiColors.dark.onAccent, CiPalette.inkDefault);
+      expect(CiColors.onLight.onAccent, CiPalette.inkDefault);
+      expect(CiColors.onInk.onAccent, CiPalette.inkDefault);
     });
 
     test('accents do not change between modes', () {
       // Meaning is carried by the accent, so it must read identically in both.
-      expect(CiColors.light.accentGood, CiColors.dark.accentGood);
-      expect(CiColors.light.accentEnergy, CiColors.dark.accentEnergy);
+      expect(CiColors.onLight.accentGood, CiColors.onInk.accentGood);
+      expect(CiColors.onLight.accentEnergy, CiColors.onInk.accentEnergy);
     });
 
     test('dark background is ink, not pure black', () {
-      expect(CiColors.dark.bg, CiPalette.inkDefault);
-      expect(CiColors.dark.bg, isNot(CiPalette.black));
+      expect(CiColors.onInk.bg, CiPalette.inkDefault);
+      expect(CiColors.onInk.bg, isNot(CiPalette.black));
     });
 
     test('surfaceDeep is pure black in both modes', () {
       // It exists to sit beneath/above ink, so it does not flip with the theme.
-      expect(CiColors.light.surfaceDeep, CiPalette.black);
-      expect(CiColors.dark.surfaceDeep, CiPalette.black);
+      expect(CiColors.onLight.surfaceDeep, CiPalette.black);
+      expect(CiColors.onInk.surfaceDeep, CiPalette.black);
     });
 
     test('no two surface tokens share a value in the same mode', () {
       // A duplicate token is worse than a missing one: two names for one value
       // means two developers choose differently for the same surface.
       // surfaceRaised was removed for exactly this reason.
-      for (final m in {'light': CiColors.light, 'dark': CiColors.dark}.entries) {
+      for (final m in {'light': CiColors.onLight, 'dark': CiColors.onInk}.entries) {
         final c = m.value;
         expect(c.surface, isNot(c.surfaceSunk), reason: '${m.key}: surface == sunk');
         expect(c.surface, isNot(c.surfaceDeep), reason: '${m.key}: surface == deep');
@@ -69,9 +69,9 @@ void main() {
     });
 
     test('light and dark invert each other for text and surface', () {
-      expect(CiColors.light.text, CiColors.dark.textInvert);
-      expect(CiColors.dark.text, CiColors.light.textInvert);
-      expect(CiColors.light.surfaceInvert, CiColors.dark.bg);
+      expect(CiColors.onLight.text, CiColors.onInk.textInvert);
+      expect(CiColors.onInk.text, CiColors.onLight.textInvert);
+      expect(CiColors.onLight.surfaceInvert, CiColors.onInk.bg);
     });
   });
 
@@ -100,19 +100,19 @@ void main() {
 
   group('theme wiring', () {
     test('CiColors is reachable through ThemeData in both modes', () {
-      expect(CiTheme.light().extension<CiColors>(), CiColors.light);
-      expect(CiTheme.dark().extension<CiColors>(), CiColors.dark);
+      expect(CiTheme.base().extension<CiColors>(), CiColors.onLight);
+      expect(CiTheme.ink().extension<CiColors>(), CiColors.onInk);
     });
 
     test('scaffold background follows the bg token', () {
-      expect(CiTheme.light().scaffoldBackgroundColor, CiColors.light.bg);
-      expect(CiTheme.dark().scaffoldBackgroundColor, CiColors.dark.bg);
+      expect(CiTheme.base().scaffoldBackgroundColor, CiColors.onLight.bg);
+      expect(CiTheme.ink().scaffoldBackgroundColor, CiColors.onInk.bg);
     });
 
     test('dividers are hairline width and use the hairline token', () {
-      final d = CiTheme.dark().dividerTheme;
+      final d = CiTheme.ink().dividerTheme;
       expect(d.thickness, CiSpace.hairline);
-      expect(d.color, CiColors.dark.hairline);
+      expect(d.color, CiColors.onInk.hairline);
     });
 
     testWidgets('CiColors.of falls back to light without our theme',
@@ -127,7 +127,7 @@ void main() {
           }),
         ),
       );
-      expect(seen, CiColors.light);
+      expect(seen, CiColors.onLight);
     });
 
     testWidgets('CiColors.of resolves the dark tokens under CiTheme',
@@ -135,7 +135,7 @@ void main() {
       late CiColors seen;
       await tester.pumpWidget(
         MaterialApp(
-          theme: CiTheme.dark(),
+          theme: CiTheme.ink(),
           home: Builder(builder: (context) {
             seen = CiColors.of(context);
             return const SizedBox.shrink();
@@ -149,13 +149,13 @@ void main() {
 
   group('lerp', () {
     test('interpolates between modes without throwing', () {
-      final mid = CiColors.light.lerp(CiColors.dark, 0.5);
+      final mid = CiColors.onLight.lerp(CiColors.onInk, 0.5);
       expect(mid, isA<CiColors>());
-      expect(mid.bg, isNot(CiColors.light.bg));
+      expect(mid.bg, isNot(CiColors.onLight.bg));
     });
 
     test('returns self when given a foreign extension', () {
-      expect(CiColors.light.lerp(null, 0.5), CiColors.light);
+      expect(CiColors.onLight.lerp(null, 0.5), CiColors.onLight);
     });
   });
 }

@@ -4,8 +4,13 @@
 // before components are built on top of them. Dev-only: not routed from any
 // user-facing screen.
 //
-// The mode toggle rebuilds the subtree under a full CiTheme, so what you see
+// The GROUND toggle rebuilds the subtree under a full CiTheme, so what you see
 // is exactly what a real screen would get - not a preview approximation.
+//
+// Ground, not mode: 2.0 is one theme with a hybrid black-and-white palette. A
+// white Today feed and an ink auth screen coexist in the same build; the user
+// never picks between them. The toggle is here to check both grounds, not to
+// simulate a setting.
 
 import 'package:flutter/material.dart';
 
@@ -32,11 +37,11 @@ class TokenGalleryPage extends StatefulWidget {
 }
 
 class _TokenGalleryPageState extends State<TokenGalleryPage> {
-  bool _dark = true;
+  bool _onInk = true;
 
   @override
   Widget build(BuildContext context) {
-    final theme = _dark ? CiTheme.dark() : CiTheme.light();
+    final theme = _onInk ? CiTheme.ink() : CiTheme.base();
 
     return Theme(
       data: theme,
@@ -49,8 +54,8 @@ class _TokenGalleryPageState extends State<TokenGalleryPage> {
               child: Column(
                 children: [
                   _Header(
-                    dark: _dark,
-                    onToggle: () => setState(() => _dark = !_dark),
+                    onInk: _onInk,
+                    onToggle: () => setState(() => _onInk = !_onInk),
                   ),
                   Expanded(
                     child: ListView(
@@ -79,9 +84,9 @@ class _TokenGalleryPageState extends State<TokenGalleryPage> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.dark, required this.onToggle});
+  const _Header({required this.onInk, required this.onToggle});
 
-  final bool dark;
+  final bool onInk;
   final VoidCallback onToggle;
 
   @override
@@ -107,7 +112,7 @@ class _Header extends StatelessWidget {
                 border: Border.all(color: c.border),
               ),
               alignment: Alignment.center,
-              child: Text(dark ? 'Dark' : 'Light',
+              child: Text(onInk ? 'On ink' : 'On light',
                   style: CiType.rowLabel.copyWith(color: c.text)),
             ),
           ),
@@ -162,7 +167,8 @@ class _ColorSection extends StatelessWidget {
         _Swatch('surface-sunk', c.surfaceSunk, c),
         _Swatch('surface-invert', c.surfaceInvert, c),
         _Swatch('surface-deep', c.surfaceDeep, c,
-            note: 'dark inputs + premium banners only'),
+            note: 'premium banners; not buttons'),
+        _Swatch('field-fill', c.fieldFill, c, note: 'input fill for this ground'),
         const _Hairline(),
         _Swatch('text', c.text, c),
         _Swatch('text-muted', c.textMuted, c),
@@ -912,7 +918,7 @@ class _FormsSectionState extends State<_FormsSection> {
                 color: CiPalette.inkDefault,
                 padding: const EdgeInsets.all(CiSpace.s4),
                 child: Theme(
-                  data: CiTheme.dark(),
+                  data: CiTheme.ink(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

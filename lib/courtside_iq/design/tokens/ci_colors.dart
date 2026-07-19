@@ -57,7 +57,13 @@ abstract final class CiPalette {
 
 /// Semantic color tokens for one theme mode.
 ///
-/// Mirrors the Figma "Color" collection, which has Light and Dark modes.
+/// Semantic colors for one ground.
+///
+/// 2.0 is a SINGLE theme with a hybrid black-and-white palette, not a
+/// light/dark mode pair the user toggles. [onLight] and [onInk] are the two
+/// grounds a region can sit on - a white Today feed and a dark auth screen
+/// coexist in the same app, at the same time. Wrap ink regions in
+/// [CiSurface.ink] rather than swapping a global theme.
 @immutable
 class CiColors extends ThemeExtension<CiColors> {
   const CiColors({
@@ -66,6 +72,7 @@ class CiColors extends ThemeExtension<CiColors> {
     required this.surfaceSunk,
     required this.surfaceInvert,
     required this.surfaceDeep,
+    required this.fieldFill,
     required this.text,
     required this.textMuted,
     required this.textFaint,
@@ -111,6 +118,16 @@ class CiColors extends ThemeExtension<CiColors> {
   /// Buttons are NOT this - they use [surfaceInvert] / ink.
   final Color surfaceDeep;
 
+  /// Input fill. Sunk grey on light ground, pure black on ink.
+  ///
+  /// This is a token rather than something [CiField] derives because the
+  /// component kept getting the derivation wrong. It was first an
+  /// `onDeepSurface` flag every call site had to remember, then a check on
+  /// theme brightness - which only makes sense if light and dark are modes a
+  /// user switches between, and they are not. The palette knows which ground
+  /// it is; the component should not be guessing.
+  final Color fieldFill;
+
   final Color text;
   final Color textMuted;
   final Color textFaint;
@@ -146,14 +163,15 @@ class CiColors extends ThemeExtension<CiColors> {
   /// Nav bar backdrop, blurred over content.
   final Color navGlass;
 
-  // --- Light -----------------------------------------------------------------
+  // --- On light ground -------------------------------------------------------
 
-  static const light = CiColors(
+  static const onLight = CiColors(
     bg: CiPalette.white,
     surface: CiPalette.white,
     surfaceSunk: CiPalette.gray50,
     surfaceInvert: CiPalette.inkDefault,
     surfaceDeep: CiPalette.black,
+    fieldFill: CiPalette.gray50,
     text: CiPalette.inkDefault,
     textMuted: CiPalette.gray500,
     textFaint: CiPalette.gray400,
@@ -171,14 +189,15 @@ class CiColors extends ThemeExtension<CiColors> {
     navGlass: CiPalette.white,
   );
 
-  // --- Dark ------------------------------------------------------------------
+  // --- On ink ground ---------------------------------------------------------
 
-  static const dark = CiColors(
+  static const onInk = CiColors(
     bg: CiPalette.inkDefault,
     surface: CiPalette.inkDefault,
     surfaceSunk: CiPalette.inkSoft,
     surfaceInvert: CiPalette.white,
     surfaceDeep: CiPalette.black,
+    fieldFill: CiPalette.black,
     text: CiPalette.white,
     textMuted: CiPalette.gray400,
     textFaint: CiPalette.gray600,
@@ -198,7 +217,7 @@ class CiColors extends ThemeExtension<CiColors> {
 
   /// Convenience accessor: `CiColors.of(context).text`
   static CiColors of(BuildContext context) =>
-      Theme.of(context).extension<CiColors>() ?? light;
+      Theme.of(context).extension<CiColors>() ?? onLight;
 
   @override
   CiColors copyWith({
@@ -207,6 +226,7 @@ class CiColors extends ThemeExtension<CiColors> {
     Color? surfaceSunk,
     Color? surfaceInvert,
     Color? surfaceDeep,
+    Color? fieldFill,
     Color? text,
     Color? textMuted,
     Color? textFaint,
@@ -229,6 +249,7 @@ class CiColors extends ThemeExtension<CiColors> {
         surfaceSunk: surfaceSunk ?? this.surfaceSunk,
         surfaceInvert: surfaceInvert ?? this.surfaceInvert,
         surfaceDeep: surfaceDeep ?? this.surfaceDeep,
+        fieldFill: fieldFill ?? this.fieldFill,
         text: text ?? this.text,
         textMuted: textMuted ?? this.textMuted,
         textFaint: textFaint ?? this.textFaint,
@@ -256,6 +277,7 @@ class CiColors extends ThemeExtension<CiColors> {
       surfaceSunk: c(surfaceSunk, other.surfaceSunk),
       surfaceInvert: c(surfaceInvert, other.surfaceInvert),
       surfaceDeep: c(surfaceDeep, other.surfaceDeep),
+      fieldFill: c(fieldFill, other.fieldFill),
       text: c(text, other.text),
       textMuted: c(textMuted, other.textMuted),
       textFaint: c(textFaint, other.textFaint),
