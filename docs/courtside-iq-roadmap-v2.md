@@ -958,8 +958,21 @@ phase item owned them. An unowned screen means either a v1 page survives into
 - Screen flags moved to `lib/features/flags.dart` (one registry, deleted whole
   in 4.24). `kUseDashboardV2` moved there too.
 - Email Auth built and routed behind `kUseAuth2`, keeping the v1 route name and
-  path so every existing navigation call reaches it unchanged.
-  `[x] built` · `[x] wired` · `[ ] device-verified`
+  path so every existing navigation call reaches it unchanged. Flag is ON.
+  `[x] built` · `[x] wired` · `[x] device-verified (sign IN only)`
+- **Sign UP is still unverified on device.** Same code path, but account
+  creation is the one action here that cannot be undone, so it is not signed
+  off. Verify before 4E cutover.
+- **Two regressions caught on device, both worth remembering:**
+  - *Dead sign-in button.* The screen called authManager but never navigated.
+    Sign-in succeeded and left the parent sitting on the auth screen. The v1
+    screen calls `prepareAuthEvent()` then `pushNamedAuth` explicitly; nothing
+    redirects an authenticated user off the auth route on its own.
+  - *Account lockout.* An 8-character minimum was applied to SIGN IN, barring
+    every account created before that rule existed, in their own app, with no
+    recourse since password reset is not built yet. Length is a rule about
+    creating a password. `validatePassword` (sign in) now checks only that
+    something was typed; `validateNewPassword` (sign up) holds the minimum.
 - **Design note:** the Validation Error frame draws the sign-in/sign-up control
   as underline tabs while the other two frames use chips. Decided in favour of
   chips, since a second tab idiom would undercut the real navigation tabs.

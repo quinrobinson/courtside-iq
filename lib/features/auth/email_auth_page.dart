@@ -26,6 +26,8 @@ import 'package:flutter/material.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/courtside_iq/auth_validation.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
@@ -80,7 +82,12 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
   // test does not fall through to the real authManager and hit Supabase.
   void _validate() {
     _emailError = validateEmail(_email.text);
-    _passwordError = validatePassword(_password.text);
+    // Length is a rule about creating a password, not about typing an existing
+    // one. Enforcing it on sign in locks out every account made before the
+    // rule existed.
+    _passwordError = _isSignUp
+        ? validateNewPassword(_password.text)
+        : validatePassword(_password.text);
     // Only meaningful on sign up, and cleared on sign in so a stale message
     // cannot survive a toggle.
     _confirmError = _isSignUp
@@ -118,16 +125,36 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
 
     setState(() => _busy = true);
     try {
+      // Suppresses the router refresh that the auth-state change would
+      // otherwise fire mid-flow, which would interrupt the navigation below.
+      GoRouter.of(context).prepareAuthEvent();
+
       final email = _email.text.trim();
       final password = _password.text;
       final user = _isSignUp
           ? await authManager.createAccountWithEmail(context, email, password)
           : await authManager.signInWithEmail(context, email, password);
 
-      // authManager surfaces its own error snackbar and returns null. Routing
-      // on success is the router's job, driven by the auth stream, so there is
-      // nothing to navigate here.
-      if (user == null && mounted) setState(() => _busy = false);
+      // authManager surfaces its own error snackbar and returns null.
+      if (user == null || !mounted) return;
+
+      // NAVIGATE EXPLICITLY. Signing in updates the auth stream, but nothing
+      // redirects an authenticated user off this route - so without this the
+      // sign-in succeeds and the parent sits on the auth screen watching
+      // nothing happen, which reads as a dead button.
+      if (loggedIn) {
+        context.pushNamedAuth(
+          HomeWidget.routeName,
+          context.mounted,
+          extra: <String, dynamic>{
+            '__transition_info__': const TransitionInfo(
+              hasTransition: true,
+              transitionType: PageTransitionType.fade,
+              duration: Duration(milliseconds: 400),
+            ),
+          },
+        );
+      }
     } finally {
       if (mounted && _busy) setState(() => _busy = false);
     }

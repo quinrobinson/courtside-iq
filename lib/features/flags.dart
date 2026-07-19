@@ -28,7 +28,7 @@ const bool kUseDashboardV2 = true;
 /// This one gates the only way an existing user gets into the app. It stays
 /// false until sign-in, sign-up, and a real password reset have been run on a
 /// device against test Supabase.
-const bool kUseAuth2 = false;
+const bool kUseAuth2 = true;
 
 /// Auth Landing, including Google and Apple sign-in.
 const bool kUseAuthLanding2 = false;

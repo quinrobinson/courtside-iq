@@ -28,7 +28,22 @@ String? validateEmail(String raw) {
   return null;
 }
 
+/// SIGN IN. Checks only that something was typed.
+///
+/// It must NEVER enforce a length or complexity rule. The password already
+/// exists, and the server is the only thing entitled to say whether it is
+/// correct. A client-side minimum here locks out every account created before
+/// that minimum existed, using their own app, with no way to argue with it -
+/// which is exactly what shipped and had to be reverted on 2026-07-19.
+///
+/// Rules about what a password may BE belong to [validateNewPassword].
 String? validatePassword(String password) {
+  if (password.isEmpty) return 'Enter your password.';
+  return null;
+}
+
+/// SIGN UP. The password is being created, so the minimum applies.
+String? validateNewPassword(String password) {
   if (password.isEmpty) return 'Enter your password.';
   if (password.length < kMinPasswordLength) {
     return 'Use at least $kMinPasswordLength characters.';

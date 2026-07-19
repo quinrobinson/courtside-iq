@@ -64,12 +64,43 @@ void main() {
     });
 
     testWidgets('surfaces both field errors on submit', (tester) async {
-      await _pump(tester);
+      // Sign UP, because the length rule only applies to a password being
+      // created. See the sign-in regression test below.
+      await _pump(tester, mode: AuthMode.signUp);
       await _type(tester, 'Email address', 'alex.rivera@');
       await _type(tester, 'Password', 'short');
       await _submit(tester);
 
       expect(find.text('Enter a valid email address.'), findsOneWidget);
+      expect(find.text('Use at least 8 characters.'), findsOneWidget);
+    });
+
+    testWidgets('sign in never rejects a short existing password',
+        (tester) async {
+      // THE LOCKOUT, 2026-07-19: an 8-character minimum on sign in barred
+      // every account created before the rule existed, in their own app, with
+      // no recourse. The email stays invalid here so this never reaches the
+      // network - the point is only that the PASSWORD draws no complaint.
+      await _pump(tester);
+      await _type(tester, 'Email address', 'alex.rivera@');
+      await _type(tester, 'Password', 'abc');
+      await _submit(tester);
+
+      expect(find.text('Enter a valid email address.'), findsOneWidget);
+      expect(find.text('Use at least 8 characters.'), findsNothing);
+      expect(find.textContaining('at least'), findsNothing);
+    });
+
+    testWidgets('switching to sign up applies the minimum again',
+        (tester) async {
+      await _pump(tester);
+      await _type(tester, 'Email address', 'alex.rivera@');
+      await _type(tester, 'Password', 'abc');
+      await _submit(tester);
+      expect(find.textContaining('at least'), findsNothing);
+
+      await _tapChip(tester, 'Sign up');
+      await _submit(tester);
       expect(find.text('Use at least 8 characters.'), findsOneWidget);
     });
 

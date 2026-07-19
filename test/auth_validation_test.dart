@@ -40,24 +40,50 @@ void main() {
     });
   });
 
-  group('validatePassword', () {
-    test('accepts anything at or over the minimum', () {
-      expect(validatePassword('a' * kMinPasswordLength), isNull);
-      expect(validatePassword('a longer passphrase'), isNull);
+  group('validatePassword (SIGN IN)', () {
+    test('accepts a short existing password', () {
+      // THE REGRESSION, 2026-07-19: a client-side 8-character minimum on sign
+      // in locked out every account created before that rule existed. The
+      // password already exists; only the server may judge it.
+      expect(validatePassword('abc'), isNull);
+      expect(validatePassword('1'), isNull);
     });
 
-    test('rejects one character under, and names the number', () {
-      expect(validatePassword('a' * (kMinPasswordLength - 1)),
+    test('accepts anything non-empty, whatever its shape', () {
+      expect(validatePassword('a' * 200), isNull);
+      expect(validatePassword('   '), isNull);
+      expect(validatePassword('!@#'), isNull);
+    });
+
+    test('never mentions a length requirement', () {
+      // Any message about length here means the minimum has crept back in.
+      for (final p in ['a', 'abc', 'short', '']) {
+        final message = validatePassword(p);
+        if (message != null) {
+          expect(message, isNot(contains('at least')));
+          expect(message, isNot(contains('characters')));
+        }
+      }
+    });
+
+    test('still catches an empty field', () {
+      expect(validatePassword(''), 'Enter your password.');
+    });
+  });
+
+  group('validateNewPassword (SIGN UP)', () {
+    test('enforces the minimum, because the password is being created', () {
+      expect(validateNewPassword('a' * (kMinPasswordLength - 1)),
           'Use at least $kMinPasswordLength characters.');
+      expect(validateNewPassword('a' * kMinPasswordLength), isNull);
     });
 
     test('does not trim: spaces are legitimate password characters', () {
-      final spaces = ' ' * kMinPasswordLength;
-      expect(validatePassword(spaces), isNull);
+      expect(validateNewPassword(' ' * kMinPasswordLength), isNull);
     });
 
     test('says what is missing when empty', () {
-      expect(validatePassword(''), 'Enter your password.');
+      expect(validateNewPassword(''), 'Enter your password.');
     });
   });
 
@@ -83,7 +109,7 @@ void main() {
         validateEmail(''),
         validateEmail('nope'),
         validatePassword(''),
-        validatePassword('short'),
+        validateNewPassword('short'),
         validateConfirmPassword('a', ''),
         validateConfirmPassword('a', 'b'),
       ];
@@ -97,7 +123,7 @@ void main() {
       for (final m in <String?>[
         validateEmail(''),
         validateEmail('nope'),
-        validatePassword('short'),
+        validateNewPassword('short'),
         validateConfirmPassword('a', 'b'),
       ]) {
         expect(m!.endsWith('.'), isTrue, reason: m);
