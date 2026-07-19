@@ -8,35 +8,34 @@ The app is live on the App Store and Google Play. Primary audience: parents trac
 
 ## How the codebase is structured
 
-This is a FlutterFlow-generated Flutter app with a Supabase backend.
+This is a Flutter/Dart app with a Supabase backend.
 
-**New feature workflow (Phase 1 onward):** New screens and features are built with Claude Code + Figma directly in Flutter/Dart — not through the FlutterFlow visual builder. New feature code lives in `lib/features/`. The existing FlutterFlow build is left untouched.
+**FlutterFlow is RETIRED (as of 2026-07-19).** It is no longer used and there are no plans to return
+to it. Nothing regenerates, so **every file in this repo is editable**. The old "do NOT edit" list
+existed only because FlutterFlow would overwrite those files; that risk is gone.
 
-**FlutterFlow-generated code (do NOT edit — existing build, leave as-is):**
-- `lib/main.dart`
-- `lib/backend/supabase/` (generated table definitions)
-- `lib/pages/` (generated screen widgets)
-- Most files in `lib/flutter_flow/` (framework files)
-- `ios/` and `android/` platform folders
-- `pubspec.yaml` (managed by FlutterFlow)
+What this changes in practice:
+- `pubspec.yaml` is ours. Adding a dependency is a normal decision (still flag it first).
+- `lib/main.dart`, `lib/pages/`, `lib/backend/supabase/`, `ios/`, `android/` are editable.
+- `lib/pages/` is **legacy FlutterFlow-generated UI, scheduled for deletion** in roadmap 4.24. Treat
+  it as code with an expiry date: fix what you must to keep it compiling, do not invest in it.
 
-**New feature code (safe to create and edit):**
-- `lib/features/` — new screens and widgets built with Claude Code
-- `lib/courtside_iq/` — shared config and utilities (e.g. `metrics_config.dart`)
-- `lib/flutter_flow/custom_functions.dart` — Custom Functions, pure Dart utilities
+**Where new code goes:**
+- `lib/features/` — new screens and widgets
+- `lib/courtside_iq/` — shared config, metrics, and pure-Dart logic (`metrics_config.dart`,
+  `growth_iq.dart`, `game_sync/`). Prefer this for anything that must survive the 2.0 rebuild:
+  keep it free of Flutter widgets and Supabase imports so it stays testable.
+- `scripts/` — one-off operational scripts, not part of the app build
 - `assets/` — images, fonts, static files
 
-**Supabase (fully owned in this repo, not touched by FlutterFlow):**
+**Supabase:**
 - `supabase/functions/` — Edge Functions (TypeScript, Deno runtime)
 - `supabase/migrations/` — SQL migrations for schema changes
 - Secrets live in the Supabase dashboard, never in the repo
 
-**Rule of thumb:** If a change needs to persist, it lives in `lib/custom_code/`, `lib/flutter_flow/custom_functions.dart`, or `supabase/`. Anything else will be overwritten.
-
 ## Tech stack
 
-- Flutter / Dart (client)
-- FlutterFlow (visual builder, source of truth for UI and action flows)
+- Flutter 3.44.6 / Dart 3.12.2 (client) — pinned in `.fvmrc`, run via `fvm`
 - Supabase (database, auth, Edge Functions)
 - Supabase Edge Functions in TypeScript (Deno runtime)
 - Claude API (AI-powered insights — Haiku for per-game, Sonnet for player-level narrative)
@@ -45,11 +44,18 @@ This is a FlutterFlow-generated Flutter app with a Supabase backend.
 
 ## The roadmap
 
-The full phased plan for current work is at `docs/roadmap.md`. Always read it at the start of a session. It covers:
-- Phase 0: foundation cleanup (tier thresholds, jsonb migration, PPSA edge case)
-- Phase 1: Buildship → Supabase Edge Functions migration + age data + metric improvements
-- Phase 2: player-level development narrative (new feature)
+The full phased plan for current work is at `docs/courtside-iq-roadmap-v2.md`. Always read it at the start of a session. It covers:
+- Phase 0: foundation cleanup (tier thresholds, jsonb migration, PPSA edge case) — **done**
+- Phase 1: Buildship → Supabase Edge Functions migration + age data + metric improvements — **done**
+- Phase 2: player-level development narrative — **done**
 - Phase 3: deferred items
+- **Phase 4: Courtside IQ 2.0** — the current work. New UI + Growth IQ, built incrementally behind
+  flags and shipped as a single **2.0.0**. Sub-phases: 4.0 screen audit, 4A foundations, 4B design
+  system, 4C screens by journey, 4D verification, 4E cutover. Phase 4A is complete.
+
+**Companion docs:**
+- `docs/2-0-screen-coverage.md` — every v1 screen mapped to its approved 2.0 Figma frame
+- `docs/entitlement-audit-findings.md` — why free-tier enforcement is safe (audited against prod)
 
 When starting a session, the user will tell you which roadmap item to work on. Stay scoped to that item unless explicitly asked to expand.
 
@@ -57,6 +63,7 @@ When starting a session, the user will tell you which roadmap item to work on. S
 
 - Figma file: **CourtsideIQ — Performance Analytics** — https://www.figma.com/design/E8n8IE9ZnPRs6vykzINIyg/CourtsideIQ---Performance-Analytics. This is the single source of truth for UI designs across the project. Use the Figma MCP to read frames and draft variants; always land on an approved variant before writing UI code.
 - **Claude-authored Figma work belongs on the "Claude Code" page** (not "Inspiration" or any active page the desktop app happens to be focused on). When creating new frames via `use_figma`, append to the Claude Code page explicitly — e.g. find the page with `/claude\s*code/i.test(p.name)` and `await page.loadAsync()` before appending. Place new frames beside the relevant existing section on that page.
+- **Organize the 2.0 Screens page as a FLOW, not a scatter.** The design-refresh file (`uvHb6HXvIVFwzSSXPtEVoc`) holds the high-fidelity screens, and they must be laid out so the user journey is legible: group each flow into a labeled Figma **Section** (Entry/Auth, Home/Today, Players, Games, New Game, Menu/Account, Premium/Paywall, Dialogs & States, etc.), arrange the screens left-to-right in journey order within each section, and draw **connector arrows** (lines + a small triangle head — FigJam Connectors are blocked in design mode) between screens to show what click leads where (including cross-section jumps like First-Run → Today, Menu Subscription → Paywall, Create → Setup → Live → Complete → Game Detail). Every NEW screen must be placed into its flow section and wired with a connector from its entry point, not just dropped on the canvas. The connectors/markings live in the gutters between frames, leaving the high-fi screens themselves untouched.
 
 ## Product constraints and rules
 
@@ -86,14 +93,34 @@ These apply to every change, every session:
 ## Workflow preferences
 
 - **When the user asks "which option?" or "should I do A or B?" — state a recommendation, give the one-line reason, then act.** Don't serve up a menu and wait. The user has said they prefer to understand the judgment call and move forward, not to pick from a checklist. If the decision is truly reversible and low-stakes, just make it.
-- **Definition of Done for phase items = built + wired + device-verified.** Don't mark a `docs/roadmap.md` item complete until all three are true. A component built in `lib/features/` but not wired into call sites is **not done** — this is how the AddPlayerSheet got lost between Phase 1.2 and Phase 1.12. Every phase item in `roadmap.md` should carry three checkboxes so gaps are visible.
+- **Definition of Done for phase items = built + wired + device-verified.** Don't mark a `docs/courtside-iq-roadmap-v2.md` item complete until all three are true. A component built in `lib/features/` but not wired into call sites is **not done** — this is how the AddPlayerSheet got lost between Phase 1.2 and Phase 1.12. Every phase item in the roadmap should carry three checkboxes so gaps are visible.
 - **UX must be designed and approved in Figma before any code is written.** No exceptions for new screens, modals, sheets, banners, badges, empty states, or copy-visible surfaces. If a feature has a user-facing visual component, pause and ask for the Figma link (or a design pass) before implementing. Code-first UX produces throwaway work and mis-scoped PRs.
+- **Design with the `design-taste-frontend` ("Taste") skill in mind on every design pass.** Whenever designing or reviewing any user-facing surface (Figma frames or built UI), apply its transferable anti-slop lenses: reach past templated defaults, off-black not pure black, one earned accent used with intent (never decorative), control hierarchy with weight + color over raw scale, label-above inputs (no placeholder-as-label), one label per CTA intent, shape-consistency lock (bind radius tokens), full interactive state cycles, and the AI-tell bans (no neon/oversaturated glow by default, ration the middle-dot to 1 per line, zero em-dashes). It is a web/landing rubric, so skip the web-only rules (GSAP/scroll-hijack, hero-viewport, bento, image-gen). The lens for this system specifically: the real risk is "safe/templated/under-designed," not slop — lean into the brand motif (dot-burst) and let accent color carry meaning rather than shouting with full-bleed color. Skill lives at `~/.claude/.agents/skills/design-taste-frontend/SKILL.md`.
 - **Always propose a plan before writing code.** State which files you'll touch, the order of changes, and what tests or verification you'll run. Wait for approval before executing.
 - **Work on feature branches, never directly on main.** Branch naming: `phase-N-short-description` (e.g., `phase-0-tier-thresholds`).
 - **Open pull requests for review** rather than merging to main directly. Keep PRs scoped to one roadmap item where possible.
 - **Run `flutter analyze` before committing** any Dart changes. Fix warnings unless there's a reason not to.
 - **For Edge Function work, test locally with `supabase functions serve`** before deploying. Deploy only when explicitly asked.
 - **Show me new Edge Function files before deploying** until we've established a rhythm.
+
+## Pending work (picked up next session)
+
+**Backfill existing subscribers into `subscriptions`.** This is the last piece before free-tier
+enforcement does anything. The table, `is_premium()`, the RevenueCat webhook, and the RLS limit are
+all built and verified on **test**; the table is simply empty, so `is_premium()` returns false for
+everyone and the paywall bypass stays open. That is a **deliberate, accepted state** - the user chose
+not to risk production changes to close it.
+
+To run the backfill:
+- A **fresh RevenueCat secret API key** (customer read only) is ready. Never paste it into chat;
+  load it with `read -s REVENUECAT_API_KEY && export REVENUECAT_API_KEY` so it does not land in the
+  transcript or shell history. A previous key was leaked exactly this way and had to be revoked.
+- `scripts/entitlement_audit.py` is the read-only precedent to model the backfill on.
+- The rows that matter live in **prod**, so this needs the `subscriptions` table promoted there
+  first. Do it as its own reviewed step with explicit approval, not folded into other work.
+
+**Also open:** `supabase/migrations/20260615000001_backfill_trend_snapshots.sql` sits in the repo
+**unapplied to test**. That is the same drift pattern that broke the Games tab (see 4.6) - resolve it.
 
 ## Supabase environments
 
@@ -127,7 +154,7 @@ Never edit the database directly through the Supabase dashboard for schema chang
 
 Pause and check with me before:
 - Introducing a new package or dependency
-- Reaching for a different state management library (stay with what FlutterFlow generates)
+- Reaching for a different state management library (stay with the existing `FFAppState` / provider setup)
 - Editing any file outside the custom-code surfaces listed above
 - Making schema changes that aren't a migration file
 - Deploying Edge Functions to production
@@ -136,9 +163,19 @@ Pause and check with me before:
 
 ## Known tech debt worth knowing
 
-- `lib/environment_values.dart` loads JSON but doesn't assign the decoded data. Dead code or latent bug — cleanup scheduled in Phase 0.5.
-- Current `disruptSolid/Good/Elite` functions take thresholds as arguments, meaning cutoffs live in FF action flows. Cleanup scheduled in Phase 0.1.
-- Current Buildship integration (`GetGameInsightsCall` in `lib/backend/api_requests/api_calls.dart`, URL `https://nni3ua.buildship.run/gameinsights`) is being replaced by Supabase Edge Functions in Phase 1.
+- `lib/environment_values.dart` loads JSON but doesn't assign the decoded data. Dead code or latent bug.
+- `test/widget_test.dart` has failed since the project was scaffolded (pumps `MyApp()` without
+  initializing Supabase). Not a regression — verified failing on both the old and new SDK. Delete or
+  fix it; a permanently-red test trains everyone to ignore test output.
+- `player_game_insights` still exists on **prod**. Phase 0.3 said to drop it after the merge; test
+  dropped it, prod did not. Needs its own reviewed migration.
+- iOS builds are now **hybrid SPM + CocoaPods** (Flutter 3.44 migrated automatically). Five plugins
+  have no SPM support and Flutter warns this will eventually become an error.
+- A game queued offline never receives its AI insight: generation needs a server row, so it is
+  skipped while offline and the later sync does not trigger it. Logged against 4C.
+- The paywall bypass is **open by decision**: `subscriptions` is empty, so `is_premium()` is false
+  for everyone until the backfill runs. The RLS limit is built and verified on test but has no data
+  to act on yet. See "Pending work" below.
 
 ## A note on the user
 
