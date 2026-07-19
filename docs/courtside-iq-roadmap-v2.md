@@ -875,7 +875,22 @@ that the cascade would land in `lib/pages/` (doomed code). It largely does for *
 hard errors are in `lib/flutter_flow/`, and patching three call sites in soon-to-be-deleted files
 is a trivial cost, not grounds for reshuffling the phase.
 
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] built` · `[x] wired` · `[x] device-verified` — **DONE 2026-07-19** (commit `695f52a`)
+
+**Outcome matched the spike.** Two package bumps, three call sites, ~half a day. `flutter analyze`
+clean, 16 Growth IQ tests pass, `--release` device run on iPhone with no visible regressions.
+
+**Unplanned side effect worth carrying forward: the iOS build migrated to Swift Package Manager.**
+Flutter 3.44 did this automatically on the first device run - `Podfile.lock` lost 177 lines and two
+`Package.resolved` files appeared (now committed; they pin SPM versions). The build is now hybrid:
+`app_links`, `flutter_native_splash`, `share_plus`, `sign_in_with_apple` and `sqflite` have no SPM
+support and stay on CocoaPods, which Flutter warns will eventually become an error. **Relevant to
+4.22** - the local release pipeline assembles the iOS app differently now than it did for 1.4.0.
+
+**Known-failing test, NOT caused by this:** `test/widget_test.dart` fails on both 3.35.0 and 3.44.6
+(verified in a worktree at the pre-upgrade commit). It is the default scaffold test pumping
+`MyApp()` without initializing Supabase. Delete or fix it - a permanently-red test trains everyone
+to ignore test output.
 
 > Numbered `4.6b` rather than renumbering 4.7-4.24. The cascade of edits that would cause across an
 > already-reviewed document is a worse trade than one irregular label.
