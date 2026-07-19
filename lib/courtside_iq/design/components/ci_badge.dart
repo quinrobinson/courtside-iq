@@ -73,7 +73,11 @@ class CiBadge extends StatelessWidget {
         borderRadius: CiRadius.chipR,
         border: border == null ? null : Border.all(color: border),
       ),
-      alignment: Alignment.center,
+      // No `alignment` here on purpose: a Container with an alignment and no
+      // explicit width expands to fill its constraints instead of hugging its
+      // child, which stretched badges to the full width of a stat tile. The
+      // Row's MainAxisSize.min is what sizes this, and Row centres vertically
+      // by default.
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

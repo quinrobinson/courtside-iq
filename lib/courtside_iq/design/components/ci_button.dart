@@ -115,7 +115,10 @@ class CiButton extends StatelessWidget {
                 borderRadius: CiRadius.pillR,
                 border: border == null ? null : Border.all(color: border),
               ),
-              alignment: Alignment.center,
+              // Align ONLY when expanding. A Container with an alignment and
+              // no explicit width fills its constraints rather than hugging
+              // its child, which silently made every button full width.
+              alignment: expand ? Alignment.center : null,
               child: content,
             ),
           ),

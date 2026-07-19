@@ -18,6 +18,9 @@ import '/courtside_iq/design/components/dot_gauge.dart';
 import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
+import '/courtside_iq/design/components/ci_segment_bar.dart';
+import '/courtside_iq/design/components/ci_stat_tile.dart';
+import '/courtside_iq/design/components/ci_stepper.dart';
 
 class TokenGalleryPage extends StatefulWidget {
   const TokenGalleryPage({super.key});
@@ -51,6 +54,7 @@ class _TokenGalleryPageState extends State<TokenGalleryPage> {
                     child: ListView(
                       padding: const EdgeInsets.only(bottom: CiSpace.s16),
                       children: const [
+                        _StatsSection(),
                         _ControlsSection(),
                         _ComponentSection(),
                         _ColorSection(),
@@ -718,6 +722,132 @@ class _ControlsSectionState extends State<_ControlsSection> {
             labels: const ['Development', 'Averages', 'Games'],
             index: _tab,
             onChanged: (i) => setState(() => _tab = i),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+// --- Stat tiles / grid / segment bar / stepper -------------------------------
+
+class _StatsSection extends StatefulWidget {
+  const _StatsSection();
+
+  @override
+  State<_StatsSection> createState() => _StatsSectionState();
+}
+
+class _StatsSectionState extends State<_StatsSection> {
+  int _pts = 12;
+  int _reb = 4;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _SectionTitle('Stat grid · seams'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('3 columns, full rows',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              CiStatGrid(
+                columns: 3,
+                tiles: [
+                  CiStatTile(
+                      label: 'Points',
+                      value: '18.5',
+                      size: CiStatTileSize.sm,
+                      trend: CiBadge.delta(value: 4.2)),
+                  const CiStatTile(
+                      label: 'Rebounds', value: '6.2', size: CiStatTileSize.sm),
+                  const CiStatTile(
+                      label: 'Assists', value: '3.1', size: CiStatTileSize.sm),
+                ],
+              ),
+              const SizedBox(height: CiSpace.s5),
+              Text('PARTIAL row: the trailing seam must still land on the '
+                  'third column boundary',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              CiStatGrid(
+                columns: 3,
+                tiles: [
+                  const CiStatTile(
+                      label: 'Steals', value: '1.4', size: CiStatTileSize.sm),
+                  CiStatTile(
+                      label: 'Turnovers',
+                      value: '1.8',
+                      size: CiStatTileSize.sm,
+                      // Fewer turnovers is better: negative reads lime.
+                      trend: CiBadge.delta(
+                          value: -1.4, higherIsBetter: false)),
+                ],
+              ),
+              const SizedBox(height: CiSpace.s5),
+              Text('Standalone Md tile (keeps its own border)',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              SizedBox(
+                width: 170,
+                child: CiStatTile(
+                    label: 'Points',
+                    value: '18.5',
+                    trend: CiBadge.delta(value: 4.2)),
+              ),
+            ],
+          ),
+        ),
+        const _SectionTitle('Scoring mix'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CiSegmentBar.scoringMix(
+                  twoPoint: 12, threePoint: 9, freeThrow: 5, colors: c),
+              const SizedBox(height: CiSpace.s4),
+              Text('a player who took no threes drops that segment entirely',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              CiSegmentBar.scoringMix(
+                  twoPoint: 14, threePoint: 0, freeThrow: 3, colors: c),
+            ],
+          ),
+        ),
+        const _SectionTitle('Stepper · live entry'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CiStepper(
+                      label: 'Points',
+                      value: _pts,
+                      onChanged: (v) => setState(() => _pts = v)),
+                  CiStepper(
+                      label: 'Rebounds',
+                      value: _reb,
+                      onChanged: (v) => setState(() => _reb = v)),
+                ],
+              ),
+              const SizedBox(height: CiSpace.s3),
+              Text('minus disables at zero - there is no minus-one rebound',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+            ],
           ),
         ),
       ],
