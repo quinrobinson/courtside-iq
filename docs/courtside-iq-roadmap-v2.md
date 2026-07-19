@@ -1020,7 +1020,43 @@ is what the free-tier RLS limit needs in order to be exercised at all.
     label colour.
   - `CiLogoMark` is painted rather than an asset: `logo-mark.png` is solid
     black and vanished on ink ground, and no white version exists in the repo.
-- Remaining: Forgot/Reset/Reset Successful, Splash, Onboarding x3.
+- Forgot Password, Reset Password and Reset Successful built and routed behind
+  `kUsePasswordReset2`. **Flag is OFF** and must stay off until the deep link
+  lands: Reset Password is reached by a recovery link, and today that link
+  opens a web page, not the app.
+  `[x] built` · `[x] wired` · `[ ] device-verified`
+
+**PASSWORD RECOVERY DEPENDS ON FLUTTERFLOW HOSTING. This is a live risk.**
+
+The recovery email redirects to `https://courtside-iq.flutterflow.app/resetPassword`,
+a FlutterFlow-hosted web page. FlutterFlow was retired 2026-07-19. The page is
+up today (verified HTTP 200), but if that hosting ever lapses, **every reset
+link in every inbox stops working and affected users cannot get back in.**
+
+Decision 2026-07-19: replace it with a `courtsideiq://` deep link so reset
+happens natively on the 2.0 screen. Split into two parts, screens first:
+
+- **Part A, still to do:** register `courtsideiq://` on iOS and Android, handle
+  the incoming recovery link, add the redirect to Supabase's allowlist.
+  Current state: iOS has **no** deep-link configuration at all (no associated
+  domains, no custom scheme beyond Google Sign-In's). Android has a custom
+  scheme `webapp://courtsideiq.app` with `flutter_deeplinking_enabled`.
+  `app_links` is in pubspec but **imported nowhere** - a dead dependency.
+- **Not a clean cutover.** Emails already sent keep pointing at the FlutterFlow
+  page, so it has to stay alive through the transition whatever we do.
+
+**Design gaps found building these:**
+
+- **No frame for what Forgot Password shows after sending.** v1 popped a
+  dialog. Using the design system's Snackbar (`521:2009`) rather than inventing
+  a dialog or a fourth screen. Same family as the missing signup confirmation
+  state. Both want a design pass.
+- **The length rule sat under the wrong field.** The frame places "Use at least
+  8 characters." under CONFIRM PASSWORD, but the rule is enforced on NEW
+  PASSWORD, so a parent would read the rule under one field and see it violated
+  under another. Moved to the field it governs. **The frame should be updated.**
+
+- Remaining: Splash, Onboarding x3.
 
 **Carry-over defects for 4.11 — verify these do not return in the rebuild:**
 

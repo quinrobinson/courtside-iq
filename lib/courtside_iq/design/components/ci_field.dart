@@ -34,6 +34,7 @@ class CiField extends StatefulWidget {
     this.onTrailingTap,
     this.keyboardType,
     this.errorText,
+    this.helperText,
     this.enabled = true,
     this.onChanged,
   });
@@ -55,6 +56,11 @@ class CiField extends StatefulWidget {
 
   final TextInputType? keyboardType;
   final String? errorText;
+
+  /// Standing guidance shown below the input, e.g. "Use at least 8
+  /// characters." An error REPLACES it rather than stacking: two lines of
+  /// small text under one field is noise, and the error is what matters.
+  final String? helperText;
   final bool enabled;
   final ValueChanged<String>? onChanged;
 
@@ -172,6 +178,10 @@ class _CiFieldState extends State<CiField> {
           const SizedBox(height: CiSpace.s1),
           Text(w.errorText!,
               style: CiType.bodyXs.copyWith(color: c.accentEnergy)),
+        ] else if (w.helperText != null && w.helperText!.isNotEmpty) ...[
+          const SizedBox(height: CiSpace.s1),
+          Text(w.helperText!,
+              style: CiType.bodyXs.copyWith(color: c.textMuted)),
         ],
       ],
     );

@@ -22,6 +22,9 @@ import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
 import '/features/auth/auth_landing_page.dart';
 import '/features/auth/email_auth_page.dart';
+import '/features/auth/forgot_password_page.dart';
+import '/features/auth/reset_password_page.dart';
+import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
     as $lock_orientation_library_opafp4;
@@ -258,13 +261,19 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: ResetPasswordWidget.routeName,
         path: ResetPasswordWidget.routePath,
+        // requireAuth stays: the recovery link establishes a session first,
+        // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) => ResetPasswordWidget(),
+        builder: (context, params) =>
+            kUsePasswordReset2 ? const ResetPasswordPage() : ResetPasswordWidget(),
       ),
       FFRoute(
         name: ForgotPasswordWidget.routeName,
         path: ForgotPasswordWidget.routePath,
-        builder: (context, params) => ForgotPasswordWidget(),
+        // 4.9: keeps the v1 route name and path so existing navigation calls
+        // reach it unchanged and the flag is a one-line revert.
+        builder: (context, params) =>
+            kUsePasswordReset2 ? const ForgotPasswordPage() : ForgotPasswordWidget(),
       ),
       FFRoute(
         name: PlayersProfileWidget.routeName,
@@ -285,8 +294,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: ResetSuccesfulWidget.routeName,
         path: ResetSuccesfulWidget.routePath,
+        // requireAuth stays: the recovery link establishes a session first,
+        // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) => ResetSuccesfulWidget(),
+        builder: (context, params) =>
+            kUsePasswordReset2 ? const ResetSuccessfulPage() : ResetSuccesfulWidget(),
       ),
       FFRoute(
         name: EditPlayerPositionWidget.routeName,
