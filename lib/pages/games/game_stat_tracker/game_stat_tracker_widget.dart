@@ -4,6 +4,7 @@ import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/courtside_iq/game_sync/supabase_game_uploader.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/pages/games/game_components/alert_dialog_game_complete/alert_dialog_game_complete_widget.dart';
 import '/pages/games/game_components/edit_game_stat/edit_game_stat_widget.dart';
@@ -4300,22 +4301,28 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                     FFAppState().gameCompleteStatus =
                                         'Saving game details...';
                                     FFAppState().update(() {});
-                                    // Game Details
-                                    _model.newGame = await GamesTable().insert({
-                                      'opponent_team': widget!.oppName,
-                                      'user_id': currentUserUid,
-                                      'player_id': widget!.playerID,
-                                      'player_team_name': widget!.playerTeam,
-                                      'event_name': widget!.eventSelected,
-                                    });
-                                    _shouldSetState = true;
-                                    FFAppState().gameCompleteStatus =
-                                        'Saving player stats...';
-                                    FFAppState().update(() {});
-                                    // Game Stats
-                                    _model.newStats =
-                                        await PlayerGameStatsTable().insert({
-                                      'game_id': _model.newGame?.id,
+                                    // Phase 4.5: offline-first save.
+                                    //
+                                    // The game is written to a local outbox
+                                    // BEFORE any network call, then uploaded.
+                                    // Gyms routinely have no signal, and the
+                                    // previous two-insert save lost the whole
+                                    // game when they failed. Now it queues and
+                                    // syncs when connectivity returns.
+                                    //
+                                    // Ids are generated client-side so the
+                                    // upload upserts by primary key: a retry
+                                    // after a timeout that actually succeeded
+                                    // cannot create a duplicate game.
+                                    final pendingGame = buildPendingGame(
+                                      gameRow: {
+                                        'opponent_team': widget!.oppName,
+                                        'user_id': currentUserUid,
+                                        'player_id': widget!.playerID,
+                                        'player_team_name': widget!.playerTeam,
+                                        'event_name': widget!.eventSelected,
+                                      },
+                                      statsRow: {
                                       'player_id': FFAppState().livePlayerID,
                                       'points': FFAppState().livePoints,
                                       'fg_made': FFAppState().liveTwoMade +
@@ -4339,7 +4346,13 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       'block': FFAppState().liveBlocks,
                                       'off_foul': FFAppState().liveOffFoul,
                                       'def_foul': FFAppState().liveDefFoul,
-                                    });
+                                      },
+                                    );
+                                    // false means "queued for later", NOT
+                                    // "failed" - the game is durably stored
+                                    // either way.
+                                    final syncedNow = await gameSyncQueue
+                                        .enqueueAndTry(pendingGame);
                                     _shouldSetState = true;
                                     if ((valueOrDefault<int>(
                                               functions.calculateEFF(
@@ -4391,7 +4404,12 @@ class _GameStatTrackerWidgetState extends State<GameStatTrackerWidget>
                                       // from v_player_game_stats; we only pass
                                       // the game id. Insight jsonb is written
                                       // to player_game_stats.game_insights.
-                                      final gameId = _model.newGame?.id;
+                                      // Only when the game actually
+                                      // reached Supabase. A queued game has no
+                                      // server row yet, so its insight is
+                                      // generated after the sync instead.
+                                      final gameId =
+                                          syncedNow ? pendingGame.gameId : null;
                                       if (gameId != null) {
                                         await actions
                                             .generateGameInsight(gameId);

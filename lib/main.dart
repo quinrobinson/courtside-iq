@@ -10,6 +10,7 @@ import 'auth/supabase_auth/supabase_user_provider.dart';
 import 'auth/supabase_auth/auth_util.dart';
 
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/game_sync/supabase_game_uploader.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
@@ -42,6 +43,11 @@ void main() async {
 
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
+
+  // Phase 4.5: drain any game queued offline, and keep draining whenever
+  // connectivity returns. Flushes once immediately so a game saved in a gym
+  // last night syncs on launch rather than waiting for a connectivity change.
+  gameSyncQueue.startAutoFlush();
 
   await revenue_cat.initialize(
     "appl_qUqQLfzwGyGbActDYFmZwkLAcsP",
