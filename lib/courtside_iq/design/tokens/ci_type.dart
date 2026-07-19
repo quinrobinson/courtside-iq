@@ -133,6 +133,10 @@ abstract final class CiType {
   static TextStyle get rowLabel =>
       _base(size: 14, weight: CiWeight.semiBold, heightPct: 118);
 
+  /// 13 SemiBold. Small button labels. (21 uses)
+  static TextStyle get buttonSm =>
+      _base(size: 13, weight: CiWeight.semiBold, heightPct: 118);
+
   /// 12 SemiBold. Small emphasized labels. (51 uses)
   static TextStyle get labelStrong =>
       _base(size: 12, weight: CiWeight.semiBold, heightPct: 118);

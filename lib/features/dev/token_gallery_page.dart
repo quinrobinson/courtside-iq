@@ -15,6 +15,9 @@ import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/components/dot_gauge.dart';
+import '/courtside_iq/design/components/ci_badge.dart';
+import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 
 class TokenGalleryPage extends StatefulWidget {
   const TokenGalleryPage({super.key});
@@ -48,6 +51,7 @@ class _TokenGalleryPageState extends State<TokenGalleryPage> {
                     child: ListView(
                       padding: const EdgeInsets.only(bottom: CiSpace.s16),
                       children: const [
+                        _ControlsSection(),
                         _ComponentSection(),
                         _ColorSection(),
                         _TypeSection(),
@@ -594,6 +598,127 @@ class _ComponentSectionState extends State<_ComponentSection> {
               'Ring RADII are tuned by eye - compare against the Figma frame '
               'and adjust innerRadius / ringGap if the spread looks wrong.',
               style: CiType.bodyXs.copyWith(color: c.textFaint)),
+        ),
+      ],
+    );
+  }
+}
+
+
+// --- Buttons / badges / tabs -------------------------------------------------
+
+class _ControlsSection extends StatefulWidget {
+  const _ControlsSection();
+
+  @override
+  State<_ControlsSection> createState() => _ControlsSectionState();
+}
+
+class _ControlsSectionState extends State<_ControlsSection> {
+  int _tab = 1;
+  bool _busy = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _SectionTitle('Buttons'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(spacing: CiSpace.s3, runSpacing: CiSpace.s3, children: [
+                CiButton(label: 'Full Breakdown', onPressed: () {}),
+                CiButton(
+                    label: 'Full Breakdown',
+                    style: CiButtonStyle.secondary,
+                    onPressed: () {}),
+                CiButton(
+                    label: 'Full Breakdown',
+                    style: CiButtonStyle.lime,
+                    onPressed: () {}),
+                CiButton(
+                    label: 'Full Breakdown',
+                    style: CiButtonStyle.orange,
+                    onPressed: () {}),
+              ]),
+              const SizedBox(height: CiSpace.s4),
+              Text('Size Sm', style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              Wrap(spacing: CiSpace.s3, runSpacing: CiSpace.s3, children: [
+                CiButton(
+                    label: 'Full Breakdown',
+                    size: CiButtonSize.sm,
+                    onPressed: () {}),
+                CiButton(
+                    label: 'See plans',
+                    size: CiButtonSize.sm,
+                    style: CiButtonStyle.lime,
+                    icon: Icons.arrow_forward,
+                    onPressed: () {}),
+              ]),
+              const SizedBox(height: CiSpace.s4),
+              Text('Disabled / busy',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              Wrap(spacing: CiSpace.s3, runSpacing: CiSpace.s3, children: [
+                const CiButton(label: 'Disabled', onPressed: null),
+                CiButton(
+                    label: 'Saving game',
+                    busy: _busy,
+                    onPressed: () async {
+                      setState(() => _busy = true);
+                      await Future<void>.delayed(const Duration(seconds: 2));
+                      if (mounted) setState(() => _busy = false);
+                    }),
+              ]),
+              const SizedBox(height: CiSpace.s4),
+              CiButton(label: 'Full width', expand: true, onPressed: () {}),
+            ],
+          ),
+        ),
+        const _SectionTitle('Badges'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.all(CiSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(spacing: CiSpace.s2, runSpacing: CiSpace.s2, children: const [
+                CiBadge(label: 'Elite', tone: CiBadgeTone.good),
+                CiBadge(label: 'Watch', tone: CiBadgeTone.energy),
+                CiBadge(label: 'Solid'),
+              ]),
+              const SizedBox(height: CiSpace.s4),
+              Text('Delta is direction-aware BY MEANING, not sign',
+                  style: CiType.caption.copyWith(color: c.textFaint)),
+              const SizedBox(height: CiSpace.s2),
+              Wrap(spacing: CiSpace.s2, runSpacing: CiSpace.s2, children: [
+                CiBadge.delta(value: 4.2),
+                CiBadge.delta(value: -1.4),
+                CiBadge.delta(value: 0),
+                // Fewer turnovers: negative number, GOOD outcome -> lime.
+                CiBadge.delta(value: -1.4, higherIsBetter: false),
+              ]),
+              const SizedBox(height: CiSpace.s2),
+              Text('the last pill is turnovers: -1.4 is an improvement',
+                  style: CiType.bodyXs.copyWith(color: c.textFaint)),
+            ],
+          ),
+        ),
+        const _SectionTitle('Segmented tabs'),
+        const _Hairline(),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: CiSpace.s4),
+          child: CiSegmentedTabs(
+            labels: const ['Development', 'Averages', 'Games'],
+            index: _tab,
+            onChanged: (i) => setState(() => _tab = i),
+          ),
         ),
       ],
     );
