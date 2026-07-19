@@ -288,6 +288,22 @@ Deno.serve(async (req) => {
   // 23505 = unique_violation: another request already claimed this generation.
   const lostClaim = claimErr !== null && claimErr.code === "23505";
 
+  // Only the request that won the insert may clean up the claim row. A request
+  // that lost and fell through must never delete the winner's in-flight claim.
+  let ownsClaim = !claimErr;
+
+  /** Remove OUR claim row so the next attempt is not blocked by a dead placeholder. */
+  const releaseClaim = async () => {
+    if (!ownsClaim) return;
+    ownsClaim = false;
+    await supabase
+      .from("player_development_insights")
+      .delete()
+      .eq("player_id", playerId)
+      .eq("generated_at_game_id", latestGameId)
+      .is("insight_json", null);
+  };
+
   if (claimErr && !lostClaim) {
     return json({ error: "db_error", detail: claimErr.message }, 500);
   }
@@ -330,13 +346,7 @@ Deno.serve(async (req) => {
       succeeded: false,
       error_kind: "throttled",
     });
-    // Release the claim so the next attempt is not blocked by our placeholder.
-    await supabase
-      .from("player_development_insights")
-      .delete()
-      .eq("player_id", playerId)
-      .eq("generated_at_game_id", latestGameId)
-      .is("insight_json", null);
+    await releaseClaim();
     return json({ error: "rate_limited" }, 429);
   }
 
@@ -356,14 +366,7 @@ Deno.serve(async (req) => {
       succeeded: false,
       error_kind: e instanceof Error ? e.message.slice(0, 120) : "unknown",
     });
-    // Drop our claim so a later request can retry instead of waiting on a
-    // permanently-null row.
-    await supabase
-      .from("player_development_insights")
-      .delete()
-      .eq("player_id", playerId)
-      .eq("generated_at_game_id", latestGameId)
-      .is("insight_json", null);
+    await releaseClaim();
     return json({ error: "insight_unavailable" }, 502);
   }
 
@@ -407,6 +410,8 @@ Deno.serve(async (req) => {
       },
       { onConflict: "player_id,generated_at_game_id" },
     );
+
+  ownsClaim = false; // the row now holds a real insight, nothing to clean up
 
   if (upsertErr) return json({ error: "db_error", detail: upsertErr.message }, 500);
 
