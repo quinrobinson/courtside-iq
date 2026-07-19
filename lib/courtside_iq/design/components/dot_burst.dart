@@ -32,27 +32,53 @@ class _BurstRing {
 class DotBurst extends StatelessWidget {
   const DotBurst({
     super.key,
-    this.size = 390,
-    this.innerRadius = 62,
-    this.ringGap = 34,
-    this.dotSpacing = 22,
+    this.size = _referenceSize,
+    double? innerRadius,
+    double? ringGap,
+    double? dotSpacing,
+    this.glowOpacity = 0.16,
     this.color,
     this.child,
-  });
+  })  : _innerRadius = innerRadius,
+        _ringGap = ringGap,
+        _dotSpacing = dotSpacing;
+
+  /// The size everything was originally measured at: the Splash frame.
+  ///
+  /// GEOMETRY SCALES WITH [size]. These were absolute constants at first,
+  /// which meant the burst was only correct at 390 - rendering it at 220 kept
+  /// the 390-sized ring gaps inside a burst two thirds as wide, and the rings
+  /// visibly drifted apart. Anything derived from this reference reproduces
+  /// the original numbers exactly at 390, so existing call sites are unchanged.
+  static const double _referenceSize = 390;
 
   /// Overall square extent of the burst.
   final double size;
 
-  /// Radius of the first ring. Sized to clear whatever sits in the middle
-  /// (on Splash, the 100px logo mark).
-  final double innerRadius;
+  final double? _innerRadius;
+  final double? _ringGap;
+  final double? _dotSpacing;
+
+  /// How much to scale the reference geometry by.
+  double get _scale => size / _referenceSize;
+
+  /// Radius of the first ring. Clears whatever sits in the middle.
+  double get innerRadius => _innerRadius ?? 62 * _scale;
 
   /// Distance between consecutive rings.
-  final double ringGap;
+  double get ringGap => _ringGap ?? 34 * _scale;
 
   /// Target arc distance between dots. Dot COUNT is derived from this and the
   /// ring radius, so outer rings get more dots and spacing stays even.
-  final double dotSpacing;
+  double get dotSpacing => _dotSpacing ?? 22 * _scale;
+
+  /// Peak alpha of the radial haze behind the dots, at the centre.
+  ///
+  /// The frame carries a 220x220 ellipse on the burst's own centre, behind
+  /// every dot - Figma's codegen drops it because it exports no gradient
+  /// fills, which is why the first build looked flat. Kept low on purpose: it
+  /// should read as depth behind the dots, never as neon. Set 0 to disable.
+  final double glowOpacity;
 
   /// Defaults to the lime accent.
   final Color? color;
@@ -84,6 +110,10 @@ class DotBurst extends StatelessWidget {
           innerRadius: innerRadius,
           ringGap: ringGap,
           dotSpacing: dotSpacing,
+          // Dot radius scales too, or a smaller burst gets reference-sized
+          // dots and reads as coarse.
+          dotScale: _scale,
+          glowOpacity: glowOpacity,
           color: color ?? c.accentGood,
         ),
         child: child == null ? null : Center(child: child),
@@ -98,6 +128,8 @@ class _DotBurstPainter extends CustomPainter {
     required this.innerRadius,
     required this.ringGap,
     required this.dotSpacing,
+    required this.dotScale,
+    required this.glowOpacity,
     required this.color,
   });
 
@@ -105,11 +137,33 @@ class _DotBurstPainter extends CustomPainter {
   final double innerRadius;
   final double ringGap;
   final double dotSpacing;
+  final double dotScale;
+  final double glowOpacity;
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final centre = Offset(size.width / 2, size.height / 2);
+
+    // Haze first, so every dot sits on top of it.
+    if (glowOpacity > 0) {
+      final radius = size.width / 2;
+      canvas.drawCircle(
+        centre,
+        radius,
+        Paint()
+          ..shader = RadialGradient(
+            colors: [
+              color.withValues(alpha: glowOpacity),
+              color.withValues(alpha: glowOpacity * 0.35),
+              color.withValues(alpha: 0),
+            ],
+            // Weighted toward the centre so the falloff is gradual rather
+            // than a visible disc edge.
+            stops: const [0, 0.45, 1],
+          ).createShader(Rect.fromCircle(center: centre, radius: radius)),
+      );
+    }
 
     for (var r = 0; r < rings.length; r++) {
       final ring = rings[r];
@@ -133,7 +187,7 @@ class _DotBurstPainter extends CustomPainter {
             centre.dx + radius * math.cos(angle),
             centre.dy + radius * math.sin(angle),
           ),
-          ring.dotSize / 2,
+          ring.dotSize * dotScale / 2,
           paint,
         );
       }
@@ -143,6 +197,8 @@ class _DotBurstPainter extends CustomPainter {
   @override
   bool shouldRepaint(_DotBurstPainter old) =>
       old.color != color ||
+      old.dotScale != dotScale ||
+      old.glowOpacity != glowOpacity ||
       old.innerRadius != innerRadius ||
       old.ringGap != ringGap ||
       old.dotSpacing != dotSpacing;

@@ -25,13 +25,16 @@ const bool kUseDashboardV2 = true;
 
 /// Email Auth (Sign In / Sign Up / Validation Error).
 ///
-/// This one gates the only way an existing user gets into the app. It stays
-/// false until sign-in, sign-up, and a real password reset have been run on a
-/// device against test Supabase.
+/// Device-verified 2026-07-19: sign in and sign up both work end to end
+/// against test Supabase.
 const bool kUseAuth2 = true;
 
 /// Auth Landing, including Google and Apple sign-in.
-const bool kUseAuthLanding2 = false;
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. The Google and Apple paths call the real
+/// providers, so no test can exercise them - both have to be tapped on a
+/// device. Turn this back off if either fails.
+const bool kUseAuthLanding2 = true;
 
 /// Forgot Password, Reset Password, Reset Successful.
 const bool kUsePasswordReset2 = false;

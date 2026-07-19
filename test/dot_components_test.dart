@@ -105,4 +105,70 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('DotBurst scales with its size', () {
+    // The geometry was absolute, calibrated for the 390 Splash frame. Rendering
+    // at 220 kept the 390-sized ring gaps inside a burst two thirds as wide, so
+    // the rings visibly drifted apart. Anything derived from the reference must
+    // reproduce the original numbers exactly at 390.
+
+    test('reference size reproduces the original constants', () {
+      const b = DotBurst();
+      expect(b.size, 390);
+      expect(b.innerRadius, 62);
+      expect(b.ringGap, 34);
+      expect(b.dotSpacing, 22);
+    });
+
+    test('a smaller burst scales every dimension proportionally', () {
+      const b = DotBurst(size: 195);
+      expect(b.innerRadius, 31);
+      expect(b.ringGap, 17);
+      expect(b.dotSpacing, 11);
+    });
+
+    test('ring gap stays a constant fraction of the burst', () {
+      // The actual symptom: gap relative to size must not change with size.
+      const big = DotBurst();
+      const small = DotBurst(size: 220);
+      expect(small.ringGap / small.size,
+          closeTo(big.ringGap / big.size, 0.0001));
+      expect(small.innerRadius / small.size,
+          closeTo(big.innerRadius / big.size, 0.0001));
+    });
+
+    test('an explicit value still overrides the derived one', () {
+      const b = DotBurst(size: 220, ringGap: 40);
+      expect(b.ringGap, 40);
+      expect(b.innerRadius, closeTo(62 * 220 / 390, 0.0001));
+    });
+  });
+
+  group('DotBurst glow', () {
+    // The frame carries a 220x220 ellipse on the burst's centre, behind every
+    // dot. Figma's codegen exports no gradient fills, so the first build
+    // dropped it silently and the burst read as flat.
+
+    test('is on by default and stays subtle', () {
+      const b = DotBurst();
+      expect(b.glowOpacity, greaterThan(0), reason: 'glow must be present');
+      // Depth behind the dots, never neon. The house rule is no oversaturated
+      // glow by default; this earns its place by being in the design.
+      expect(b.glowOpacity, lessThan(0.25));
+    });
+
+    test('can be switched off', () {
+      expect(const DotBurst(glowOpacity: 0).glowOpacity, 0);
+    });
+
+    testWidgets('renders with and without the glow', (tester) async {
+      for (final o in [0.0, 0.16, 0.24]) {
+        await tester.pumpWidget(MaterialApp(
+          theme: CiTheme.ink(),
+          home: Scaffold(body: Center(child: DotBurst(size: 220, glowOpacity: o))),
+        ));
+        expect(tester.takeException(), isNull, reason: 'glowOpacity=$o');
+      }
+    });
+  });
 }

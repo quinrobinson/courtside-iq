@@ -995,7 +995,32 @@ is what the free-tier RLS limit needs in order to be exercised at all.
   as underline tabs while the other two frames use chips. Decided in favour of
   chips, since a second tab idiom would undercut the real navigation tabs.
   **The Figma frame is stale and should be updated.**
-- Remaining: Auth Landing, Forgot/Reset/Reset Successful, Splash, Onboarding x3.
+- Auth Landing built and routed behind `kUseAuthLanding2`. Google and Apple
+  sign-in both device-verified 2026-07-19.
+  `[x] built` · `[x] wired` · `[x] device-verified` (glow and mark sizing still
+  being tuned on device)
+- **Reading the v1 widget before writing the replacement caught four behaviours
+  the frame does not show**, and this is now the standing approach for 4C:
+  Apple is hidden on Android; OAuth uses `goNamedAuth` (replaces the stack)
+  while email uses `pushNamed` (keeps it); `prepareAuthEvent()` precedes every
+  OAuth call; the legal links are real and point at Apple's standard EULA and
+  `courtsideiq.app/policy`.
+- **Figma's code export is lossy. Read the node tree, not just the generated
+  code.** Two things were silently missing from the export and only found in
+  the metadata: the `TapGestureRecognizer` on the legal links, and the 220x220
+  ellipse behind the burst that produces its glow (`251:977`). Both would have
+  shipped as quiet regressions against the design.
+- Component fixes that came out of this screen:
+  - `DotBurst` geometry was absolute, calibrated for the 390 Splash frame, so
+    it was only correct at that one size. Now scales from a 390 reference;
+    identical output at 390, correct at every other size.
+  - `DotBurst` gained `glowOpacity` for the haze the frame carries.
+  - `CiButton` gained `leading` for brand marks. `FaIconData` is not
+    assignable to `IconData`, and a brand mark must not be recoloured to the
+    label colour.
+  - `CiLogoMark` is painted rather than an asset: `logo-mark.png` is solid
+    black and vanished on ink ground, and no white version exists in the repo.
+- Remaining: Forgot/Reset/Reset Successful, Splash, Onboarding x3.
 
 **Carry-over defects for 4.11 — verify these do not return in the rebuild:**
 

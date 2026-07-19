@@ -20,6 +20,7 @@ import 'serialization_util.dart';
 import '/index.dart';
 import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
+import '/features/auth/auth_landing_page.dart';
 import '/features/auth/email_auth_page.dart';
 import '/features/flags.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
@@ -124,7 +125,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: UserAuthWidget.routeName,
         path: UserAuthWidget.routePath,
-        builder: (context, params) => UserAuthWidget(),
+        // 4.9: keeps the v1 route name and path so existing navigation calls
+        // reach it unchanged and the flag is a one-line revert.
+        builder: (context, params) =>
+            kUseAuthLanding2 ? const AuthLandingPage() : UserAuthWidget(),
       ),
       FFRoute(
         name: GameStatTrackerWidget.routeName,

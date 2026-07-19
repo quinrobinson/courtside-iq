@@ -32,6 +32,7 @@ class CiButton extends StatelessWidget {
     this.style = CiButtonStyle.primary,
     this.size = CiButtonSize.md,
     this.icon,
+    this.leading,
     this.expand = false,
     this.busy = false,
   });
@@ -45,6 +46,11 @@ class CiButton extends StatelessWidget {
   final CiButtonStyle style;
   final CiButtonSize size;
   final IconData? icon;
+
+  /// Arbitrary leading widget, for marks that are not IconData - brand logos
+  /// in particular. Takes precedence over [icon]. Sized and coloured by the
+  /// caller, since a brand mark must not be recoloured to the label colour.
+  final Widget? leading;
 
   /// Stretch to the available width. Off by default: buttons hug their label
   /// in the designs except where a screen explicitly wants full width.
@@ -80,7 +86,10 @@ class CiButton extends StatelessWidget {
             mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
+              if (leading != null) ...[
+                leading!,
+                const SizedBox(width: CiSpace.s2),
+              ] else if (icon != null) ...[
                 Icon(icon, size: md ? 18 : 16, color: fg),
                 const SizedBox(width: CiSpace.s2),
               ],
