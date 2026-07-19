@@ -904,6 +904,22 @@ Built against approved Figma frames, in `lib/features/`. **Decision: new screens
 | 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Email auth, sign-in/sign-up chips |
 | 4.10 | Home/Today | Today feed, empty + first-run states |
 | 4.11 | Players | Players list, Player Profile, Averages, Games, Full Breakdown, About Growth IQ |
+
+**Carry-over defects for 4.11 — verify these do not return in the rebuild:**
+
+- **Duplicate narrative generation.** The v1 profile page swapped tab widgets by
+  type, so every return to the Development tab remounted it and fired another
+  paid Sonnet call. Fixed in v1 via request de-duplication in
+  `PlayerInsightService`; **the 2.0 rebuild must not reintroduce the pattern.**
+  Whatever replaces the tab control should either keep the tabs alive or hoist
+  the fetch above them.
+- **The server-side claim row is UNEXERCISED.** The claim-row guard in
+  generate-player-insight has never actually raced - the client dedup absorbed
+  every duplicate before it reached the server. Treat it as unverified
+  defense-in-depth and exercise it deliberately during 4.11.
+- **`readCached` ignores the game id.** It returns the player's most recent
+  insight regardless of which game generated it, so a stale narrative can render
+  instantly while the current one loads. Not fixed in v1; fix in the rebuild.
 | 4.12 | Games | Games list, filters, skeleton, live-in-progress, no-games |
 | 4.13 | New Game | Create → Setup → Live Tracker → Complete |
 | 4.14 | Game Detail | Hero, stat rows, shooting blocks, scoring mix, insight card, remove game |
