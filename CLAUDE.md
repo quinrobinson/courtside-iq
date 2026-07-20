@@ -119,8 +119,10 @@ To run the backfill:
 - The rows that matter live in **prod**, so this needs the `subscriptions` table promoted there
   first. Do it as its own reviewed step with explicit approval, not folded into other work.
 
-**Also open:** `supabase/migrations/20260615000001_backfill_trend_snapshots.sql` sits in the repo
-**unapplied to test**. That is the same drift pattern that broke the Games tab (see 4.6) - resolve it.
+**Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
+recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its
+snapshot, since test holds no games predating the trigger. The point was closing the drift, not the
+rows: an unapplied migration sitting in the repo is the pattern that broke the Games tab (4.6).
 
 ## Supabase environments
 
@@ -164,9 +166,10 @@ Pause and check with me before:
 ## Known tech debt worth knowing
 
 - `lib/environment_values.dart` loads JSON but doesn't assign the decoded data. Dead code or latent bug.
-- `test/widget_test.dart` has failed since the project was scaffolded (pumps `MyApp()` without
-  initializing Supabase). Not a regression — verified failing on both the old and new SDK. Delete or
-  fix it; a permanently-red test trains everyone to ignore test output.
+- ~~`test/widget_test.dart` permanently red~~ — **deleted 2026-07-19.** It was the default Flutter
+  scaffold test: it pumped `MyApp()`, asserted nothing, and was named "Counter increments smoke
+  test" in an app with no counter. Fixing it would have meant mocking Supabase startup to verify
+  nothing. The suite is now fully green, so a red run means something is actually broken.
 - `player_game_insights` still exists on **prod**. Phase 0.3 said to drop it after the merge; test
   dropped it, prod did not. Needs its own reviewed migration.
 - iOS builds are now **hybrid SPM + CocoaPods** (Flutter 3.44 migrated automatically). Five plugins
