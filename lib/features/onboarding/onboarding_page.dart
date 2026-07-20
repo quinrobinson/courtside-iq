@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/components/ci_page_dots.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -133,7 +134,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 // The indicator sat flush against the body copy. Spacing comes
                 // off the scale, not from nudging until it looks right.
                 const SizedBox(height: CiSpace.s6),
-                _PageIndicator(
+                CiPageDots(
                   count: kOnboardingSlides.length,
                   index: _index,
                 ),
@@ -264,42 +265,6 @@ class _Slide extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Active page is a wide pill, the others are dots.
-///
-/// Deliberately not smooth_page_indicator, which v1 used: the shape change is
-/// what the frames show, and it means position is not carried by colour alone.
-class _PageIndicator extends StatelessWidget {
-  const _PageIndicator({required this.count, required this.index});
-
-  final int count;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    return Semantics(
-      label: 'Page ${index + 1} of $count',
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (var i = 0; i < count; i++)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOut,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              height: 6,
-              width: i == index ? 22 : 6,
-              decoration: BoxDecoration(
-                color: i == index ? c.text : c.textFaint,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

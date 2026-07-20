@@ -62,6 +62,14 @@ abstract final class CiType {
   static TextStyle get statMd =>
       _base(size: 48, weight: CiWeight.light, heightPct: 104, tracking: -2);
 
+  /// 22 Light. The Today hero line, e.g. "Maya is on a 3-game upswing".
+  ///
+  /// Light at this size on purpose: the sentence sits beside a heavy Growth IQ
+  /// number, and a second heavy element would fight it. The score is the
+  /// figure; this is the reading of it.
+  static TextStyle get heroLine =>
+      _base(size: 22, weight: CiWeight.light, heightPct: 122, tracking: -0.4);
+
   /// 32 Light.
   static TextStyle get statSm =>
       _base(size: 32, weight: CiWeight.light, heightPct: 104, tracking: -2);
