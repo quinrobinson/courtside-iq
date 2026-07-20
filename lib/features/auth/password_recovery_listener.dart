@@ -18,6 +18,8 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/nav/nav.dart';
@@ -40,17 +42,42 @@ class PasswordRecoveryListener {
   /// stack two reset screens.
   bool _navigating = false;
 
+  /// Flip to true to diagnose a recovery that lands on the wrong screen.
+  ///
+  /// Left in deliberately. Two fixes for this flow each produced a DIFFERENT
+  /// wrong destination, which means both were guesses, and one failure was
+  /// never explained - it stopped reproducing once the parent signed out
+  /// first. Every branch below reports itself, so if it recurs the cause is
+  /// one bool away instead of another round of inference from where the
+  /// parent landed.
+  static const bool _kLogRecovery = false;
+
+  static void _log(String message) {
+    if (_kLogRecovery) debugPrint('[recovery] $message');
+  }
+
   void start() {
     _sub?.cancel();
     _sub = SupaFlow.client.auth.onAuthStateChange.listen((state) {
+      // EVERY event, not just recovery. If the SDK reports this link as a
+      // plain signedIn rather than passwordRecovery, the listener never runs
+      // at all - and that is indistinguishable from the listener running and
+      // failing unless we can see which arrived.
+      _log('event=${state.event} hasSession=${state.session != null} '
+          'loggedIn=${AppStateNotifier.instance.loggedIn}');
       if (state.event != AuthChangeEvent.passwordRecovery) return;
       _openResetPassword();
     });
+    _log('listening');
   }
 
   void _openResetPassword() {
-    if (_navigating) return;
+    if (_navigating) {
+      _log('ignored: already navigating');
+      return;
+    }
     _navigating = true;
+    _log('recovery detected, waiting for app auth state');
     _waitForAuthThenNavigate();
   }
 
@@ -71,9 +98,15 @@ class PasswordRecoveryListener {
     Timer? timeout;
 
     void attempt() {
-      if (!notifier.loggedIn) return;
+      if (!notifier.loggedIn) {
+        _log('attempt: app not logged in yet');
+        return;
+      }
       final context = appNavigatorKey.currentContext;
-      if (context == null) return;
+      if (context == null) {
+        _log('attempt: no navigator context yet');
+        return;
+      }
 
       notifier.removeListener(attempt);
       timeout?.cancel();
@@ -86,6 +119,7 @@ class PasswordRecoveryListener {
 
       // goNamed, not push: they arrived from an email, not from inside the
       // app, so there is no stack behind this worth preserving.
+      _log('navigating to ${ResetPasswordWidget.routeName}');
       context.goNamed(ResetPasswordWidget.routeName);
 
       // Released after a beat rather than never, so a SECOND genuine recovery
@@ -100,6 +134,7 @@ class PasswordRecoveryListener {
     // Gives up rather than listening forever: a recovery session that never
     // materialises should leave the app usable, not wedged.
     timeout = Timer(const Duration(seconds: 15), () {
+      _log('GAVE UP after 15s: app auth state never reported logged in');
       notifier.removeListener(attempt);
       _navigating = false;
     });

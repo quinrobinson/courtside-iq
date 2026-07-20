@@ -1090,8 +1090,38 @@ entry points.
 
 | # | State | Why it is needed | b | w | v |
 |---|---|---|---|---|---|
-| 4.9b.1 | **Signup - check your email** (`765:3144`) | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. **Without this, prod signup looks broken.** | ☑ | ☑ | ☐ |
-| 4.9b.2 | **Forgot Password - link sent** (`765:3370`) | Replaces the Snackbar. Copy does not confirm whether an account exists, since that would let anyone probe which emails are registered. | ☑ | ☑ | ☐ |
+| 4.9b.1 | **Signup - check your email** (`765:3144`) | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. | ☑ | ☑ | ☑ |
+| 4.9b.2 | **Forgot Password - link sent** (`765:3370`) | Replaces the Snackbar. Copy does not confirm whether an account exists. | ☑ | ☑ | ☑ |
+
+**Both verified on device 2026-07-19 with email confirmation temporarily ON.**
+Signup showed Check Your Email naming the address, the confirmation link
+confirmed the account, and the full recovery loop ran end to end: request,
+email, deep link into the app, new password set, Password Updated.
+
+**A LATENT BUG WAS FOUND ONLY BECAUSE CONFIRMATION WAS TURNED ON.** With it
+OFF, signup returned a session and everything looked right. With it ON, signup
+did nothing at all - silently. `emailCreateAccountFunc` returns null for an
+unconfirmed account, which is indistinguishable from a failure, so the screen
+bailed before it could ever render. **The screen was built, wired, tested and
+still could not have worked on prod.** Fixed by calling `signUp` directly,
+where the SESSION rather than the user says whether they are signed in.
+
+**Two open items from this verification:**
+
+1. **Signup confirmation links open a browser, not the app.** The project's
+   Site URL is still `http://localhost:3000`, a FlutterFlow web-preview
+   leftover, so tapping the link lands on a Safari error page. **The account
+   IS confirmed** - verified in `auth.users` - but a parent has no way to know
+   that, and it looks like signup failed at the last step. Same shape as the
+   password-reset problem, same fix: pass `emailRedirectTo` on signup and
+   handle the resulting event. The deep-link plumbing already exists.
+2. **One recovery failure was never explained.** It landed on onboarding
+   instead of Reset Password, then stopped reproducing once the parent signed
+   out first. The strongest hypothesis is a stale session: "Back to sign in"
+   navigates without clearing one, so recovery cannot assume a signed-out
+   start. **Not fixed, because a third speculative fix is not a fix.**
+   Diagnostic logging is left in `password_recovery_listener.dart` behind
+   `_kLogRecovery`; flip it to true if this recurs.
 
 **Frames approved and built 2026-07-19.** One screen, `CheckEmailPage`, with a
 `CheckEmailPurpose` enum - the two frames are clones differing only in body copy
