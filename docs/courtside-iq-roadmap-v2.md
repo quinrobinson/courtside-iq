@@ -1105,7 +1105,20 @@ entry points.
 ### 4.9 Splash + Onboarding
 
 - Splash and Onboarding x3 built and routed behind `kUseEntry2`.
-  `[x] built` · `[x] wired` · `[ ] device-verified`
+  `[x] built` · `[x] wired` · `[x] device-verified`
+- **Native splash checked on device: no white or coloured flash before the dot
+  burst.** The earlier concern about LaunchScreen.storyboard did not
+  materialise, so nothing to fix there.
+- **The onboarding VISUAL DESIGN is accepted as good-for-now, not final.** The
+  user intends a further design pass. Nothing outside `onboarding_page.dart`
+  depends on the slides' internals, so a redesign is a Figma pass plus swapping
+  copy, images and layout in one file.
+- **The mockup fade is owned in CODE, not the image.** The exports are fully
+  opaque (alpha 255 throughout) and fade by darkening toward `#0F0F0F`. A ramp
+  painted into pixels cannot be smoothed from code - anything added compounds
+  with it and steepens the falloff. **The Figma mockups still carry that baked
+  gradient; removing it would let the code-side ramp do the whole job and read
+  smoother.** Worth doing in the next design pass.
 - **Splash is painted, not an image.** It replaces
   `assets/images/App_Load_d.png`, a fixed bitmap drawn with `BoxFit.cover` that
   distorted on any aspect ratio it was not drawn for. It also replaces the
@@ -1129,8 +1142,7 @@ on device. **Check on the device run; fix before cutover.**
 
 ### Remaining in 4.9
 
-- 4.9b: the two undesigned states above.
-- Native splash background, pending the device check.
+- 4.9b: the two undesigned states above. **This is all that is left.**
 
 **Carry-over defects for 4.11 — verify these do not return in the rebuild:**
 

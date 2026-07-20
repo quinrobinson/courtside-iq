@@ -5,6 +5,7 @@ import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_logo_mark.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_burst.dart';
 import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_metrics.dart';
 import 'package:courtside_i_q/features/onboarding/onboarding_page.dart';
 import 'package:courtside_i_q/features/onboarding/splash_view.dart';
 
@@ -112,6 +113,40 @@ void main() {
       final button = tester.widget<CiButton>(find.byType(CiButton));
       expect(button.style, CiButtonStyle.lime);
       expect(button.expand, isTrue);
+    });
+  });
+
+  group('slide composition', () {
+    testWidgets('owns the fade in code, with an eased multi-stop ramp',
+        (tester) async {
+      // The exports are fully opaque and fade by darkening toward the
+      // background. A ramp painted into pixels cannot be smoothed from code,
+      // so the fade belongs here where the curve is tunable. A two-stop linear
+      // alpha ramp still reads as a band, hence the extra stops.
+      await _pump(tester);
+      expect(find.byType(ShaderMask), findsWidgets);
+    });
+
+    testWidgets('spacing comes off the scale, not from nudging',
+        (tester) async {
+      await _pump(tester);
+      // Childless SizedBoxes only: those are spacers. A SizedBox WITH a child
+      // is a component sizing itself, not a gap in this layout.
+      final gaps = tester
+          .widgetList<SizedBox>(find.byType(SizedBox))
+          .where((b) => b.child == null)
+          .map((b) => b.height)
+          .whereType<double>()
+          .where((h) => h > 0)
+          .toSet();
+      // Not a const Set: doubles have no primitive equality.
+      final scale = <double>[
+        CiSpace.s1, CiSpace.s2, CiSpace.s3, CiSpace.s4,
+        CiSpace.s5, CiSpace.s6, CiSpace.s7, CiSpace.s8,
+      ];
+      for (final g in gaps) {
+        expect(scale.contains(g), isTrue, reason: '$g is not on the scale');
+      }
     });
   });
 

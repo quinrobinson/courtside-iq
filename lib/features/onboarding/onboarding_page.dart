@@ -130,6 +130,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         _Slide(slide: kOnboardingSlides[i]),
                   ),
                 ),
+                // The indicator sat flush against the body copy. Spacing comes
+                // off the scale, not from nudging until it looks right.
+                const SizedBox(height: CiSpace.s6),
                 _PageIndicator(
                   count: kOnboardingSlides.length,
                   index: _index,
@@ -170,7 +173,8 @@ class _TopBar extends StatelessWidget {
         children: [
           // Balances the Skip button so the mark sits truly centred.
           const SizedBox(width: 56),
-          const Expanded(child: Center(child: CiLogoMark(size: 26))),
+          // CiSpace.s7, not a hand-picked 34: sizes come off the scale too.
+          const Expanded(child: Center(child: CiLogoMark(size: CiSpace.s7))),
           GestureDetector(
             onTap: onSkip,
             behavior: HitTestBehavior.opaque,
@@ -201,17 +205,36 @@ class _Slide extends StatelessWidget {
     final c = CiColors.of(context);
     return Column(
       children: [
+        // Sits the mockup below the top bar rather than tight against it.
+        const SizedBox(height: CiSpace.s6),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: CiSpace.s5),
             child: ShaderMask(
-              // The mockup fades out at its lower edge rather than ending on a
-              // hard line, so it reads as a glimpse into the app.
+              // THE FADE LIVES HERE, not in the exported image.
+              //
+              // The exports are fully opaque - alpha 255 everywhere - and fade
+              // by darkening toward #0F0F0F instead. A ramp painted into the
+              // pixels cannot be smoothed from code: anything added compounds
+              // with it and makes the falloff steeper, not gentler. Owning it
+              // here makes the curve a number we can tune.
+              //
+              // Many stops rather than two, because a linear alpha ramp still
+              // reads as a band. This approximates an ease: slow to start,
+              // quickest through the middle, slow to finish.
               shaderCallback: (rect) => const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.white, Colors.white, Colors.transparent],
-                stops: [0, 0.72, 1],
+                colors: [
+                  Colors.white,
+                  Colors.white,
+                  Color(0xE6FFFFFF),
+                  Color(0xB3FFFFFF),
+                  Color(0x66FFFFFF),
+                  Color(0x26FFFFFF),
+                  Colors.transparent,
+                ],
+                stops: [0, 0.42, 0.56, 0.70, 0.82, 0.92, 1],
               ).createShader(rect),
               blendMode: BlendMode.dstIn,
               child: Image.asset(
@@ -225,7 +248,7 @@ class _Slide extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: CiSpace.s5),
+        const SizedBox(height: CiSpace.s6),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
           child: Column(

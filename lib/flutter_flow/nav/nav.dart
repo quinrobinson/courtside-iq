@@ -91,6 +91,22 @@ class AppStateNotifier extends ChangeNotifier {
   }
 }
 
+/// The screen a session starts on, flags applied.
+///
+/// This exists because the flags were applied in three places and one of them
+/// was missed: the signed-OUT branch here still built the v1 OnBoardWidget
+/// directly, so the 2.0 onboarding was routed correctly and never actually
+/// seen. `_initialize` and `errorBuilder` both bypass the route table, so a
+/// flag added only to the route table does nothing for a cold start.
+///
+/// Every entry point calls this. Adding a screen flag means changing one line.
+Widget _entryScreen(AppStateNotifier appStateNotifier) {
+  if (appStateNotifier.loggedIn) {
+    return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
+  }
+  return kUseEntry2 ? const OnboardingPage() : OnBoardWidget();
+}
+
 GoRouter createRouter(AppStateNotifier appStateNotifier) {
   $lock_orientation_library_opafp4.initializeRoutes(
     homePageWidgetName: 'lock_orientation_library_opafp4.HomePage',
@@ -102,18 +118,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
     debugLogDiagnostics: false,
     refreshListenable: appStateNotifier,
     navigatorKey: appNavigatorKey,
-    errorBuilder: (context, state) =>
-        appStateNotifier.loggedIn
-            ? (kUseDashboardV2 ? const DashboardPage() : HomeWidget())
-            : OnBoardWidget(),
+    errorBuilder: (context, state) => _entryScreen(appStateNotifier),
     routes: [
       FFRoute(
         name: '_initialize',
         path: '/',
-        builder: (context, _) =>
-            appStateNotifier.loggedIn
-                ? (kUseDashboardV2 ? const DashboardPage() : HomeWidget())
-                : OnBoardWidget(),
+        builder: (context, _) => _entryScreen(appStateNotifier),
       ),
       FFRoute(
         name: PlayersListWidget.routeName,
@@ -184,6 +194,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         path: OnBoardWidget.routePath,
         // 4.9: keeps the v1 route name and path so existing navigation calls
         // reach it unchanged and the flag is a one-line revert.
+        //
+        // NOT the only way onboarding is reached - _initialize and
+        // errorBuilder bypass the route table entirely, which is why they go
+        // through _entryScreen. Flagging only here left the v1 screen showing
+        // on every cold start.
         builder: (context, params) =>
             kUseEntry2 ? const OnboardingPage() : OnBoardWidget(),
       ),
