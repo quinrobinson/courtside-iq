@@ -62,18 +62,29 @@ class _TodayPageState extends State<TodayPage> {
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
         return Scaffold(
-          // INK, not the light page colour. Overscrolling at the top reveals
-          // whatever sits behind the viewport, and a white flash above a dark
-          // hero on every pull-to-refresh is the seam this palette exists to
-          // avoid. The feed paints its own light ground below.
-          backgroundColor: CiColors.onInk.bg,
+          backgroundColor: c.bg,
           body: FutureBuilder<TodayData>(
             future: _future,
             builder: (context, snap) {
               // Hero first, always. It carries the brand bar, so showing a
               // bare spinner would blank the top of the app on every open.
               final data = snap.data;
-              return RefreshIndicator(
+              // A BACKDROP, ink above and light below. Overscroll reveals
+              // whatever sits behind the scroll view: pulling down at the top
+              // must show ink under the dark hero, and the bottom must stay
+              // light. Making the whole scaffold ink fixed the top and put a
+              // black bar under the feed instead.
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: Column(
+                      children: [
+                        Expanded(child: ColoredBox(color: CiColors.onInk.bg)),
+                        Expanded(child: ColoredBox(color: c.bg)),
+                      ],
+                    ),
+                  ),
+                  RefreshIndicator(
                 onRefresh: _refresh,
                 // On the ink overscroll, so the spinner and its puck match.
                 color: CiColors.onInk.text,
@@ -117,8 +128,7 @@ class _TodayPageState extends State<TodayPage> {
                     else if (data != null)
                       ..._feedSlivers(context, data).map(
                         // Each feed sliver paints the light ground itself, so
-                        // the ink behind the scroll view only ever shows
-                        // through the top overscroll.
+                        // the backdrop only ever shows through an overscroll.
                         (sliver) => DecoratedSliver(
                           decoration: BoxDecoration(color: c.bg),
                           sliver: sliver,
@@ -126,6 +136,8 @@ class _TodayPageState extends State<TodayPage> {
                       ),
                   ],
                 ),
+                  ),
+                ],
               );
             },
           ),
@@ -260,9 +272,10 @@ class _ViewAllGames extends StatelessWidget {
     final c = CiColors.of(context);
     return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: CiSpace.screen, vertical: CiSpace.s4),
+      child: Container(
+        // Matches the section header above the list.
+        height: kFeedBandHeight,
+        padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
         child: Row(
           children: [
             Text('View All Games',

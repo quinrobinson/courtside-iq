@@ -5,6 +5,7 @@ import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_page_dots.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
 import 'package:courtside_i_q/features/home/widgets/today_hero.dart';
 
@@ -81,6 +82,20 @@ void main() {
       await _pump(tester, [_snap(games: 10, points: 185)]);
       final badge = tester.widget<CiBadge>(find.byType(CiBadge));
       expect(badge.tone, CiBadgeTone.ghost);
+    });
+
+    testWidgets('components inside the hero resolve INK, not the page ground',
+        (tester) async {
+      // The hero paints ink but sits inside a light page. Painting a colour
+      // is not the same as declaring a ground: without CiSurface.ink, every
+      // component that resolves its own palette from context - CiBadge,
+      // CiAvatar, CiIconButton - reads LIGHT and renders ink-on-ink. That is
+      // what put black text inside the ghost tag on a dark hero.
+      await _pump(tester, [_snap(games: 10, points: 185)]);
+
+      final ctx = tester.element(find.byType(CiBadge));
+      expect(CiColors.of(ctx).text, CiColors.onInk.text);
+      expect(CiColors.of(ctx).text, isNot(CiColors.onLight.text));
     });
 
     testWidgets('the delta is plain text, not a chip', (tester) async {

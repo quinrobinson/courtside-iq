@@ -165,6 +165,13 @@ class _Stat extends StatelessWidget {
   }
 }
 
+/// Height shared by the section header and the View All Games row.
+///
+/// The two bracket the list, so they have to match. Measured from the frame:
+/// 56 for the header, 54 for the footer - close enough that the difference
+/// read as a mistake rather than a rhythm.
+const double kFeedBandHeight = 56;
+
 /// "Recent Games" with the hairline the frame puts beneath it.
 class FeedSectionHeader extends StatelessWidget {
   const FeedSectionHeader({super.key, required this.title});
@@ -179,12 +186,20 @@ class FeedSectionHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s3),
-          child: Text(title,
-              style: CiType.rowLabel
-                  .copyWith(color: c.textMuted, fontWeight: CiWeight.medium)),
+        SizedBox(
+          // Same height as the View All Games row beneath the list, so the
+          // section is bounded by two matching bands rather than one tall and
+          // one short. kFeedBandHeight is shared by both.
+          height: kFeedBandHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(title,
+                  style: CiType.rowLabel.copyWith(
+                      color: c.textMuted, fontWeight: CiWeight.medium)),
+            ),
+          ),
         ),
         const FeedHairline(),
       ],

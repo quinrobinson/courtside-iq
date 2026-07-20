@@ -21,6 +21,7 @@
 
 import 'package:flutter/material.dart';
 
+import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
@@ -85,8 +86,12 @@ class _TodayHeroState extends State<TodayHero> {
     const c = CiColors.onInk;
     final hasContent = widget.snapshots.isNotEmpty;
 
-    return ColoredBox(
-      color: c.bg,
+    // DECLARES the ground rather than only painting it. CiBadge, CiAvatar and
+    // CiIconButton all resolve their colours from context, so without this
+    // they read the ambient LIGHT palette and render ink-on-ink - which is
+    // exactly what put black text inside the ghost tag on a dark hero.
+    // Painting c.bg by hand is not the same as being on that ground.
+    return CiSurface.ink(
       child: Stack(
         children: [
           // Two soft lime washes, matching glow-a and glow-b in the frame.
