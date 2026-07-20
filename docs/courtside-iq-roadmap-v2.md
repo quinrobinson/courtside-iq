@@ -1078,7 +1078,33 @@ happens natively on the 2.0 screen. Split into two parts, screens first:
   PASSWORD, so a parent would read the rule under one field and see it violated
   under another. Moved to the field it governs. **The frame should be updated.**
 
-- Remaining: Splash, Onboarding x3.
+### 4.9b Undesigned states (BLOCKS 4E cutover)
+
+Two states the app genuinely needs, that no Figma frame covers. Both were
+found while building 4.9. Neither is a nice-to-have: the first is what every
+new user on prod sees, and shipping without it means signup appears to hang.
+
+**Per the standing rule, these get designed and approved in Figma before any
+code.** Place them in the Entry/Auth flow section with connectors from their
+entry points.
+
+| # | State | Why it is needed | b | w | v |
+|---|---|---|---|---|---|
+| 4.9b.1 | **Signup - check your email** | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. Test has confirmation OFF, which is why the verified signup flow is not the one a real parent gets. **Without this, prod signup looks broken.** | ☐ | ☐ | ☐ |
+| 4.9b.2 | **Forgot Password - link sent** | v1 popped a dialog. Currently a Snackbar (`521:2009`), chosen so nothing was invented. Copy deliberately does not confirm whether an account exists, since that would let anyone probe which emails are registered - any design must preserve that. | ☐ | ☐ | ☐ |
+
+**Also for the Figma file, found while building 4.9:**
+
+- **Email Auth - Validation Error (`524:2009`)** draws the sign-in/sign-up
+  control as underline tabs while the other two frames use chips. Chips won.
+  The frame is stale.
+- **Reset Password (`608:2172`)** places "Use at least 8 characters." under
+  CONFIRM PASSWORD, but the rule is enforced on NEW PASSWORD. Moved in code to
+  the field it governs; the frame should follow.
+
+### Remaining in 4.9
+
+- Splash, Onboarding x3.
 
 **Carry-over defects for 4.11 — verify these do not return in the rebuild:**
 
