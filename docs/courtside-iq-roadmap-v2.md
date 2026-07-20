@@ -964,6 +964,36 @@ Built against approved Figma frames, in `lib/features/`. **Decision: new screens
   across Today, Players, Games and Menu, and folding it in would make 4.10
   unreviewable. Currently still the v1 `CustomNavBarWidget`.
 
+**4.10a is BUILT, WIRED and DEVICE-VERIFIED (2026-07-20).** `kUseToday2` is on.
+`DashboardPage` is untouched and still reachable by turning it off.
+
+Corrections that came out of two device reviews, each measured from the frame
+rather than nudged by eye: the second carousel player was unattributed (now
+"Maya's Growth IQ"); the PPG tag is a ghost, not a filled chip; the stat
+columns are `spaceBetween`, since equal `Expanded` slots pooled their slack on
+the right; both feed bands share `kFeedBandHeight`; and the hero now DECLARES
+its ground with `CiSurface.ink` rather than only painting ink - without that,
+every component resolving its palette from context read LIGHT and rendered
+ink-on-ink.
+
+**One deliberate departure from the frame:** the Growth IQ delta is a chip, not
+the frame's plain lime text. Consistency with every other delta in the app beat
+matching one frame. **The frame should be updated to follow.**
+
+**KNOWN ISSUE: the bottom overscroll shows ink.** Scrolling past the end of the
+feed reveals the ink scaffold beneath it. Deferred 2026-07-20 pending the nav
+rebuild, but **the nav is unlikely to fix it on its own**: the cause is that the
+scaffold is ink so the TOP overscroll can reveal ink under the dark hero, and
+the trailing light filler only extends to the viewport edge. The real fix is a
+bottom-anchored light layer behind the scroll view, independent of the nav.
+Revisit when the nav lands, and do not assume it went away.
+
+**STATUS-BAR ICONS ARE WRONG ON EVERY INK SCREEN.** The app pins DARK icons
+globally, from when it was a light-mode design, so the clock and signal bars are
+black on near-black. Today overrides it with an `AnnotatedRegion`; **Auth,
+Onboarding and Splash have the same bug and have not been fixed.** Today is
+simply the first screen dark enough at the very top for it to show.
+
 **DESIGN GAP: the empty header.** A user whose players all lack enough games
 gets an EMPTY header carousel, and no frame covers it. This is NOT the same as
 `Today - Empty (No Players)` (`204:763`), which is for a user with no players
