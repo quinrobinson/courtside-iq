@@ -20,6 +20,7 @@ import 'serialization_util.dart';
 import '/index.dart';
 import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
+import '/features/home/today_page.dart';
 import '/features/auth/auth_landing_page.dart';
 import '/features/auth/email_auth_page.dart';
 import '/features/auth/forgot_password_page.dart';
@@ -102,9 +103,17 @@ class AppStateNotifier extends ChangeNotifier {
 /// Every entry point calls this. Adding a screen flag means changing one line.
 Widget _entryScreen(AppStateNotifier appStateNotifier) {
   if (appStateNotifier.loggedIn) {
-    return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
+    return _homeScreen();
   }
   return kUseEntry2 ? const OnboardingPage() : OnBoardWidget();
+}
+
+/// Home, flags applied. 4.10a's TodayPage supersedes DashboardPage, which
+/// itself superseded HomeWidget - so the newest wins and each older one stays
+/// reachable by turning its successor off.
+Widget _homeScreen() {
+  if (kUseToday2) return const TodayPage();
+  return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
 }
 
 GoRouter createRouter(AppStateNotifier appStateNotifier) {
@@ -206,8 +215,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: HomeWidget.routeName,
         path: HomeWidget.routePath,
         requireAuth: true,
-        builder: (context, params) =>
-            kUseDashboardV2 ? const DashboardPage() : HomeWidget(),
+        builder: (context, params) => _homeScreen(),
       ),
       FFRoute(
         name: EditNameWidget.routeName,

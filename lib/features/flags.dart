@@ -43,6 +43,13 @@ const bool kUseAuthLanding2 = true;
 /// open the app - a half-working recovery flow is worse than none.
 const bool kUsePasswordReset2 = true;
 
+/// Today, rebuilt on the 2.0 design system (4.10a).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. The existing DashboardPage stays live
+/// behind kUseDashboardV2 and is untouched, so flipping this back is a
+/// one-line revert to a working screen.
+const bool kUseToday2 = true;
+
 /// Splash (Dot Burst) and Onboarding x3.
 ///
 /// ON FOR REVIEW, NOT YET VERIFIED. Also swaps the loading splash, so a
