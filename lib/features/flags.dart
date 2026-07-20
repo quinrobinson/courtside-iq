@@ -50,6 +50,14 @@ const bool kUsePasswordReset2 = true;
 /// one-line revert to a working screen.
 const bool kUseToday2 = true;
 
+/// Bottom navigation, rebuilt on the 2.0 design system.
+///
+/// Shared chrome across Home, Players, Games and Menu, so this is the flag
+/// that makes those four stop looking half-migrated. It also FIXES A REAL
+/// DEFECT: the v1 bar pushes tabs onto the stack instead of switching between
+/// them.
+const bool kUseNavBar2 = true;
+
 /// Splash (Dot Burst) and Onboarding x3.
 ///
 /// ON FOR REVIEW, NOT YET VERIFIED. Also swaps the loading splash, so a

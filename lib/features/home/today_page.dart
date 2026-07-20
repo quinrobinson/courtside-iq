@@ -32,6 +32,8 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/features/flags.dart';
+import '/features/nav/ci_nav_bar.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import 'today_repository.dart';
 import 'widgets/game_feed_row.dart';
@@ -115,21 +117,19 @@ class _TodayPageState extends State<TodayPage> {
                 );
               },
             ),
-            // WHITE behind the nav and the home-indicator strip below it.
-            //
-            // The scaffold is ink so the top overscroll reveals ink under the
-            // dark hero, but the v1 nav is a fixed 60pt bar with no bottom
-            // safe-area handling, so the strip beneath it fell through to that
-            // ink and read as a black band. The nav is a separate Scaffold
-            // slot from the body, so painting it light here does not affect
-            // the overscroll at all - the two are not one background.
-            bottomNavigationBar: ColoredBox(
-              color: c.bg,
-              child: const SafeArea(
-                top: false,
-                child: CustomNavBarWidget(page: 'Home'),
-              ),
-            ),
+            // CiNavBar owns its own ground and safe area, so the ColoredBox
+            // and SafeArea wrapper this screen used to need for the v1 bar
+            // are gone. The v1 bar had neither, which is why the
+            // home-indicator strip fell through to the ink scaffold.
+            bottomNavigationBar: kUseNavBar2
+                ? const CiNavBar(active: CiNavTab.home)
+                : ColoredBox(
+                    color: c.bg,
+                    child: const SafeArea(
+                      top: false,
+                      child: CustomNavBarWidget(page: 'Home'),
+                    ),
+                  ),
           ),
         );
       }),
