@@ -1102,9 +1102,35 @@ entry points.
   CONFIRM PASSWORD, but the rule is enforced on NEW PASSWORD. Moved in code to
   the field it governs; the frame should follow.
 
+### 4.9 Splash + Onboarding
+
+- Splash and Onboarding x3 built and routed behind `kUseEntry2`.
+  `[x] built` · `[x] wired` · `[ ] device-verified`
+- **Splash is painted, not an image.** It replaces
+  `assets/images/App_Load_d.png`, a fixed bitmap drawn with `BoxFit.cover` that
+  distorted on any aspect ratio it was not drawn for. It also replaces the
+  loading placeholder inside `FFRoute`, so a regression shows on every cold
+  start.
+- **THREE onboarding slides, not v1's four.** A deliberate change in the 2.0
+  design, not a port.
+- **The slide mockups ARE images**, exported from Figma at 3x (463KB total).
+  Decided 2026-07-19 against the general "avoid images" preference: they are
+  static marketing artwork of a fictional player, not functioning UI, and
+  rebuilding them from live components would mean maintaining three fake
+  screens plus a sparkline component nothing else needs yet. **They will drift
+  as the real screens evolve - re-export when the underlying frames change.**
+
+**Open: the NATIVE splash has not been touched.** iOS still has
+`LaunchScreen.storyboard` with `LaunchBackground`/`LaunchImage`, and
+`flutter_native_splash` is a dependency with no config block. That renders
+before Flutter boots, so if its background is not `#0F0F0F` there is a visible
+flash on every cold start ahead of the 2.0 splash. Invisible in debug, obvious
+on device. **Check on the device run; fix before cutover.**
+
 ### Remaining in 4.9
 
-- Splash, Onboarding x3.
+- 4.9b: the two undesigned states above.
+- Native splash background, pending the device check.
 
 **Carry-over defects for 4.11 — verify these do not return in the rebuild:**
 

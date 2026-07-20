@@ -1,0 +1,41 @@
+// Splash — Phase 4.9
+//
+// Measured from Screens / Splash 191:789: full-bleed ink, the dot burst filling
+// the width, and a 100px logo mark at the centre.
+//
+// Painted, not an image. It replaces `assets/images/App_Load_d.png`, which was
+// a fixed bitmap stretched with BoxFit.cover - so it distorted on any aspect
+// ratio it was not drawn for. The burst is geometry, so it fits every screen.
+//
+// A NATIVE SPLASH RENDERS BEFORE THIS ONE. iOS has LaunchScreen.storyboard and
+// Android its own; if their background is not #0F0F0F there is a visible flash
+// on every cold start before Flutter boots. Invisible in debug, obvious on a
+// real device.
+
+import 'package:flutter/material.dart';
+
+import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/components/dot_burst.dart';
+import '/courtside_iq/design/tokens/ci_colors.dart';
+
+class SplashView extends StatelessWidget {
+  const SplashView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return ColoredBox(
+      // Not CiColors.of(context): this renders inside the router, above any
+      // CiSurface, so it names its ground explicitly.
+      color: CiColors.onInk.bg,
+      child: Center(
+        child: DotBurst(
+          // Fills the width like the frame does. The burst scales its own
+          // geometry, so the rings stay proportionate on any device.
+          size: width,
+          child: CiLogoMark(size: width * 0.26, color: CiColors.onInk.text),
+        ),
+      ),
+    );
+  }
+}

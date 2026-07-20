@@ -1,0 +1,328 @@
+// Onboarding — Phase 4.9
+//
+// Measured from Screens / Onboarding (Slide 1 · Promise) 248:950,
+// (Slide 2 · Insights) 250:955 and (Slide 3 · Growth) 250:1287:
+//
+//   ground     #0F0F0F, ink
+//   top        logo mark centred, "Skip" right
+//   mockup     app-screen preview, fading out at its lower edge
+//   title      h1, centred
+//   body       Regular 16, muted, centred
+//   indicator  active is a wide pill, inactive are dots
+//   CTA        lime pill, full width
+//   footer     "Already have an account? Sign in", Sign in in lime
+//
+// THREE SLIDES, NOT FOUR. v1 ran a four-page PageView; the 2.0 file has three.
+// Not a port - a deliberate change in the design.
+//
+// The mockups are exported images. They depict a FICTIONAL player with
+// fabricated stats and are static marketing artwork, not functioning UI, which
+// is why they are not rebuilt from live components. They will drift as the
+// real screens evolve: re-export from Figma when the underlying frames change.
+
+import 'package:flutter/material.dart';
+
+import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/tokens/ci_colors.dart';
+import '/courtside_iq/design/tokens/ci_metrics.dart';
+import '/courtside_iq/design/tokens/ci_type.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
+
+class OnboardingSlide {
+  const OnboardingSlide({
+    required this.image,
+    required this.title,
+    required this.body,
+  });
+
+  final String image;
+  final String title;
+  final String body;
+}
+
+const kOnboardingSlides = <OnboardingSlide>[
+  OnboardingSlide(
+    image: 'assets/images/onboarding/slide-1.png',
+    title: 'More than a stat tracker',
+    body:
+        'Courtside IQ turns every game into a clear picture of how your player is developing.',
+  ),
+  OnboardingSlide(
+    image: 'assets/images/onboarding/slide-2.png',
+    title: 'Insights, not box scores',
+    body:
+        'Warm, plain-language coaching after every game, focused on how your player is growing.',
+  ),
+  OnboardingSlide(
+    image: 'assets/images/onboarding/slide-3.png',
+    title: 'Follow their growth',
+    body:
+        'Watch development unfold across the season, one game and one story at a time.',
+  ),
+];
+
+class OnboardingPage extends StatefulWidget {
+  const OnboardingPage({super.key});
+
+  @override
+  State<OnboardingPage> createState() => _OnboardingPageState();
+}
+
+class _OnboardingPageState extends State<OnboardingPage> {
+  final _controller = PageController();
+  int _index = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// Skip and Get Started land in the same place. Onboarding is not a gate:
+  /// a parent who already knows what the app does should not have to page
+  /// through three slides to reach sign-in.
+  void _continue() {
+    context.pushNamed(
+      UserAuthWidget.routeName,
+      extra: <String, dynamic>{
+        '__transition_info__': const TransitionInfo(
+          hasTransition: true,
+          transitionType: PageTransitionType.fade,
+          duration: Duration(milliseconds: 400),
+        ),
+      },
+    );
+  }
+
+  void _signIn() {
+    context.pushNamed(
+      UserAuthEmailWidget.routeName,
+      extra: <String, dynamic>{
+        '__transition_info__': const TransitionInfo(
+          hasTransition: true,
+          transitionType: PageTransitionType.fade,
+          duration: Duration(milliseconds: 400),
+        ),
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CiSurface.ink(
+      child: Builder(builder: (context) {
+        final c = CiColors.of(context);
+        return Scaffold(
+          backgroundColor: c.bg,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _TopBar(onSkip: _continue),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _controller,
+                    itemCount: kOnboardingSlides.length,
+                    onPageChanged: (i) => setState(() => _index = i),
+                    itemBuilder: (context, i) =>
+                        _Slide(slide: kOnboardingSlides[i]),
+                  ),
+                ),
+                _PageIndicator(
+                  count: kOnboardingSlides.length,
+                  index: _index,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      CiSpace.screen, CiSpace.s6, CiSpace.screen, CiSpace.s4),
+                  child: CiButton(
+                    label: 'Get Started',
+                    style: CiButtonStyle.lime,
+                    expand: true,
+                    onPressed: _continue,
+                  ),
+                ),
+                _SignInFooter(onTap: _signIn),
+                const SizedBox(height: CiSpace.s4),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.onSkip});
+
+  final VoidCallback onSkip;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+          CiSpace.screen, CiSpace.s3, CiSpace.s4, 0),
+      child: Row(
+        children: [
+          // Balances the Skip button so the mark sits truly centred.
+          const SizedBox(width: 56),
+          const Expanded(child: Center(child: CiLogoMark(size: 26))),
+          GestureDetector(
+            onTap: onSkip,
+            behavior: HitTestBehavior.opaque,
+            child: Semantics(
+              button: true,
+              child: Padding(
+                // Padded to a real touch target; the label alone is too short.
+                padding: const EdgeInsets.symmetric(
+                    vertical: CiSpace.s3, horizontal: CiSpace.s3),
+                child: Text('Skip',
+                    style: CiType.body.copyWith(color: c.textMuted)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Slide extends StatelessWidget {
+  const _Slide({required this.slide});
+
+  final OnboardingSlide slide;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: CiSpace.s5),
+            child: ShaderMask(
+              // The mockup fades out at its lower edge rather than ending on a
+              // hard line, so it reads as a glimpse into the app.
+              shaderCallback: (rect) => const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.white, Colors.white, Colors.transparent],
+                stops: [0, 0.72, 1],
+              ).createShader(rect),
+              blendMode: BlendMode.dstIn,
+              child: Image.asset(
+                slide.image,
+                fit: BoxFit.contain,
+                alignment: Alignment.topCenter,
+                // A missing asset must not blank the slide: the copy below
+                // still carries the message.
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: CiSpace.s5),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+          child: Column(
+            children: [
+              Text(slide.title,
+                  textAlign: TextAlign.center,
+                  style: CiType.h1.copyWith(color: c.text)),
+              const SizedBox(height: CiSpace.s3),
+              Text(slide.body,
+                  textAlign: TextAlign.center,
+                  style: CiType.body.copyWith(color: c.textMuted)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Active page is a wide pill, the others are dots.
+///
+/// Deliberately not smooth_page_indicator, which v1 used: the shape change is
+/// what the frames show, and it means position is not carried by colour alone.
+class _PageIndicator extends StatelessWidget {
+  const _PageIndicator({required this.count, required this.index});
+
+  final int count;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Semantics(
+      label: 'Page ${index + 1} of $count',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < count; i++)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOut,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              height: 6,
+              width: i == index ? 22 : 6,
+              decoration: BoxDecoration(
+                color: i == index ? c.text : c.textFaint,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SignInFooter extends StatelessWidget {
+  const _SignInFooter({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Semantics(
+      button: true,
+      // container + excludeSemantics so this is ONE node a screen reader can
+      // land on. "Sign in" is a TextSpan inside a rich string, not a widget of
+      // its own, so without this the tappable target has no button semantics
+      // and the label merges with the child text instead of replacing it.
+      //
+      // The label matches what is on screen, rather than describing it: a
+      // screen reader user and a sighted user should hear and see the same
+      // words.
+      container: true,
+      excludeSemantics: true,
+      label: 'Already have an account? Sign in',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: CiSpace.s3),
+          child: Text.rich(
+            TextSpan(
+              style: CiType.bodySm.copyWith(color: c.textMuted),
+              children: [
+                const TextSpan(text: 'Already have an account? '),
+                TextSpan(
+                  text: 'Sign in',
+                  style: CiType.bodySm.copyWith(
+                      color: c.accentGood, fontWeight: CiWeight.semiBold),
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}

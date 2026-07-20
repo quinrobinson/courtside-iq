@@ -44,4 +44,7 @@ const bool kUseAuthLanding2 = true;
 const bool kUsePasswordReset2 = true;
 
 /// Splash (Dot Burst) and Onboarding x3.
-const bool kUseEntry2 = false;
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Also swaps the loading splash, so a
+/// regression here is visible on every cold start.
+const bool kUseEntry2 = true;

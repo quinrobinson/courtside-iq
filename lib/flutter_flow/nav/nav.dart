@@ -26,6 +26,8 @@ import '/features/auth/forgot_password_page.dart';
 import '/features/auth/reset_password_page.dart';
 import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
+import '/features/onboarding/onboarding_page.dart';
+import '/features/onboarding/splash_view.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
     as $lock_orientation_library_opafp4;
 
@@ -180,7 +182,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: OnBoardWidget.routeName,
         path: OnBoardWidget.routePath,
-        builder: (context, params) => OnBoardWidget(),
+        // 4.9: keeps the v1 route name and path so existing navigation calls
+        // reach it unchanged and the flag is a one-line revert.
+        builder: (context, params) =>
+            kUseEntry2 ? const OnboardingPage() : OnBoardWidget(),
       ),
       FFRoute(
         name: HomeWidget.routeName,
@@ -552,14 +557,19 @@ class FFRoute {
                   builder: (context, _) => builder(context, ffParams),
                 )
               : builder(context, ffParams);
+          // 4.9: the 2.0 splash is painted, so it fits any aspect ratio. The
+          // v1 asset was a fixed bitmap stretched with BoxFit.cover, which
+          // distorted on anything it was not drawn for.
           final child = appStateNotifier.loading
-              ? Container(
-                  color: Colors.transparent,
-                  child: Image.asset(
-                    'assets/images/App_Load_d.png',
-                    fit: BoxFit.cover,
-                  ),
-                )
+              ? (kUseEntry2
+                  ? const SplashView()
+                  : Container(
+                      color: Colors.transparent,
+                      child: Image.asset(
+                        'assets/images/App_Load_d.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ))
               : page;
 
           final transitionInfo = state.transitionInfo;
