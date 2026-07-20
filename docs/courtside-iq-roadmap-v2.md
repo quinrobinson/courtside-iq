@@ -1036,6 +1036,36 @@ every user's first days in the app, so it is not an edge case.
 Figma pass before 4.10a can be considered done.**
 | 4.11 | Players | Players list, Player Profile, Averages, Games, Full Breakdown, About Growth IQ |
 
+**4.11 is a REBUILD, not a fresh build.** A 2291-line `PlayerProfilePageV2`
+(Phase 2) already implements the profile tabs, data layer and the insight dedup
+fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
+
+**4.11 sub-phasing (2026-07-20):**
+- **4.11a Players List** - list, empty, list-level gating. IN PROGRESS.
+- **4.11b Player Profile + tabs** - rebuild PlayerProfilePageV2. Carries the
+  three roadmap defects: keep the dedup fix, fix `readCached` ignoring game_id,
+  and exercise the claim row.
+- **4.11c Full Breakdown, About Growth IQ, info sheets.**
+- **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
+- **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
+  (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
+
+**4.11a.1 built 2026-07-20** (list + empty). `kUsePlayers2` ON for review.
+`[x] built` · `[x] wired` · `[ ] device-verified`
+- Hybrid ground like Today: ink header, light rows. Row carries avatar, name,
+  "position, band · N games", PPG/RPG/APG, and a DotGauge with Growth IQ + a
+  Building/Steady/Rising chip.
+- Averages from lifetime totals; Growth IQ from per-game rows, reusing the
+  Today builder. Two queries, no per-player fan-out.
+- **4.11a.2 (gating) still to do:** free add-gate sheet, 3-player cap dialog,
+  premium-lapsed banner. Client-side entitlement, per the approved boundary.
+
+**NOTE a header/list trend-word discrepancy.** The Today header (4.10a) labels
+trend Rising/Steady/**Dipping** from the delta SIGN. Growth IQ's own
+classification is Building/Steady/Rising by movement THRESHOLD, which is what
+the frames show and what the players list uses. The header should be
+reconciled to the real GrowthTrend - logged, not yet done.
+
 **4.9 scope was widened on 2026-07-19.** Auth Landing and the Forgot / Reset /
 Reset Successful trio had approved Figma frames and live v1 equivalents, but no
 phase item owned them. An unowned screen means either a v1 page survives into

@@ -21,6 +21,7 @@ import '/index.dart';
 import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
 import '/features/home/today_page.dart';
+import '/features/players/players_list_page.dart';
 import '/features/auth/auth_landing_page.dart';
 import '/features/auth/email_auth_page.dart';
 import '/features/auth/forgot_password_page.dart';
@@ -138,7 +139,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: PlayersListWidget.routeName,
         path: PlayersListWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => PlayersListWidget(),
+        // 4.11a: keeps the v1 route name and path so existing navigation
+        // reaches it unchanged; the flag is a one-line revert.
+        builder: (context, params) =>
+            kUsePlayers2 ? const PlayersListPage() : PlayersListWidget(),
       ),
       FFRoute(
         name: MenuWidget.routeName,

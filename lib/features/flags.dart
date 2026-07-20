@@ -58,6 +58,12 @@ const bool kUseToday2 = true;
 /// them.
 const bool kUseNavBar2 = true;
 
+/// Players list, rebuilt on the 2.0 design system (4.11a).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. The v1 PlayersListWidget stays reachable
+/// by turning it off.
+const bool kUsePlayers2 = true;
+
 /// Splash (Dot Burst) and Onboarding x3.
 ///
 /// ON FOR REVIEW, NOT YET VERIFIED. Also swaps the loading splash, so a
