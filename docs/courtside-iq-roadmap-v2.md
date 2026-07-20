@@ -1024,9 +1024,31 @@ is what the free-tier RLS limit needs in order to be exercised at all.
   `kUsePasswordReset2`. **Flag is OFF** and must stay off until the deep link
   lands: Reset Password is reached by a recovery link, and today that link
   opens a web page, not the app.
-  `[x] built` · `[x] wired` · `[ ] device-verified`
+  `[x] built` · `[x] wired` · `[x] device-verified`
 
-**PASSWORD RECOVERY DEPENDS ON FLUTTERFLOW HOSTING. This is a live risk.**
+**Part A is DONE and device-verified 2026-07-19.** Full loop confirmed on a
+real device against test: Forgot Password sends, the email arrives, the link
+opens the app, Reset Password applies, and the new password signs in.
+
+**The FlutterFlow page still cannot be switched off.** Every recovery email
+already sent points at it, and older installs keep sending it. It can only be
+retired once those links have expired and those installs have updated.
+
+**Two device-only bugs, both from the same root cause: two clocks that do not
+agree.** Supabase emits `passwordRecovery` the instant it parses the link,
+while `AppStateNotifier` is driven by a separate user stream that lags. Acting
+on the Supabase event alone navigated to a `requireAuth` route while the app
+still believed nobody was signed in:
+
+  1. FFRoute honoured a stale "come back here once you log in" stash and sent
+     the parent to Home before they could type a password.
+  2. With that cleared, `requireAuth && !loggedIn` bounced them to /onBoard.
+
+Chasing each destination in turn was treating symptoms. The listener now waits
+for the app's own `loggedIn` before navigating, with a 15s give-up so a
+recovery session that never materialises leaves the app usable.
+
+**ORIGINAL RISK, NOW RESOLVED - kept for the record.**
 
 The recovery email redirects to `https://courtside-iq.flutterflow.app/resetPassword`,
 a FlutterFlow-hosted web page. FlutterFlow was retired 2026-07-19. The page is

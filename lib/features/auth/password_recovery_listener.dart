@@ -18,7 +18,6 @@
 
 import 'dart:async';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/nav/nav.dart';
@@ -51,19 +50,62 @@ class PasswordRecoveryListener {
 
   void _openResetPassword() {
     if (_navigating) return;
-    final nav = appNavigatorKey.currentContext;
-    if (nav == null) return;
-
     _navigating = true;
-    // goNamed, not push: the parent arrived from an email, not from inside the
-    // app, so there is no stack behind this worth preserving.
-    nav.goNamed(ResetPasswordWidget.routeName);
+    _waitForAuthThenNavigate();
+  }
 
-    // Released on the next frame rather than never, so a SECOND, genuine
-    // recovery later in the session still works.
-    Future<void>.delayed(const Duration(seconds: 2), () {
+  /// Navigates once the APP agrees the parent is signed in.
+  ///
+  /// Two clocks are running and they do not agree. Supabase emits
+  /// passwordRecovery the moment it parses the link, but AppStateNotifier is
+  /// driven by a separate user stream that has not caught up yet. Navigating
+  /// on the Supabase event alone sends the parent to a `requireAuth` route
+  /// while the app still believes nobody is signed in, and FFRoute bounces
+  /// them straight to /onBoard.
+  ///
+  /// So: wait for `loggedIn`, then go. Both bounces seen on device came from
+  /// jumping the gun - first onto Home via a stale redirect stash, then onto
+  /// onboarding via requireAuth.
+  void _waitForAuthThenNavigate() {
+    final notifier = AppStateNotifier.instance;
+    Timer? timeout;
+
+    void attempt() {
+      if (!notifier.loggedIn) return;
+      final context = appNavigatorKey.currentContext;
+      if (context == null) return;
+
+      notifier.removeListener(attempt);
+      timeout?.cancel();
+
+      // FFRoute stashes a "come back here once you log in" location whenever
+      // it bounces a signed-out user off a protected route. Recovery is the
+      // one sign-in that must NOT resume where they left off, or the router
+      // pulls them onto Home before they can type a password.
+      notifier.clearRedirectLocation();
+
+      // goNamed, not push: they arrived from an email, not from inside the
+      // app, so there is no stack behind this worth preserving.
+      context.goNamed(ResetPasswordWidget.routeName);
+
+      // Released after a beat rather than never, so a SECOND genuine recovery
+      // later in the same session still works.
+      Future<void>.delayed(const Duration(seconds: 3), () {
+        _navigating = false;
+      });
+    }
+
+    notifier.addListener(attempt);
+
+    // Gives up rather than listening forever: a recovery session that never
+    // materialises should leave the app usable, not wedged.
+    timeout = Timer(const Duration(seconds: 15), () {
+      notifier.removeListener(attempt);
       _navigating = false;
     });
+
+    // The state may already be there on a warm start.
+    attempt();
   }
 
   void dispose() {
