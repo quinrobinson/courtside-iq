@@ -74,46 +74,64 @@ class _TodayPageState extends State<TodayPage> {
             statusBarBrightness: Brightness.dark, // iOS
           ),
           child: Scaffold(
-            // INK. Overscrolling at the top reveals whatever is behind the
-            // scroll view, and that must be ink beneath a dark hero. Every
-            // sliver below the hero paints its own light ground, INCLUDING a
-            // trailing filler - the previous attempt left that filler empty,
-            // so it had nothing to paint and the ink showed through as a
-            // black bar at the bottom.
-            backgroundColor: CiColors.onInk.bg,
+            // Transparent: the two-tone backdrop below owns the ground, not
+            // the scaffold. A SINGLE scaffold colour cannot be ink at the top
+            // and light at the bottom, and both overscroll ends reveal it -
+            // which is why every earlier attempt fixed one end and broke the
+            // other.
+            backgroundColor: Colors.transparent,
             body: FutureBuilder<TodayData>(
               future: _future,
               builder: (context, snap) {
                 // Hero first, always. It carries the brand bar, so a bare
                 // spinner would blank the top of the app on every open.
                 final data = snap.data;
-                return RefreshIndicator(
+                return Stack(
+                  children: [
+                    // TWO-TONE BACKDROP behind the transparent scroll view.
+                    // Light fills everything, so the BOTTOM overscroll reveals
+                    // light. A tall ink cap is anchored to the top, so the TOP
+                    // overscroll reveals ink under the dark hero. The cap's
+                    // lower seam sits at 360, always behind the opaque hero and
+                    // feed, so it is never seen - the content fills the viewport
+                    // in every state, guaranteeing at least that much cover.
+                    Positioned.fill(child: ColoredBox(color: c.bg)),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 360,
+                      child: ColoredBox(color: CiColors.onInk.bg),
+                    ),
+                    RefreshIndicator(
                   onRefresh: _refresh,
                   // Sits on the ink overscroll, so both match it.
                   color: CiColors.onInk.text,
                   backgroundColor: CiColors.onInk.surfaceSunk,
-                  child: CustomScrollView(
-                    // Always scrollable, or pull-to-refresh dies whenever the
-                    // content is shorter than the screen - exactly the empty
-                    // states.
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: TodayHero(
-                          snapshots: data?.headerPlayers ?? const [],
-                          userName: currentUserDisplayName,
-                          onProfile: () =>
-                              context.pushNamed(MenuWidget.routeName),
-                          onPlayerTap: (s) => context.pushNamed(
-                            PlayersListWidget.routeName,
+                    child: CustomScrollView(
+                      // Always scrollable, or pull-to-refresh dies whenever
+                      // the content is shorter than the screen - exactly the
+                      // empty states.
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: TodayHero(
+                            snapshots: data?.headerPlayers ?? const [],
+                            userName: currentUserDisplayName,
+                            onProfile: () =>
+                                context.pushNamed(MenuWidget.routeName),
+                            onPlayerTap: (s) => context.pushNamed(
+                              PlayersListWidget.routeName,
+                            ),
                           ),
                         ),
-                      ),
-                      // Everything below the hero is light ground, whatever
-                      // state it is in.
-                      ..._bodySlivers(context, c, snap, data),
-                    ],
+                        // Everything below the hero is light ground, whatever
+                        // state it is in.
+                        ..._bodySlivers(context, c, snap, data),
+                      ],
+                    ),
                   ),
+                  ],
                 );
               },
             ),
