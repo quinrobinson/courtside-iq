@@ -946,6 +946,32 @@ Built against approved Figma frames, in `lib/features/`. **Decision: new screens
 |---|---|---|
 | 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Auth Landing, Email auth (sign-in/sign-up chips + validation error), Forgot Password, Reset Password, Reset Successful |
 | 4.10 | Home/Today | Today feed, empty + first-run states |
+
+**4.10 decisions, 2026-07-20:**
+
+- **Growth IQ is computed CLIENT-SIDE** via `lib/courtside_iq/growth_iq.dart`.
+  It is not stored anywhere. The repository feeds per-game metrics into the
+  existing formula.
+- **The Today header shows ONLY players with a computable Growth IQ.** A player
+  with too few games is absent from the header while remaining everywhere else
+  in the app. The header is about growth, and growth needs games; a zero would
+  be a claim about the child. Encoded in `headerSnapshots()`.
+- **Paging dots follow the FILTERED count.** Two players where only one
+  qualifies is a single-item header with no dots.
+- **Recent games cap raised from 3 to 5.** A deliberate change from production
+  behaviour, not an accident of the redesign.
+- **The bottom nav is its own item, not part of 4.10.** It is shared chrome
+  across Today, Players, Games and Menu, and folding it in would make 4.10
+  unreviewable. Currently still the v1 `CustomNavBarWidget`.
+
+**DESIGN GAP: the empty header.** A user whose players all lack enough games
+gets an EMPTY header carousel, and no frame covers it. This is NOT the same as
+`Today - Empty (No Players)` (`204:763`), which is for a user with no players
+at all. The new state is "players exist, none have enough games yet" - which is
+every user's first days in the app, so it is not an edge case.
+
+`headerSnapshots()` can return empty and its callers must handle it. **Needs a
+Figma pass before 4.10a can be considered done.**
 | 4.11 | Players | Players list, Player Profile, Averages, Games, Full Breakdown, About Growth IQ |
 
 **4.9 scope was widened on 2026-07-19.** Auth Landing and the Forgot / Reset /

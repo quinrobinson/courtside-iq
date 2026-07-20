@@ -92,8 +92,33 @@ class TodaySnapshot {
     return d > 0 ? '+$d' : '$d';
   }
 
-  /// True when the header should show the locked state instead of a score.
-  bool get isLocked => growthIq == null;
+  /// Whether this player belongs in the Today header at all.
+  ///
+  /// The header is about growth, and growth needs games. A player with no
+  /// computable Growth IQ is NOT shown there with a zero or a placeholder -
+  /// they are absent from it, while remaining everywhere else in the app.
+  /// Decided 2026-07-20.
+  bool get qualifiesForHeader => growthIq != null;
+}
+
+/// The players the Today header pages through, in order.
+///
+/// Filters to those with a Growth IQ, then puts the strongest movement first
+/// so a parent opening the app lands on something meaningful rather than on
+/// whichever player happens to sort first alphabetically.
+///
+/// **Can return an empty list**, and callers must handle that: a user whose
+/// players have no games yet has nothing to show in the header. There is no
+/// approved design for that state - see the roadmap under 4.10.
+List<TodaySnapshot> headerSnapshots(List<TodaySnapshot> all) {
+  final qualifying = all.where((s) => s.qualifiesForHeader).toList();
+  qualifying.sort((a, b) {
+    // Most games first: more games means a more trustworthy score.
+    final byGames = b.totalGames.compareTo(a.totalGames);
+    if (byGames != 0) return byGames;
+    return a.firstName.compareTo(b.firstName);
+  });
+  return qualifying;
 }
 
 /// Whether the header shows paging dots.

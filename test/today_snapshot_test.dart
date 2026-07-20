@@ -83,12 +83,53 @@ void main() {
     });
   });
 
-  group('locked', () {
-    test('no score means locked, and no score is shown', () {
-      // A zero would be a claim about the player. "Not enough games yet" is
-      // not a claim.
-      expect(_snap(growthIq: null).isLocked, isTrue);
-      expect(_snap(growthIq: 40).isLocked, isFalse);
+  group('header membership', () {
+    test('a player without a Growth IQ is absent, not shown as zero', () {
+      // The header is about growth, and growth needs games. A zero would be a
+      // claim about the child.
+      expect(_snap(growthIq: null).qualifiesForHeader, isFalse);
+      expect(_snap(growthIq: 40).qualifiesForHeader, isTrue);
+    });
+
+    test('filters out players with no score', () {
+      final list = headerSnapshots([
+        _snap(first: 'Maya', growthIq: 82, totalGames: 10),
+        _snap(first: 'Jordan', growthIq: null, totalGames: 1),
+      ]);
+      expect(list.map((s) => s.firstName), ['Maya']);
+    });
+
+    test('orders by games, so the most trustworthy score leads', () {
+      final list = headerSnapshots([
+        _snap(first: 'Jordan', growthIq: 70, totalGames: 6),
+        _snap(first: 'Maya', growthIq: 82, totalGames: 12),
+      ]);
+      expect(list.map((s) => s.firstName), ['Maya', 'Jordan']);
+    });
+
+    test('breaks ties by name rather than leaving order to chance', () {
+      final list = headerSnapshots([
+        _snap(first: 'Zoe', growthIq: 70, totalGames: 6),
+        _snap(first: 'Amara', growthIq: 82, totalGames: 6),
+      ]);
+      expect(list.map((s) => s.firstName), ['Amara', 'Zoe']);
+    });
+
+    test('CAN return empty, and callers must handle it', () {
+      // A user whose players have no games yet has nothing for the header.
+      // There is no approved design for that state.
+      expect(headerSnapshots([_snap(growthIq: null)]), isEmpty);
+      expect(headerSnapshots(const []), isEmpty);
+    });
+
+    test('paging follows the FILTERED count, not the player count', () {
+      // Two players where only one qualifies is a single-item header, and a
+      // lone dot would invite a swipe that does nothing.
+      final list = headerSnapshots([
+        _snap(first: 'Maya', growthIq: 82),
+        _snap(first: 'Jordan', growthIq: null),
+      ]);
+      expect(showsPlayerPaging(list.length), isFalse);
     });
   });
 
