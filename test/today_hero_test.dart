@@ -80,8 +80,11 @@ void main() {
     testWidgets('the PPG tag is ghost, not a filled chip', (tester) async {
       // A filled grey pill beside the score competes with it.
       await _pump(tester, [_snap(games: 10, points: 185)]);
-      final badge = tester.widget<CiBadge>(find.byType(CiBadge));
-      expect(badge.tone, CiBadgeTone.ghost);
+      // Two badges now: the PPG tag and the delta chip.
+      final ppgTag = tester
+          .widgetList<CiBadge>(find.byType(CiBadge))
+          .firstWhere((b) => b.label.contains('PPG'));
+      expect(ppgTag.tone, CiBadgeTone.ghost);
     });
 
     testWidgets('components inside the hero resolve INK, not the page ground',
@@ -93,18 +96,27 @@ void main() {
       // what put black text inside the ghost tag on a dark hero.
       await _pump(tester, [_snap(games: 10, points: 185)]);
 
-      final ctx = tester.element(find.byType(CiBadge));
+      final ctx = tester.element(find.byType(CiBadge).first);
       expect(CiColors.of(ctx).text, CiColors.onInk.text);
       expect(CiColors.of(ctx).text, isNot(CiColors.onLight.text));
     });
 
-    testWidgets('the delta is plain text, not a chip', (tester) async {
-      // The frame draws it as lime text with a triangle, so movement reads as
-      // a note on the score rather than a second object beside it.
+    testWidgets('the delta is a chip, coloured by meaning', (tester) async {
+      // Chosen over the frame's plain lime text, for consistency with every
+      // other delta in the app. A gain is lime because higher Growth IQ is
+      // better - CiBadge.delta reads MEANING, not sign.
       await _pump(tester, [_snap(delta: 4)]);
-      expect(find.textContaining('+4'), findsOneWidget);
-      // Only the PPG tag is a badge.
-      expect(find.byType(CiBadge), findsOneWidget);
+      final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
+      final delta = badges.firstWhere((b) => b.label.contains('4'));
+      expect(delta.tone, CiBadgeTone.good);
+      expect(delta.label, '+4');
+    });
+
+    testWidgets('a drop reads as energy, not as a failure', (tester) async {
+      await _pump(tester, [_snap(delta: -3)]);
+      final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
+      final delta = badges.firstWhere((b) => b.label.contains('3'));
+      expect(delta.tone, CiBadgeTone.energy);
     });
 
     testWidgets('shows the gauge, score and trend word', (tester) async {

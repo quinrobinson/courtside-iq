@@ -22,6 +22,7 @@
 // screen sits above an old-looking nav bar until that lands.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
@@ -61,92 +62,110 @@ class _TodayPageState extends State<TodayPage> {
     return CiSurface.light(
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
-        return Scaffold(
-          backgroundColor: c.bg,
-          body: FutureBuilder<TodayData>(
-            future: _future,
-            builder: (context, snap) {
-              // Hero first, always. It carries the brand bar, so showing a
-              // bare spinner would blank the top of the app on every open.
-              final data = snap.data;
-              // A BACKDROP, ink above and light below. Overscroll reveals
-              // whatever sits behind the scroll view: pulling down at the top
-              // must show ink under the dark hero, and the bottom must stay
-              // light. Making the whole scaffold ink fixed the top and put a
-              // black bar under the feed instead.
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: Column(
-                      children: [
-                        Expanded(child: ColoredBox(color: CiColors.onInk.bg)),
-                        Expanded(child: ColoredBox(color: c.bg)),
-                      ],
-                    ),
-                  ),
-                  RefreshIndicator(
-                onRefresh: _refresh,
-                // On the ink overscroll, so the spinner and its puck match.
-                color: CiColors.onInk.text,
-                backgroundColor: CiColors.onInk.surfaceSunk,
-                child: CustomScrollView(
-                  // Always scrollable, or pull-to-refresh dies whenever the
-                  // content is shorter than the screen - which is exactly the
-                  // empty states.
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: TodayHero(
-                        snapshots: data?.headerPlayers ?? const [],
-                        userName: currentUserDisplayName,
-                        onProfile: () =>
-                            context.pushNamed(MenuWidget.routeName),
-                        onPlayerTap: (s) => context.pushNamed(
-                          PlayersListWidget.routeName,
-                        ),
-                      ),
-                    ),
-                    if (snap.connectionState == ConnectionState.waiting &&
-                        data == null)
-                      const SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (snap.hasError)
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: _Message(
-                          title: 'Could not load your games',
-                          body: 'Pull down to try again.',
-                        ),
-                      )
-                    else if (data != null && data.hasNoPlayers)
-                      const SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: _AddFirstPlayer(),
-                      )
-                    else if (data != null)
-                      ..._feedSlivers(context, data).map(
-                        // Each feed sliver paints the light ground itself, so
-                        // the backdrop only ever shows through an overscroll.
-                        (sliver) => DecoratedSliver(
-                          decoration: BoxDecoration(color: c.bg),
-                          sliver: sliver,
-                        ),
-                      ),
-                  ],
-                ),
-                  ),
-                ],
-              );
-            },
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          // LIGHT status-bar icons. The app pins DARK ones globally because
+          // it was a light-mode design, but Today's hero is ink, so the clock
+          // and signal bars were black on near-black.
+          value: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light, // Android
+            statusBarBrightness: Brightness.dark, // iOS
           ),
-          // v1 chrome, deliberately. Rebuilding the nav is its own item, so
-          // this screen sits above an old-looking bar until that lands.
-          bottomNavigationBar: const CustomNavBarWidget(page: 'Home'),
+          child: Scaffold(
+            // INK. Overscrolling at the top reveals whatever is behind the
+            // scroll view, and that must be ink beneath a dark hero. Every
+            // sliver below the hero paints its own light ground, INCLUDING a
+            // trailing filler - the previous attempt left that filler empty,
+            // so it had nothing to paint and the ink showed through as a
+            // black bar at the bottom.
+            backgroundColor: CiColors.onInk.bg,
+            body: FutureBuilder<TodayData>(
+              future: _future,
+              builder: (context, snap) {
+                // Hero first, always. It carries the brand bar, so a bare
+                // spinner would blank the top of the app on every open.
+                final data = snap.data;
+                return RefreshIndicator(
+                  onRefresh: _refresh,
+                  // Sits on the ink overscroll, so both match it.
+                  color: CiColors.onInk.text,
+                  backgroundColor: CiColors.onInk.surfaceSunk,
+                  child: CustomScrollView(
+                    // Always scrollable, or pull-to-refresh dies whenever the
+                    // content is shorter than the screen - exactly the empty
+                    // states.
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: TodayHero(
+                          snapshots: data?.headerPlayers ?? const [],
+                          userName: currentUserDisplayName,
+                          onProfile: () =>
+                              context.pushNamed(MenuWidget.routeName),
+                          onPlayerTap: (s) => context.pushNamed(
+                            PlayersListWidget.routeName,
+                          ),
+                        ),
+                      ),
+                      // Everything below the hero is light ground, whatever
+                      // state it is in.
+                      ..._bodySlivers(context, c, snap, data),
+                    ],
+                  ),
+                );
+              },
+            ),
+            // v1 chrome, deliberately. Rebuilding the nav is its own item, so
+            // this screen sits above an old-looking bar until that lands.
+            bottomNavigationBar: const CustomNavBarWidget(page: 'Home'),
+          ),
         );
       }),
     );
+  }
+
+  /// Wraps each sliver in the light ground so the ink scaffold only ever shows
+  /// through the top overscroll.
+  List<Widget> _bodySlivers(
+    BuildContext context,
+    CiColors c,
+    AsyncSnapshot<TodayData> snap,
+    TodayData? data,
+  ) {
+    Widget light(Widget sliver) => DecoratedSliver(
+          decoration: BoxDecoration(color: c.bg),
+          sliver: sliver,
+        );
+
+    if (snap.connectionState == ConnectionState.waiting && data == null) {
+      return [
+        light(const SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(child: CircularProgressIndicator()),
+        )),
+      ];
+    }
+    if (snap.hasError) {
+      return [
+        light(const SliverFillRemaining(
+          hasScrollBody: false,
+          child: _Message(
+            title: 'Could not load your games',
+            body: 'Pull down to try again.',
+          ),
+        )),
+      ];
+    }
+    if (data == null) return const [];
+    if (data.hasNoPlayers) {
+      return [
+        light(const SliverFillRemaining(
+          hasScrollBody: false,
+          child: _AddFirstPlayer(),
+        )),
+      ];
+    }
+    return _feedSlivers(context, data).map(light).toList();
   }
 
   List<Widget> _feedSlivers(BuildContext context, TodayData data) {
@@ -184,9 +203,13 @@ class _TodayPageState extends State<TodayPage> {
       // the section reads as bounded rather than trailing off.
       const SliverToBoxAdapter(child: FeedHairline()),
       const SliverToBoxAdapter(child: SizedBox(height: CiSpace.s8)),
-      // Fills whatever is left with light ground, so a short list does not
-      // leave ink showing beneath it.
-      const SliverFillRemaining(hasScrollBody: false, child: SizedBox.shrink()),
+      // Fills whatever is left with light ground. A SizedBox.shrink here
+      // paints NOTHING, which is what let the ink scaffold show through as a
+      // black bar under a short list.
+      SliverFillRemaining(
+        hasScrollBody: false,
+        child: ColoredBox(color: CiColors.of(context).bg),
+      ),
     ];
   }
 }

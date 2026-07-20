@@ -241,29 +241,6 @@ class _BrandRow extends StatelessWidget {
   }
 }
 
-/// Movement as text, not a chip. Lime for a gain, orange for a drop, muted
-/// when flat - the same meaning-not-sign rule CiBadge.delta uses.
-class _DeltaText extends StatelessWidget {
-  const _DeltaText({required this.delta});
-
-  final int delta;
-
-  @override
-  Widget build(BuildContext context) {
-    const c = CiColors.onInk;
-    final (String glyph, Color colour) = delta > 0
-        ? ('▲ ', c.accentGood)
-        : delta < 0
-            ? ('▼ ', c.accentEnergy)
-            : ('', c.textMuted);
-    final sign = delta > 0 ? '+' : '';
-
-    return Text('$glyph$sign$delta',
-        style: CiType.bodySm
-            .copyWith(color: colour, fontWeight: CiWeight.semiBold));
-  }
-}
-
 /// Growth IQ runs 40..99, never 0..100. Feeding the raw score to a 0..1 gauge
 /// would draw a nearly empty ring for a score of 45, which is a real result
 /// and should not look like a failure.
@@ -346,10 +323,16 @@ class _GrowthBlock extends StatelessWidget {
                         CiBadge(label: ppg, tone: CiBadgeTone.ghost),
                         const SizedBox(width: CiSpace.s3),
                       ],
-                      // NOT a chip. The frame draws this as plain lime text
-                      // with a triangle, so the movement reads as a note on
-                      // the score rather than a second object beside it.
-                      if (delta != null) _DeltaText(delta: delta),
+                      // A CHIP, not the frame's plain lime text. Chosen for
+                      // consistency with every other delta in the app, which
+                      // is worth more than matching this one frame. The frame
+                      // should be updated to follow.
+                      //
+                      // CiBadge.delta picks its tone from MEANING, not sign:
+                      // higher Growth IQ is better, so a gain is lime and a
+                      // drop is orange.
+                      if (delta != null)
+                        CiBadge.delta(value: delta.toDouble(), decimals: 0),
                     ],
                   ),
                 ],
