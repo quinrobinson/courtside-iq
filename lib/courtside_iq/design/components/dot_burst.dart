@@ -72,6 +72,15 @@ class DotBurst extends StatelessWidget {
   /// ring radius, so outer rings get more dots and spacing stays even.
   double get dotSpacing => _dotSpacing ?? 22 * _scale;
 
+  /// The ring-to-ring gap for a given overall size.
+  ///
+  /// A caller that centres a child of known size can set
+  /// `innerRadius: childRadius + DotBurst.ringGapFor(size)` so the first ring
+  /// sits one gap out from the child - the SAME gap the rings have between
+  /// each other. Without it the first ring hugs the child and the spacing
+  /// reads as uneven.
+  static double ringGapFor(double size) => 34 * (size / _referenceSize);
+
   /// Peak alpha of the radial haze behind the dots, at the centre.
   ///
   /// The frame carries a 220x220 ellipse on the burst's own centre, behind

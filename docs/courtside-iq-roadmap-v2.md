@@ -1010,6 +1010,15 @@ the trailing light filler only extends to the viewport edge. The real fix is a
 bottom-anchored light layer behind the scroll view, independent of the nav.
 Revisit when the nav lands, and do not assume it went away.
 
+**KNOWN ISSUE: the nav bar shifts position between pages.** On Today the bar is
+a `Scaffold.bottomNavigationBar` slot; on the v1 Players/Games/Menu pages it
+sits in a `Stack`/`Align`, so it lands a few pixels differently and appears to
+jump when switching tabs. There is also no shared page transition. The real fix
+is a PERSISTENT SHELL: the nav bar lives outside the routed content (a
+`StatefulShellRoute` or an app shell) so it never rebuilds or moves between
+tabs, and tab switches animate. This is an architectural change, not a tweak,
+and belongs with the 4C navigation work or its own item - deferred 2026-07-20.
+
 **STATUS-BAR ICONS: FIXED 2026-07-20.** The global default is dark (light-mode
 era); every ink screen now goes light. Centralised as `CiSystemUi.onInk`, and
 opt-in through `CiSurface.ink(statusBar: true)` so a full-screen ink surface

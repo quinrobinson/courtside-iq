@@ -62,13 +62,15 @@ class CiNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _Tab(
-                  icon: Icons.grid_view_outlined,
+                  // Rounded family throughout: the outlined icons read sharp,
+                  // and the brand is round. Closer to the Figma marks too.
+                  icon: Icons.grid_view_rounded,
                   label: 'Home',
                   selected: active == CiNavTab.home,
                   onTap: () => _go(context, HomeWidget.routeName),
                 ),
                 _Tab(
-                  icon: Icons.people_outline,
+                  icon: Icons.groups_rounded,
                   label: 'Players',
                   selected: active == CiNavTab.players,
                   onTap: () => _go(context, PlayersListWidget.routeName),
@@ -77,13 +79,13 @@ class CiNavBar extends StatelessWidget {
                   onTap: onCreate ?? () => _openCreateSheet(context),
                 ),
                 _Tab(
-                  icon: Icons.scoreboard_outlined,
+                  icon: Icons.scoreboard_rounded,
                   label: 'Games',
                   selected: active == CiNavTab.games,
                   onTap: () => _go(context, AllGamesWidget.routeName),
                 ),
                 _Tab(
-                  icon: Icons.menu,
+                  icon: Icons.menu_rounded,
                   label: 'Menu',
                   selected: active == CiNavTab.menu,
                   onTap: () => _go(context, MenuWidget.routeName),
@@ -180,7 +182,7 @@ class _CreateButton extends StatelessWidget {
             color: c.surfaceInvert,
             borderRadius: CiRadius.pillR,
           ),
-          child: Icon(Icons.add, size: 22, color: c.textInvert),
+          child: Icon(Icons.add_rounded, size: 22, color: c.textInvert),
         ),
       ),
     );
