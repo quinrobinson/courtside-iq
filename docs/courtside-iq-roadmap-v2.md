@@ -1090,8 +1090,23 @@ entry points.
 
 | # | State | Why it is needed | b | w | v |
 |---|---|---|---|---|---|
-| 4.9b.1 | **Signup - check your email** (`765:3144`) | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. Test has confirmation OFF, which is why the verified signup flow is not the one a real parent gets. **Without this, prod signup looks broken.** | ☐ | ☐ | ☐ |
-| 4.9b.2 | **Forgot Password - link sent** (`765:3370`) | v1 popped a dialog; code currently shows a Snackbar. Copy deliberately does not confirm whether an account exists, since that would let anyone probe which emails are registered. | ☐ | ☐ | ☐ |
+| 4.9b.1 | **Signup - check your email** (`765:3144`) | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. **Without this, prod signup looks broken.** | ☑ | ☑ | ☐ |
+| 4.9b.2 | **Forgot Password - link sent** (`765:3370`) | Replaces the Snackbar. Copy does not confirm whether an account exists, since that would let anyone probe which emails are registered. | ☑ | ☑ | ☐ |
+
+**Frames approved and built 2026-07-19.** One screen, `CheckEmailPage`, with a
+`CheckEmailPurpose` enum - the two frames are clones differing only in body copy
+and which resend they offer, so two files would have been duplication.
+
+**4.9b.1 CANNOT be device-verified on test, by choice.** It only appears when
+signup does NOT sign the parent in, which is what email confirmation produces.
+Test has confirmation OFF and the user has chosen to keep it that way, so on
+test signup falls through to Home and this screen never renders. Nine tests
+cover the copy rules; the render itself is unverified until either confirmation
+is turned on temporarily or cutover reaches prod. **Do not tick `v` for 4.9b.1
+without one of those.**
+
+4.9b.2 is reachable on test and should be verified on the next device run:
+Forgot password, submit, and the screen replaces the old snackbar.
 
 **Frames drafted 2026-07-19, AWAITING APPROVAL.** Both sit in the `1 · Entry &
 Auth` section on the Screens page, inserted in journey order rather than

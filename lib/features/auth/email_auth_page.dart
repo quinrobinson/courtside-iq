@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/courtside_iq/auth_validation.dart';
+import 'check_email_page.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/courtside_iq/design/ci_theme.dart';
@@ -137,6 +138,22 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
 
       // authManager surfaces its own error snackbar and returns null.
       if (user == null || !mounted) return;
+
+      // SIGN UP WITH EMAIL CONFIRMATION ON does not sign the parent in: the
+      // account exists but there is no session until they click the link. On
+      // prod that is the normal path, so say so rather than sitting here
+      // looking like nothing happened. On test, confirmation is OFF and they
+      // ARE signed in, which falls through to the navigation below - and is
+      // why this branch cannot be verified there.
+      if (_isSignUp && !loggedIn) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => CheckEmailPage(
+            purpose: CheckEmailPurpose.signup,
+            email: email,
+          ),
+        ));
+        return;
+      }
 
       // NAVIGATE EXPLICITLY. Signing in updates the auth stream, but nothing
       // redirects an authenticated user off this route - so without this the

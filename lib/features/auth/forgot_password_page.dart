@@ -18,6 +18,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/auth_validation.dart';
+import 'check_email_page.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/custom_code/actions/index.dart' as actions;
@@ -96,9 +97,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       return;
     }
 
-    // Deliberately does not say whether an account exists: confirming that
-    // would let anyone check which emails are registered.
-    _snack('If that email has an account, a reset link is on its way.');
+    // A screen, not a snackbar. The frame for this exists now (765:3370), and
+    // a snackbar vanishes - leaving a parent on a form they already submitted
+    // with no way to resend.
+    //
+    // Still says nothing about whether the account exists.
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => CheckEmailPage(
+        purpose: CheckEmailPurpose.passwordReset,
+        email: _email.text.trim(),
+      ),
+    ));
   }
 
   void _snack(String message, {bool isError = false}) {
