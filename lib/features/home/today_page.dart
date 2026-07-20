@@ -34,16 +34,27 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
+import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
+import 'entitlement_status.dart';
+import 'widgets/today_promo_banner.dart';
+import 'widgets/today_skeleton.dart';
 import 'today_repository.dart';
 import 'widgets/game_feed_row.dart';
 import 'widgets/today_hero.dart';
 
 class TodayPage extends StatefulWidget {
-  const TodayPage({super.key, this.repository = const TodayRepository()});
+  const TodayPage({
+    super.key,
+    this.repository = const TodayRepository(),
+    this.entitlementReader = fetchEntitlementStatus,
+  });
 
   /// Injectable so the screen can be tested without Supabase.
   final TodayRepository repository;
+
+  /// Injectable so the screen can be tested without RevenueCat.
+  final Future<EntitlementStatus> Function() entitlementReader;
 
   @override
   State<TodayPage> createState() => _TodayPageState();
@@ -52,10 +63,38 @@ class TodayPage extends StatefulWidget {
 class _TodayPageState extends State<TodayPage> {
   late Future<TodayData> _future = widget.repository.load();
 
+  /// Client-side RevenueCat read. Starts at never - the safe default is to
+  /// invite, not to nag - and resolves once the customer is fetched. A
+  /// separate future so a slow entitlement read never delays the games.
+  EntitlementStatus _entitlement = EntitlementStatus.never;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEntitlement();
+  }
+
+  Future<void> _loadEntitlement() async {
+    final status = await widget.entitlementReader();
+    if (mounted) setState(() => _entitlement = status);
+  }
+
   Future<void> _refresh() async {
     final next = widget.repository.load();
     setState(() => _future = next);
-    await next;
+    await Future.wait([next, _loadEntitlement()]);
+  }
+
+  void _openPaywall() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) => Padding(
+        padding: MediaQuery.viewInsetsOf(context),
+        child: const PaywallWidget(),
+      ),
+    );
   }
 
   @override
@@ -117,6 +156,9 @@ class _TodayPageState extends State<TodayPage> {
                         SliverToBoxAdapter(
                           child: TodayHero(
                             snapshots: data?.headerPlayers ?? const [],
+                            loading: snap.connectionState ==
+                                    ConnectionState.waiting &&
+                                data == null,
                             userName: currentUserDisplayName,
                             onProfile: () =>
                                 context.pushNamed(MenuWidget.routeName),
@@ -168,10 +210,13 @@ class _TodayPageState extends State<TodayPage> {
         );
 
     if (snap.connectionState == ConnectionState.waiting && data == null) {
+      // The screen's own outline, not a spinner: Today has a fixed shape, so
+      // showing it reads as "arriving" and holds the layout still.
       return [
+        light(const SliverToBoxAdapter(child: TodayFeedSkeleton())),
         light(const SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: CircularProgressIndicator()),
+          child: SizedBox.shrink(),
         )),
       ];
     }
@@ -195,7 +240,28 @@ class _TodayPageState extends State<TodayPage> {
         )),
       ];
     }
-    return _feedSlivers(context, data).map(light).toList();
+
+    return [
+      // Promo banner between hero and feed, for a non-premium parent. It is
+      // ink, so it is NOT wrapped in the light ground the feed uses.
+      ..._promoSlivers(),
+      ..._feedSlivers(context, data).map(light),
+    ];
+  }
+
+  /// The upgrade or lapse banner, or nothing for a premium parent.
+  List<Widget> _promoSlivers() {
+    final purpose = switch (_entitlement) {
+      EntitlementStatus.premium => null,
+      EntitlementStatus.lapsed => TodayPromoPurpose.lapse,
+      EntitlementStatus.never => TodayPromoPurpose.upgrade,
+    };
+    if (purpose == null) return const [];
+    return [
+      SliverToBoxAdapter(
+        child: TodayPromoBanner(purpose: purpose, onTap: _openPaywall),
+      ),
+    ];
   }
 
   List<Widget> _feedSlivers(BuildContext context, TodayData data) {

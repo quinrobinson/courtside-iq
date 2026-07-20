@@ -31,17 +31,23 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/today_snapshot.dart';
+import 'today_skeleton.dart';
 
 class TodayHero extends StatefulWidget {
   const TodayHero({
     super.key,
     required this.snapshots,
+    this.loading = false,
     this.userName,
     this.userPhotoUrl,
     this.onNotifications,
     this.onProfile,
     this.onPlayerTap,
   });
+
+  /// While true, the content region is a grey skeleton. The brand bar stays
+  /// real - the logo, bell and profile do not depend on the pending data.
+  final bool loading;
 
   /// Already filtered and ordered by [headerSnapshots]. Empty renders the
   /// reduced form.
@@ -110,7 +116,9 @@ class _TodayHeroState extends State<TodayHero> {
                   onNotifications: widget.onNotifications,
                   onProfile: widget.onProfile,
                 ),
-                if (!hasContent)
+                if (widget.loading)
+                  const TodayHeroSkeleton()
+                else if (!hasContent)
                   const SizedBox(height: CiSpace.s9)
                 else ...[
                   const SizedBox(height: CiSpace.s5),

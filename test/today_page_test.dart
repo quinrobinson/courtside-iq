@@ -4,7 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
 import 'package:courtside_i_q/features/home/today_repository.dart';
+import 'package:courtside_i_q/features/home/entitlement_status.dart';
+import 'package:courtside_i_q/features/home/today_page.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
+import 'package:courtside_i_q/features/home/widgets/today_promo_banner.dart';
 
 // The page itself pulls in the v1 nav bar and the router, so these cover the
 // pieces that carry the decisions: the feed row's copy handling and the
@@ -110,6 +113,51 @@ void main() {
     });
   });
 
+  group('promo banner visibility', () {
+    // A fake repository that returns players-with-games so the feed renders and
+    // the banner has somewhere to sit.
+    TodayData _dataWithGames() => TodayData(
+          headerPlayers: const [],
+          recentGames: const [
+            GameFeedEntry(
+              gameId: 'g1',
+              playerName: 'Maya Chen',
+              points: 22, rebounds: 7, assists: 5, steals: 3, turnovers: 2,
+            ),
+          ],
+          playerCount: 1,
+        );
+
+    Future<void> pump(WidgetTester tester, EntitlementStatus status) async {
+      await tester.pumpWidget(MaterialApp(
+        home: TodayPage(
+          repository: _FakeRepo(_dataWithGames()),
+          entitlementReader: () async => status,
+        ),
+      ));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('premium sees no banner', (tester) async {
+      await pump(tester, EntitlementStatus.premium);
+      expect(find.byType(TodayPromoBanner), findsNothing);
+    });
+
+    testWidgets('never-subscribed sees the upgrade banner', (tester) async {
+      await pump(tester, EntitlementStatus.never);
+      final banner = tester.widget<TodayPromoBanner>(find.byType(TodayPromoBanner));
+      expect(banner.purpose, TodayPromoPurpose.upgrade);
+      expect(find.text('Unlock Premium'), findsOneWidget);
+    });
+
+    testWidgets('lapsed sees the renew banner', (tester) async {
+      await pump(tester, EntitlementStatus.lapsed);
+      final banner = tester.widget<TodayPromoBanner>(find.byType(TodayPromoBanner));
+      expect(banner.purpose, TodayPromoPurpose.lapse);
+      expect(find.text('Your Premium has ended'), findsOneWidget);
+    });
+  });
+
   group('TodayData', () {
     test('distinguishes no players from players without games', () {
       // Different screens. Conflating them would show "Add your first player"
@@ -129,4 +177,11 @@ void main() {
       expect(kTodayRecentGamesLimit, 5);
     });
   });
+}
+
+class _FakeRepo implements TodayRepository {
+  const _FakeRepo(this._data);
+  final TodayData _data;
+  @override
+  Future<TodayData> load() async => _data;
 }

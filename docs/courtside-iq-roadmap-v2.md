@@ -947,6 +947,28 @@ Built against approved Figma frames, in `lib/features/`. **Decision: new screens
 | 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Auth Landing, Email auth (sign-in/sign-up chips + validation error), Forgot Password, Reset Password, Reset Successful |
 | 4.10 | Home/Today | Today feed, empty + first-run states |
 
+**4.10b (loading skeleton + premium banners) built 2026-07-20.**
+`[x] built` · `[x] wired` · `[~] device-verified`
+
+- **Skeleton** replaces the loading spinner: the hero's gauge and the feed rows
+  become grey placeholders. The screen has a fixed shape, so its outline reads
+  as "arriving" and holds the layout still. Shapes only, no shimmer - Today is
+  opened many times a day and a sweep would distract.
+- **Two premium banners**, one `TodayPromoBanner` with an upgrade/lapse purpose
+  enum (same shape as CheckEmailPage). Upgrade is lime "See plans", lapse is
+  orange "Renew". Both open the EXISTING paywall - display and routing only.
+- **Which banner shows is a CLIENT-SIDE RevenueCat read** via
+  `entitlement_status.dart`: `premium_users` in `entitlements.active` = premium
+  (no banner); present in `.all` but not `.active` = lapsed (Renew); absent =
+  never (Unlock). **This does not touch Supabase, prod, or the deferred
+  `subscriptions` backfill** - it reads only what RevenueCat tells the client,
+  the same source the dashboard already used. Fails safe to `never`: a network
+  blip must never tell a paying parent their premium ended.
+- **The lapsed RENDER is unverifiable on test.** It needs a genuinely expired
+  RevenueCat account, which test users do not have. The LOGIC is unit-tested;
+  the render is confirmed only by forcing the enum or against a real lapsed
+  account. Same shape as the signup-confirmation gap. `[~]` reflects this.
+
 **4.10 decisions, 2026-07-20:**
 
 - **Growth IQ is computed CLIENT-SIDE** via `lib/courtside_iq/growth_iq.dart`.
