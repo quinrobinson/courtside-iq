@@ -14,7 +14,18 @@ import '../tokens/ci_colors.dart';
 import '../tokens/ci_metrics.dart';
 import '../tokens/ci_type.dart';
 
-enum CiBadgeTone { good, energy, neutral }
+enum CiBadgeTone {
+  good,
+  energy,
+  neutral,
+
+  /// Outline only: no fill, a 1px border, current text colour.
+  ///
+  /// Measured from Today's hero, where "18.5 PPG" is a ghost tag rather than
+  /// a filled chip. A filled grey pill beside a Growth IQ score competes with
+  /// it; an outline states the figure without claiming the same weight.
+  ghost,
+}
 
 class CiBadge extends StatelessWidget {
   const CiBadge({
@@ -63,6 +74,8 @@ class CiBadge extends StatelessWidget {
       CiBadgeTone.good => (c.accentGood, c.onAccent, null),
       CiBadgeTone.energy => (c.accentEnergy, c.onAccent, null),
       CiBadgeTone.neutral => (c.surfaceSunk, c.textMuted, c.border),
+      // No fill at all, so it reads as an annotation rather than a chip.
+      CiBadgeTone.ghost => (Colors.transparent, c.text, c.border),
     };
 
     return Container(

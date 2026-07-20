@@ -119,7 +119,13 @@ class GameFeedRow extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: CiSpace.s4),
+              // spaceBetween, NOT five Expanded slots. In the frame the
+              // columns start at 0, 88, 169, 249, 329 across a 342 row - the
+              // last ENDS at the right edge. Equal slots left a visible gap
+              // on the right because each column hugs its own narrow number.
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Stat(value: entry.points, label: 'PTS'),
                   _Stat(value: entry.rebounds, label: 'REB'),
@@ -145,18 +151,16 @@ class _Stat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
           Text('$value',
               style: CiType.heroLine.copyWith(color: c.text)),
           const SizedBox(height: 2),
-          Text(label,
-              style: CiType.micro.copyWith(
-                  color: c.textMuted, fontWeight: CiWeight.medium)),
-        ],
-      ),
+        Text(label,
+            style: CiType.micro.copyWith(
+                color: c.textMuted, fontWeight: CiWeight.medium)),
+      ],
     );
   }
 }
@@ -170,12 +174,20 @@ class FeedSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-          CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s3),
-      child: Text(title,
-          style: CiType.rowLabel
-              .copyWith(color: c.textMuted, fontWeight: CiWeight.medium)),
+    // The frame puts a full-bleed hairline UNDER the section header, so the
+    // header sits on the list rather than floating above it.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s3),
+          child: Text(title,
+              style: CiType.rowLabel
+                  .copyWith(color: c.textMuted, fontWeight: CiWeight.medium)),
+        ),
+        const FeedHairline(),
+      ],
     );
   }
 }

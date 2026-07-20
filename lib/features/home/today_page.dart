@@ -62,7 +62,11 @@ class _TodayPageState extends State<TodayPage> {
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
         return Scaffold(
-          backgroundColor: c.bg,
+          // INK, not the light page colour. Overscrolling at the top reveals
+          // whatever sits behind the viewport, and a white flash above a dark
+          // hero on every pull-to-refresh is the seam this palette exists to
+          // avoid. The feed paints its own light ground below.
+          backgroundColor: CiColors.onInk.bg,
           body: FutureBuilder<TodayData>(
             future: _future,
             builder: (context, snap) {
@@ -71,7 +75,9 @@ class _TodayPageState extends State<TodayPage> {
               final data = snap.data;
               return RefreshIndicator(
                 onRefresh: _refresh,
-                color: c.text,
+                // On the ink overscroll, so the spinner and its puck match.
+                color: CiColors.onInk.text,
+                backgroundColor: CiColors.onInk.surfaceSunk,
                 child: CustomScrollView(
                   // Always scrollable, or pull-to-refresh dies whenever the
                   // content is shorter than the screen - which is exactly the
@@ -109,7 +115,15 @@ class _TodayPageState extends State<TodayPage> {
                         child: _AddFirstPlayer(),
                       )
                     else if (data != null)
-                      ..._feedSlivers(context, data),
+                      ..._feedSlivers(context, data).map(
+                        // Each feed sliver paints the light ground itself, so
+                        // the ink behind the scroll view only ever shows
+                        // through the top overscroll.
+                        (sliver) => DecoratedSliver(
+                          decoration: BoxDecoration(color: c.bg),
+                          sliver: sliver,
+                        ),
+                      ),
                   ],
                 ),
               );
@@ -154,7 +168,13 @@ class _TodayPageState extends State<TodayPage> {
           onTap: () => context.pushNamed(AllGamesWidget.routeName),
         ),
       ),
+      // The frame closes the list with a hairline below View All Games, so
+      // the section reads as bounded rather than trailing off.
+      const SliverToBoxAdapter(child: FeedHairline()),
       const SliverToBoxAdapter(child: SizedBox(height: CiSpace.s8)),
+      // Fills whatever is left with light ground, so a short list does not
+      // leave ink showing beneath it.
+      const SliverFillRemaining(hasScrollBody: false, child: SizedBox.shrink()),
     ];
   }
 }

@@ -236,6 +236,29 @@ class _BrandRow extends StatelessWidget {
   }
 }
 
+/// Movement as text, not a chip. Lime for a gain, orange for a drop, muted
+/// when flat - the same meaning-not-sign rule CiBadge.delta uses.
+class _DeltaText extends StatelessWidget {
+  const _DeltaText({required this.delta});
+
+  final int delta;
+
+  @override
+  Widget build(BuildContext context) {
+    const c = CiColors.onInk;
+    final (String glyph, Color colour) = delta > 0
+        ? ('▲ ', c.accentGood)
+        : delta < 0
+            ? ('▼ ', c.accentEnergy)
+            : ('', c.textMuted);
+    final sign = delta > 0 ? '+' : '';
+
+    return Text('$glyph$sign$delta',
+        style: CiType.bodySm
+            .copyWith(color: colour, fontWeight: CiWeight.semiBold));
+  }
+}
+
 /// Growth IQ runs 40..99, never 0..100. Feeding the raw score to a 0..1 gauge
 /// would draw a nearly empty ring for a score of 45, which is a real result
 /// and should not look like a failure.
@@ -288,9 +311,15 @@ class _GrowthBlock extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Growth IQ',
+                  // NAMES THE PLAYER on every page. With two players in the
+                  // carousel, "Growth IQ" alone leaves the second one
+                  // unattributed - the headline usually mentions a name, but
+                  // it is AI-written and cannot be relied on to.
+                  Text("${snapshot.firstName}'s Growth IQ",
                       style: CiType.rowLabel.copyWith(
-                          color: c.textMuted, fontWeight: CiWeight.semiBold)),
+                          color: c.textMuted, fontWeight: CiWeight.semiBold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                   const SizedBox(height: CiSpace.s2),
                   Expanded(
                     child: Text(
@@ -306,11 +335,16 @@ class _GrowthBlock extends StatelessWidget {
                   Row(
                     children: [
                       if (ppg != null) ...[
-                        CiBadge(label: ppg, tone: CiBadgeTone.neutral),
-                        const SizedBox(width: CiSpace.s2),
+                        // Ghost, not filled: a grey pill beside the score
+                        // competes with it. Measured from the frame - no
+                        // fill, 1px border.
+                        CiBadge(label: ppg, tone: CiBadgeTone.ghost),
+                        const SizedBox(width: CiSpace.s3),
                       ],
-                      if (delta != null)
-                        CiBadge.delta(value: delta.toDouble()),
+                      // NOT a chip. The frame draws this as plain lime text
+                      // with a triangle, so the movement reads as a note on
+                      // the score rather than a second object beside it.
+                      if (delta != null) _DeltaText(delta: delta),
                     ],
                   ),
                 ],

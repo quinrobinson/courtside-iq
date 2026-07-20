@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_page_dots.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
@@ -59,6 +60,38 @@ void main() {
   });
 
   group('full form', () {
+    testWidgets('names the player on every page of the carousel',
+        (tester) async {
+      // With two players, "Growth IQ" alone leaves the second unattributed.
+      // The headline usually mentions a name but is AI-written, so it cannot
+      // be relied on to.
+      await _pump(tester, [
+        _snap(first: 'Maya', growthIq: 82),
+        _snap(first: 'Jordan', growthIq: 71),
+      ]);
+      expect(find.text("Maya's Growth IQ"), findsOneWidget);
+
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+      expect(find.text("Jordan's Growth IQ"), findsOneWidget);
+    });
+
+    testWidgets('the PPG tag is ghost, not a filled chip', (tester) async {
+      // A filled grey pill beside the score competes with it.
+      await _pump(tester, [_snap(games: 10, points: 185)]);
+      final badge = tester.widget<CiBadge>(find.byType(CiBadge));
+      expect(badge.tone, CiBadgeTone.ghost);
+    });
+
+    testWidgets('the delta is plain text, not a chip', (tester) async {
+      // The frame draws it as lime text with a triangle, so movement reads as
+      // a note on the score rather than a second object beside it.
+      await _pump(tester, [_snap(delta: 4)]);
+      expect(find.textContaining('+4'), findsOneWidget);
+      // Only the PPG tag is a badge.
+      expect(find.byType(CiBadge), findsOneWidget);
+    });
+
     testWidgets('shows the gauge, score and trend word', (tester) async {
       await _pump(tester, [_snap(growthIq: 82, delta: 4)]);
       expect(find.byType(DotGauge), findsOneWidget);
