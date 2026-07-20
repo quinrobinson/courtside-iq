@@ -25,6 +25,8 @@
 import 'package:flutter/material.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
+import '/auth/supabase_auth/supabase_user_provider.dart';
+import '/backend/supabase/supabase.dart';
 import '/courtside_iq/auth_validation.dart';
 import 'check_email_page.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -132,28 +134,16 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
 
       final email = _email.text.trim();
       final password = _password.text;
-      final user = _isSignUp
-          ? await authManager.createAccountWithEmail(context, email, password)
-          : await authManager.signInWithEmail(context, email, password);
 
-      // authManager surfaces its own error snackbar and returns null.
-      if (user == null || !mounted) return;
-
-      // SIGN UP WITH EMAIL CONFIRMATION ON does not sign the parent in: the
-      // account exists but there is no session until they click the link. On
-      // prod that is the normal path, so say so rather than sitting here
-      // looking like nothing happened. On test, confirmation is OFF and they
-      // ARE signed in, which falls through to the navigation below - and is
-      // why this branch cannot be verified there.
-      if (_isSignUp && !loggedIn) {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => CheckEmailPage(
-            purpose: CheckEmailPurpose.signup,
-            email: email,
-          ),
-        ));
-        return;
+      if (_isSignUp) {
+        final handled = await _signUp(email, password);
+        if (handled) return;
+      } else {
+        // authManager surfaces its own error snackbar and returns null.
+        final user = await authManager.signInWithEmail(context, email, password);
+        if (user == null) return;
       }
+      if (!mounted) return;
 
       // NAVIGATE EXPLICITLY. Signing in updates the auth stream, but nothing
       // redirects an authenticated user off this route - so without this the
@@ -174,6 +164,68 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
       }
     } finally {
       if (mounted && _busy) setState(() => _busy = false);
+    }
+  }
+
+  /// Signs up, and returns true when it has already handled the outcome.
+  ///
+  /// NOT authManager.createAccountWithEmail. That routes through
+  /// emailCreateAccountFunc, which returns NULL when the account is
+  /// unconfirmed:
+  ///
+  ///   return res.user?.lastSignInAt == null ? null : res.user;
+  ///
+  /// which is indistinguishable from a failure. With email confirmation ON -
+  /// the prod configuration - every signup would look like an error, the
+  /// screen would bail, and nothing at all would happen. That is the exact
+  /// failure CheckEmailPage exists to prevent, and it hid here because test
+  /// had confirmation OFF.
+  ///
+  /// Calling signUp directly is what makes the two cases distinguishable: the
+  /// SESSION, not the user, says whether they are signed in.
+  ///
+  /// The shared function is deliberately left alone. v1 still calls it, and it
+  /// relies on that null to skip a users-table insert it would otherwise
+  /// attempt with no session.
+  Future<bool> _signUp(String email, String password) async {
+    try {
+      final res = await SupaFlow.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+      if (!mounted) return true;
+
+      // No session means confirmation is required: the account exists, but
+      // they are not signed in until they click the link.
+      if (res.session == null) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => CheckEmailPage(
+            purpose: CheckEmailPurpose.signup,
+            email: email,
+          ),
+        ));
+        return true;
+      }
+
+      // Signed in immediately, so confirmation is off. Mirror the bookkeeping
+      // authManager does, or the app's own auth state lags behind Supabase's
+      // and the navigation below runs against a stale `loggedIn`.
+      if (res.user != null) {
+        final authUser = CourtsideIQSupabaseUser(res.user);
+        currentUser = authUser;
+        AppStateNotifier.instance.update(authUser);
+      }
+      return false;
+    } on AuthException catch (e) {
+      if (!mounted) return true;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(e.message.contains('User already registered')
+              ? 'That email is already in use by a different account.'
+              : 'Error: ${e.message}'),
+        ));
+      return true;
     }
   }
 
