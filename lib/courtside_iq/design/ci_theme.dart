@@ -12,10 +12,27 @@
 // stock Material widgets in the tree do not look foreign.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'tokens/ci_colors.dart';
 import 'tokens/ci_metrics.dart';
 import 'tokens/ci_type.dart';
+
+/// Status-bar overlay styles by ground.
+///
+/// The app pins DARK icons globally, from when it was a light-mode design.
+/// That is correct on light ground and wrong on ink - the clock and signal
+/// bars go black on near-black. Every full-screen ink surface wraps itself in
+/// an AnnotatedRegion with [onInk] to override it; light screens inherit the
+/// global default and need nothing.
+abstract final class CiSystemUi {
+  /// Light icons, for ink-ground screens.
+  static const SystemUiOverlayStyle onInk = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light, // Android
+    statusBarBrightness: Brightness.dark, // iOS
+  );
+}
 
 abstract final class CiTheme {
   /// The app theme. Light ground - the default for most screens.
@@ -170,11 +187,28 @@ abstract final class CiTheme {
 /// never disagree; pass `paint: false` if the caller already painted it.
 class CiSurface extends StatelessWidget {
   const CiSurface._(
-      {super.key, required this.child, required this.onInk, this.paint = true});
+      {super.key,
+      required this.child,
+      required this.onInk,
+      this.paint = true,
+      this.statusBar = false});
 
   /// The dark ground: auth, onboarding, premium callouts.
-  const CiSurface.ink({Key? key, required Widget child, bool paint = true})
-      : this._(key: key, child: child, onInk: true, paint: paint);
+  ///
+  /// Pass `statusBar: true` for a full-SCREEN ink surface, so the status-bar
+  /// icons go light. Leave it false for a partial ink region - a mid-screen
+  /// promo banner must not flip the whole screen's status bar.
+  const CiSurface.ink({
+    Key? key,
+    required Widget child,
+    bool paint = true,
+    bool statusBar = false,
+  }) : this._(
+            key: key,
+            child: child,
+            onInk: true,
+            paint: paint,
+            statusBar: statusBar);
 
   /// The light ground. Rarely needed at the top level, but necessary to return
   /// a subtree to light ground from inside an ink region.
@@ -185,12 +219,22 @@ class CiSurface extends StatelessWidget {
   final bool onInk;
   final bool paint;
 
+  /// Whether this surface owns the status bar. See [CiSurface.ink].
+  final bool statusBar;
+
   CiColors get colors => onInk ? CiColors.onInk : CiColors.onLight;
 
   @override
   Widget build(BuildContext context) {
-    final themed =
+    Widget out =
         Theme(data: onInk ? CiTheme.ink() : CiTheme.base(), child: child);
-    return paint ? ColoredBox(color: colors.bg, child: themed) : themed;
+    if (paint) out = ColoredBox(color: colors.bg, child: out);
+    if (statusBar) {
+      out = AnnotatedRegion<SystemUiOverlayStyle>(
+        value: onInk ? CiSystemUi.onInk : SystemUiOverlayStyle.dark,
+        child: out,
+      );
+    }
+    return out;
   }
 }

@@ -2,6 +2,9 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/features/flags.dart';
+import '/features/nav/ci_nav_bar.dart';
+
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/pages/global/alert_rate/alert_rate_widget.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
@@ -1510,13 +1513,16 @@ class _MenuWidgetState extends State<MenuWidget> {
                 ),
                 Align(
                   alignment: AlignmentDirectional(0.0, 1.0),
-                  child: wrapWithModel(
-                    model: _model.customNavBarModel,
-                    updateCallback: () => safeSetState(() {}),
-                    child: CustomNavBarWidget(
-                      page: 'Menu',
-                    ),
-                  ),
+                  // 4.10c: the 2.0 nav bar replaces the v1 one behind the flag.
+                  child: kUseNavBar2
+                      ? const CiNavBar(active: CiNavTab.menu)
+                      : wrapWithModel(
+                          model: _model.customNavBarModel,
+                          updateCallback: () => safeSetState(() {}),
+                          child: CustomNavBarWidget(
+                            page: 'Menu',
+                          ),
+                        ),
                 ),
                 if (FFAppState().showsnackbard == true)
                   Align(

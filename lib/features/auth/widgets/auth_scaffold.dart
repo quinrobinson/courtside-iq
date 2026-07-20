@@ -66,6 +66,7 @@ class AuthScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CiSurface.ink(
+      statusBar: true,
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
         final align =

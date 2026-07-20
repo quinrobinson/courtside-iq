@@ -104,14 +104,9 @@ class _TodayPageState extends State<TodayPage> {
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
         return AnnotatedRegion<SystemUiOverlayStyle>(
-          // LIGHT status-bar icons. The app pins DARK ones globally because
-          // it was a light-mode design, but Today's hero is ink, so the clock
-          // and signal bars were black on near-black.
-          value: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light, // Android
-            statusBarBrightness: Brightness.dark, // iOS
-          ),
+          // Light icons: the hero is ink, so the global dark default would put
+          // the clock and signal bars black on near-black. See CiSystemUi.
+          value: CiSystemUi.onInk,
           child: Scaffold(
             // Transparent: the two-tone backdrop below owns the ground, not
             // the scaffold. A SINGLE scaffold colour cannot be ink at the top

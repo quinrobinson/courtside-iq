@@ -13,7 +13,9 @@
 // real device.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -23,6 +25,14 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      // Ink ground, so the status-bar icons go light. See CiSystemUi.
+      value: CiSystemUi.onInk,
+      child: _body(context),
+    );
+  }
+
+  Widget _body(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     return ColoredBox(
       // Not CiColors.of(context): this renders inside the router, above any

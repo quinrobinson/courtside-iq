@@ -1010,11 +1010,12 @@ the trailing light filler only extends to the viewport edge. The real fix is a
 bottom-anchored light layer behind the scroll view, independent of the nav.
 Revisit when the nav lands, and do not assume it went away.
 
-**STATUS-BAR ICONS ARE WRONG ON EVERY INK SCREEN.** The app pins DARK icons
-globally, from when it was a light-mode design, so the clock and signal bars are
-black on near-black. Today overrides it with an `AnnotatedRegion`; **Auth,
-Onboarding and Splash have the same bug and have not been fixed.** Today is
-simply the first screen dark enough at the very top for it to show.
+**STATUS-BAR ICONS: FIXED 2026-07-20.** The global default is dark (light-mode
+era); every ink screen now goes light. Centralised as `CiSystemUi.onInk`, and
+opt-in through `CiSurface.ink(statusBar: true)` so a full-screen ink surface
+takes it while a partial ink region (the promo banner) does not flip the whole
+screen. Applied to Auth Landing, Email Auth, the AuthScaffold screens
+(Forgot/Reset/Reset Successful/Check Email), Onboarding, Splash and Today.
 
 **DESIGN GAP: the empty header.** A user whose players all lack enough games
 gets an EMPTY header carousel, and no frame covers it. This is NOT the same as

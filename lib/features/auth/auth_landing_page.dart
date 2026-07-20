@@ -108,6 +108,7 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
   @override
   Widget build(BuildContext context) {
     return CiSurface.ink(
+      statusBar: true,
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
         return Scaffold(

@@ -3,6 +3,9 @@ import '/courtside_iq/design_tokens.dart';
 import '/courtside_iq/skeleton_widget.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/features/flags.dart';
+import '/features/nav/ci_nav_bar.dart';
+
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
@@ -798,13 +801,16 @@ class _PlayersListWidgetState extends State<PlayersListWidget> {
                 ),
                 Align(
                   alignment: AlignmentDirectional(0.0, 1.0),
-                  child: wrapWithModel(
-                    model: _model.customNavBarModel,
-                    updateCallback: () => safeSetState(() {}),
-                    child: CustomNavBarWidget(
-                      page: 'Players',
-                    ),
-                  ),
+                  // 4.10c: the 2.0 nav bar replaces the v1 one behind the flag.
+                  child: kUseNavBar2
+                      ? const CiNavBar(active: CiNavTab.players)
+                      : wrapWithModel(
+                          model: _model.customNavBarModel,
+                          updateCallback: () => safeSetState(() {}),
+                          child: CustomNavBarWidget(
+                            page: 'Players',
+                          ),
+                        ),
                 ),
                 if (FFAppState().showsnackbard == true)
                   Align(
