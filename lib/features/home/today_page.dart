@@ -115,9 +115,21 @@ class _TodayPageState extends State<TodayPage> {
                 );
               },
             ),
-            // v1 chrome, deliberately. Rebuilding the nav is its own item, so
-            // this screen sits above an old-looking bar until that lands.
-            bottomNavigationBar: const CustomNavBarWidget(page: 'Home'),
+            // WHITE behind the nav and the home-indicator strip below it.
+            //
+            // The scaffold is ink so the top overscroll reveals ink under the
+            // dark hero, but the v1 nav is a fixed 60pt bar with no bottom
+            // safe-area handling, so the strip beneath it fell through to that
+            // ink and read as a black band. The nav is a separate Scaffold
+            // slot from the body, so painting it light here does not affect
+            // the overscroll at all - the two are not one background.
+            bottomNavigationBar: ColoredBox(
+              color: c.bg,
+              child: const SafeArea(
+                top: false,
+                child: CustomNavBarWidget(page: 'Home'),
+              ),
+            ),
           ),
         );
       }),
