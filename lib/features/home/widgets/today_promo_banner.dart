@@ -7,7 +7,7 @@
 //
 //   card     black (surfaceDeep), 98 tall, full bleed, sits between hero
 //            and feed
-//   emblem   dot-burst with the white logo mark
+//   emblem   white logo mark (dot burst dropped 2026-07-20, read as busy)
 //   copy     title ExtraBold 16 white, subtitle Medium 13 muted
 //   CTA      pill: lime "See plans" (upgrade) / orange "Renew" (lapse)
 //
@@ -20,7 +20,6 @@ import 'package:flutter/material.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -67,15 +66,11 @@ class TodayPromoBanner extends StatelessWidget {
                 horizontal: CiSpace.screen, vertical: CiSpace.s5),
             child: Row(
               children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: DotBurst(
-                    size: 40,
-                    child: CiLogoMark(size: 18, color: c.text),
-                  ),
-                ),
-                const SizedBox(width: CiSpace.s3),
+                // Just the mark, no dot burst: the burst around a small mark
+                // read as busy at this size. Larger and on its own it carries
+                // the brand more cleanly. The icon itself may change later.
+                CiLogoMark(size: 32, color: c.text),
+                const SizedBox(width: CiSpace.s4),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
