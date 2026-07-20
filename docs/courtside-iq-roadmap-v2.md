@@ -1090,8 +1090,38 @@ entry points.
 
 | # | State | Why it is needed | b | w | v |
 |---|---|---|---|---|---|
-| 4.9b.1 | **Signup - check your email** | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. Test has confirmation OFF, which is why the verified signup flow is not the one a real parent gets. **Without this, prod signup looks broken.** | ☐ | ☐ | ☐ |
-| 4.9b.2 | **Forgot Password - link sent** | v1 popped a dialog. Currently a Snackbar (`521:2009`), chosen so nothing was invented. Copy deliberately does not confirm whether an account exists, since that would let anyone probe which emails are registered - any design must preserve that. | ☐ | ☐ | ☐ |
+| 4.9b.1 | **Signup - check your email** (`765:3144`) | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. Test has confirmation OFF, which is why the verified signup flow is not the one a real parent gets. **Without this, prod signup looks broken.** | ☐ | ☐ | ☐ |
+| 4.9b.2 | **Forgot Password - link sent** (`765:3370`) | v1 popped a dialog; code currently shows a Snackbar. Copy deliberately does not confirm whether an account exists, since that would let anyone probe which emails are registered. | ☐ | ☐ | ☐ |
+
+**Frames drafted 2026-07-19, AWAITING APPROVAL.** Both sit in the `1 · Entry &
+Auth` section on the Screens page, inserted in journey order rather than
+appended: Check Your Email directly after Email Auth (Sign Up), Link Sent
+directly after Forgot Password. Ten existing frames shifted right to open the
+slots, and the section widened to 7980.
+
+Both are clones of Reset Successful, so the status bar, back button, dot burst,
+button instance and type scale are the existing ones rather than reproductions.
+Shared shape: burst, "Check your email" h1, one line of body, a lime CTA, and a
+text link beneath it for the secondary action.
+
+Copy decisions to preserve when these are built:
+
+- **The signup screen names the address** ("We sent a link to
+  alex.rivera@email.com"), so a parent catches a typo instead of hunting in an
+  inbox that will never receive anything. **The reset screen must NOT** - it
+  says "If that email has an account", and reads identically whether or not the
+  address is registered. Confirming existence would let anyone probe which
+  parents have accounts.
+- Both offer a resend, because the commonest failure here is an email that
+  never arrives or lands in spam, and a dead end is the worst outcome.
+- The reset screen states the expiry (one hour), since a link that silently
+  stops working is indistinguishable from a broken app.
+
+**Connectors deliberately not drawn.** CLAUDE.md asks new screens to be wired
+with connectors from their entry points, but the whole file contains exactly
+ONE such node (`flow-arrow`, in `4 · Games`). Two orphan arrows in a section
+with none would be noise. Wiring Entry & Auth properly is worth doing as its
+own pass.
 
 **Also for the Figma file, found while building 4.9:**
 
