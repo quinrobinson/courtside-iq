@@ -20,6 +20,13 @@ import '../tokens/ci_colors.dart';
 import '../tokens/ci_metrics.dart';
 import '../tokens/ci_type.dart';
 
+/// A player avatar is a circle; the header profile is a rounded square.
+///
+/// The header one deliberately matches the icon buttons beside it (40x40,
+/// radius 6) so the bell and the profile read as one pair, rather than a
+/// circle floating next to a square.
+enum CiAvatarShape { circle, rounded }
+
 class CiAvatar extends StatelessWidget {
   const CiAvatar({
     super.key,
@@ -27,6 +34,7 @@ class CiAvatar extends StatelessWidget {
     this.imageUrl,
     this.size = 40,
     this.selected = true,
+    this.shape = CiAvatarShape.circle,
     this.onTap,
   });
 
@@ -41,6 +49,9 @@ class CiAvatar extends StatelessWidget {
   /// Filled when selected, ringed outline when not. In a switcher this is
   /// which player is active.
   final bool selected;
+
+  /// Circle for a player, rounded square for the header profile.
+  final CiAvatarShape shape;
 
   final VoidCallback? onTap;
 
@@ -64,26 +75,34 @@ class CiAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
 
-    final child = imageUrl != null && imageUrl!.isNotEmpty
-        ? ClipOval(
-            child: Image.network(
-              imageUrl!,
-              width: size,
-              height: size,
-              fit: BoxFit.cover,
-              // A broken photo URL must never blank the avatar - fall back to
-              // initials, which always work.
-              errorBuilder: (_, __, ___) => _initials(c),
-            ),
+    final rounded = shape == CiAvatarShape.rounded;
+    final radius = rounded ? CiRadius.chipR : null;
+
+    final photo = imageUrl != null && imageUrl!.isNotEmpty
+        ? Image.network(
+            imageUrl!,
+            width: size,
+            height: size,
+            fit: BoxFit.cover,
+            // A broken photo URL must never blank the avatar - fall back to
+            // initials, which always work.
+            errorBuilder: (_, __, ___) => _initials(c),
           )
-        : _initials(c);
+        : null;
+
+    final child = photo == null
+        ? _initials(c)
+        : rounded
+            ? ClipRRect(borderRadius: CiRadius.chipR, child: photo)
+            : ClipOval(child: photo);
 
     final avatar = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: selected ? c.surfaceInvert : Colors.transparent,
-        shape: BoxShape.circle,
+        shape: rounded ? BoxShape.rectangle : BoxShape.circle,
+        borderRadius: radius,
         border: selected ? null : Border.all(color: c.borderStrong),
       ),
       child: child,

@@ -232,6 +232,8 @@ class _BrandRow extends StatelessWidget {
             CiAvatar(
               name: userName ?? '',
               imageUrl: userPhotoUrl,
+              // Rounded square, to pair with the bell icon button beside it.
+              shape: CiAvatarShape.rounded,
               onTap: onProfile,
             ),
           ],

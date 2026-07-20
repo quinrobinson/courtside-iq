@@ -347,6 +347,32 @@ void main() {
     });
   });
 
+  group('CiAvatar shape', () {
+    BoxShape shapeOf(WidgetTester t) {
+      final container = t.widget<Container>(
+        find.descendant(of: find.byType(CiAvatar), matching: find.byType(Container)).first,
+      );
+      return (container.decoration! as BoxDecoration).shape;
+    }
+
+    testWidgets('a player avatar is a circle', (tester) async {
+      await _pump(tester, const CiAvatar(name: 'Maya Chen'));
+      expect(shapeOf(tester), BoxShape.circle);
+    });
+
+    testWidgets('the rounded shape is a rectangle with a radius', (tester) async {
+      // The header profile pairs with the icon buttons beside it, so it is a
+      // rounded square, not a circle floating next to squares.
+      await _pump(tester,
+          const CiAvatar(name: 'Maya Chen', shape: CiAvatarShape.rounded));
+      expect(shapeOf(tester), BoxShape.rectangle);
+      final container = tester.widget<Container>(
+        find.descendant(of: find.byType(CiAvatar), matching: find.byType(Container)).first,
+      );
+      expect((container.decoration! as BoxDecoration).borderRadius, isNotNull);
+    });
+  });
+
   group('CiAvatar initials', () {
     test('derives initials, and never renders empty', () {
       expect(CiAvatar.initialsOf('Jada White'), 'JW');
