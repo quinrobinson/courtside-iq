@@ -152,11 +152,13 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      // Centre the label UNDER the number. Left-aligned, "PTS" is wider than
+      // "12" and spills to the right of it rather than sitting beneath it.
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-          Text('$value',
-              style: CiType.heroLine.copyWith(color: c.text)),
-          const SizedBox(height: 2),
+        Text('$value', style: CiType.heroLine.copyWith(color: c.text)),
+        const SizedBox(height: 2),
         Text(label,
             style: CiType.micro.copyWith(
                 color: c.textMuted, fontWeight: CiWeight.medium)),
