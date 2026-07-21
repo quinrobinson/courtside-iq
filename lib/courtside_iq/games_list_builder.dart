@@ -20,24 +20,23 @@ export 'games_list_types.dart';
 const String kAllPlayersId = '';
 const String kAllDatesKey = '';
 
-/// Player chips, in the order they appear.
+/// Player chips, built from the ROSTER.
 ///
-/// Built from the GAMES, not from the roster: a player with no games has
-/// nothing to filter to, and offering their chip leads to an empty list that
-/// looks like a bug.
-List<GameFilterOption> playerOptions(List<GameListRow> games) {
-  final seen = <String, String>{};
-  for (final g in games) {
-    if (g.playerId.isEmpty) continue;
-    seen.putIfAbsent(g.playerId, () => g.playerName);
-  }
-  final options = seen.entries
-      .map((e) => GameFilterOption(id: e.key, label: e.value))
+/// This was built from the GAMES until 2026-07-21, on the reasoning that a
+/// chip yielding nothing is a dead control. That was wrong twice over: a
+/// parent with two players saw one chip and no explanation, and it made frame
+/// 683:2755 - "No games for Jordan yet" - unreachable, since the only way to
+/// see it is to select a player who has none.
+///
+/// Selecting an empty player is a fair question with a useful answer.
+List<GameFilterOption> playerOptions(List<GameRosterEntry> roster) {
+  final options = roster
+      .where((p) => p.playerId.isNotEmpty)
+      .map((p) => GameFilterOption(id: p.playerId, label: p.firstName))
       .toList()
     ..sort((a, b) => a.label.compareTo(b.label));
 
-  // Only worth offering when there is a choice to make. One player means
-  // every chip shows the same list.
+  // Still hidden for a single player: every chip would show the same list.
   if (options.length < 2) return const [];
   return [const GameFilterOption(id: kAllPlayersId, label: 'All'), ...options];
 }

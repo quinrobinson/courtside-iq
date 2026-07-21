@@ -17,23 +17,26 @@ GameListRow _g({
 
 void main() {
   group('playerOptions', () {
-    test('is built from the GAMES, not the roster', () {
-      // A player with no games has nothing to filter to, and their chip would
-      // lead to an empty list that reads as a bug.
-      final options = playerOptions([
-        _g(player: 'p1', name: 'Maya'),
-        _g(player: 'p2', name: 'Jordan'),
+    test('is built from the ROSTER, including players with no games', () {
+      // Reversed 2026-07-21. Building from the games hid a player who had not
+      // played from their own filter, and made the "No games for X yet" state
+      // unreachable.
+      final options = playerOptions(const [
+        GameRosterEntry(playerId: 'p1', firstName: 'Maya'),
+        GameRosterEntry(playerId: 'p2', firstName: 'Jordan'),
       ]);
       expect(options.map((o) => o.label), ['All', 'Jordan', 'Maya']);
     });
 
     test('is withheld entirely when there is only one player', () {
       // Every chip would show the same list.
-      expect(playerOptions([_g(player: 'p1'), _g(id: 'g2', player: 'p1')]),
+      expect(
+          playerOptions(
+              const [GameRosterEntry(playerId: 'p1', firstName: 'Maya')]),
           isEmpty);
     });
 
-    test('is withheld when there are no games', () {
+    test('is withheld for an empty roster', () {
       expect(playerOptions(const []), isEmpty);
     });
   });

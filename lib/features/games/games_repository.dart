@@ -15,12 +15,24 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/games_list_builder.dart';
 
+/// The screen's whole data set: the roster the chips come from, and the games
+/// the rows come from.
+///
+/// Both, because they are not the same thing. A player with no games still
+/// gets a chip - see playerOptions.
+class GamesData {
+  final List<GameRosterEntry> roster;
+  final List<GameListRow> games;
+
+  const GamesData({required this.roster, required this.games});
+}
+
 class GamesRepository {
   const GamesRepository();
 
-  Future<List<GameListRow>> load() async {
+  Future<GamesData> load() async {
     final uid = currentUserUid;
-    if (uid.isEmpty) return const [];
+    if (uid.isEmpty) return const GamesData(roster: [], games: []);
 
     final profileRows = await SupaFlow.client
         .from('player_profile_view')
@@ -38,14 +50,17 @@ class GamesRepository {
 
     final names = <String, String>{};
     final photos = <String, String?>{};
+    final roster = <GameRosterEntry>[];
     for (final r in profileRows) {
       final id = r['player_id'] as String?;
       if (id == null) continue;
-      names[id] = r['player_first_name'] as String? ?? '';
+      final name = r['player_first_name'] as String? ?? '';
+      names[id] = name;
       photos[id] = r['player_profile_pic'] as String?;
+      roster.add(GameRosterEntry(playerId: id, firstName: name));
     }
 
-    return gameRows.map((r) {
+    final games = gameRows.map((r) {
       final playerId = r['player_id'] as String? ?? '';
       return GameListRow(
         gameId: r['game_id'] as String? ?? '',
@@ -64,6 +79,8 @@ class GamesRepository {
         turnovers: _int(r['turnover']),
       );
     }).toList();
+
+    return GamesData(roster: roster, games: games);
   }
 
   static int _int(dynamic v) {

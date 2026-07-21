@@ -43,3 +43,15 @@ class GameFilterOption {
 
   const GameFilterOption({required this.id, required this.label});
 }
+
+/// A player who can be filtered to, whether or not they have games.
+///
+/// Kept separate from [GameListRow] because the chips come from the roster
+/// and the rows come from the games - conflating them is what hid a player
+/// with no games from their own filter.
+class GameRosterEntry {
+  final String playerId;
+  final String firstName;
+
+  const GameRosterEntry({required this.playerId, required this.firstName});
+}

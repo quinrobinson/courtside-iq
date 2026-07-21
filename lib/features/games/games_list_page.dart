@@ -43,7 +43,7 @@ class GamesListPage extends StatefulWidget {
 }
 
 class _GamesListPageState extends State<GamesListPage> {
-  late Future<List<GameListRow>> _future = widget.repository.load();
+  late Future<GamesData> _future = widget.repository.load();
 
   String _playerId = kAllPlayersId;
   String _dateId = kAllDatesKey;
@@ -66,11 +66,11 @@ class _GamesListPageState extends State<GamesListPage> {
           // No SafeArea here: the ink header claims the status bar itself,
           // exactly as the Players list does. Wrapping the page would leave a
           // white strip above a black header.
-          body: FutureBuilder<List<GameListRow>>(
+          body: FutureBuilder<GamesData>(
             future: _future,
             builder: (context, snap) {
-            final all = snap.data;
-            if (all == null) {
+            final data = snap.data;
+            if (data == null) {
               // The header still renders: it is the screen's identity and
               // does not depend on the games arriving.
               return const Column(
@@ -78,7 +78,10 @@ class _GamesListPageState extends State<GamesListPage> {
               );
             }
 
-              final players = playerOptions(all);
+              final all = data.games;
+            // From the ROSTER, so a player with no games still gets a chip -
+            // and the "No games for X yet" state is reachable at all.
+            final players = playerOptions(data.roster);
               // The player filter narrows what dates are even possible, so
               // the date chips are built from the ALREADY-FILTERED rows. A
               // chip that yields nothing is a dead control the parent
@@ -128,7 +131,18 @@ class _GamesListPageState extends State<GamesListPage> {
                     child: RefreshIndicator(
                       onRefresh: _refresh,
                       child: rows.isEmpty
-                          ? _Empty(filtered: all.isNotEmpty)
+                          ? _Empty(
+                              // Naming the player turns "nothing here" into
+                              // an answer to the question they just asked.
+                              playerName: _playerId.isEmpty
+                                  ? null
+                                  : players
+                                      .firstWhere((p) => p.id == _playerId,
+                                          orElse: () => const GameFilterOption(
+                                              id: '', label: ''))
+                                      .label,
+                              filtered: all.isNotEmpty,
+                            )
                           : ListView.separated(
                               padding: EdgeInsets.zero,
                               // +1 so the LAST row is closed by a rule too.
@@ -219,39 +233,81 @@ class _Loading extends StatelessWidget {
 /// A parent with no games at all needs an invitation. A parent whose FILTER
 /// emptied the list needs to know the games are still there - telling them to
 /// log their first game when they have twenty would read as data loss.
+/// Measured from Games — No Games (Player Filter) (683:2910): an 80 sunk
+/// circle with a 34 basketball, an ExtraBold 24 line, a Medium 15 muted
+/// paragraph, and a lime CTA.
+///
+/// THREE DIFFERENT NOTHINGS, and they must not share copy:
+///   no games at all       an invitation
+///   a player with none    names them, and offers to start one FOR them
+///   a filter that matched  says the games are still there
+/// Telling a parent with twenty games to log their first would read as data
+/// loss; telling them "try a different filter" when they have none is a
+/// dead end.
 class _Empty extends StatelessWidget {
-  const _Empty({required this.filtered});
+  const _Empty({required this.filtered, this.playerName});
 
   final bool filtered;
+
+  /// Null unless a specific player is selected.
+  final String? playerName;
 
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
+    final who = playerName;
+    final forPlayer = who != null && who.isNotEmpty;
+
+    final title = !filtered
+        ? 'No games yet'
+        : forPlayer
+            ? 'No games for $who yet'
+            : 'No games match these filters';
+    final body = !filtered
+        ? 'Track a game and it will show up here.'
+        : forPlayer
+            ? 'Track a game with $who to see how they performed and what it '
+                'means for their growth.'
+            : 'Try a different player or date.';
+
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+      padding: const EdgeInsets.symmetric(horizontal: 45),
       children: [
         const SizedBox(height: CiSpace.s12),
-        Text(
-          filtered ? 'No games match these filters' : 'No games yet',
-          textAlign: TextAlign.center,
-          style: CiType.h3.copyWith(color: c.text),
-        ),
-        const SizedBox(height: CiSpace.s4),
-        Text(
-          filtered
-              ? 'Try a different player or date.'
-              : 'Track a game and it will show up here.',
-          textAlign: TextAlign.center,
-          style: CiType.body.copyWith(color: c.textMuted),
-        ),
-        if (!filtered) ...[
-          const SizedBox(height: CiSpace.s7),
-          CiButton(
-            label: 'Track a Game',
-            expand: true,
-            onPressed: () => context.pushNamed(NewGameWidget.routeName),
+        Center(
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: c.surfaceSunk,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.sports_basketball_rounded,
+                size: 34, color: c.textMuted),
           ),
-        ],
+        ),
+        const SizedBox(height: CiSpace.s5),
+        Text(title,
+            textAlign: TextAlign.center,
+            style: CiType.sectionTitle.copyWith(color: c.text)),
+        const SizedBox(height: CiSpace.s2),
+        Text(
+          body,
+          textAlign: TextAlign.center,
+          style: CiType.rowTitle.copyWith(
+              color: c.textMuted, fontWeight: CiWeight.medium, height: 1.45),
+        ),
+        const SizedBox(height: CiSpace.s5),
+        CiButton(
+          // "Start a game", per the frame. Not "Track a Game": this offers to
+          // begin one now, which is what a parent looking at an empty list
+          // for their child is being invited to do.
+          label: forPlayer ? 'Start a game' : 'Track a Game',
+          style: forPlayer ? CiButtonStyle.lime : CiButtonStyle.primary,
+          expand: true,
+          onPressed: () => context.pushNamed(NewGameWidget.routeName),
+        ),
+        const SizedBox(height: CiSpace.s8),
       ],
     );
   }

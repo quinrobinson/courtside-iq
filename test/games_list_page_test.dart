@@ -13,11 +13,22 @@ import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
 
 class _FakeRepo implements GamesRepository {
-  const _FakeRepo(this.rows);
+  const _FakeRepo(this.rows, {this.roster});
   final List<GameListRow> rows;
+  final List<GameRosterEntry>? roster;
 
   @override
-  Future<List<GameListRow>> load() async => rows;
+  Future<GamesData> load() async => GamesData(
+        // Defaults to the players who appear in the games, so existing tests
+        // read the same. Pass `roster` to include one with none.
+        roster: roster ??
+            {for (final r in rows) r.playerId: r.playerName}
+                .entries
+                .map((e) =>
+                    GameRosterEntry(playerId: e.key, firstName: e.value))
+                .toList(),
+        games: rows,
+      );
 }
 
 /// Never resolves. A Future.delayed would leave a pending timer and fail the
@@ -25,7 +36,7 @@ class _FakeRepo implements GamesRepository {
 class _SlowRepo implements GamesRepository {
   const _SlowRepo();
   @override
-  Future<List<GameListRow>> load() => Completer<List<GameListRow>>().future;
+  Future<GamesData> load() => Completer<GamesData>().future;
 }
 
 GameListRow _g({
@@ -44,10 +55,14 @@ GameListRow _g({
       points: points,
     );
 
-Future<void> _pump(WidgetTester tester, List<GameListRow> rows) async {
+Future<void> _pump(
+  WidgetTester tester,
+  List<GameListRow> rows, {
+  List<GameRosterEntry>? roster,
+}) async {
   await tester.pumpWidget(MaterialApp(
     theme: CiTheme.base(),
-    home: GamesListPage(repository: _FakeRepo(rows)),
+    home: GamesListPage(repository: _FakeRepo(rows, roster: roster)),
   ));
   await tester.pumpAndSettle();
 }
@@ -162,5 +177,62 @@ void main() {
     await tester.pump();
     expect(find.text('Games'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
+
+  testWidgets('a player with NO games still gets a chip', (tester) async {
+    // Reported on device: two players, one chip. Chips were built from the
+    // games, so a player who had not played was invisible in their own
+    // filter - and frame 683:2755 was unreachable.
+    await _pump(
+      tester,
+      [_g(id: 'a', player: 'p1', name: 'Maya')],
+      roster: const [
+        GameRosterEntry(playerId: 'p1', firstName: 'Maya'),
+        GameRosterEntry(playerId: 'p2', firstName: 'Jordan'),
+      ],
+    );
+
+    expect(find.widgetWithText(CiChip, 'Maya'), findsOneWidget);
+    expect(find.widgetWithText(CiChip, 'Jordan'), findsOneWidget);
+  });
+
+  testWidgets('selecting a player with no games names them', (tester) async {
+    await _pump(
+      tester,
+      [_g(id: 'a', player: 'p1', name: 'Maya')],
+      roster: const [
+        GameRosterEntry(playerId: 'p1', firstName: 'Maya'),
+        GameRosterEntry(playerId: 'p2', firstName: 'Jordan'),
+      ],
+    );
+
+    await tester.tap(find.widgetWithText(CiChip, 'Jordan'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No games for Jordan yet'), findsOneWidget);
+    expect(
+        find.text('Track a game with Jordan to see how they performed and '
+            'what it means for their growth.'),
+        findsOneWidget);
+    expect(find.text('Start a game'), findsOneWidget);
+    // Not the generic filter copy - this is an answer, not a dead end.
+    expect(find.text('No games match these filters'), findsNothing);
+  });
+
+  testWidgets('the date row disappears for a player with no games',
+      (tester) async {
+    await _pump(
+      tester,
+      [_g(id: 'a', player: 'p1', name: 'Maya', at: DateTime(2026, 5, 4))],
+      roster: const [
+        GameRosterEntry(playerId: 'p1', firstName: 'Maya'),
+        GameRosterEntry(playerId: 'p2', firstName: 'Jordan'),
+      ],
+    );
+
+    await tester.tap(find.widgetWithText(CiChip, 'Jordan'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(CiChip, 'May 4'), findsNothing);
+    expect(find.widgetWithText(CiChip, 'All dates'), findsNothing);
   });
 }
