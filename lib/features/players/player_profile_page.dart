@@ -33,6 +33,8 @@ import '/features/nav/ci_nav_bar.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
+import '/features/players/age_band_service.dart';
+import '/features/players/widgets/age_band_notice.dart';
 import '/features/players/widgets/averages_view.dart';
 import '/features/players/widgets/development_view.dart';
 import '/features/players/widgets/games_view.dart';
@@ -76,6 +78,10 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   Future<PlayerAverages>? _averagesFuture;
   Future<List<GameFeedEntry>>? _gamesFuture;
 
+  /// Set once the player's band is seen to differ from the one we last
+  /// recorded. Cleared on dismiss and when switching players.
+  bool _showBandNotice = false;
+
   /// Rendered instantly when it matches the player's current game. See
   /// PlayerInsightService.readCached - it deliberately returns nothing when
   /// the cached story describes an older game.
@@ -86,6 +92,17 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     super.initState();
     _playersFuture = widget.repository.load();
     _loadPlayerData();
+    // Driven off the future rather than off build(): checking inside the
+    // FutureBuilder would re-fire on every rebuild, including the one this
+    // check itself causes.
+    _playersFuture!.then(_checkBandFor).catchError((_) {});
+  }
+
+  Future<void> _checkBandFor(List<PlayerListEntry> players) async {
+    final id = _playerId;
+    final match = players.where((p) => p.playerId == id);
+    if (match.isEmpty) return;
+    await _checkAgeBand(id, match.first.ageBand);
   }
 
   void _loadPlayerData() {
@@ -105,8 +122,24 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       _playerId = playerId;
       // The previous player's story must not linger under the new name.
       _cachedInsight = null;
+      _showBandNotice = false;
       _loadPlayerData();
     });
+    _playersFuture?.then(_checkBandFor).catchError((_) {});
+  }
+
+  /// Announces a band change once, then records the new band so it is not
+  /// announced again.
+  ///
+  /// Recorded on SIGHT rather than on dismiss: this is a one-time note, and a
+  /// parent who scrolls past it without tapping the X has still seen it.
+  Future<void> _checkAgeBand(String playerId, String? band) async {
+    final lastSeen = await AgeBandService.lastSeenBand(playerId);
+    final moved = AgeBandService.movedUp(current: band, lastSeen: lastSeen);
+    await AgeBandService.recordBand(playerId, band);
+    if (!mounted || !moved) return;
+    if (playerId != _playerId) return; // switched away while we were reading
+    setState(() => _showBandNotice = true);
   }
 
   @override
@@ -143,6 +176,13 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                     onChanged: (i) =>
                         setState(() => _tab = ProfileTab.values[i]),
                   ),
+                  if (_showBandNotice && player?.ageBand != null)
+                    AgeBandNotice(
+                      firstName: player!.firstName,
+                      ageBand: player.ageBand!,
+                      onDismiss: () =>
+                          setState(() => _showBandNotice = false),
+                    ),
                   Expanded(child: _body(player)),
                 ],
               );
