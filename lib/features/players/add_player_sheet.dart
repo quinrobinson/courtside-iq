@@ -46,6 +46,14 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
   List<String> _positions = [];
   bool _saving = false;
 
+  /// Shown INLINE, above the Save button.
+  ///
+  /// A SnackBar raised from inside a modal bottom sheet renders BEHIND the
+  /// sheet, so the previous attempt caught the error, stopped the spinner and
+  /// showed the parent nothing at all - which reads as "Save does nothing".
+  /// The message has to live where the sheet is.
+  String? _error;
+
   List<int> get _years {
     final now = DateTime.now().year;
     return List.generate(17, (i) => now - 3 - i);
@@ -95,7 +103,10 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
 
   Future<void> _save() async {
     if (!_canSave || _saving) return;
-    setState(() => _saving = true);
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
 
     final userId = SupaFlow.client.auth.currentUser?.id;
     if (userId == null) { setState(() => _saving = false); return; }
@@ -117,16 +128,14 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _saving = false);
       final refused = e.toString().contains('row-level security');
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(refused
-              // Says what to do, not what the database called it.
-              ? 'Your plan does not allow another player right now.'
-              : 'Could not add player: $e'),
-        ));
+      setState(() {
+        _saving = false;
+        _error = refused
+            // Says what the parent can do, not what the database called it.
+            ? 'Your plan does not allow another player right now.'
+            : 'Could not add player. Please try again.';
+      });
       return;
     }
 
@@ -292,6 +301,28 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
               color: _hintColor,
             ),
           ),
+          if (_error != null) ...[
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.error_outline,
+                    size: 18, color: Color(0xFFFF4F00)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(
+                      fontFamily: 'HankenGrotesk',
+                      fontSize: 13,
+                      height: 1.4,
+                      color: Color(0xFFFF4F00),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 24),
 
           // Save button
