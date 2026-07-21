@@ -33,6 +33,7 @@ import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/player_insight/widgets/averages_tab.dart';
 import '/features/player_insight/widgets/games_tab.dart';
+import '/features/players/widgets/development_view.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'players_repository.dart';
@@ -152,10 +153,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       index: _tab.index,
       children: [
         AveragesTab(playerId: _playerId),
-        _DevelopmentPlaceholder(
-          playerId: _playerId,
-          firstName: player?.firstName ?? '',
-          gamesCount: player?.totalGames,
+        _Development(
+          player: player,
           insightFuture: _insightFuture,
           cached: _cachedInsight,
         ),
@@ -263,46 +262,36 @@ class _Hero extends StatelessWidget {
   }
 }
 
-/// Temporary seam: the Development tab still owns its own rendering and is
-/// re-skinned in the next step of 4.11b. It now RECEIVES the hoisted future
-/// rather than starting its own, which is what removes the refetch-on-remount.
-class _DevelopmentPlaceholder extends StatelessWidget {
-  const _DevelopmentPlaceholder({
-    required this.playerId,
-    required this.firstName,
-    required this.gamesCount,
+/// Binds the hoisted insight future to the 2.0 [DevelopmentView].
+///
+/// The future is NOT created here - see the note at the top of this file. This
+/// widget only chooses between the live response and the cached story, so the
+/// tab has something to show on the first frame instead of a spinner.
+class _Development extends StatelessWidget {
+  const _Development({
+    required this.player,
     required this.insightFuture,
     required this.cached,
   });
 
-  final String playerId;
-  final String firstName;
-  final int? gamesCount;
+  final PlayerListEntry? player;
   final Future<PlayerInsightResponse>? insightFuture;
   final PlayerInsight? cached;
 
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
     return FutureBuilder<PlayerInsightResponse>(
       future: insightFuture,
       builder: (context, snap) {
-        final insight = snap.data?.insight ?? cached;
-        if (insight == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(CiSpace.screen),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(insight.headline ?? '',
-                  style: CiType.h3.copyWith(color: c.text)),
-              const SizedBox(height: CiSpace.s3),
-              Text(insight.text ?? '',
-                  style: CiType.body.copyWith(color: c.textMuted)),
-            ],
-          ),
+        return DevelopmentView(
+          firstName: player?.firstName ?? '',
+          insight: snap.data?.insight ?? cached,
+          growthIq: player?.growthIq,
+          trend: player?.trend,
+          trendLabel: player?.trendLabel,
+          gamesLogged: player?.totalGames,
+          gamesUntilUnlock: snap.data?.gamesUntilUnlock,
+          onTrackGame: () => context.pushNamed(NewGameWidget.routeName),
         );
       },
     );

@@ -14,6 +14,15 @@ import 'metrics_config.dart';
 /// Direction-of-travel qualifier shown beside the number ("Rising +5").
 enum GrowthTrend { building, steady, rising }
 
+/// A display score as a 0..1 gauge fill.
+///
+/// Lives here rather than beside each gauge because the 40-99 floor and
+/// ceiling are a Growth IQ decision, not a drawing one. Two screens drawing
+/// the same score from two private copies of this mapping is how a gauge ends
+/// up disagreeing with the number printed inside it.
+double growthIqGaugeValue(int score) =>
+    ((score - 40) / (99 - 40)).clamp(0.0, 1.0);
+
 /// Per-game inputs the composite is built from. One instance per logged game,
 /// ordered oldest -> newest by the caller.
 class GrowthGame {

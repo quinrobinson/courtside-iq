@@ -54,10 +54,6 @@ const double _kRowHeight =
 /// the difference on top of this padding.
 const double _kRowPadding = 32;
 
-/// Growth IQ runs 40..99, so a raw /100 would draw a nearly empty ring for a
-/// real score. Map the range onto the full sweep. Shared with the header.
-double _gaugeValue(int score) => ((score - 40) / (99 - 40)).clamp(0.0, 1.0);
-
 class PlayerListRow extends StatelessWidget {
   const PlayerListRow({super.key, required this.entry, this.onTap});
 
@@ -203,7 +199,7 @@ class _GrowthGauge extends StatelessWidget {
           // There are never more than three players, so the row can afford a
           // gauge that fills its space rather than floating in it.
           size: _kGaugeSize,
-          value: _gaugeValue(entry.growthIq!),
+          value: growthIqGaugeValue(entry.growthIq!),
           child: Text('${entry.growthIq}',
               style: CiType.h1.copyWith(
                   color: c.text, fontWeight: CiWeight.light)),
