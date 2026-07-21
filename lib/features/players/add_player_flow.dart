@@ -17,6 +17,8 @@ import '/features/flags.dart';
 import '/features/players/add_player_sheet.dart';
 import '/features/players/add_player_sheet_v2.dart';
 import '/features/players/widgets/player_gates.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 
 /// Runs the gate and then whichever screen it decides on.
 ///
@@ -39,9 +41,29 @@ Future<void> runAddPlayerFlow(
 
   switch (action) {
     case AddPlayerAction.allowed:
+      // Tracked here rather than trusted from the sheet's return: both sheets
+      // pop the same way whether they saved or the parent backed out, and
+      // only onPlayerAdded distinguishes them.
+      var added = false;
+      void onAdded() {
+        added = true;
+        onPlayerAdded?.call();
+      }
+
       await (kUseAddPlayer2
-          ? showAddPlayerSheetV2(context, onPlayerAdded: onPlayerAdded)
-          : showAddPlayerSheet(context, onPlayerAdded: onPlayerAdded));
+          ? showAddPlayerSheetV2(context, onPlayerAdded: onAdded)
+          : showAddPlayerSheet(context, onPlayerAdded: onAdded));
+
+      // LAND ON THE PLAYERS LIST. Wherever the parent started - Today, the
+      // nav bar, the profile switcher - the new player is what they just
+      // made, so the app should show it rather than leave them on a screen
+      // where a count quietly went up.
+      //
+      // goNamed, not push: this is a tab, and pushing would stack a second
+      // Players list under a back arrow that leads to the screen they left.
+      if (added && context.mounted) {
+        context.goNamed(PlayersListWidget.routeName);
+      }
     case AddPlayerAction.upgradeGate:
       if (await showAddPlayerUpgradeGate(context) && context.mounted) {
         await openPaywall();
