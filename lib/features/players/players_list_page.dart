@@ -219,7 +219,12 @@ class _Header extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
                 CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s6),
-            child: Row(
+            // Height shared with the Games header, which has no icon button
+            // and would otherwise sit 9pt shorter. See
+            // kCiListHeaderContentHeight.
+            child: SizedBox(
+              height: kCiListHeaderContentHeight,
+              child: Row(
               children: [
                 Expanded(
                   child: Text('Players',
@@ -233,6 +238,7 @@ class _Header extends StatelessWidget {
                   onPressed: onAdd,
                 ),
               ],
+              ),
             ),
           ),
         );

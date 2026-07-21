@@ -77,3 +77,10 @@ abstract final class CiRadius {
   /// Sheets round only their top corners when anchored to the bottom edge.
   static const sheetTopR = BorderRadius.vertical(top: Radius.circular(sheet));
 }
+
+/// Content height of a list screen's ink header.
+///
+/// Set by the 40pt icon button in the Players header. The Games header has no
+/// button, and text alone measures ~31, so without a shared floor the two
+/// headers sat 9pt apart - visible the moment a parent switches tabs.
+const double kCiListHeaderContentHeight = 40;

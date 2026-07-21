@@ -98,6 +98,11 @@ class _GamesListPageState extends State<GamesListPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const _Header(),
+                  // The chips must not touch the header. With one player the
+                  // player row is hidden, so the DATE row would otherwise butt
+                  // straight against the ink.
+                  if (players.isNotEmpty || dates.isNotEmpty)
+                    const SizedBox(height: CiSpace.s3),
                   if (players.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: CiSpace.s3),
@@ -210,9 +215,19 @@ class _Header extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
                 CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s6),
-            child: Text('Games',
-                style: CiType.h2
-                    .copyWith(color: c.text, fontWeight: CiWeight.extraBold)),
+            // Matches the height of the Players header, whose row is set by a
+            // 40pt icon button. Text alone is ~31, so without this the two
+            // headers sat 9pt apart - visible when switching tabs, and the
+            // kind of difference that reads as a bug rather than a choice.
+            child: SizedBox(
+              height: kCiListHeaderContentHeight,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Games',
+                    style: CiType.h2.copyWith(
+                        color: c.text, fontWeight: CiWeight.extraBold)),
+              ),
+            ),
           ),
         );
       }),
