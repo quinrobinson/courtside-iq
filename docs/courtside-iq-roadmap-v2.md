@@ -1106,6 +1106,33 @@ Behaviour changes worth knowing before the device run:
 **Unverified render (same gap as Today and the Players list):** the lapse
 strip needs a genuinely expired subscription.
 
+**Device review 2026-07-21 — three fixes, all landed:**
+
+1. **Two trend classifiers, found via "Building -13".** The same player read
+   "Dipping" on Today and "Building -13" on both the list and the profile.
+   `growthIq()` computes a trend and `today_builder` was throwing it away;
+   `TodaySnapshot` then re-derived one from the SIGN of the delta. Different
+   vocabulary AND different classification, since a sign has no dead band.
+   `GrowthTrend.building` is now `dipping`, `TodayTrend` is deleted, and
+   `CiBadge.growthTrend` is the only thing that colours a trend.
+   `PlayerListEntry.trendLabel` went too - it was a second copy of the word.
+2. **The word rides the chip, never the gauge.** The gauge holds the score,
+   the chip holds the movement, word and number together. Splitting them left
+   the number without the word that explains it.
+3. **Development tab spacing re-measured, not nudged.** The code had 20pt
+   vertical throughout where the frames say 24 (summary, focus) and 22/32
+   (wash blocks), a 96 gauge that should be 104, and a 22pt headline that
+   should be 15. A hairline was added above the Development Story header,
+   which is NOT in the frame - noted in code as deliberate.
+
+**LOCKED PRODUCT RULE, decided on device after trying both:** a dipping Growth
+IQ chip is **neutral**, not orange and never red. Growth IQ is a composite
+judgement about a child at the top of the app, and an accent there reads as
+"something is wrong with them". This deliberately DIFFERS from the Averages
+tiles, which do paint a declining stat orange: "free throws are down 4%" is
+narrow and actionable, the whole child in one number is not. Scope is the
+reason the two rules differ. See `CiBadge.growthTrend`.
+
 - **4.11c Full Breakdown, About Growth IQ, info sheets.**
 - **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
