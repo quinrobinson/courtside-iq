@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/courtside_iq/players_list_builder.dart';
 import 'package:courtside_i_q/features/players/widgets/player_list_row.dart';
@@ -70,5 +71,37 @@ void main() {
     // "0.0" would state a season that never happened.
     expect(find.text('—'), findsNWidgets(3));
     expect(find.textContaining('0.0'), findsNothing);
+  });
+
+  testWidgets('a decline is NOT dressed in the positive accent',
+      (tester) async {
+    // "Building -13" on a lime chip read as a contradiction: the gentle word
+    // dressed as a win. Lime is reserved for Rising.
+    await _pump(tester,
+        _entry(growthIq: 61, delta: -13, trend: GrowthTrend.building));
+    expect(find.text('Building -13'), findsOneWidget);
+
+    final chip = tester.widget<Container>(
+      find.ancestor(
+              of: find.text('Building -13'), matching: find.byType(Container))
+          .first,
+    );
+    final colour = (chip.decoration! as BoxDecoration).color;
+    expect(colour, isNot(CiColors.onLight.accentGood),
+        reason: 'a drop must not use the positive accent');
+    // And NOT an alarm colour either: this is a child's development shown to
+    // their parent, so "not climbing" must not read as "something is wrong".
+    expect(colour, isNot(CiColors.onLight.accentEnergy));
+  });
+
+  testWidgets('a rise keeps the lime chip', (tester) async {
+    await _pump(tester,
+        _entry(growthIq: 82, delta: 5, trend: GrowthTrend.rising));
+    final chip = tester.widget<Container>(
+      find.ancestor(of: find.text('Rising +5'), matching: find.byType(Container))
+          .first,
+    );
+    expect((chip.decoration! as BoxDecoration).color,
+        CiColors.onLight.accentGood);
   });
 }

@@ -109,14 +109,24 @@ class _PlayersListPageState extends State<PlayersListPage> {
     }
 
     final c = CiColors.of(context);
-    return ListView.separated(
+    // A hairline BENEATH every row, including the last, so the list reads as
+    // closed rather than trailing off. ListView.separated only puts them
+    // BETWEEN items, which leaves the final row unbounded.
+    Widget hairline() =>
+        Container(height: CiSpace.hairline, color: c.hairline);
+
+    return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: players.length,
-      separatorBuilder: (_, __) =>
-          Container(height: CiSpace.hairline, color: c.hairline),
-      itemBuilder: (context, i) => PlayerListRow(
-        entry: players[i],
-        onTap: () => _openProfile(players[i]),
+      itemBuilder: (context, i) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PlayerListRow(
+            entry: players[i],
+            onTap: () => _openProfile(players[i]),
+          ),
+          hairline(),
+        ],
       ),
     );
   }

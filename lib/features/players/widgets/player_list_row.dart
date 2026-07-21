@@ -21,6 +21,7 @@ import '/courtside_iq/design/components/dot_gauge.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/growth_iq.dart';
 import '/courtside_iq/players_list_builder.dart';
 
 /// Growth IQ runs 40..99, so a raw /100 would draw a nearly empty ring for a
@@ -44,8 +45,12 @@ class PlayerListRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
               CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s5),
+          // CENTRED, not top-aligned. The gauge column is taller than the
+          // identity+averages column, so top-aligning left the left side
+          // hanging with dead space beneath it and made rows with and without
+          // a gauge sit at visibly different rhythms.
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
@@ -128,6 +133,41 @@ class _Avg extends StatelessWidget {
   }
 }
 
+/// The trend chip, coloured by CLASSIFICATION rather than always lime.
+///
+/// A 13-point drop rendered on the positive accent read as a contradiction:
+/// the gentle word "Building" dressed as a win. Lime is reserved for Rising;
+/// Steady and Building take a soft neutral, so the number stays honest without
+/// the colour arguing with it. Decided 2026-07-20.
+///
+/// Building is deliberately NOT orange or red. It is the bucket for flat AND
+/// declining movement, and this is a child's development shown to their
+/// parent - a soft neutral says "not climbing right now", an alarm colour
+/// would say "something is wrong".
+class _TrendChip extends StatelessWidget {
+  const _TrendChip({required this.label, required this.trend});
+
+  final String label;
+  final GrowthTrend trend;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final rising = trend == GrowthTrend.rising;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: rising ? c.accentGood : c.surfaceSunk,
+        borderRadius: CiRadius.chipR,
+      ),
+      child: Text(label,
+          style: CiType.micro.copyWith(
+              color: rising ? c.onAccent : c.textMuted,
+              fontWeight: CiWeight.bold)),
+    );
+  }
+}
+
 class _GrowthGauge extends StatelessWidget {
   const _GrowthGauge({required this.entry});
 
@@ -140,7 +180,9 @@ class _GrowthGauge extends StatelessWidget {
     return Column(
       children: [
         DotGauge(
-          size: 96,
+          // 112: there are never more than three players, so the row can
+          // afford a gauge that fills its space rather than floating in it.
+          size: 112,
           value: _gaugeValue(entry.growthIq!),
           child: Text('${entry.growthIq}',
               style: CiType.h1.copyWith(
@@ -148,16 +190,7 @@ class _GrowthGauge extends StatelessWidget {
         ),
         if (label != null) ...[
           const SizedBox(height: CiSpace.s2),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: c.accentGood,
-              borderRadius: CiRadius.chipR,
-            ),
-            child: Text(label,
-                style: CiType.micro.copyWith(
-                    color: c.onAccent, fontWeight: CiWeight.bold)),
-          ),
+          _TrendChip(label: label, trend: entry.trend!),
         ],
       ],
     );
