@@ -244,25 +244,59 @@ class CiChipBar extends StatelessWidget {
     required this.labels,
     required this.index,
     required this.onChanged,
+    this.scrollable = false,
+    this.padding = EdgeInsets.zero,
   });
 
   final List<String> labels;
   final int index;
   final ValueChanged<int> onChanged;
 
+  /// One scrolling row instead of a wrapping block.
+  ///
+  /// Needed wherever the set is OPEN-ENDED. The Games list has a chip per
+  /// date a game was logged, so wrapping would grow a filter block taller
+  /// than the list it filters - and the frame runs those chips off the right
+  /// edge, which is a scroll.
+  final bool scrollable;
+
+  /// Applied inside the scroll view, so the first and last chips clear the
+  /// gutter without the scroll itself being inset.
+  final EdgeInsets padding;
+
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: CiSpace.s2,
-      runSpacing: CiSpace.s2,
-      children: [
-        for (var i = 0; i < labels.length; i++)
-          CiChip(
-            label: labels[i],
-            selected: i == index,
-            onTap: () => onChanged(i),
-          ),
-      ],
+    final chips = [
+      for (var i = 0; i < labels.length; i++)
+        CiChip(
+          label: labels[i],
+          selected: i == index,
+          onTap: () => onChanged(i),
+        ),
+    ];
+
+    if (!scrollable) {
+      return Padding(
+        padding: padding,
+        child: Wrap(
+          spacing: CiSpace.s2,
+          runSpacing: CiSpace.s2,
+          children: chips,
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: padding,
+      child: Row(
+        children: [
+          for (var i = 0; i < chips.length; i++) ...[
+            if (i > 0) const SizedBox(width: CiSpace.s2),
+            chips[i],
+          ],
+        ],
+      ),
     );
   }
 }

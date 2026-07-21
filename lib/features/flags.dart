@@ -94,3 +94,10 @@ const bool kUseAddPlayer2 = true;
 /// v1 screen is left behind, so this flag is a pure rollback rather than a
 /// feature trade.
 const bool kUseEditPlayer2 = true;
+
+/// Games list, rebuilt on the 2.0 design system (4.12).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Also FIXES A REAL DEFECT: the v1 list
+/// ordered created_at ASCENDING, so it opened on the oldest game a parent had
+/// ever logged. Turning this off restores that.
+const bool kUseGames2 = true;

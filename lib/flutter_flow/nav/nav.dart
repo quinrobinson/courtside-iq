@@ -29,6 +29,7 @@ import '/features/auth/forgot_password_page.dart';
 import '/features/auth/reset_password_page.dart';
 import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
+import '/features/games/games_list_page.dart';
 import '/features/onboarding/onboarding_page.dart';
 import '/features/onboarding/splash_view.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
@@ -190,7 +191,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: AllGamesWidget.routeName,
         path: AllGamesWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => AllGamesWidget(),
+        builder: (context, params) =>
+            kUseGames2 ? const GamesListPage() : AllGamesWidget(),
       ),
       FFRoute(
         name: EditPlayerWidget.routeName,
