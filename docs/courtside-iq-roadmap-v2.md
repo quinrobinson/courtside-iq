@@ -1050,16 +1050,28 @@ fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
   (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
 
-**4.11a.1 built 2026-07-20** (list + empty). `kUsePlayers2` ON for review.
-`[x] built` · `[x] wired` · `[ ] device-verified`
+**4.11a.1 built and device-verified 2026-07-20** (list + empty). `kUsePlayers2`
+is ON.
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+Row height is FIXED, not content-driven. Three configurations appeared at
+different heights on device before this: a scored row with a trend chip, a
+scored row without one, and a brand-new player with no gauge at all. Every
+player joins the list with no data, so the rhythm cannot depend on how much
+they have.
 - Hybrid ground like Today: ink header, light rows. Row carries avatar, name,
   "position, band · N games", PPG/RPG/APG, and a DotGauge with Growth IQ + a
   Building/Steady/Rising chip.
 - Averages from lifetime totals; Growth IQ from per-game rows, reusing the
   Today builder. Two queries, no per-player fan-out.
-**4.11a.2 (gating) built 2026-07-20.** Client-side entitlement only - no
-Supabase, no prod, nothing touching the deferred subscriptions backfill.
-`[x] built` · `[x] wired` · `[ ] device-verified`
+**4.11a.2 (gating) built and device-verified 2026-07-20.** Client-side
+entitlement only - no Supabase, no prod, nothing touching the deferred
+subscriptions backfill.
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+Verified on device: the free-tier upgrade sheet, the 3-player cap dialog, and
+adding a player end to end. **The lapsed banner is NOT verified** - it needs a
+genuinely expired subscription, the same gap as Today's lapse banner.
 
 - Free tier at 1 player -> upgrade gate SHEET ("Track more players").
 - Premium at 3 -> cap DIALOG ("You've reached 3 players"). **It does not
