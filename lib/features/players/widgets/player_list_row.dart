@@ -47,9 +47,12 @@ const double _kRowHeight =
 
 /// Vertical breathing room around each row's content.
 ///
-/// Deliberately generous: there are never more than three players, and the
-/// device review asked for the same 40-50pt above and below every row.
-const double _kRowPadding = 44;
+/// Applied symmetrically, and with TOP alignment this is exactly the space
+/// above the player's name AND below the trend chip - the two the device
+/// review asked to match. Centring made them differ: the gauge column is
+/// taller than the identity column, so centring pushed the name down by half
+/// the difference on top of this padding.
+const double _kRowPadding = 32;
 
 /// Growth IQ runs 40..99, so a raw /100 would draw a nearly empty ring for a
 /// real score. Map the range onto the full sweep. Shared with the header.
@@ -71,7 +74,7 @@ class PlayerListRow extends StatelessWidget {
         onTap: onTap,
         child: Container(
           height: _kRowHeight,
-          alignment: Alignment.center,
+          alignment: Alignment.topCenter,
           padding: const EdgeInsets.fromLTRB(
               CiSpace.screen, _kRowPadding, CiSpace.screen, _kRowPadding),
           // CENTRED, not top-aligned. The gauge column is taller than the
