@@ -281,3 +281,98 @@ class _CiOptionSheetState<T> extends State<CiOptionSheet<T>> {
     );
   }
 }
+
+/// An action row inside a sheet: icon tile, title, subtitle, chevron.
+///
+/// Measured from Create — New Sheet (281:1313): tile 48 with radius 12 on the
+/// sunk fill, icon 24, title SemiBold 17 at 84, subtitle Regular 14 muted,
+/// chevron 18 at the right. Divider inset to the 24 gutter, like every other
+/// in-sheet rule.
+///
+/// A null [onTap] renders it disabled rather than hiding it. Which of those
+/// two a caller wants is a real decision - see CreateSheet, where an
+/// impossible action is HIDDEN and a blocked one stays TAPPABLE so the parent
+/// can find out why.
+class CiSheetActionRow extends StatelessWidget {
+  const CiSheetActionRow({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+    this.showDivider = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final disabled = onTap == null;
+
+    return Semantics(
+      button: true,
+      enabled: !disabled,
+      child: Opacity(
+        opacity: disabled ? 0.4 : 1,
+        child: InkWell(
+          onTap: onTap,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s5),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: c.surfaceSunk,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(icon, size: 24, color: c.text),
+                    ),
+                    const SizedBox(width: CiSpace.s3),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(title,
+                              style: CiType.h4.copyWith(color: c.text),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 2),
+                          Text(subtitle,
+                              style:
+                                  CiType.bodySm.copyWith(color: c.textMuted),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: CiSpace.s2),
+                    Icon(Icons.chevron_right, size: 18, color: c.textMuted),
+                  ],
+                ),
+              ),
+              if (showDivider)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+                  child:
+                      Container(height: CiSpace.hairline, color: c.hairline),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

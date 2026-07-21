@@ -22,8 +22,8 @@ import 'package:flutter/material.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
+import '/features/nav/create_flow.dart';
 import '/index.dart';
-import '/pages/games/game_components/create_new/create_new_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
 enum CiNavTab {
@@ -42,7 +42,8 @@ class CiNavBar extends StatelessWidget {
 
   final CiNavTab active;
 
-  /// Defaults to the v1 Create sheet. The New Game flow is rebuilt in 4.13.
+  /// Defaults to the 2.0 create sheet. Overridable so a screen can refresh
+  /// itself afterwards, and so tests can avoid the network.
   final VoidCallback? onCreate;
 
   static const double barHeight = 70;
@@ -76,7 +77,7 @@ class CiNavBar extends StatelessWidget {
                   onTap: () => _go(context, PlayersListWidget.routeName),
                 ),
                 _CreateButton(
-                  onTap: onCreate ?? () => _openCreateSheet(context),
+                  onTap: onCreate ?? () => handleCreateTap(context),
                 ),
                 _Tab(
                   icon: Icons.scoreboard_rounded,
@@ -102,17 +103,6 @@ class CiNavBar extends StatelessWidget {
   static void _go(BuildContext context, String routeName) =>
       context.goNamed(routeName);
 
-  static Future<void> _openCreateSheet(BuildContext context) {
-    return showModalBottomSheet(
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) => Padding(
-        padding: MediaQuery.viewInsetsOf(context),
-        child: SizedBox(height: 248, child: CreateNewWidget()),
-      ),
-    );
-  }
 }
 
 class _Tab extends StatelessWidget {

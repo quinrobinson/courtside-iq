@@ -16,15 +16,13 @@ import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
-import '/courtside_iq/player_gating.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/features/home/entitlement_status.dart';
 import '/features/home/widgets/today_promo_banner.dart';
-import '/features/players/widgets/player_gates.dart';
+import '/features/players/add_player_flow.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
-import '/features/players/add_player_sheet.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
@@ -93,26 +91,19 @@ class _PlayersListPageState extends State<PlayersListPage> {
     if (mounted) await _loadEntitlement();
   }
 
-  Future<void> _addPlayer() async {
-    final action = addPlayerAction(
-      isPremium: _entitlement == EntitlementStatus.premium,
-      playerCount: _playerCount,
-    );
-
-    switch (action) {
-      case AddPlayerAction.allowed:
-        await showAddPlayerSheet(context, onPlayerAdded: _refresh);
-      case AddPlayerAction.upgradeGate:
-        if (await showAddPlayerUpgradeGate(context) && mounted) {
-          _openPaywall();
-        }
-      case AddPlayerAction.capReached:
-        // "Manage players" just closes: they are already on the list, which
-        // is where a player is removed from. Sending them somewhere else
-        // would be a detour to where they already are.
-        await showPlayerCapReached(context);
-    }
-  }
+  /// Delegates to the shared flow so this screen, the create sheet and the
+  /// profile's switcher cannot disagree about who may add a player.
+  ///
+  /// On the cap branch that flow just closes the dialog, which is right here:
+  /// the parent is already ON the list, and that is where a player is removed
+  /// from. Sending them somewhere else would be a detour to where they are.
+  Future<void> _addPlayer() => runAddPlayerFlow(
+        context,
+        entitlement: _entitlement,
+        playerCount: _playerCount,
+        onPlayerAdded: _refresh,
+        openPaywall: _openPaywall,
+      );
 
   void _openProfile(PlayerListEntry e) {
     context.pushNamed(
