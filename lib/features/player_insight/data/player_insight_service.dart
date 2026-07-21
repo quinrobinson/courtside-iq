@@ -94,15 +94,44 @@ class PlayerInsightService {
   /// scopes to the caller's players). Used to render the card instantly on
   /// tab open while the Edge Function refresh runs in parallel. Returns null
   /// if no cache row exists yet.
+  /// The cached narrative, but ONLY if it describes the player's current
+  /// latest game.
+  ///
+  /// This used to take whichever insight was newest for the player, with no
+  /// game filter at all. A narrative generated three games ago rendered
+  /// instantly while the current one loaded - so a parent could read a
+  /// paragraph about games they have long since moved past, presented as if
+  /// it were about last night. Returning null instead means the tab shows its
+  /// loading state and then the real story. A visible load is a fair price for
+  /// never telling a parent something untrue about their child.
+  ///
+  /// `generated_at_game_id` is what makes this checkable; it is NOT NULL on
+  /// every insight row.
   Future<PlayerInsight?> readCached(String playerId) async {
-    final row = await SupaFlow.client
-        .from('player_development_insights')
-        .select('insight_json')
+    final latest = await SupaFlow.client
+        .from('v_player_game_stats')
+        .select('game_id')
         .eq('player_id', playerId)
         .order('created_at', ascending: false)
         .limit(1)
         .maybeSingle();
+
+    final latestGameId = latest?['game_id'] as String?;
+    // No games means nothing could have been generated yet.
+    if (latestGameId == null) return null;
+
+    final row = await SupaFlow.client
+        .from('player_development_insights')
+        .select('insight_json')
+        .eq('player_id', playerId)
+        .eq('generated_at_game_id', latestGameId)
+        .order('created_at', ascending: false)
+        .limit(1)
+        .maybeSingle();
     if (row == null) return null;
+
+    // A claim row carries a null insight_json: generation is in flight, not
+    // finished. Rendering it would be rendering nothing.
     final raw = row['insight_json'];
     if (raw is! Map) return null;
     return PlayerInsight.fromJson(Map<String, dynamic>.from(raw));
