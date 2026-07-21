@@ -78,23 +78,21 @@ class CiBadge extends StatelessWidget {
   /// development shown to their parent: neutral says "not climbing right now",
   /// an alarm colour says "something is wrong".
   ///
-  /// [showWord] is off on Today, where the word already sits inside the gauge
-  /// and repeating it in the chip beside it says the same thing twice. The
-  /// TONE still comes from the trend either way, which is the part that must
-  /// not vary by screen.
+  /// THE WORD AND THE NUMBER TRAVEL TOGETHER, always on this chip and never
+  /// split across the gauge. Today and the profile briefly put the word inside
+  /// the gauge and the number on the chip; on device that read as two separate
+  /// facts about the player rather than one, and the number lost the word that
+  /// explains it. The gauge holds the score. This chip holds the movement.
   factory CiBadge.growthTrend({
     Key? key,
     required GrowthTrend trend,
     int? delta,
-    bool showWord = true,
   }) {
-    final word = showWord
-        ? switch (trend) {
-            GrowthTrend.rising => 'Rising',
-            GrowthTrend.steady => 'Steady',
-            GrowthTrend.dipping => 'Dipping',
-          }
-        : '';
+    final word = switch (trend) {
+      GrowthTrend.rising => 'Rising',
+      GrowthTrend.steady => 'Steady',
+      GrowthTrend.dipping => 'Dipping',
+    };
     final number = delta == null ? '' : '${delta >= 0 ? '+' : ''}$delta';
     return CiBadge(
       key: key,

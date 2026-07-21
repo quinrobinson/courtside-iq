@@ -286,17 +286,13 @@ class _GrowthBlock extends StatelessWidget {
               // would leave the ring looking barely started at a genuinely
               // good score. Map the real range onto the full sweep.
               value: _gaugeValue(snapshot.growthIq!),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('${snapshot.growthIq}',
-                      style: CiType.h2.copyWith(
-                          color: c.text, fontWeight: CiWeight.light)),
-                  if (snapshot.trendLabel != null)
-                    Text(snapshot.trendLabel!,
-                        style: CiType.caption.copyWith(color: c.textMuted)),
-                ],
-              ),
+              // THE SCORE ONLY. The trend word used to sit under it here and
+              // the delta rode the chip to the right, which split one fact
+              // across two places - the number lost the word explaining it.
+              // Both now travel together on the chip.
+              child: Text('${snapshot.growthIq}',
+                  style: CiType.h2
+                      .copyWith(color: c.text, fontWeight: CiWeight.light)),
             ),
             const SizedBox(width: CiSpace.s4),
             Expanded(
@@ -343,11 +339,7 @@ class _GrowthBlock extends StatelessWidget {
                       // Players list for the same player's same drop.
                       if (snapshot.trend != null)
                         CiBadge.growthTrend(
-                          trend: snapshot.trend!,
-                          delta: delta,
-                          // The word is already inside the gauge.
-                          showWord: false,
-                        ),
+                            trend: snapshot.trend!, delta: delta),
                     ],
                   ),
                 ],

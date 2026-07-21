@@ -116,12 +116,10 @@ void main() {
 
       final chip = tester.widget<CiBadge>(find.byType(CiBadge).first);
       expect(chip.tone == CiBadgeTone.good, expectRising, reason: '$trend');
-      // The number is on the chip; the word is inside the gauge.
-      expect(chip.label, '+2');
     }
   });
 
-  testWidgets('the word sits in the gauge, not doubled on the chip',
+  testWidgets('the word and the number travel together on the chip',
       (tester) async {
     await tester.pumpWidget(_host(DevelopmentView(
       firstName: 'Maya',
@@ -131,9 +129,11 @@ void main() {
       trend: GrowthTrend.dipping,
     )));
 
-    // "Dipping -13" agrees with itself. "Building -13" - the word this
-    // replaced - said the opposite of the number beside it.
-    expect(find.text('Dipping'), findsOneWidget);
-    expect(find.text('-13'), findsOneWidget);
+    // "Dipping -13" agrees with itself, and the gauge holds only the score.
+    // The word was briefly inside the gauge with the number on the chip; on
+    // device that read as two separate facts about the player.
+    expect(find.text('Dipping -13'), findsOneWidget);
+    expect(find.text('61'), findsOneWidget);
+    expect(find.text('Dipping'), findsNothing);
   });
 }

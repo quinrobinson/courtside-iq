@@ -116,18 +116,11 @@ class _Story extends StatelessWidget {
                 DotGauge(
                   size: 104,
                   value: growthIqGaugeValue(growthIq!),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('$growthIq',
-                          style: CiType.statSm.copyWith(color: c.text)),
-                      // The word sits INSIDE the gauge here, as it does on
-                      // Today. The chip beside it then carries the number.
-                      if (trend != null)
-                        Text(_trendWord(trend!),
-                            style: CiType.micro.copyWith(color: c.textMuted)),
-                    ],
-                  ),
+                  // The score only. See CiBadge.growthTrend: the word and the
+                  // delta stay together on the chip rather than being split
+                  // across the gauge and the chip.
+                  child: Text('$growthIq',
+                      style: CiType.statSm.copyWith(color: c.text)),
                 ),
                 const SizedBox(width: 18),
               ],
@@ -137,10 +130,7 @@ class _Story extends StatelessWidget {
                   children: [
                     if (trend != null) ...[
                       CiBadge.growthTrend(
-                        trend: trend!,
-                        delta: growthIqDelta,
-                        showWord: false,
-                      ),
+                          trend: trend!, delta: growthIqDelta),
                       const SizedBox(height: 10),
                     ],
                     Text(insight.headline ?? '',
@@ -185,12 +175,6 @@ class _Story extends StatelessWidget {
   }
 
   static bool _has(String? s) => s != null && s.trim().isNotEmpty;
-
-  static String _trendWord(GrowthTrend t) => switch (t) {
-        GrowthTrend.rising => 'Rising',
-        GrowthTrend.steady => 'Steady',
-        GrowthTrend.dipping => 'Dipping',
-      };
 }
 
 /// A lime-wash block. Used for both the positive and the growth section on

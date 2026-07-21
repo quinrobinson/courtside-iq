@@ -112,7 +112,7 @@ void main() {
       final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
       final delta = badges.firstWhere((b) => b.label.contains('4'));
       expect(delta.tone, CiBadgeTone.good);
-      expect(delta.label, '+4');
+      expect(delta.label, 'Rising +4');
     });
 
     testWidgets('a drop is neutral here, exactly as on the Players list',
@@ -126,18 +126,23 @@ void main() {
       expect(delta.tone, CiBadgeTone.neutral);
     });
 
-    testWidgets('the chip does not repeat the word inside the gauge',
+    testWidgets('the word and the number travel together on the chip',
         (tester) async {
-      await _pump(tester, [_snap(delta: -3, trend: GrowthTrend.dipping)]);
-      // "Dipping" appears once - in the gauge, not also in the chip.
-      expect(find.text('Dipping'), findsOneWidget);
+      // They were briefly split - word inside the gauge, number on the chip -
+      // and on device that read as two separate facts about the player. The
+      // gauge holds the score; the chip holds the movement.
+      await _pump(tester, [_snap(delta: -13, trend: GrowthTrend.dipping)]);
+      expect(find.text('Dipping -13'), findsOneWidget);
+      expect(find.text('Dipping'), findsNothing);
     });
 
-    testWidgets('shows the gauge, score and trend word', (tester) async {
+    testWidgets('the gauge holds the score and nothing else', (tester) async {
       await _pump(tester, [_snap(growthIq: 82, delta: 4)]);
       expect(find.byType(DotGauge), findsOneWidget);
       expect(find.text('82'), findsOneWidget);
-      expect(find.text('Rising'), findsOneWidget);
+      // The word rides the chip, so it never appears bare.
+      expect(find.text('Rising'), findsNothing);
+      expect(find.text('Rising +4'), findsOneWidget);
     });
 
     testWidgets('falls back to the name when there is no headline',
