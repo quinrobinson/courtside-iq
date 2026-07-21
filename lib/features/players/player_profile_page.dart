@@ -37,6 +37,9 @@ import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/players/add_player_flow.dart';
+import '/features/players/birth_date_gate.dart';
+import '/features/players/birth_date_nudges.dart';
+import '/features/players/birth_date_sheet.dart';
 import '/features/players/edit_player_page.dart';
 import '/features/players/age_band_service.dart';
 import '/features/players/info_copy.dart';
@@ -140,7 +143,26 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   /// Refetches the switcher. A player added from this screen lands in that
   /// row, so without this the avatar never appears where it was added from.
   void _reloadPlayers() =>
-      setState(() => _playersFuture = widget.repository.load());
+      setState(() {
+        _playersFuture = widget.repository.load();
+      });
+
+  Future<void> _addBirthDate(String playerId) async {
+    final date = await presentBirthDateSheet(context);
+    if (date == null || !mounted) return;
+    try {
+      await writeBirthDate(playerId, date);
+      _reloadPlayers();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+            content: Text('Could not save that birth date. Please try again.'),
+          ));
+      }
+    }
+  }
 
   Future<void> _editPlayer(PlayerListEntry player) async {
     if (!kUseEditPlayer2) {
@@ -268,6 +290,17 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                     onChanged: (i) =>
                         setState(() => _tab = ProfileTab.values[i]),
                   ),
+                  // No age band means no birth date, which means the ratings
+                  // below are NOT age-normalised. The banner sits with them
+                  // and says so.
+                  if (player != null && player.ageBand == null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: CiSpace.s4),
+                      child: BirthDateCaveat(
+                        firstName: player.firstName,
+                        onAdd: () => _addBirthDate(player.playerId),
+                      ),
+                    ),
                   if (_showBandNotice && player?.ageBand != null)
                     AgeBandNotice(
                       firstName: player!.firstName,

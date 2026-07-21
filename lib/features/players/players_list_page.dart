@@ -69,7 +69,9 @@ class _PlayersListPageState extends State<PlayersListPage> {
 
   Future<void> _refresh() async {
     final next = widget.repository.load();
-    setState(() => _future = next);
+    setState(() {
+      _future = next;
+    });
     await Future.wait([next, _loadEntitlement()]);
   }
 

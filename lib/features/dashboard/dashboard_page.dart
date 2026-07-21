@@ -233,7 +233,9 @@ class _DashboardPageState extends State<DashboardPage> {
             }
             if (snap.hasError || !snap.hasData) {
               return _ErrorState(onRetry: () {
-                setState(() => _dataFuture = _loadData());
+                setState(() {
+                  _dataFuture = _loadData();
+                });
               });
             }
             return _Body(

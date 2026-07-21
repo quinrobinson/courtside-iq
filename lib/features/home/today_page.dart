@@ -34,6 +34,7 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/features/flags.dart';
+import '/features/players/birth_date_gate.dart';
 import '/features/players/info_copy.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
@@ -74,6 +75,16 @@ class _TodayPageState extends State<TodayPage> {
   void initState() {
     super.initState();
     _loadEntitlement();
+    // The v1 gate lives on home_widget, which this screen replaces, so
+    // without this the birth-date prompt is dead on every 2.0 build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      maybePromptForBirthDate(context).then((_) {
+        // A birth date added from the prompt changes the age band, and the
+        // header is built on it.
+        if (mounted) _refresh();
+      });
+    });
   }
 
   Future<void> _loadEntitlement() async {
@@ -83,7 +94,12 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> _refresh() async {
     final next = widget.repository.load();
-    setState(() => _future = next);
+    // Block body, not an arrow: an arrow RETURNS the assigned Future, and
+    // Flutter asserts that a setState callback returns nothing. It only ever
+    // ran from pull-to-refresh before, which is why it went unnoticed.
+    setState(() {
+      _future = next;
+    });
     await Future.wait([next, _loadEntitlement()]);
   }
 
