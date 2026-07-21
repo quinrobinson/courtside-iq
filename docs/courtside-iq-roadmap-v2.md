@@ -1207,9 +1207,47 @@ reason the two rules differ. See `CiBadge.growthTrend`.
   Also fixed a latent `setState(() => _future = ...)` bug in four screens -
   the arrow returns the assigned Future, which Flutter asserts against.
 
-- **4.11e Games tab event filter and insight spark** - NOW UNBLOCKED. Both
-  were deferred in 4.11b because events had no 2.0 home; they do now. Needs a
-  design pass, since neither is in frame `98:583`.
+- **4.11e Games tab event filter and insight spark** - FOLDED INTO 4.12,
+  which is already "Games list, filters". Both were deferred in 4.11b because
+  events had no 2.0 home; they do now. Neither is in frame `98:583`, so both
+  still need a design pass.
+
+**A PRODUCT RULE CHANGED IN 4.11d: no birth date, no rating.** Approved
+2026-07-21 after the device review asked how the app could know a bandless
+player was 11U-13U. It could not.
+
+`get_age_band()` returned `'11U-13U'` for a null birth date - deliberately,
+and mirrored in `metrics_config.dart` and `metrics.ts`. Two consequences:
+
+- an ASSUMPTION rendered identically to a FACT, on the list subtitle, the
+  profile identity line and the Averages calibration note
+- ratings were computed against middle-school cutoffs for a player of unknown
+  age, while presenting themselves as age-normalised. Age fairness is the
+  entire premise of Growth IQ.
+
+Now: migration `20260721000000` returns NULL (**applied to TEST only**),
+`ageBandFromString` returns null, and `growthIq()` locks with
+`GrowthIqLock.noBirthDate`. **The TypeScript mirror is written but NOT
+DEPLOYED** - `getAgeBand` returns `AgeBand | null`, tiers are withheld without
+a band, and both prompts say the age is unknown. Both deno check clean.
+
+A lock now carries its REASON, because the two resolve differently: telling a
+parent their story "unlocks in 2 games" when it needs a birth date sends them
+to do the wrong thing.
+
+**Consequences worth carrying forward:**
+- a player with no birth date is absent from the Today header, exactly as one
+  with too few games is
+- **frame `649:2201` (the caveat banner) is now obsolete and was deleted.** It
+  existed to caveat an uncalibrated rating; there are none left to caveat. The
+  decision retired one of its own frames.
+- `3.7 Fallback band indicator in UI` in Phase 3 is likewise moot - there is no
+  fallback band any more.
+- v1 FlutterFlow callers keep the old u18 fallback. They cannot render a
+  locked state and are deleted in 4.24.
+
+**Still open from 4.11d:** deploy the two Edge Functions (needs approval), and
+promote migration `20260721000000` to prod at cutover.
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
   (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
 
