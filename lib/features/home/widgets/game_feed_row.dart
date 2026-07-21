@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -172,41 +173,21 @@ class _Stat extends StatelessWidget {
 /// The two bracket the list, so they have to match. Measured from the frame:
 /// 56 for the header, 54 for the footer - close enough that the difference
 /// read as a mistake rather than a rhythm.
-const double kFeedBandHeight = 56;
+const double kFeedBandHeight = kCiSectionBandHeight;
 
 /// "Recent Games" with the hairline the frame puts beneath it.
+///
+/// Now a thin alias over the design system's CiSectionHeader. It was written
+/// here first, before the profile tabs needed the same band; keeping a second
+/// implementation is how the two screens end up with headers that differ by a
+/// weight or two and nobody notices until they are side by side.
 class FeedSectionHeader extends StatelessWidget {
   const FeedSectionHeader({super.key, required this.title});
 
   final String title;
 
   @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    // The frame puts a full-bleed hairline UNDER the section header, so the
-    // header sits on the list rather than floating above it.
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(
-          // Same height as the View All Games row beneath the list, so the
-          // section is bounded by two matching bands rather than one tall and
-          // one short. kFeedBandHeight is shared by both.
-          height: kFeedBandHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(title,
-                  style: CiType.rowLabel.copyWith(
-                      color: c.textMuted, fontWeight: CiWeight.medium)),
-            ),
-          ),
-        ),
-        const FeedHairline(),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => CiSectionHeader(title: title);
 }
 
 /// Full-bleed hairline. Never inset - the locked treatment.

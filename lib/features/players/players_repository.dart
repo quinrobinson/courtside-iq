@@ -9,6 +9,7 @@
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/courtside_iq/today_builder.dart' show TodayGameRow;
 
@@ -65,6 +66,41 @@ class PlayersRepository {
       return b.totalGames.compareTo(a.totalGames);
     });
     return entries;
+  }
+
+  /// Per-game rows for ONE player, newest first, folded into the Averages
+  /// tab's numbers.
+  ///
+  /// A separate query rather than a wider [load]: the list needs six columns
+  /// for every player, this needs thirteen for one. Widening the list query to
+  /// serve a screen the parent may never open makes every Players load slower.
+  Future<PlayerAverages> loadAverages(String playerId) async {
+    final rows = await SupaFlow.client
+        .from('v_player_game_stats')
+        .select(
+          'points, off_reb, def_reb, assist, steal, block, turnover, '
+          'fg_made, fg_attempt, three_made, three_attempt, ft_made, ft_attempt',
+        )
+        .eq('player_id', playerId)
+        .order('created_at', ascending: false) as List;
+
+    return buildPlayerAverages(rows
+        .map((r) => AveragesGameRow(
+              points: _int(r['points']),
+              offReb: _int(r['off_reb']),
+              defReb: _int(r['def_reb']),
+              assist: _int(r['assist']),
+              steal: _int(r['steal']),
+              block: _int(r['block']),
+              turnover: _int(r['turnover']),
+              fgMade: _int(r['fg_made']),
+              fgAttempt: _int(r['fg_attempt']),
+              threeMade: _int(r['three_made']),
+              threeAttempt: _int(r['three_attempt']),
+              ftMade: _int(r['ft_made']),
+              ftAttempt: _int(r['ft_attempt']),
+            ))
+        .toList());
   }
 
   static TodayGameRow _toGameRow(dynamic r) => TodayGameRow(

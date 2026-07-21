@@ -26,13 +26,14 @@ import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
-import '/features/player_insight/widgets/averages_tab.dart';
 import '/features/player_insight/widgets/games_tab.dart';
+import '/features/players/widgets/averages_view.dart';
 import '/features/players/widgets/development_view.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -68,6 +69,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   /// refresh is asked for.
   Future<PlayerInsightResponse>? _insightFuture;
 
+  /// Hoisted for the same reason, though the cost here is a query rather than
+  /// a generation: the tab stays mounted, so refetching on every switch would
+  /// be pure waste.
+  Future<PlayerAverages>? _averagesFuture;
+
   /// Rendered instantly when it matches the player's current game. See
   /// PlayerInsightService.readCached - it deliberately returns nothing when
   /// the cached story describes an older game.
@@ -77,10 +83,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   void initState() {
     super.initState();
     _playersFuture = widget.repository.load();
-    _loadInsight();
+    _loadPlayerData();
   }
 
-  void _loadInsight() {
+  void _loadPlayerData() {
+    _averagesFuture = widget.repository.loadAverages(_playerId);
     _insightFuture = _service.fetch(_playerId);
     _service.readCached(_playerId).then((cached) {
       if (mounted && cached != null) setState(() => _cachedInsight = cached);
@@ -95,7 +102,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       _playerId = playerId;
       // The previous player's story must not linger under the new name.
       _cachedInsight = null;
-      _loadInsight();
+      _loadPlayerData();
     });
   }
 
@@ -152,7 +159,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     return IndexedStack(
       index: _tab.index,
       children: [
-        AveragesTab(playerId: _playerId),
+        _Averages(future: _averagesFuture, ageBand: player?.ageBand),
         _Development(
           player: player,
           insightFuture: _insightFuture,
@@ -259,6 +266,32 @@ class _Hero extends StatelessWidget {
       if (p.ageBand != null && p.ageBand!.trim().isNotEmpty) p.ageBand!.trim(),
     ];
     return parts.isEmpty ? ' ' : parts.join(' · ');
+  }
+}
+
+/// Binds the hoisted averages future to the 2.0 [AveragesView].
+class _Averages extends StatelessWidget {
+  const _Averages({required this.future, required this.ageBand});
+
+  final Future<PlayerAverages>? future;
+  final String? ageBand;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PlayerAverages>(
+      future: future,
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return AveragesView(
+          averages: snap.data!,
+          ageBand: ageBand,
+          // 4.11c builds both destinations. Until then the row is absent
+          // rather than dead.
+        );
+      },
+    );
   }
 }
 

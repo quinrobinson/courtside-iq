@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/components/dot_gauge.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -143,7 +144,7 @@ class _Story extends StatelessWidget {
             ],
           ),
         ),
-        const _SectionHeader(title: 'Development Story'),
+        const CiSectionHeader(title: 'Development Story'),
         // A v2 cache row has no split narrative, only `text`. Rendering it in
         // one block is what keeps an existing user's story on screen instead
         // of an empty tab while the v3 insight regenerates.
@@ -172,28 +173,6 @@ class _Story extends StatelessWidget {
   }
 
   static bool _has(String? s) => s != null && s.trim().isNotEmpty;
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(height: CiSpace.hairline, color: c.hairline),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s4),
-          child: Text(title, style: CiType.label.copyWith(color: c.textMuted)),
-        ),
-      ],
-    );
-  }
 }
 
 /// A lime-wash block. Used for both the positive and the growth section on
