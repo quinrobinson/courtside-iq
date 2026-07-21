@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/components/dot_gauge.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -25,7 +26,10 @@ import '/courtside_iq/growth_iq.dart';
 import '/courtside_iq/players_list_builder.dart';
 
 /// Reserved height for the trend chip, so a row without one is not shorter.
-const double _kChipHeight = 22;
+///
+/// 24 to match CiBadge, which is what Today's Growth IQ chips use - the two
+/// screens show the same kind of chip and must not differ in height.
+const double _kChipHeight = 24;
 
 /// Vertical breathing room around each row's content.
 ///
@@ -142,40 +146,25 @@ class _Avg extends StatelessWidget {
   }
 }
 
-/// The trend chip, coloured by CLASSIFICATION rather than always lime.
+/// The trend chip, using the design system's badge so it matches the chips in
+/// Today's Growth IQ block exactly - same 24pt height, same shape.
 ///
-/// A 13-point drop rendered on the positive accent read as a contradiction:
-/// the gentle word "Building" dressed as a win. Lime is reserved for Rising;
-/// Steady and Building take a soft neutral, so the number stays honest without
-/// the colour arguing with it. Decided 2026-07-20.
+/// Colour follows the CLASSIFICATION, not the delta's sign. A 13-point drop
+/// rendered on the positive accent read as a contradiction: the gentle word
+/// "Building" dressed as a win. Lime is reserved for Rising; Steady and
+/// Building take the neutral tone, so the number stays honest without the
+/// colour arguing with it.
 ///
-/// Building is deliberately NOT orange or red. It is the bucket for flat AND
-/// declining movement, and this is a child's development shown to their
-/// parent - a soft neutral says "not climbing right now", an alarm colour
-/// would say "something is wrong".
-class _TrendChip extends StatelessWidget {
-  const _TrendChip({required this.label, required this.trend});
-
-  final String label;
-  final GrowthTrend trend;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    final rising = trend == GrowthTrend.rising;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: rising ? c.accentGood : c.surfaceSunk,
-        borderRadius: CiRadius.chipR,
-      ),
-      child: Text(label,
-          style: CiType.micro.copyWith(
-              color: rising ? c.onAccent : c.textMuted,
-              fontWeight: CiWeight.bold)),
+/// Building is deliberately NOT the energy accent. It is the bucket for flat
+/// AND declining movement, and this is a child's development shown to their
+/// parent - neutral says "not climbing right now", an alarm colour would say
+/// "something is wrong".
+CiBadge _trendChip(String label, GrowthTrend trend) => CiBadge(
+      label: label,
+      tone: trend == GrowthTrend.rising
+          ? CiBadgeTone.good
+          : CiBadgeTone.neutral,
     );
-  }
-}
 
 class _GrowthGauge extends StatelessWidget {
   const _GrowthGauge({required this.entry});
@@ -204,9 +193,7 @@ class _GrowthGauge extends StatelessWidget {
         // in the device review. Reserving it keeps every row identical.
         SizedBox(
           height: _kChipHeight,
-          child: label == null
-              ? null
-              : _TrendChip(label: label, trend: entry.trend!),
+          child: label == null ? null : _trendChip(label, entry.trend!),
         ),
       ],
     );

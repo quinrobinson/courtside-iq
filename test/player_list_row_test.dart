@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
-import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/courtside_iq/players_list_builder.dart';
 import 'package:courtside_i_q/features/players/widgets/player_list_row.dart';
@@ -81,28 +81,19 @@ void main() {
         _entry(growthIq: 61, delta: -13, trend: GrowthTrend.building));
     expect(find.text('Building -13'), findsOneWidget);
 
-    final chip = tester.widget<Container>(
-      find.ancestor(
-              of: find.text('Building -13'), matching: find.byType(Container))
-          .first,
-    );
-    final colour = (chip.decoration! as BoxDecoration).color;
-    expect(colour, isNot(CiColors.onLight.accentGood),
+    final badge = tester.widget<CiBadge>(find.byType(CiBadge));
+    expect(badge.tone, isNot(CiBadgeTone.good),
         reason: 'a drop must not use the positive accent');
-    // And NOT an alarm colour either: this is a child's development shown to
+    // And NOT an alarm tone either: this is a child's development shown to
     // their parent, so "not climbing" must not read as "something is wrong".
-    expect(colour, isNot(CiColors.onLight.accentEnergy));
+    expect(badge.tone, isNot(CiBadgeTone.energy));
   });
 
   testWidgets('a rise keeps the lime chip', (tester) async {
     await _pump(tester,
         _entry(growthIq: 82, delta: 5, trend: GrowthTrend.rising));
-    final chip = tester.widget<Container>(
-      find.ancestor(of: find.text('Rising +5'), matching: find.byType(Container))
-          .first,
-    );
-    expect((chip.decoration! as BoxDecoration).color,
-        CiColors.onLight.accentGood);
+    expect(tester.widget<CiBadge>(find.byType(CiBadge)).tone,
+        CiBadgeTone.good);
   });
 
   testWidgets('a row with a chip is the SAME height as one without',
@@ -127,5 +118,14 @@ void main() {
     expect(find.byType(DotGauge), findsOneWidget);
     expect(find.textContaining('Rising'), findsNothing);
     expect(find.textContaining('Building'), findsNothing);
+  });
+
+  testWidgets('the trend chip is the same height as Today\'s Growth IQ chips',
+      (tester) async {
+    // Both screens show the same kind of chip. Using CiBadge rather than a
+    // bespoke container is what guarantees they cannot drift apart.
+    await _pump(tester,
+        _entry(growthIq: 82, delta: 5, trend: GrowthTrend.rising));
+    expect(tester.getSize(find.byType(CiBadge)).height, 24);
   });
 }
