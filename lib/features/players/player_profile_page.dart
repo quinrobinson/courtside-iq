@@ -36,6 +36,7 @@ import '/features/nav/ci_nav_bar.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
+import '/features/players/add_player_flow.dart';
 import '/features/players/age_band_service.dart';
 import '/features/players/info_copy.dart';
 import '/features/players/widgets/age_band_notice.dart';
@@ -135,6 +136,20 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     if (mounted) await _loadEntitlement();
   }
 
+  Future<void> _addPlayer(List<PlayerListEntry> players) async {
+    await runAddPlayerFlow(
+      context,
+      entitlement: _entitlement,
+      playerCount: players.length,
+      // A player added from here lands in the switcher, so the list behind it
+      // has to be refetched or the new avatar never appears.
+      onPlayerAdded: () => setState(() {
+        _playersFuture = widget.repository.load();
+      }),
+      openPaywall: _openPaywall,
+    );
+  }
+
   Future<void> _checkBandFor(List<PlayerListEntry> players) async {
     final id = _playerId;
     final match = players.where((p) => p.playerId == id);
@@ -201,6 +216,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                     currentId: _playerId,
                     player: player,
                     onSelect: _selectPlayer,
+                    // The dashed slot. Present whenever the parent could
+                    // conceivably add - the gate behind it decides, and
+                    // explains, exactly as on the Players list and the
+                    // create sheet.
+                    onAdd: players.isEmpty ? null : () => _addPlayer(players),
                     onEdit: player == null
                         ? null
                         : () => context.pushNamed(
@@ -303,6 +323,7 @@ class _Hero extends StatelessWidget {
     required this.currentId,
     required this.player,
     required this.onSelect,
+    this.onAdd,
     this.onEdit,
   });
 
@@ -310,6 +331,7 @@ class _Hero extends StatelessWidget {
   final String currentId;
   final PlayerListEntry? player;
   final ValueChanged<String> onSelect;
+  final VoidCallback? onAdd;
   final VoidCallback? onEdit;
 
   @override
@@ -358,6 +380,7 @@ class _Hero extends StatelessWidget {
                     imageUrls: players.map((p) => p.profilePic).toList(),
                     index: index < 0 ? 0 : index,
                     onSelected: (i) => onSelect(players[i].playerId),
+                    onAdd: onAdd,
                   ),
                 const SizedBox(height: CiSpace.s6),
                 Text(

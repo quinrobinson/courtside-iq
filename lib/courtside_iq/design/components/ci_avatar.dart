@@ -14,6 +14,8 @@
 // no field capturing one, and the rule is that the UI never displays a player
 // attribute it cannot collect. It is deliberately not ported.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../tokens/ci_colors.dart';
@@ -145,7 +147,11 @@ class CiPlayerSwitcher extends StatelessWidget {
   final ValueChanged<int> onSelected;
   final List<String?> imageUrls;
 
-  /// Null hides the add button, e.g. when a free user is at their limit.
+  /// Null hides the add slot entirely.
+  ///
+  /// Callers decide when that is - see runAddPlayerFlow. It is NOT hidden at
+  /// the cap: the slot routes through the same gate as every other add
+  /// entry point, which explains why rather than leaving a parent guessing.
   final VoidCallback? onAdd;
 
   @override
@@ -172,14 +178,17 @@ class CiPlayerSwitcher extends StatelessWidget {
             child: GestureDetector(
               onTap: onAdd,
               behavior: HitTestBehavior.opaque,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: c.borderStrong),
+              // DASHED, per the component (72:170). A solid ring reads as a
+              // player who has not loaded; a dashed one reads as a space
+              // waiting to be filled, which is what it is.
+              child: CustomPaint(
+                painter: _DashedRing(color: c.text.withValues(alpha: 0.18)),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(Icons.add,
+                      size: 16, color: c.text.withValues(alpha: 0.6)),
                 ),
-                child: Icon(Icons.add, size: 16, color: c.text),
               ),
             ),
           ),
@@ -242,4 +251,51 @@ class CiIconButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The dashed ring around the add-player slot.
+///
+/// Painted because Flutter's Border draws solid only, and the alternative -
+/// an image asset - would not take the ground's colour. Measured from 72:170:
+/// a 1px stroke at 18% of the foreground.
+class _DashedRing extends CustomPainter {
+  const _DashedRing({required this.color});
+
+  final Color color;
+
+  /// Dash and gap in logical pixels. Close enough to the frame's rhythm that
+  /// the ring reads as dashed rather than dotted at 40pt.
+  static const double _dash = 3.5;
+  static const double _gap = 3.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final radius = size.width / 2;
+    final centre = Offset(radius, radius);
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..strokeCap = StrokeCap.round;
+
+    // Whole number of dash+gap pairs, so the ring closes cleanly instead of
+    // leaving a long or clipped final dash at the twelve o'clock seam.
+    final circumference = 2 * math.pi * (radius - 0.5);
+    final pairs = (circumference / (_dash + _gap)).round().clamp(6, 60);
+    final sweep = 2 * math.pi / pairs;
+    final dashSweep = sweep * (_dash / (_dash + _gap));
+
+    for (var i = 0; i < pairs; i++) {
+      canvas.drawArc(
+        Rect.fromCircle(center: centre, radius: radius - 0.5),
+        i * sweep,
+        dashSweep,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedRing old) => old.color != color;
 }
