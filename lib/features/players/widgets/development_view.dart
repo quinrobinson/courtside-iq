@@ -40,6 +40,7 @@ class DevelopmentView extends StatelessWidget {
     this.gamesUntilUnlock,
     this.onTrackGame,
     this.onAbout,
+    this.onAboutGrowthIq,
   });
 
   final String firstName;
@@ -58,7 +59,13 @@ class DevelopmentView extends StatelessWidget {
   final int? gamesUntilUnlock;
 
   final VoidCallback? onTrackGame;
+
+  /// "About this story", under the narrative.
   final VoidCallback? onAbout;
+
+  /// Tapping the gauge. Per the frame: "Today or Player Profile, tap the
+  /// Growth IQ gauge".
+  final VoidCallback? onAboutGrowthIq;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +87,7 @@ class DevelopmentView extends StatelessWidget {
       growthIqDelta: growthIqDelta,
       trend: trend,
       onAbout: onAbout,
+      onAboutGrowthIq: onAboutGrowthIq,
     );
   }
 }
@@ -91,6 +99,7 @@ class _Story extends StatelessWidget {
     required this.growthIqDelta,
     required this.trend,
     this.onAbout,
+    this.onAboutGrowthIq,
   });
 
   final PlayerInsight insight;
@@ -98,6 +107,7 @@ class _Story extends StatelessWidget {
   final int? growthIqDelta;
   final GrowthTrend? trend;
   final VoidCallback? onAbout;
+  final VoidCallback? onAboutGrowthIq;
 
   @override
   Widget build(BuildContext context) {
@@ -113,14 +123,17 @@ class _Story extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (growthIq != null) ...[
-                DotGauge(
-                  size: 104,
-                  value: growthIqGaugeValue(growthIq!),
-                  // The score only. See CiBadge.growthTrend: the word and the
-                  // delta stay together on the chip rather than being split
-                  // across the gauge and the chip.
-                  child: Text('$growthIq',
-                      style: CiType.statSm.copyWith(color: c.text)),
+                DotGaugeTapTarget(
+                  onTap: onAboutGrowthIq,
+                  child: DotGauge(
+                    size: 104,
+                    value: growthIqGaugeValue(growthIq!),
+                    // The score only. See CiBadge.growthTrend: the word and
+                    // the delta stay together on the chip rather than being
+                    // split across the gauge and the chip.
+                    child: Text('$growthIq',
+                        style: CiType.statSm.copyWith(color: c.text)),
+                  ),
                 ),
                 const SizedBox(width: 18),
               ],

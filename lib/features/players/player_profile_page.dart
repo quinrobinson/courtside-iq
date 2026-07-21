@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_info_sheet.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -36,6 +37,7 @@ import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/players/age_band_service.dart';
+import '/features/players/info_copy.dart';
 import '/features/players/widgets/age_band_notice.dart';
 import '/features/players/widgets/averages_view.dart';
 import '/features/players/widgets/development_view.dart';
@@ -437,6 +439,16 @@ class _Development extends StatelessWidget {
           gamesLogged: player?.totalGames,
           gamesUntilUnlock: snap.data?.gamesUntilUnlock,
           onTrackGame: () => context.pushNamed(NewGameWidget.routeName),
+          onAbout: () => showCiInfoSheet(
+            context,
+            title: InfoCopy.developmentStoryTitle,
+            body: InfoCopy.developmentStoryBody,
+          ),
+          onAboutGrowthIq: () => showCiInfoSheet(
+            context,
+            title: InfoCopy.growthIqTitle,
+            body: InfoCopy.growthIqBody,
+          ),
         );
       },
     );

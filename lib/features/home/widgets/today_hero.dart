@@ -30,6 +30,7 @@ import '/courtside_iq/design/components/dot_gauge.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/growth_iq.dart';
 import '/courtside_iq/today_snapshot.dart';
 import 'today_skeleton.dart';
 
@@ -43,6 +44,7 @@ class TodayHero extends StatefulWidget {
     this.onNotifications,
     this.onProfile,
     this.onPlayerTap,
+    this.onAboutGrowthIq,
   });
 
   /// While true, the content region is a grey skeleton. The brand bar stays
@@ -61,6 +63,13 @@ class TodayHero extends StatefulWidget {
 
   /// Tapping the Growth IQ block opens that player.
   final ValueChanged<TodaySnapshot>? onPlayerTap;
+
+  /// Tapping the GAUGE ITSELF explains the score instead of navigating.
+  ///
+  /// The entry point the frame specifies: "Today or Player Profile, tap the
+  /// Growth IQ gauge". A number a parent cannot interrogate is a number they
+  /// have to take on faith, and this one is about their child.
+  final VoidCallback? onAboutGrowthIq;
 
   @override
   State<TodayHero> createState() => _TodayHeroState();
@@ -133,6 +142,7 @@ class _TodayHeroState extends State<TodayHero> {
                         onTap: widget.onPlayerTap == null
                             ? null
                             : () => widget.onPlayerTap!(widget.snapshots[i]),
+                        onGaugeTap: widget.onAboutGrowthIq,
                       ),
                     ),
                   ),
@@ -252,19 +262,12 @@ class _BrandRow extends StatelessWidget {
 }
 
 /// Growth IQ runs 40..99, never 0..100. Feeding the raw score to a 0..1 gauge
-/// would draw a nearly empty ring for a score of 45, which is a real result
-/// and should not look like a failure.
-double _gaugeValue(int score) {
-  const min = 40.0;
-  const max = 99.0;
-  return ((score - min) / (max - min)).clamp(0.0, 1.0);
-}
-
 class _GrowthBlock extends StatelessWidget {
-  const _GrowthBlock({required this.snapshot, this.onTap});
+  const _GrowthBlock({required this.snapshot, this.onTap, this.onGaugeTap});
 
   final TodaySnapshot snapshot;
   final VoidCallback? onTap;
+  final VoidCallback? onGaugeTap;
 
   @override
   Widget build(BuildContext context) {
@@ -280,12 +283,17 @@ class _GrowthBlock extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DotGauge(
+            // The gauge is its own tap target, nested inside the block's. It
+            // wins the gesture arena, so tapping the ring explains the score
+            // while tapping anywhere else still opens the player.
+            DotGaugeTapTarget(
+              onTap: onGaugeTap,
+              child: DotGauge(
               size: 120,
               // The gauge takes 0..1. Growth IQ runs 40..99, so a raw /100
               // would leave the ring looking barely started at a genuinely
               // good score. Map the real range onto the full sweep.
-              value: _gaugeValue(snapshot.growthIq!),
+              value: growthIqGaugeValue(snapshot.growthIq!),
               // THE SCORE ONLY. The trend word used to sit under it here and
               // the delta rode the chip to the right, which split one fact
               // across two places - the number lost the word explaining it.
@@ -293,6 +301,7 @@ class _GrowthBlock extends StatelessWidget {
               child: Text('${snapshot.growthIq}',
                   style: CiType.h2
                       .copyWith(color: c.text, fontWeight: CiWeight.light)),
+            ),
             ),
             const SizedBox(width: CiSpace.s4),
             Expanded(

@@ -74,6 +74,7 @@ class CiColors extends ThemeExtension<CiColors> {
     required this.surfaceDeep,
     required this.fieldFill,
     required this.text,
+    required this.textSoft,
     required this.textMuted,
     required this.textFaint,
     required this.textInvert,
@@ -129,6 +130,15 @@ class CiColors extends ThemeExtension<CiColors> {
   final Color fieldFill;
 
   final Color text;
+
+  /// Body copy that should read easily but not carry full ink weight.
+  ///
+  /// Sits between [text] and [textMuted], and exists because those two are not
+  /// interchangeable for a PARAGRAPH: full ink is heavier than the explainer
+  /// sheets are drawn, and textMuted at 15px on white is around 3.5:1 - fine
+  /// for a label, a readability regression for prose. Used by the info sheets.
+  final Color textSoft;
+
   final Color textMuted;
   final Color textFaint;
 
@@ -173,6 +183,7 @@ class CiColors extends ThemeExtension<CiColors> {
     surfaceDeep: CiPalette.black,
     fieldFill: CiPalette.gray50,
     text: CiPalette.inkDefault,
+    textSoft: CiPalette.gray700,
     textMuted: CiPalette.gray500,
     textFaint: CiPalette.gray400,
     textInvert: CiPalette.white,
@@ -199,6 +210,7 @@ class CiColors extends ThemeExtension<CiColors> {
     surfaceDeep: CiPalette.black,
     fieldFill: CiPalette.black,
     text: CiPalette.white,
+    textSoft: CiPalette.gray300,
     textMuted: CiPalette.gray400,
     textFaint: CiPalette.gray600,
     textInvert: CiPalette.inkDefault,
@@ -228,6 +240,7 @@ class CiColors extends ThemeExtension<CiColors> {
     Color? surfaceDeep,
     Color? fieldFill,
     Color? text,
+    Color? textSoft,
     Color? textMuted,
     Color? textFaint,
     Color? textInvert,
@@ -251,6 +264,7 @@ class CiColors extends ThemeExtension<CiColors> {
         surfaceDeep: surfaceDeep ?? this.surfaceDeep,
         fieldFill: fieldFill ?? this.fieldFill,
         text: text ?? this.text,
+        textSoft: textSoft ?? this.textSoft,
         textMuted: textMuted ?? this.textMuted,
         textFaint: textFaint ?? this.textFaint,
         textInvert: textInvert ?? this.textInvert,
@@ -279,6 +293,7 @@ class CiColors extends ThemeExtension<CiColors> {
       surfaceDeep: c(surfaceDeep, other.surfaceDeep),
       fieldFill: c(fieldFill, other.fieldFill),
       text: c(text, other.text),
+      textSoft: c(textSoft, other.textSoft),
       textMuted: c(textMuted, other.textMuted),
       textFaint: c(textFaint, other.textFaint),
       textInvert: c(textInvert, other.textInvert),

@@ -38,6 +38,61 @@ Future<void> _pump(WidgetTester tester, List<TodaySnapshot> snaps) =>
     ));
 
 void main() {
+  group('About Growth IQ', () {
+    testWidgets('the gauge is its own tap target', (tester) async {
+      // Per the frame: "Today or Player Profile, tap the Growth IQ gauge".
+      var explained = 0;
+      var opened = 0;
+      await tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: Scaffold(
+          body: TodayHero(
+            snapshots: [_snap()],
+            onPlayerTap: (_) => opened++,
+            onAboutGrowthIq: () => explained++,
+          ),
+        ),
+      ));
+
+      await tester.tap(find.byType(DotGauge));
+      expect(explained, 1);
+      // The nested target wins the arena, so the gauge must not ALSO open
+      // the player.
+      expect(opened, 0, reason: 'the gauge explains, it does not navigate');
+    });
+
+    testWidgets('tapping outside the gauge still opens the player',
+        (tester) async {
+      var explained = 0;
+      var opened = 0;
+      await tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: Scaffold(
+          body: TodayHero(
+            snapshots: [_snap(headline: 'Maya is on a 3-game upswing')],
+            onPlayerTap: (_) => opened++,
+            onAboutGrowthIq: () => explained++,
+          ),
+        ),
+      ));
+
+      await tester.tap(find.text('Maya is on a 3-game upswing'));
+      expect(opened, 1);
+      expect(explained, 0);
+    });
+
+    testWidgets('a gauge with nothing to explain is not a button',
+        (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: Scaffold(body: TodayHero(snapshots: [_snap()])),
+      ));
+
+      expect(
+          find.bySemanticsLabel('About Growth IQ'), findsNothing);
+    });
+  });
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('reduced form', () {

@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_info_sheet.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -33,6 +34,7 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/features/flags.dart';
+import '/features/players/info_copy.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
@@ -165,6 +167,11 @@ class _TodayPageState extends State<TodayPage> {
                                 context.pushNamed(MenuWidget.routeName),
                             onPlayerTap: (s) => context.pushNamed(
                               PlayersListWidget.routeName,
+                            ),
+                            onAboutGrowthIq: () => showCiInfoSheet(
+                              context,
+                              title: InfoCopy.growthIqTitle,
+                              body: InfoCopy.growthIqBody,
                             ),
                           ),
                         ),

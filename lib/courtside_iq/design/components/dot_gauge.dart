@@ -188,3 +188,40 @@ class _DotGaugePainter extends CustomPainter {
       old.empty != empty ||
       old.rings != rings;
 }
+
+/// Makes a [DotGauge] tappable, with the label a screen reader needs.
+///
+/// The gauge is the entry point to "About Growth IQ" on both Today and the
+/// player profile ("tap the Growth IQ gauge", per the frame). Shared rather
+/// than wrapped inline at each site so both carry the same semantics: a bare
+/// GestureDetector around a painter is an unlabelled tap target, which reads
+/// to a screen reader as nothing at all.
+///
+/// Passing a null [onTap] returns the child untouched, so a gauge with nothing
+/// to explain does not advertise itself as a button.
+class DotGaugeTapTarget extends StatelessWidget {
+  const DotGaugeTapTarget({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.semanticLabel = 'About Growth IQ',
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+  final String semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    if (onTap == null) return child;
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: child,
+      ),
+    );
+  }
+}
