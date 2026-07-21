@@ -21,6 +21,7 @@ class PlayerListEntry {
     this.profilePic,
     this.position,
     this.ageBand,
+    this.hasBirthDate = true,
     required this.totalGames,
     required this.totalPoints,
     required this.totalRebounds,
@@ -37,7 +38,20 @@ class PlayerListEntry {
 
   /// Raw strings from the view, shown as typed. v1 joins them the same way.
   final String? position;
+  /// The band a rating was computed against. PRESENT EVEN WHEN ASSUMED - see
+  /// [hasBirthDate] before showing it to anyone.
   final String? ageBand;
+
+  /// False when the player has no birth date.
+  ///
+  /// get_age_band() returns '11U-13U' for a null birth date, so ageBand is
+  /// NEVER null and cannot be used to tell "we know" from "we guessed". The
+  /// band is still needed for the rating maths; this is what says whether it
+  /// is a fact.
+  final bool hasBirthDate;
+
+  /// The band, only when it is actually known.
+  String? get knownAgeBand => hasBirthDate ? ageBand : null;
 
   final int totalGames;
   final int totalPoints;
@@ -77,7 +91,9 @@ class PlayerListEntry {
   String get subtitle {
     final left = <String>[
       if (position != null && position!.trim().isNotEmpty) position!.trim(),
-      if (ageBand != null && ageBand!.trim().isNotEmpty) ageBand!.trim(),
+      // knownAgeBand, not ageBand: an assumed band must not read as a fact.
+      if (knownAgeBand != null && knownAgeBand!.trim().isNotEmpty)
+        knownAgeBand!.trim(),
     ].join(', ');
     final games = '$totalGames ${totalGames == 1 ? 'game' : 'games'}';
     return left.isEmpty ? games : '$left · $games';
@@ -93,6 +109,7 @@ class PlayerListPlayerRow {
     this.profilePic,
     this.position,
     this.ageBand,
+    this.hasBirthDate = true,
     required this.totalGames,
     required this.totalPoints,
     required this.totalRebounds,
@@ -105,6 +122,11 @@ class PlayerListPlayerRow {
   final String? profilePic;
   final String? position;
   final String? ageBand;
+
+  /// See [PlayerListEntry.hasBirthDate]. Set from `birth_date != null`, not
+  /// from the band, which is never null.
+  final bool hasBirthDate;
+
   final int totalGames;
   final int totalPoints;
   final int totalRebounds;
@@ -146,6 +168,7 @@ List<PlayerListEntry> buildPlayerList({
       profilePic: p.profilePic,
       position: p.position,
       ageBand: p.ageBand,
+      hasBirthDate: p.hasBirthDate,
       totalGames: p.totalGames,
       totalPoints: p.totalPoints,
       totalRebounds: p.totalRebounds,

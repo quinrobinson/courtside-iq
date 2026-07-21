@@ -290,10 +290,10 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                     onChanged: (i) =>
                         setState(() => _tab = ProfileTab.values[i]),
                   ),
-                  // No age band means no birth date, which means the ratings
-                  // below are NOT age-normalised. The banner sits with them
-                  // and says so.
-                  if (player != null && player.ageBand == null)
+                  // Keyed on the BIRTH DATE, not the band. get_age_band()
+                  // returns '11U-13U' for a missing birth date, so the band is
+                  // never null and this banner could never have fired.
+                  if (player != null && !player.hasBirthDate)
                     Padding(
                       padding: const EdgeInsets.only(top: CiSpace.s4),
                       child: BirthDateCaveat(
@@ -332,7 +332,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       children: [
         _Averages(
           future: _averagesFuture,
-          ageBand: player?.ageBand,
+          ageBand: player?.knownAgeBand,
           playerName: player?.displayName ?? '',
           rowsFuture: _gameRowsFuture,
         ),
@@ -472,7 +472,9 @@ class _Hero extends StatelessWidget {
     if (p == null) return ' ';
     final parts = <String>[
       if (p.position != null && p.position!.trim().isNotEmpty) p.position!.trim(),
-      if (p.ageBand != null && p.ageBand!.trim().isNotEmpty) p.ageBand!.trim(),
+      // knownAgeBand: an assumed band must not be stated as this player's.
+      if (p.knownAgeBand != null && p.knownAgeBand!.trim().isNotEmpty)
+        p.knownAgeBand!.trim(),
     ];
     return parts.isEmpty ? ' ' : parts.join(' · ');
   }

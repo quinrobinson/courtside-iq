@@ -113,6 +113,39 @@ void main() {
     });
   });
 
+  group('an assumed age band is never stated as fact', () {
+    // get_age_band() returns '11U-13U' when birth_date IS NULL, so ageBand is
+    // NEVER null. Reported on device: a player created with no birth date was
+    // listed as "11U-13U", which the app has no way of knowing.
+    PlayerListEntry entry({required bool hasBirthDate}) => PlayerListEntry(
+          playerId: 'p1',
+          firstName: 'Jordan',
+          position: 'Guard',
+          ageBand: '11U-13U',
+          hasBirthDate: hasBirthDate,
+          totalGames: 0,
+          totalPoints: 0,
+          totalRebounds: 0,
+          totalAssists: 0,
+        );
+
+    test('a known band is shown', () {
+      final e = entry(hasBirthDate: true);
+      expect(e.knownAgeBand, '11U-13U');
+      expect(e.subtitle, contains('11U-13U'));
+    });
+
+    test('an assumed band is withheld everywhere', () {
+      final e = entry(hasBirthDate: false);
+      // The band survives for the rating maths...
+      expect(e.ageBand, '11U-13U');
+      // ...but nothing may show it.
+      expect(e.knownAgeBand, isNull);
+      expect(e.subtitle, isNot(contains('11U')));
+      expect(e.subtitle, 'Guard · 0 games');
+    });
+  });
+
   // The trend WORD is no longer built here. It lives in CiBadge.growthTrend,
   // which is also what colours the chip, so the word and its tone cannot
   // drift apart across Today, the list, and the profile. Covered by

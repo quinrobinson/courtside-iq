@@ -25,7 +25,7 @@ class PlayersRepository {
         .from('player_profile_view')
         .select(
           'player_id, player_first_name, player_last_name, player_profile_pic, '
-          'player_position, age_band, total_games, total_points, '
+          'player_position, age_band, birth_date, total_games, total_points, '
           'total_off_reb, total_def_reb, total_assist',
         )
         .eq('user_id', uid) as List;
@@ -49,6 +49,10 @@ class PlayersRepository {
         profilePic: r['player_profile_pic'] as String?,
         position: r['player_position'] as String?,
         ageBand: r['age_band'] as String?,
+        // The BAND is never null - get_age_band assumes 11U-13U for a missing
+        // birth date - so this is the only way to tell a known age from an
+        // assumed one.
+        hasBirthDate: r['birth_date'] != null,
         totalGames: _int(r['total_games']),
         totalPoints: _int(r['total_points']),
         totalRebounds: _int(r['total_off_reb']) + _int(r['total_def_reb']),
