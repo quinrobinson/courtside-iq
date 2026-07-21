@@ -1133,7 +1133,29 @@ tiles, which do paint a declining stat orange: "free throws are down 4%" is
 narrow and actionable, the whole child in one number is not. Scope is the
 reason the two rules differ. See `CiBadge.growthTrend`.
 
-- **4.11c Full Breakdown, About Growth IQ, info sheets.**
+- **4.11c Full Breakdown, About Growth IQ, info sheets** - **BUILT AND WIRED
+  2026-07-21, awaiting a device run.** Full Breakdown `435:1922`, About Story
+  Sheet `648:2195`, About Growth IQ `691:2845`. The two sheets are one
+  component (`CiInfoSheet`): the frames differ only by the length of their
+  paragraph.
+
+  Entry points came from `entry-label` text in the Figma gutters, not from
+  guesswork - "Today or Player Profile, tap the Growth IQ gauge" and "from
+  Averages -> Full Breakdown". **Read those labels before assuming a surface
+  is undesigned.**
+
+  - **`Game Insights Info` (668:2555) deferred to 4.12.** It reads as Game
+    Detail, not the profile.
+  - **"View trends" is still absent from the Averages action row.** Its
+    destination is Stats & Trends (307:1407), scoped out of 4.11, and a button
+    that goes nowhere is worse than no button. The row shows ONE button until
+    that item lands, which does not match the frame.
+  - Adds a `textSoft` colour token (gray700 on light). The sheets' body is
+    #4d4d4d, and `text`/`textMuted` are not interchangeable for a paragraph:
+    full ink is heavier than drawn, textMuted at 15px on white is ~3.5:1.
+
+  `[x] built` · `[x] wired` · `[ ] device-verified`
+
 - **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
   (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
