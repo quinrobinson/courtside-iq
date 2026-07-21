@@ -7,7 +7,10 @@
 //   rule     full bleed at 250
 //   rows     RecentGameRow, the same one Today and the profile use
 //
-// LIGHT GROUND throughout - there is no ink hero on this screen.
+// THE HEADER IS INK, matching the Players list exactly - same ground, same
+// h2 ExtraBold, same padding, and it claims the status bar itself. The frame
+// draws it on light, but Games and Players are the same kind of screen and
+// two list headers that differ read as a mistake rather than a distinction.
 //
 // The two chip rows behave differently on purpose. Players is a CLOSED set of
 // at most three, so it wraps and is hidden entirely when there is only one.
@@ -60,102 +63,115 @@ class _GamesListPageState extends State<GamesListPage> {
         final c = CiColors.of(context);
         return Scaffold(
           backgroundColor: c.bg,
-          body: SafeArea(
-            bottom: false,
-            child: FutureBuilder<List<GameListRow>>(
-              future: _future,
-              builder: (context, snap) {
-                final all = snap.data;
-                if (all == null) return const _Loading();
+          // No SafeArea here: the ink header claims the status bar itself,
+          // exactly as the Players list does. Wrapping the page would leave a
+          // white strip above a black header.
+          body: FutureBuilder<List<GameListRow>>(
+            future: _future,
+            builder: (context, snap) {
+            final all = snap.data;
+            if (all == null) {
+              // The header still renders: it is the screen's identity and
+              // does not depend on the games arriving.
+              return const Column(
+                children: [_Header(), Expanded(child: _Loading())],
+              );
+            }
 
-                final players = playerOptions(all);
-                // The player filter narrows what dates are even possible, so
-                // the date chips are built from the ALREADY-FILTERED rows. A
-                // chip that yields nothing is a dead control the parent
-                // cannot explain.
-                final byPlayer = filterGames(all, playerId: _playerId);
-                final dates = dateOptions(byPlayer);
+              final players = playerOptions(all);
+              // The player filter narrows what dates are even possible, so
+              // the date chips are built from the ALREADY-FILTERED rows. A
+              // chip that yields nothing is a dead control the parent
+              // cannot explain.
+              final byPlayer = filterGames(all, playerId: _playerId);
+              final dates = dateOptions(byPlayer);
 
-                // A selection can outlive its chip - a deleted game, or a
-                // player filter that removed that day entirely.
-                final dateId = reconcileSelection(_dateId, dates);
-                final rows = filterGames(byPlayer, dateId: dateId);
+              // A selection can outlive its chip - a deleted game, or a
+              // player filter that removed that day entirely.
+              final dateId = reconcileSelection(_dateId, dates);
+              final rows = filterGames(byPlayer, dateId: dateId);
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _Header(),
-                    if (players.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: CiSpace.s3),
-                        child: CiChipBar(
-                          labels: [for (final p in players) p.label],
-                          index: players.indexWhere((p) => p.id == _playerId),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: CiSpace.screen),
-                          onChanged: (i) => setState(() {
-                            _playerId = players[i].id;
-                            // The date may not exist for the new player.
-                            _dateId = kAllDatesKey;
-                          }),
-                        ),
-                      ),
-                    if (dates.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: CiSpace.s3),
-                        child: CiChipBar(
-                          labels: [for (final d in dates) d.label],
-                          index: dates.indexWhere((d) => d.id == dateId),
-                          scrollable: true,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: CiSpace.screen),
-                          onChanged: (i) =>
-                              setState(() => _dateId = dates[i].id),
-                        ),
-                      ),
-                    const CiHairline(),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: _refresh,
-                        child: rows.isEmpty
-                            ? _Empty(filtered: all.isNotEmpty)
-                            : ListView.separated(
-                                padding: EdgeInsets.zero,
-                                itemCount: rows.length,
-                                separatorBuilder: (_, __) => const CiHairline(),
-                                itemBuilder: (context, i) {
-                                  final g = rows[i];
-                                  return GameFeedRow(
-                                    entry: GameFeedEntry(
-                                      gameId: g.gameId,
-                                      playerName: g.playerName,
-                                      playerPhotoUrl: g.playerPhotoUrl,
-                                      opponent: g.opponent,
-                                      playedAt: g.playedAt,
-                                      points: g.points,
-                                      rebounds: g.rebounds,
-                                      assists: g.assists,
-                                      steals: g.steals,
-                                      turnovers: g.turnovers,
-                                    ),
-                                    onTap: () => context.pushNamed(
-                                      GameStatsWidget.routeName,
-                                      queryParameters: {
-                                        'playerID': serializeParam(
-                                            g.playerId, ParamType.String),
-                                        'gameID': serializeParam(
-                                            g.gameId, ParamType.String),
-                                      }.withoutNulls,
-                                    ),
-                                  );
-                                },
-                              ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _Header(),
+                  if (players.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: CiSpace.s3),
+                      child: CiChipBar(
+                        labels: [for (final p in players) p.label],
+                        index: players.indexWhere((p) => p.id == _playerId),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: CiSpace.screen),
+                        onChanged: (i) => setState(() {
+                          _playerId = players[i].id;
+                          // The date may not exist for the new player.
+                          _dateId = kAllDatesKey;
+                        }),
                       ),
                     ),
-                  ],
-                );
-              },
-            ),
+                  if (dates.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: CiSpace.s3),
+                      child: CiChipBar(
+                        labels: [for (final d in dates) d.label],
+                        index: dates.indexWhere((d) => d.id == dateId),
+                        scrollable: true,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: CiSpace.screen),
+                        onChanged: (i) =>
+                            setState(() => _dateId = dates[i].id),
+                      ),
+                    ),
+                  const CiHairline(),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _refresh,
+                      child: rows.isEmpty
+                          ? _Empty(filtered: all.isNotEmpty)
+                          : ListView.separated(
+                              padding: EdgeInsets.zero,
+                              // +1 so the LAST row is closed by a rule too.
+                              // Without it the list stopped mid-air against
+                              // the nav bar, which reads as content cut off
+                              // rather than a list that ended.
+                              itemCount: rows.length + 1,
+                              separatorBuilder: (_, __) => const CiHairline(),
+                              itemBuilder: (context, i) {
+                                if (i == rows.length) {
+                                  return const SizedBox.shrink();
+                                }
+                                final g = rows[i];
+                                return GameFeedRow(
+                                  entry: GameFeedEntry(
+                                    gameId: g.gameId,
+                                    playerName: g.playerName,
+                                    playerPhotoUrl: g.playerPhotoUrl,
+                                    opponent: g.opponent,
+                                    playedAt: g.playedAt,
+                                    points: g.points,
+                                    rebounds: g.rebounds,
+                                    assists: g.assists,
+                                    steals: g.steals,
+                                    turnovers: g.turnovers,
+                                  ),
+                                  onTap: () => context.pushNamed(
+                                    GameStatsWidget.routeName,
+                                    queryParameters: {
+                                      'playerID': serializeParam(
+                                          g.playerId, ParamType.String),
+                                      'gameID': serializeParam(
+                                          g.gameId, ParamType.String),
+                                    }.withoutNulls,
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           bottomNavigationBar: const CiNavBar(active: CiNavTab.games),
         );
@@ -165,13 +181,27 @@ class _GamesListPageState extends State<GamesListPage> {
 }
 
 class _Header extends StatelessWidget {
+  const _Header();
+
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-          CiSpace.screen, CiSpace.s6, CiSpace.screen, CiSpace.s5),
-      child: Text('Games', style: CiType.sectionTitle.copyWith(color: c.text)),
+    // Deliberately identical to the Players list header. If one changes, both
+    // should.
+    return CiSurface.ink(
+      statusBar: true,
+      child: Builder(builder: (context) {
+        final c = CiColors.of(context);
+        return SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+                CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s6),
+            child: Text('Games',
+                style: CiType.h2
+                    .copyWith(color: c.text, fontWeight: CiWeight.extraBold)),
+          ),
+        );
+      }),
     );
   }
 }

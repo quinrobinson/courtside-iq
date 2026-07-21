@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,6 +8,8 @@ import 'package:courtside_i_q/courtside_iq/design/components/ci_field.dart';
 import 'package:courtside_i_q/courtside_iq/games_list_builder.dart';
 import 'package:courtside_i_q/features/games/games_list_page.dart';
 import 'package:courtside_i_q/features/games/games_repository.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_segmented_tabs.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
 
 class _FakeRepo implements GamesRepository {
@@ -14,6 +18,14 @@ class _FakeRepo implements GamesRepository {
 
   @override
   Future<List<GameListRow>> load() async => rows;
+}
+
+/// Never resolves. A Future.delayed would leave a pending timer and fail the
+/// test binding's invariant check on teardown.
+class _SlowRepo implements GamesRepository {
+  const _SlowRepo();
+  @override
+  Future<List<GameListRow>> load() => Completer<List<GameListRow>>().future;
 }
 
 GameListRow _g({
@@ -116,5 +128,39 @@ void main() {
     expect(find.text('No games yet'), findsOneWidget);
     expect(find.text('Track a Game'), findsOneWidget);
     expect(find.text('No games match these filters'), findsNothing);
+  });
+
+  testWidgets('the header is ink, matching the Players list', (tester) async {
+    // Games and Players are the same kind of screen. Two list headers that
+    // differ read as a mistake rather than a distinction.
+    await _pump(tester, [_g()]);
+    final title = tester.widget<Text>(find.text('Games'));
+    expect(title.style!.color, CiColors.onInk.text);
+  });
+
+  testWidgets('the last row is closed by a rule', (tester) async {
+    // Without it the list stops mid-air against the nav bar, which reads as
+    // content cut off rather than a list that ended.
+    await _pump(tester, [
+      _g(id: 'a', at: DateTime(2026, 5, 4)),
+      _g(id: 'b', at: DateTime(2026, 5, 2)),
+    ]);
+
+    final rows = tester.widgetList<GameFeedRow>(find.byType(GameFeedRow));
+    final rules = tester.widgetList<CiHairline>(find.byType(CiHairline));
+    // One under the filters, one between the two rows, one under the last.
+    expect(rows.length, 2);
+    expect(rules.length, greaterThanOrEqualTo(3));
+  });
+
+  testWidgets('the header survives loading', (tester) async {
+    // The screen's identity does not depend on the games arriving.
+    await tester.pumpWidget(MaterialApp(
+      theme: CiTheme.base(),
+      home: GamesListPage(repository: const _SlowRepo()),
+    ));
+    await tester.pump();
+    expect(find.text('Games'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 }
