@@ -338,11 +338,16 @@ class _GrowthBlock extends StatelessWidget {
                       // is worth more than matching this one frame. The frame
                       // should be updated to follow.
                       //
-                      // CiBadge.delta picks its tone from MEANING, not sign:
-                      // higher Growth IQ is better, so a gain is lime and a
-                      // drop is orange.
-                      if (delta != null)
-                        CiBadge.delta(value: delta.toDouble(), decimals: 0),
+                      // growthTrend, NOT delta. CiBadge.delta colours by sign,
+                      // so this chip was orange here and neutral on the
+                      // Players list for the same player's same drop.
+                      if (snapshot.trend != null)
+                        CiBadge.growthTrend(
+                          trend: snapshot.trend!,
+                          delta: delta,
+                          // The word is already inside the gauge.
+                          showWord: false,
+                        ),
                     ],
                   ),
                 ],

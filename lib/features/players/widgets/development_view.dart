@@ -34,8 +34,8 @@ class DevelopmentView extends StatelessWidget {
     required this.firstName,
     required this.insight,
     this.growthIq,
+    this.growthIqDelta,
     this.trend,
-    this.trendLabel,
     this.gamesLogged,
     this.gamesUntilUnlock,
     this.onTrackGame,
@@ -49,8 +49,8 @@ class DevelopmentView extends StatelessWidget {
   final PlayerInsight? insight;
 
   final int? growthIq;
+  final int? growthIqDelta;
   final GrowthTrend? trend;
-  final String? trendLabel;
   final int? gamesLogged;
 
   /// The server's own countdown. Preferred over deriving one from the game
@@ -77,8 +77,8 @@ class DevelopmentView extends StatelessWidget {
     return _Story(
       insight: i,
       growthIq: growthIq,
+      growthIqDelta: growthIqDelta,
       trend: trend,
-      trendLabel: trendLabel,
       onAbout: onAbout,
     );
   }
@@ -88,15 +88,15 @@ class _Story extends StatelessWidget {
   const _Story({
     required this.insight,
     required this.growthIq,
+    required this.growthIqDelta,
     required this.trend,
-    required this.trendLabel,
     this.onAbout,
   });
 
   final PlayerInsight insight;
   final int? growthIq;
+  final int? growthIqDelta;
   final GrowthTrend? trend;
-  final String? trendLabel;
   final VoidCallback? onAbout;
 
   @override
@@ -107,43 +107,55 @@ class _Story extends StatelessWidget {
       padding: EdgeInsets.zero,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              CiSpace.screen, CiSpace.s6, CiSpace.screen, CiSpace.s6),
+          // 24 all round, measured from 94:235.
+          padding: const EdgeInsets.all(CiSpace.screen),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (growthIq != null) ...[
                 DotGauge(
-                  size: 96,
+                  size: 104,
                   value: growthIqGaugeValue(growthIq!),
-                  child: Text('$growthIq',
-                      style: CiType.statSm.copyWith(color: c.text)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('$growthIq',
+                          style: CiType.statSm.copyWith(color: c.text)),
+                      // The word sits INSIDE the gauge here, as it does on
+                      // Today. The chip beside it then carries the number.
+                      if (trend != null)
+                        Text(_trendWord(trend!),
+                            style: CiType.micro.copyWith(color: c.textMuted)),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: CiSpace.s5),
+                const SizedBox(width: 18),
               ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (trendLabel != null && trend != null) ...[
-                      CiBadge(
-                        label: trendLabel!,
-                        // Same rule as the list: lime only for Rising, so a
-                        // decline is never dressed as a win.
-                        tone: trend == GrowthTrend.rising
-                            ? CiBadgeTone.good
-                            : CiBadgeTone.neutral,
+                    if (trend != null) ...[
+                      CiBadge.growthTrend(
+                        trend: trend!,
+                        delta: growthIqDelta,
+                        showWord: false,
                       ),
-                      const SizedBox(height: CiSpace.s3),
+                      const SizedBox(height: 10),
                     ],
                     Text(insight.headline ?? '',
-                        style: CiType.heroLine.copyWith(color: c.text)),
+                        style: CiType.body.copyWith(color: c.text)),
                   ],
                 ),
               ),
             ],
           ),
         ),
+        // The frame has no rule here, but on device the summary and the
+        // section header ran together as one undifferentiated block. Averages
+        // does not need this because its header sits directly under the tab
+        // bar, which already ends in a rule.
+        Container(height: CiSpace.hairline, color: c.hairline),
         const CiSectionHeader(title: 'Development Story'),
         // A v2 cache row has no split narrative, only `text`. Rendering it in
         // one block is what keeps an existing user's story on screen instead
@@ -173,6 +185,12 @@ class _Story extends StatelessWidget {
   }
 
   static bool _has(String? s) => s != null && s.trim().isNotEmpty;
+
+  static String _trendWord(GrowthTrend t) => switch (t) {
+        GrowthTrend.rising => 'Rising',
+        GrowthTrend.steady => 'Steady',
+        GrowthTrend.dipping => 'Dipping',
+      };
 }
 
 /// A lime-wash block. Used for both the positive and the growth section on
@@ -191,20 +209,22 @@ class _WashBlock extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: c.accentGoodWash,
-      padding: const EdgeInsets.symmetric(
-          horizontal: CiSpace.screen, vertical: CiSpace.s5),
+      // 22 top / 32 bottom, measured from 128:608. The bottom is heavier on
+      // purpose: it is what separates one narrative block from the next.
+      padding: const EdgeInsets.fromLTRB(
+          CiSpace.screen, 22, CiSpace.screen, CiSpace.s7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome, size: 16, color: c.text),
+              Icon(Icons.auto_awesome, size: 17, color: c.text),
               const SizedBox(width: CiSpace.s2),
-              Text(title, style: CiType.rowLabel.copyWith(color: c.text)),
+              Text(title, style: CiType.buttonSm.copyWith(color: c.text)),
             ],
           ),
-          const SizedBox(height: CiSpace.s3),
-          Text(body, style: CiType.bodySm.copyWith(color: c.text, height: 1.5)),
+          const SizedBox(height: CiSpace.s2),
+          Text(body, style: CiType.body.copyWith(color: c.text, height: 1.48)),
         ],
       ),
     );
@@ -225,19 +245,19 @@ class _FocusBlock extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: c.bg,
-      padding: const EdgeInsets.symmetric(
-          horizontal: CiSpace.screen, vertical: CiSpace.s5),
+      // 24 all round, measured from 95:304.
+      padding: const EdgeInsets.all(CiSpace.screen),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: CiType.badge.copyWith(color: c.accentGood)),
           if (focus != null && focus!.trim().isNotEmpty) ...[
             const SizedBox(height: CiSpace.s2),
-            Text(focus!, style: CiType.statInline.copyWith(color: c.text)),
+            Text(focus!, style: CiType.statSm.copyWith(color: c.text)),
           ],
-          const SizedBox(height: CiSpace.s3),
+          const SizedBox(height: CiSpace.s2),
           Text(body,
-              style: CiType.bodySm.copyWith(color: c.textMuted, height: 1.5)),
+              style: CiType.body.copyWith(color: c.textMuted, height: 1.48)),
         ],
       ),
     );

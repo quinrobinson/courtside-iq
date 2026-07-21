@@ -83,20 +83,6 @@ class PlayerListEntry {
     return left.isEmpty ? games : '$left · $games';
   }
 
-  /// "Rising +5", "Steady +2", "Building +3". Null when there is no trend to
-  /// describe. The word is Growth IQ's classification; the number is the delta.
-  String? get trendLabel {
-    final t = trend;
-    final d = growthIqDelta;
-    if (t == null || d == null) return null;
-    final word = switch (t) {
-      GrowthTrend.rising => 'Rising',
-      GrowthTrend.steady => 'Steady',
-      GrowthTrend.building => 'Building',
-    };
-    final sign = d >= 0 ? '+' : '';
-    return '$word $sign$d';
-  }
 }
 
 class PlayerListPlayerRow {

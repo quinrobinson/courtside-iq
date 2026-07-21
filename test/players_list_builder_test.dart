@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/players_list_builder.dart';
-import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/courtside_iq/today_builder.dart';
 
 PlayerListPlayerRow _player({
@@ -114,40 +113,10 @@ void main() {
     });
   });
 
-  group('trend label', () {
-    PlayerListEntry entry(GrowthTrend? t, int? d) => PlayerListEntry(
-          playerId: 'p1',
-          firstName: 'Maya',
-          totalGames: 10,
-          totalPoints: 185,
-          totalRebounds: 60,
-          totalAssists: 40,
-          growthIq: 80,
-          growthIqDelta: d,
-          trend: t,
-        );
-
-    test('the word is the classification, the number is the delta', () {
-      expect(entry(GrowthTrend.rising, 5).trendLabel, 'Rising +5');
-      expect(entry(GrowthTrend.steady, 2).trendLabel, 'Steady +2');
-      expect(entry(GrowthTrend.building, 3).trendLabel, 'Building +3');
-    });
-
-    test('a negative delta keeps a positive-sounding word', () {
-      // The word comes from movement classification, not the sign, so it is
-      // never "Declining" - a struggling week reads as Building, not a verdict.
-      final label = entry(GrowthTrend.building, -2).trendLabel!;
-      expect(label, 'Building -2');
-      for (final harsh in ['Declining', 'Falling', 'Poor', 'Bad', 'Dipping']) {
-        expect(label, isNot(contains(harsh)));
-      }
-    });
-
-    test('is null without a trend', () {
-      expect(entry(null, null).trendLabel, isNull);
-      expect(entry(GrowthTrend.rising, null).trendLabel, isNull);
-    });
-  });
+  // The trend WORD is no longer built here. It lives in CiBadge.growthTrend,
+  // which is also what colours the chip, so the word and its tone cannot
+  // drift apart across Today, the list, and the profile. Covered by
+  // today_hero_test and player_list_row_test.
 }
 
 PlayerListEntry _entry({String? position, String? band, int games = 5}) =>

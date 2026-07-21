@@ -139,6 +139,10 @@ List<TodaySnapshot> buildTodaySnapshots({
       // than shown with a provisional number.
       growthIq: result.locked ? null : result.score,
       growthIqDelta: result.locked ? null : result.delta,
+      // CARRIED, not re-derived. The snapshot used to work the word out from
+      // the sign of the delta, which is how Today came to say "Dipping" about
+      // a player their own profile called "Building".
+      trend: result.locked ? null : result.trend,
       headline: p.headline,
     );
   }).toList();

@@ -95,7 +95,7 @@ const int kGrowthIqWindowGames = 5;
 // Qualifier cutoffs, in normalized composite points (0-1 scale) of movement
 // between the current and prior window.
 const double kGrowthIqRisingMin = 0.03;
-const double kGrowthIqBuildingMax = -0.03;
+const double kGrowthIqDippingMax = -0.03;
 
 // --- Normalization anchors ---------------------------------------------------
 //

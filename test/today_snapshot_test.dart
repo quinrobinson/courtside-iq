@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
 
 TodaySnapshot _snap({
@@ -7,6 +8,7 @@ TodaySnapshot _snap({
   int totalPoints = 185,
   int? growthIq = 82,
   int? delta,
+  GrowthTrend? trend,
   String first = 'Maya',
   String? last = 'Chen',
 }) =>
@@ -18,6 +20,7 @@ TodaySnapshot _snap({
       totalPoints: totalPoints,
       growthIq: growthIq,
       growthIqDelta: delta,
+      trend: trend,
     );
 
 void main() {
@@ -48,19 +51,24 @@ void main() {
   });
 
   group('trend', () {
-    test('a gain rises, a drop dips', () {
-      expect(_snap(delta: 4).trend, TodayTrend.rising);
-      expect(_snap(delta: -1).trend, TodayTrend.dipping);
+    test('the word comes from the classification, NOT the sign', () {
+      // The whole point of carrying GrowthTrend through the builder. A
+      // one-point wobble is steadiness; deriving the word from the sign here
+      // called it a dip, and called the same player "Building" on their
+      // profile.
+      expect(_snap(delta: -1, trend: GrowthTrend.steady).trendLabel, 'Steady');
+      expect(_snap(delta: 4, trend: GrowthTrend.rising).trendLabel, 'Rising');
+      expect(
+          _snap(delta: -13, trend: GrowthTrend.dipping).trendLabel, 'Dipping');
     });
 
     test('zero is steady, NOT unknown', () {
       // "No change" is information a parent wants. It is different from "we
       // cannot tell yet".
-      expect(_snap(delta: 0).trend, TodayTrend.steady);
-      expect(_snap(delta: 0).trendLabel, 'Steady');
+      expect(_snap(delta: 0, trend: GrowthTrend.steady).trendLabel, 'Steady');
     });
 
-    test('no delta means no trend, not steady', () {
+    test('no trend means no label, not steady', () {
       expect(_snap(delta: null).trend, isNull);
       expect(_snap(delta: null).trendLabel, isNull);
     });
@@ -68,7 +76,7 @@ void main() {
     test('the down label is survivable', () {
       // This is a child's development shown to their parent. A bad stretch
       // must not read as a verdict.
-      final label = _snap(delta: -3).trendLabel!;
+      final label = _snap(delta: -3, trend: GrowthTrend.dipping).trendLabel!;
       expect(label, 'Dipping');
       for (final harsh in ['Declining', 'Falling', 'Poor', 'Bad', 'Worse']) {
         expect(label, isNot(contains(harsh)));

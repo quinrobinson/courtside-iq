@@ -6,6 +6,7 @@ import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_page_dots.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
 import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
+import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
 import 'package:courtside_i_q/features/home/widgets/today_hero.dart';
 
@@ -13,6 +14,7 @@ TodaySnapshot _snap({
   String first = 'Maya',
   int? growthIq = 82,
   int? delta = 4,
+  GrowthTrend? trend = GrowthTrend.rising,
   int games = 10,
   int points = 185,
   String? headline,
@@ -25,6 +27,7 @@ TodaySnapshot _snap({
       totalPoints: points,
       growthIq: growthIq,
       growthIqDelta: delta,
+      trend: trend,
       headline: headline,
     );
 
@@ -101,22 +104,33 @@ void main() {
       expect(CiColors.of(ctx).text, isNot(CiColors.onLight.text));
     });
 
-    testWidgets('the delta is a chip, coloured by meaning', (tester) async {
+    testWidgets('the delta is a chip, coloured by classification',
+        (tester) async {
       // Chosen over the frame's plain lime text, for consistency with every
-      // other delta in the app. A gain is lime because higher Growth IQ is
-      // better - CiBadge.delta reads MEANING, not sign.
-      await _pump(tester, [_snap(delta: 4)]);
+      // other delta in the app.
+      await _pump(tester, [_snap(delta: 4, trend: GrowthTrend.rising)]);
       final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
       final delta = badges.firstWhere((b) => b.label.contains('4'));
       expect(delta.tone, CiBadgeTone.good);
       expect(delta.label, '+4');
     });
 
-    testWidgets('a drop reads as energy, not as a failure', (tester) async {
-      await _pump(tester, [_snap(delta: -3)]);
+    testWidgets('a drop is neutral here, exactly as on the Players list',
+        (tester) async {
+      // This chip used CiBadge.delta and came out ORANGE, while the Players
+      // list painted the same player's same drop neutral. One rule now, in
+      // CiBadge.growthTrend.
+      await _pump(tester, [_snap(delta: -3, trend: GrowthTrend.dipping)]);
       final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
       final delta = badges.firstWhere((b) => b.label.contains('3'));
-      expect(delta.tone, CiBadgeTone.energy);
+      expect(delta.tone, CiBadgeTone.neutral);
+    });
+
+    testWidgets('the chip does not repeat the word inside the gauge',
+        (tester) async {
+      await _pump(tester, [_snap(delta: -3, trend: GrowthTrend.dipping)]);
+      // "Dipping" appears once - in the gauge, not also in the chip.
+      expect(find.text('Dipping'), findsOneWidget);
     });
 
     testWidgets('shows the gauge, score and trend word', (tester) async {

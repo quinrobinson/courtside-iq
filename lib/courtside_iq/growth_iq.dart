@@ -12,7 +12,19 @@
 import 'metrics_config.dart';
 
 /// Direction-of-travel qualifier shown beside the number ("Rising +5").
-enum GrowthTrend { building, steady, rising }
+///
+/// THE ONLY TREND CLASSIFIER IN THE APP. Today used to derive its own from the
+/// sign of the delta, which produced two problems at once: the same player read
+/// "Dipping" on Today and "Building -13" on their profile, and a one-point
+/// wobble was called a dip because a sign has no dead band. Every screen now
+/// reads this.
+///
+/// "Dipping", never "Declining" or "Falling". This is a child's development
+/// shown to their parent, and a bad stretch should not read as a verdict. The
+/// word was "Building" until 2026-07-21: it was gentle to the point of
+/// contradiction, since "Building -13" says the opposite of the number beside
+/// it. A euphemism that disagrees with the data is not kind, it is confusing.
+enum GrowthTrend { dipping, steady, rising }
 
 /// A display score as a 0..1 gauge fill.
 ///
@@ -219,8 +231,8 @@ GrowthIqResult growthIq(List<GrowthGame> games, AgeBand band) {
 
     if (rawMovement >= kGrowthIqRisingMin) {
       trend = GrowthTrend.rising;
-    } else if (rawMovement <= kGrowthIqBuildingMax) {
-      trend = GrowthTrend.building;
+    } else if (rawMovement <= kGrowthIqDippingMax) {
+      trend = GrowthTrend.dipping;
     } else {
       trend = GrowthTrend.steady;
     }

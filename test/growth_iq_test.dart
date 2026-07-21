@@ -74,7 +74,7 @@ void main() {
       // Same weak recent form, but no prior window to fall from.
       final flat = growthIq(run(5, ppsa: 0.6, astTov: 1.0, disrupt: 4), AgeBand.u13);
 
-      expect(declining.trend, GrowthTrend.building);
+      expect(declining.trend, GrowthTrend.dipping);
       expect(declining.delta, isNotNull);
       expect(declining.delta! < 0, isTrue);
       expect(declining.score! < flat.score!, isTrue,

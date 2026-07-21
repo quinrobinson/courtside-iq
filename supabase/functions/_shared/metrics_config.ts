@@ -66,7 +66,7 @@ export const GROWTH_IQ_MIN_GAMES = 5;
 export const GROWTH_IQ_WINDOW_GAMES = 5;
 
 export const GROWTH_IQ_RISING_MIN = 0.03;
-export const GROWTH_IQ_BUILDING_MAX = -0.03;
+export const GROWTH_IQ_DIPPING_MAX = -0.03;
 
 // Piecewise-linear normalization anchors across existing approved tiers.
 export const GROWTH_IQ_SOLID_ANCHOR = 1 / 3;

@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../growth_iq.dart';
 import '../tokens/ci_colors.dart';
 import '../tokens/ci_metrics.dart';
 import '../tokens/ci_type.dart';
@@ -63,6 +64,44 @@ class CiBadge extends StatelessWidget {
           : improved
               ? CiBadgeTone.good
               : CiBadgeTone.energy,
+    );
+  }
+
+  /// The Growth IQ trend chip: "Rising +5", "Dipping -13", "Steady +2".
+  ///
+  /// THE ONE PLACE THAT COLOURS A TREND. Lime is reserved for Rising; Steady
+  /// and Dipping take neutral. Three screens show this chip and they must not
+  /// disagree - Today used CiBadge.delta and painted a drop ORANGE while the
+  /// Players list painted the same drop neutral, for the same player.
+  ///
+  /// Dipping is deliberately NOT the energy accent. This is a child's
+  /// development shown to their parent: neutral says "not climbing right now",
+  /// an alarm colour says "something is wrong".
+  ///
+  /// [showWord] is off on Today, where the word already sits inside the gauge
+  /// and repeating it in the chip beside it says the same thing twice. The
+  /// TONE still comes from the trend either way, which is the part that must
+  /// not vary by screen.
+  factory CiBadge.growthTrend({
+    Key? key,
+    required GrowthTrend trend,
+    int? delta,
+    bool showWord = true,
+  }) {
+    final word = showWord
+        ? switch (trend) {
+            GrowthTrend.rising => 'Rising',
+            GrowthTrend.steady => 'Steady',
+            GrowthTrend.dipping => 'Dipping',
+          }
+        : '';
+    final number = delta == null ? '' : '${delta >= 0 ? '+' : ''}$delta';
+    return CiBadge(
+      key: key,
+      label: [word, number].where((s) => s.isNotEmpty).join(' '),
+      tone: trend == GrowthTrend.rising
+          ? CiBadgeTone.good
+          : CiBadgeTone.neutral,
     );
   }
 

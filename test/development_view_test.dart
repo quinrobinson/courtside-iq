@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
-import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/features/player_insight/models/player_insight.dart';
 import 'package:courtside_i_q/features/players/widgets/development_view.dart';
@@ -43,8 +43,8 @@ void main() {
       firstName: 'Maya',
       insight: _insight(text: 'LEGACY COPY'),
       growthIq: 72,
+      growthIqDelta: 5,
       trend: GrowthTrend.rising,
-      trendLabel: 'Rising +5',
     )));
 
     expect(find.text("What's Working"), findsOneWidget);
@@ -98,32 +98,42 @@ void main() {
   });
 
   testWidgets('trend chip is lime only for Rising', (tester) async {
-    // Building covers flat AND declining movement. Painting it on the positive
-    // accent would dress a decline as a win - the defect the Players list
-    // review caught, and this view repeats the rule.
+    // Dipping covers flat AND declining movement. Painting it on the positive
+    // accent would dress a decline as a win.
     for (final (trend, expectRising) in [
       (GrowthTrend.rising, true),
-      (GrowthTrend.building, false),
+      (GrowthTrend.dipping, false),
       (GrowthTrend.steady, false),
     ]) {
       await tester.pumpWidget(_host(DevelopmentView(
         firstName: 'Maya',
         insight: _insight(),
         growthIq: 72,
+        growthIqDelta: 2,
         trend: trend,
-        trendLabel: 'Label +2',
       )));
       await tester.pump();
 
-      final chip = tester.widget<Container>(find
-          .ancestor(
-            of: find.text('Label +2'),
-            matching: find.byType(Container),
-          )
-          .first);
-      final decoration = chip.decoration as BoxDecoration;
-      expect(decoration.color == CiColors.onLight.accentGood, expectRising,
-          reason: '$trend');
+      final chip = tester.widget<CiBadge>(find.byType(CiBadge).first);
+      expect(chip.tone == CiBadgeTone.good, expectRising, reason: '$trend');
+      // The number is on the chip; the word is inside the gauge.
+      expect(chip.label, '+2');
     }
+  });
+
+  testWidgets('the word sits in the gauge, not doubled on the chip',
+      (tester) async {
+    await tester.pumpWidget(_host(DevelopmentView(
+      firstName: 'Maya',
+      insight: _insight(),
+      growthIq: 61,
+      growthIqDelta: -13,
+      trend: GrowthTrend.dipping,
+    )));
+
+    // "Dipping -13" agrees with itself. "Building -13" - the word this
+    // replaced - said the opposite of the number beside it.
+    expect(find.text('Dipping'), findsOneWidget);
+    expect(find.text('-13'), findsOneWidget);
   });
 }

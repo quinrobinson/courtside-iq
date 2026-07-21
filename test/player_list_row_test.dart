@@ -75,11 +75,12 @@ void main() {
 
   testWidgets('a decline is NOT dressed in the positive accent',
       (tester) async {
-    // "Building -13" on a lime chip read as a contradiction: the gentle word
-    // dressed as a win. Lime is reserved for Rising.
+    // Lime is reserved for Rising. The word was "Building" until 2026-07-21,
+    // when "Building -13" was read on device as saying the opposite of the
+    // number beside it.
     await _pump(tester,
-        _entry(growthIq: 61, delta: -13, trend: GrowthTrend.building));
-    expect(find.text('Building -13'), findsOneWidget);
+        _entry(growthIq: 61, delta: -13, trend: GrowthTrend.dipping));
+    expect(find.text('Dipping -13'), findsOneWidget);
 
     final badge = tester.widget<CiBadge>(find.byType(CiBadge));
     expect(badge.tone, isNot(CiBadgeTone.good),
@@ -103,7 +104,7 @@ void main() {
     // player with no Growth IQ at all. A player joins the list with no data,
     // so the rhythm cannot depend on how much they have.
     await _pump(tester,
-        _entry(growthIq: 70, delta: -13, trend: GrowthTrend.building));
+        _entry(growthIq: 70, delta: -13, trend: GrowthTrend.dipping));
     final withChip = tester.getSize(find.byType(PlayerListRow)).height;
 
     await _pump(tester, _entry(growthIq: 87, delta: null, trend: null));
@@ -122,7 +123,7 @@ void main() {
     await _pump(tester, _entry(growthIq: 87, delta: null, trend: null));
     expect(find.byType(DotGauge), findsOneWidget);
     expect(find.textContaining('Rising'), findsNothing);
-    expect(find.textContaining('Building'), findsNothing);
+    expect(find.textContaining('Dipping'), findsNothing);
   });
 
   testWidgets('the trend chip is the same height as Today\'s Growth IQ chips',
@@ -140,7 +141,7 @@ void main() {
     // because the gauge column is taller than the identity column and centring
     // pushed the name down by half that difference.
     await _pump(tester,
-        _entry(growthIq: 70, delta: -13, trend: GrowthTrend.building));
+        _entry(growthIq: 70, delta: -13, trend: GrowthTrend.dipping));
 
     final row = tester.getRect(find.byType(PlayerListRow));
     final name = tester.getRect(find.text('Maya Chen'));

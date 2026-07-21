@@ -7,8 +7,7 @@
 // that matter (division by zero, no games yet, a score that cannot be computed)
 // and none of it needs a widget or a network call to be wrong. See CLAUDE.md.
 
-/// Which direction a Growth IQ score has moved.
-enum TodayTrend { rising, steady, dipping }
+import 'growth_iq.dart';
 
 class TodaySnapshot {
   const TodaySnapshot({
@@ -20,6 +19,7 @@ class TodaySnapshot {
     required this.totalPoints,
     this.growthIq,
     this.growthIqDelta,
+    this.trend,
     this.headline,
   });
 
@@ -39,6 +39,13 @@ class TodaySnapshot {
   /// Movement since the previous snapshot. Null when there is no prior score
   /// to compare against, which is NOT the same as no movement.
   final int? growthIqDelta;
+
+  /// Growth IQ's own classification. Null when there is no prior window.
+  ///
+  /// Note this can be [GrowthTrend.steady] alongside a non-zero delta: the
+  /// classifier has a dead band, so a one-point wobble is steadiness, not a
+  /// dip. That is the point of carrying it rather than re-deriving it here.
+  final GrowthTrend? trend;
 
   /// The AI headline. Null before enough games, or if generation failed.
   final String? headline;
@@ -61,27 +68,17 @@ class TodaySnapshot {
     return '${ppg.toStringAsFixed(1)} PPG';
   }
 
-  /// Null when there is no delta to describe.
-  ///
-  /// Zero is deliberately [TodayTrend.steady] rather than null: "no change" is
-  /// information a parent wants, and is different from "we cannot tell yet".
-  TodayTrend? get trend {
-    final d = growthIqDelta;
-    if (d == null) return null;
-    if (d > 0) return TodayTrend.rising;
-    if (d < 0) return TodayTrend.dipping;
-    return TodayTrend.steady;
-  }
-
   /// Parent-facing word under the score.
   ///
-  /// "Dipping", never "Declining" or "Falling". Every rating level has to feel
-  /// survivable - this is a child's development, shown to their parent, and a
-  /// bad week should not read as a verdict.
+  /// Comes from [trend], which is Growth IQ's own classification carried
+  /// through the builder. It used to be derived here from the SIGN of the
+  /// delta, and that was wrong twice over: the same player read "Dipping" here
+  /// and "Building -13" on their profile, and a one-point wobble was called a
+  /// dip because a sign has no dead band.
   String? get trendLabel => switch (trend) {
-        TodayTrend.rising => 'Rising',
-        TodayTrend.steady => 'Steady',
-        TodayTrend.dipping => 'Dipping',
+        GrowthTrend.rising => 'Rising',
+        GrowthTrend.steady => 'Steady',
+        GrowthTrend.dipping => 'Dipping',
         null => null,
       };
 

@@ -164,26 +164,6 @@ class _Avg extends StatelessWidget {
   }
 }
 
-/// The trend chip, using the design system's badge so it matches the chips in
-/// Today's Growth IQ block exactly - same 24pt height, same shape.
-///
-/// Colour follows the CLASSIFICATION, not the delta's sign. A 13-point drop
-/// rendered on the positive accent read as a contradiction: the gentle word
-/// "Building" dressed as a win. Lime is reserved for Rising; Steady and
-/// Building take the neutral tone, so the number stays honest without the
-/// colour arguing with it.
-///
-/// Building is deliberately NOT the energy accent. It is the bucket for flat
-/// AND declining movement, and this is a child's development shown to their
-/// parent - neutral says "not climbing right now", an alarm colour would say
-/// "something is wrong".
-CiBadge _trendChip(String label, GrowthTrend trend) => CiBadge(
-      label: label,
-      tone: trend == GrowthTrend.rising
-          ? CiBadgeTone.good
-          : CiBadgeTone.neutral,
-    );
-
 class _GrowthGauge extends StatelessWidget {
   const _GrowthGauge({required this.entry});
 
@@ -192,7 +172,6 @@ class _GrowthGauge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    final label = entry.trendLabel;
     return Column(
       children: [
         DotGauge(
@@ -211,7 +190,12 @@ class _GrowthGauge extends StatelessWidget {
         // in the device review. Reserving it keeps every row identical.
         SizedBox(
           height: _kChipHeight,
-          child: label == null ? null : _trendChip(label, entry.trend!),
+          child: entry.trend == null
+              ? null
+              // The colour rule lives in CiBadge.growthTrend so Today, this
+              // list, and the profile cannot disagree about the same drop.
+              : CiBadge.growthTrend(
+                  trend: entry.trend!, delta: entry.growthIqDelta),
         ),
       ],
     );
