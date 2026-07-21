@@ -1044,7 +1044,8 @@ fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
 - **4.11a Players List** - list, empty, list-level gating. **DONE and
   device-verified 2026-07-20** (lapsed banner excepted, needs a real expired
   subscription).
-- **4.11b Player Profile + tabs** - NEXT. Rebuild `PlayerProfilePageV2` (2291
+- **4.11b Player Profile + tabs** - **BUILT AND WIRED 2026-07-21, awaiting a
+  device run.** Rebuild `PlayerProfilePageV2` (2291
   lines, Phase 2, on the OLD tokens) onto 2.0. The behaviour is proven; this is
   a re-skin plus three defects.
 
@@ -1065,6 +1066,46 @@ fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
   5. Frames: Player Profile `93:211`, Averages `97:340`, Games `98:583`,
      Development (Locked) `156:704`, Locked `663:2426`, Age-Band Transition
      `687:2742`.
+**4.11b built and wired 2026-07-21. NOT yet device-verified.**
+`[x] built` · `[x] wired` · `[ ] device-verified`
+
+Shipped in five commits: the shell (`2fe8674`), Development (`1ad3b35`),
+Averages (`3c06590`), Games (`a2b384e`), and the age-band notice (`e579bce`).
+`kUseProfile2` is ON; `PlayerProfilePageV2` stays reachable by turning it off.
+
+Checklist outcomes:
+1. Read the v1 action code first - done. It is what surfaced the two Games-tab
+   features below and the missing home/away column.
+2. **Insight dedup fix - done.** All three tab futures are hoisted onto the
+   page and the body is an `IndexedStack`, so no tab switch can refetch,
+   whatever the tab control does.
+3. **`readCached` game_id fix - done.** It now matches the cached story to the
+   player's latest game and returns nothing when it describes an older one.
+4. **Server claim row - STILL UNVERIFIED.** Carried to 4.11c. Nothing in this
+   build races it, so it remains untested defence-in-depth.
+
+Behaviour changes worth knowing before the device run:
+- **Averages deltas changed meaning.** v1 compared the last 5 games against a
+  lifetime average that CONTAINS those 5 games, damping every trend toward
+  zero and shrinking as a player logs more. Deltas now compare the recent
+  window against the games before it, and need 3 games on each side. Numbers
+  will read differently, and some that showed a near-zero now show nothing.
+- Shooting percentages weight by attempts, not by game. A shot never attempted
+  is absent rather than "0.0%".
+- Games rows use `event_name` where the frame says "Home". **There is no
+  home/away column** and adding one is a migration plus a New Game change.
+
+**Deliberately NOT built, needs a designed placement first:**
+- The Games tab's **event filter chips** (2+ distinct events) and the
+  **"✦ marks games with an AI insight"** indicator. Both are real v1 features
+  absent from frame `98:583`. They still exist on `GamesTab` behind the flag.
+- **Development-tab gating for lapsed users.** Frame `663:2426` adds a lapse
+  strip but leaves every average visible, and there is no frame showing what a
+  lapsed parent sees on Development. Not invented.
+
+**Unverified render (same gap as Today and the Players list):** the lapse
+strip needs a genuinely expired subscription.
+
 - **4.11c Full Breakdown, About Growth IQ, info sheets.**
 - **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends

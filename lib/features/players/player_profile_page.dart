@@ -29,6 +29,8 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/features/flags.dart';
+import '/features/home/entitlement_status.dart';
+import '/features/home/widgets/today_promo_banner.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
@@ -38,6 +40,7 @@ import '/features/players/widgets/age_band_notice.dart';
 import '/features/players/widgets/averages_view.dart';
 import '/features/players/widgets/development_view.dart';
 import '/features/players/widgets/games_view.dart';
+import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'players_repository.dart';
@@ -82,6 +85,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   /// recorded. Cleared on dismiss and when switching players.
   bool _showBandNotice = false;
 
+  /// Read once from RevenueCat. Only `lapsed` changes this screen: a parent
+  /// who was never premium sees no strip here, because the profile is not
+  /// where they are asked to subscribe.
+  EntitlementStatus _entitlement = EntitlementStatus.premium;
+
   /// Rendered instantly when it matches the player's current game. See
   /// PlayerInsightService.readCached - it deliberately returns nothing when
   /// the cached story describes an older game.
@@ -96,6 +104,28 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     // FutureBuilder would re-fire on every rebuild, including the one this
     // check itself causes.
     _playersFuture!.then(_checkBandFor).catchError((_) {});
+    _loadEntitlement();
+  }
+
+  Future<void> _loadEntitlement() async {
+    final s = await fetchEntitlementStatus();
+    if (mounted) setState(() => _entitlement = s);
+  }
+
+  Future<void> _openPaywall() async {
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) => Padding(
+        padding: MediaQuery.viewInsetsOf(context),
+        child: const PaywallWidget(),
+      ),
+    );
+    // RE-READ AFTER THE PAYWALL CLOSES, the same rule as the Players list: a
+    // parent who renews must not come back to a screen still telling them
+    // their Premium has ended.
+    if (mounted) await _loadEntitlement();
   }
 
   Future<void> _checkBandFor(List<PlayerListEntry> players) async {
@@ -170,6 +200,15 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                               queryParameters: {'playerID': player.playerId},
                             ),
                   ),
+                  // Above the tabs, per 663:2426. It explains what the parent
+                  // is still seeing rather than hiding anything: the frame
+                  // leaves every average visible.
+                  if (_entitlement == EntitlementStatus.lapsed)
+                    TodayPromoBanner(
+                      purpose: TodayPromoPurpose.lapse,
+                      compact: true,
+                      onTap: _openPaywall,
+                    ),
                   CiSegmentedTabs(
                     labels: const ['Averages', 'Development', 'Games'],
                     index: _tab.index,

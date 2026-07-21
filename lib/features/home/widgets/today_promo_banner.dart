@@ -34,19 +34,40 @@ enum TodayPromoPurpose {
 }
 
 class TodayPromoBanner extends StatelessWidget {
-  const TodayPromoBanner({super.key, required this.purpose, this.onTap});
+  const TodayPromoBanner({
+    super.key,
+    required this.purpose,
+    this.onTap,
+    this.compact = false,
+  });
 
   final TodayPromoPurpose purpose;
   final VoidCallback? onTap;
+
+  /// The 60-tall strip from Player Profile — Locked (663:2584): no logo mark,
+  /// tighter padding, and copy that names what is still visible.
+  ///
+  /// A variant rather than a second component. The profile hero is already
+  /// 258 tall, so the full 98-tall card would push the tabs most of the way
+  /// down the screen - which is why the frame designed a strip for this spot
+  /// and not why it is a different banner.
+  final bool compact;
 
   bool get _isUpgrade => purpose == TodayPromoPurpose.upgrade;
 
   String get _title =>
       _isUpgrade ? 'Unlock Premium' : 'Your Premium has ended';
 
-  String get _subtitle => _isUpgrade
-      ? 'Trends, insights, and the full development story.'
-      : 'Renew to keep trends, insights, and the full story.';
+  String get _subtitle {
+    if (compact) {
+      return _isUpgrade
+          ? 'High-level stats only. Upgrade to unlock the rest.'
+          : 'High-level stats only. Renew to unlock the rest.';
+    }
+    return _isUpgrade
+        ? 'Trends, insights, and the full development story.'
+        : 'Renew to keep trends, insights, and the full story.';
+  }
 
   String get _cta => _isUpgrade ? 'See plans' : 'Renew';
 
@@ -62,15 +83,21 @@ class TodayPromoBanner extends StatelessWidget {
           // card reads as a distinct block, not part of the hero.
           color: c.surfaceDeep,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: CiSpace.screen, vertical: CiSpace.s5),
+            padding: EdgeInsets.fromLTRB(
+              CiSpace.screen,
+              compact ? CiSpace.s3 : CiSpace.s5,
+              compact ? CiSpace.s4 : CiSpace.screen,
+              compact ? CiSpace.s3 : CiSpace.s5,
+            ),
             child: Row(
               children: [
                 // Just the mark, no dot burst: the burst around a small mark
                 // read as busy at this size. Larger and on its own it carries
                 // the brand more cleanly. The icon itself may change later.
-                CiLogoMark(size: 32, color: c.text),
-                const SizedBox(width: CiSpace.s4),
+                if (!compact) ...[
+                  CiLogoMark(size: 32, color: c.text),
+                  const SizedBox(width: CiSpace.s4),
+                ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,10 +105,15 @@ class TodayPromoBanner extends StatelessWidget {
                     children: [
                       Text(_title,
                           style: CiType.rowTitle.copyWith(
-                              color: c.text, fontWeight: CiWeight.extraBold)),
+                              color: c.text,
+                              fontWeight: compact
+                                  ? CiWeight.semiBold
+                                  : CiWeight.extraBold)),
                       const SizedBox(height: 2),
                       Text(_subtitle,
-                          style: CiType.bodyXs.copyWith(color: c.textMuted)),
+                          style: CiType.bodyXs.copyWith(color: c.textMuted),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
                     ],
                   ),
                 ),
