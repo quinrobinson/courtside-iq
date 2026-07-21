@@ -1044,8 +1044,8 @@ fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
 - **4.11a Players List** - list, empty, list-level gating. **DONE and
   device-verified 2026-07-20** (lapsed banner excepted, needs a real expired
   subscription).
-- **4.11b Player Profile + tabs** - **BUILT AND WIRED 2026-07-21, awaiting a
-  device run.** Rebuild `PlayerProfilePageV2` (2291
+- **4.11b Player Profile + tabs** - **DONE 2026-07-21.** Rebuild
+  `PlayerProfilePageV2` (2291
   lines, Phase 2, on the OLD tokens) onto 2.0. The behaviour is proven; this is
   a re-skin plus three defects.
 
@@ -1066,8 +1066,13 @@ fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
   5. Frames: Player Profile `93:211`, Averages `97:340`, Games `98:583`,
      Development (Locked) `156:704`, Locked `663:2426`, Age-Band Transition
      `687:2742`.
-**4.11b built and wired 2026-07-21. NOT yet device-verified.**
-`[x] built` · `[x] wired` · `[ ] device-verified`
+**4.11b built, wired and DEVICE-VERIFIED 2026-07-21.**
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+Two states could not be exercised and remain unverified: the **lapse strip**
+(needs a genuinely expired subscription, the same gap as Today and the
+Players list) and the **age-band notice** (needs a player who actually crosses
+a band between opens).
 
 Shipped in five commits: the shell (`2fe8674`), Development (`1ad3b35`),
 Averages (`3c06590`), Games (`a2b384e`), and the age-band notice (`e579bce`).
@@ -1133,8 +1138,8 @@ tiles, which do paint a declining stat orange: "free throws are down 4%" is
 narrow and actionable, the whole child in one number is not. Scope is the
 reason the two rules differ. See `CiBadge.growthTrend`.
 
-- **4.11c Full Breakdown, About Growth IQ, info sheets** - **BUILT AND WIRED
-  2026-07-21, awaiting a device run.** Full Breakdown `435:1922`, About Story
+- **4.11c Full Breakdown, About Growth IQ, info sheets** - **DONE 2026-07-21.**
+  Full Breakdown `435:1922`, About Story
   Sheet `648:2195`, About Growth IQ `691:2845`. The two sheets are one
   component (`CiInfoSheet`): the frames differ only by the length of their
   paragraph.
@@ -1154,7 +1159,19 @@ reason the two rules differ. See `CiBadge.growthTrend`.
     #4d4d4d, and `text`/`textMuted` are not interchangeable for a paragraph:
     full ink is heavier than drawn, textMuted at 15px on white is ~3.5:1.
 
-  `[x] built` · `[x] wired` · `[ ] device-verified`
+  **Device-verified 2026-07-21**, after three fixes from the review: the Full
+  Breakdown hero was built LIGHT when 435:1923 is ink, the info sheets were
+  given the system's top-sheet radius when the frames carry none, and the
+  Scoring grid was missing the seam between its two rows.
+
+  **Two of those three were the same failure: writing what the design system
+  would do instead of fetching what the frame says.** The hero was never
+  measured at all, and the code carried a comment JUSTIFYING the light ground -
+  which made an unchecked assumption read as a decision. Fetch design context
+  for every region being rendered, hero included, not only the novel-looking
+  parts.
+
+  `[x] built` · `[x] wired` · `[x] device-verified`
 
 - **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends

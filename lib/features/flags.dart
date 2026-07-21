@@ -66,10 +66,12 @@ const bool kUsePlayers2 = true;
 
 /// Player Profile, rebuilt on the 2.0 design system (4.11b).
 ///
-/// ON FOR REVIEW, NOT YET VERIFIED. All three tabs, the age-band notice, and
-/// the lapse strip are 2.0. PlayerProfilePageV2 stays reachable by turning
-/// this off - which is also how to get the Games tab's event filter and
-/// insight spark back, since neither is in the 2.0 frame.
+/// DEVICE-VERIFIED 2026-07-21. All three tabs, Full Breakdown, both info
+/// sheets, the age-band notice and the lapse strip are 2.0.
+///
+/// PlayerProfilePageV2 stays reachable by turning this off - which is also how
+/// to get the Games tab's event filter and insight spark back, since neither
+/// is in the 2.0 frame.
 const bool kUseProfile2 = true;
 
 /// Splash (Dot Burst) and Onboarding x3.
