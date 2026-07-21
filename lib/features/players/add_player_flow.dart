@@ -13,7 +13,9 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/player_gating.dart';
 import '/features/home/entitlement_status.dart';
+import '/features/flags.dart';
 import '/features/players/add_player_sheet.dart';
+import '/features/players/add_player_sheet_v2.dart';
 import '/features/players/widgets/player_gates.dart';
 
 /// Runs the gate and then whichever screen it decides on.
@@ -37,7 +39,9 @@ Future<void> runAddPlayerFlow(
 
   switch (action) {
     case AddPlayerAction.allowed:
-      await showAddPlayerSheet(context, onPlayerAdded: onPlayerAdded);
+      await (kUseAddPlayer2
+          ? showAddPlayerSheetV2(context, onPlayerAdded: onPlayerAdded)
+          : showAddPlayerSheet(context, onPlayerAdded: onPlayerAdded));
     case AddPlayerAction.upgradeGate:
       if (await showAddPlayerUpgradeGate(context) && context.mounted) {
         await openPaywall();

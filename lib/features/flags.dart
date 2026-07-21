@@ -79,3 +79,10 @@ const bool kUseProfile2 = true;
 /// ON FOR REVIEW, NOT YET VERIFIED. Also swaps the loading splash, so a
 /// regression here is visible on every cold start.
 const bool kUseEntry2 = true;
+
+/// Add Player, rebuilt on the 2.0 design system (4.11d).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. This one carries a DATA change as well as
+/// a re-skin - last name is collected, birth date becomes optional - so
+/// turning it off restores both the old UI and the old required-fields rule.
+const bool kUseAddPlayer2 = true;

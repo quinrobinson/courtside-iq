@@ -266,3 +266,101 @@ class CiChipBar extends StatelessWidget {
     );
   }
 }
+
+/// A field that opens something instead of accepting typing.
+///
+/// Measured from Add Player Sheet (595:22, 595:29): the same 48pt bordered
+/// input as [CiField] with a chevron-down and a value in place of the
+/// placeholder. Used for Position and Birth Date, both of which are chosen in
+/// a sheet rather than typed.
+///
+/// A separate widget rather than a `readOnly` flag on CiField: that flag
+/// would leave a real TextField in the tree, which still takes focus, still
+/// raises the keyboard on some platforms, and still reads to a screen reader
+/// as an editable field. This one is a button, and says so.
+class CiPickerField extends StatelessWidget {
+  const CiPickerField({
+    super.key,
+    required this.label,
+    required this.placeholder,
+    required this.onTap,
+    this.value,
+    this.errorText,
+    this.enabled = true,
+  });
+
+  final String label;
+
+  /// Shown when [value] is null. An instruction here, not an example: the
+  /// field cannot be typed into, so "Select position" is the honest prompt.
+  final String placeholder;
+
+  final String? value;
+  final VoidCallback? onTap;
+  final String? errorText;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final hasError = errorText != null && errorText!.isNotEmpty;
+    final empty = value == null || value!.isEmpty;
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      value: value,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: CiType.caption.copyWith(color: c.textMuted),
+          ),
+          const SizedBox(height: CiSpace.s2),
+          Opacity(
+            opacity: enabled ? 1 : 0.5,
+            child: InkWell(
+              onTap: enabled ? onTap : null,
+              borderRadius: CiRadius.chipR,
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: CiSpace.s4),
+                decoration: BoxDecoration(
+                  color: c.fieldFill,
+                  borderRadius: CiRadius.chipR,
+                  border: Border.all(
+                      color: hasError ? c.accentEnergy : c.border),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        empty ? placeholder : value!,
+                        style: CiType.rowTitle.copyWith(
+                          color: empty ? c.textMuted : c.text,
+                          fontWeight: CiWeight.regular,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(Icons.keyboard_arrow_down_rounded,
+                        size: 18, color: c.textMuted),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (hasError) ...[
+            const SizedBox(height: CiSpace.s2),
+            Text(errorText!,
+                style: CiType.bodyXs.copyWith(color: c.accentEnergy)),
+          ],
+        ],
+      ),
+    );
+  }
+}
