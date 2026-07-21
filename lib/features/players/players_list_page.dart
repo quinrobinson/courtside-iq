@@ -117,6 +117,10 @@ class _PlayersListPageState extends State<PlayersListPage> {
 
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
+      // Zero, explicitly. A scroll view under a SafeArea header inherits the
+      // ambient MediaQuery padding, which put a large unexplained gap above
+      // the first row.
+      padding: EdgeInsets.zero,
       itemCount: players.length,
       itemBuilder: (context, i) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

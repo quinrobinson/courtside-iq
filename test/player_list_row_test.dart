@@ -104,4 +104,28 @@ void main() {
     expect((chip.decoration! as BoxDecoration).color,
         CiColors.onLight.accentGood);
   });
+
+  testWidgets('a row with a chip is the SAME height as one without',
+      (tester) async {
+    // Jada carried a "Building -13" chip and Jordan did not, so her row sat
+    // ~28pt taller and the list rhythm looked broken. The chip slot is
+    // reserved whether or not it is filled.
+    await _pump(tester,
+        _entry(growthIq: 70, delta: -13, trend: GrowthTrend.building));
+    final withChip = tester.getSize(find.byType(PlayerListRow)).height;
+
+    await _pump(tester, _entry(growthIq: 87, delta: null, trend: null));
+    final withoutChip = tester.getSize(find.byType(PlayerListRow)).height;
+
+    expect(withChip, withoutChip,
+        reason: 'rows must not change height with the chip');
+  });
+
+  testWidgets('the gauge still reserves its slot with no trend to show',
+      (tester) async {
+    await _pump(tester, _entry(growthIq: 87, delta: null, trend: null));
+    expect(find.byType(DotGauge), findsOneWidget);
+    expect(find.textContaining('Rising'), findsNothing);
+    expect(find.textContaining('Building'), findsNothing);
+  });
 }

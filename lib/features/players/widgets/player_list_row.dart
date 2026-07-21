@@ -24,6 +24,15 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/growth_iq.dart';
 import '/courtside_iq/players_list_builder.dart';
 
+/// Reserved height for the trend chip, so a row without one is not shorter.
+const double _kChipHeight = 22;
+
+/// Vertical breathing room around each row's content.
+///
+/// Deliberately generous: there are never more than three players, and the
+/// device review asked for the same 40-50pt above and below every row.
+const double _kRowPadding = 44;
+
 /// Growth IQ runs 40..99, so a raw /100 would draw a nearly empty ring for a
 /// real score. Map the range onto the full sweep. Shared with the header.
 double _gaugeValue(int score) => ((score - 40) / (99 - 40)).clamp(0.0, 1.0);
@@ -44,7 +53,7 @@ class PlayerListRow extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
-              CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s5),
+              CiSpace.screen, _kRowPadding, CiSpace.screen, _kRowPadding),
           // CENTRED, not top-aligned. The gauge column is taller than the
           // identity+averages column, so top-aligning left the left side
           // hanging with dead space beneath it and made rows with and without
@@ -188,10 +197,17 @@ class _GrowthGauge extends StatelessWidget {
               style: CiType.h1.copyWith(
                   color: c.text, fontWeight: CiWeight.light)),
         ),
-        if (label != null) ...[
-          const SizedBox(height: CiSpace.s2),
-          _TrendChip(label: label, trend: entry.trend!),
-        ],
+        const SizedBox(height: CiSpace.s2),
+        // The chip slot is ALWAYS reserved, even when there is no trend to
+        // show. Jada carries a chip and Jordan does not, so letting the slot
+        // collapse made her row ~28pt taller than his - the uneven heights
+        // in the device review. Reserving it keeps every row identical.
+        SizedBox(
+          height: _kChipHeight,
+          child: label == null
+              ? null
+              : _TrendChip(label: label, trend: entry.trend!),
+        ),
       ],
     );
   }
