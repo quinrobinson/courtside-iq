@@ -1615,6 +1615,35 @@ on device. **Check on the device run; fix before cutover.**
   insight regardless of which game generated it, so a stale narrative can render
   instantly while the current one loads. Not fixed in v1; fix in the rebuild.
 | 4.12 | Games | Games list, filters, skeleton, live-in-progress, no-games |
+
+**4.12 built 2026-07-21.** `[x] built` · `[x] wired` · `[~] device-verified`
+(list, both empty states and the filters verified; the LIVE pill cannot be,
+see below).
+
+- **Fixes a real defect:** the v1 list ordered `created_at` ASCENDING, so it
+  opened on the oldest game a parent had ever logged.
+- **Two filter rows, behaving differently.** Players is a closed set of at most
+  three: it wraps, and is hidden entirely for a single player. Dates is
+  open-ended: it scrolls, or the filter block grows taller than the list.
+- **Chips come from the ROSTER, not the games.** Building them from the games
+  hid a player who had not played from their own filter, and made frame
+  `683:2755` unreachable - I had built an empty state that could not be opened.
+- **Three empty states, none sharing copy:** no games at all, a named player
+  with none, and a filter that matched nothing (the last is undesigned and
+  effectively unreachable, kept as a fallback).
+- **The header is INK**, deliberately matching the Players list rather than the
+  frame, which draws it light. Both share `kCiListHeaderContentHeight` - they
+  sat 9pt apart until that landed. **The frame should be updated to match.**
+- **The LIVE pill is built but unverifiable.** There are no live games in test
+  and creating one needs the tracker. RESUMING from the list is deferred to
+  4.13: v1 resumes through a client-state flag with no game id, and the 2.0
+  tracker does not exist yet.
+
+**Lesson repeated three times this phase** (Full Breakdown hero, the
+unreachable player-filter state, the no-games copy): **read every state frame
+before writing the state.** Reasoning about what a screen "should" do produced
+wrong copy, a wrong button, a wrong ground, and one screen that could never be
+reached.
 | 4.13 | New Game | Create → Setup → Live Tracker → Complete |
 | 4.14 | Game Detail | Hero, stat rows, shooting blocks, scoring mix, insight card, remove game |
 | 4.15 | Menu/Account | Menu, subscription, settings |
