@@ -31,6 +31,7 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import 'birth_date_sheet.dart';
 import 'delete_player_dialog.dart';
 import 'present_picker.dart';
+import 'profile_photo_sheet.dart';
 
 class EditPlayerPage extends StatefulWidget {
   const EditPlayerPage({
@@ -64,6 +65,11 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
 
   bool _loading = true;
   bool _saving = false;
+
+  /// Separate from [_saving]: an upload runs while the form stays usable, and
+  /// blocking Save behind it would be wrong. The well shows its own spinner.
+  bool _uploading = false;
+
   String? _error;
 
   @override
@@ -132,6 +138,66 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
   Future<void> _pickBirthDate() async {
     final picked = await presentBirthDateSheet(context, current: _birthDate);
     if (picked != null && mounted) setState(() => _birthDate = picked);
+  }
+
+  Future<void> _changePhoto() async {
+    final action = await presentProfilePhotoSheet(
+      context,
+      // Nothing to remove when there is no photo.
+      canRemove: _photoUrl != null && _photoUrl!.isNotEmpty,
+    );
+    if (action == null || !mounted) return;
+
+    if (action == PhotoAction.remove) {
+      await _writePhotoUrl(null);
+      return;
+    }
+
+    final files = await pickPlayerPhoto(action);
+    // Null means the parent backed out of the system picker, which is not an
+    // error and must not surface as one.
+    if (files == null || files.isEmpty || !mounted) return;
+
+    setState(() {
+      _uploading = true;
+      _error = null;
+    });
+
+    try {
+      final urls = await uploadSupabaseStorageFiles(
+        bucketName: 'playerprofiles',
+        selectedFiles: files,
+      );
+      if (urls.isEmpty) throw StateError('upload returned no url');
+      await _writePhotoUrl(urls.first);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _uploading = false;
+        _error = 'Could not upload that photo. Please try again.';
+      });
+      return;
+    }
+    if (mounted) setState(() => _uploading = false);
+  }
+
+  /// Writes the photo straight to the row rather than waiting for Save.
+  ///
+  /// The photo is chosen in a sheet and applied immediately, so a parent who
+  /// picks one and then backs out of the screen keeps it. Making it depend on
+  /// Save would silently discard a photo they watched upload.
+  Future<void> _writePhotoUrl(String? url) async {
+    try {
+      await SupaFlow.client
+          .from('players')
+          .update({'player_profile_pic': url}).eq('id', widget.playerId);
+      if (!mounted) return;
+      setState(() => _photoUrl = url);
+      widget.onSaved?.call();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _error = 'Could not update the photo. Please try again.');
+    }
   }
 
   Future<void> _save() async {
@@ -239,8 +305,8 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
           child: _PhotoWell(
             name: _firstName.text,
             imageUrl: _photoUrl,
-            // Wired with the Profile Photo Sheet, which is its own frame.
-            onTap: null,
+            busy: _uploading,
+            onTap: _uploading ? null : _changePhoto,
           ),
         ),
         const SizedBox(height: CiSpace.s6),
@@ -347,11 +413,17 @@ class _Header extends StatelessWidget {
 
 /// The 88 avatar with its camera badge.
 class _PhotoWell extends StatelessWidget {
-  const _PhotoWell({required this.name, this.imageUrl, this.onTap});
+  const _PhotoWell({
+    required this.name,
+    this.imageUrl,
+    this.onTap,
+    this.busy = false,
+  });
 
   final String name;
   final String? imageUrl;
   final VoidCallback? onTap;
+  final bool busy;
 
   @override
   Widget build(BuildContext context) {
@@ -368,6 +440,16 @@ class _PhotoWell extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               CiAvatar(name: name, imageUrl: imageUrl, size: 88),
+              if (busy)
+                const Positioned.fill(
+                  child: Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
               Positioned(
                 right: -2,
                 bottom: 0,

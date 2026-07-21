@@ -37,6 +37,7 @@ import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/players/add_player_flow.dart';
+import '/features/players/edit_player_page.dart';
 import '/features/players/age_band_service.dart';
 import '/features/players/info_copy.dart';
 import '/features/players/widgets/age_band_notice.dart';
@@ -141,6 +142,32 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   void _reloadPlayers() =>
       setState(() => _playersFuture = widget.repository.load());
 
+  Future<void> _editPlayer(PlayerListEntry player) async {
+    if (!kUseEditPlayer2) {
+      context.pushNamed(
+        EditPlayerWidget.routeName,
+        queryParameters: {'playerID': player.playerId},
+      );
+      return;
+    }
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => EditPlayerPage(
+        playerId: player.playerId,
+        onSaved: _reloadPlayers,
+        // A deleted player cannot stay on screen as the profile's subject, so
+        // this screen leaves with them.
+        onDeleted: () {
+          _reloadPlayers();
+          if (mounted) Navigator.of(context).maybePop();
+        },
+      ),
+    ));
+    // Also refetch on plain dismissal: the photo is written the moment it is
+    // chosen, so a parent can change it and back out without ever pressing
+    // Save.
+    _reloadPlayers();
+  }
+
   Future<void> _addPlayer(List<PlayerListEntry> players) async {
     await runAddPlayerFlow(
       context,
@@ -224,12 +251,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                     // explains, exactly as on the Players list and the
                     // create sheet.
                     onAdd: players.isEmpty ? null : () => _addPlayer(players),
-                    onEdit: player == null
-                        ? null
-                        : () => context.pushNamed(
-                              EditPlayerWidget.routeName,
-                              queryParameters: {'playerID': player.playerId},
-                            ),
+                    onEdit: player == null ? null : () => _editPlayer(player),
                   ),
                   // Above the tabs, per 663:2426. It explains what the parent
                   // is still seeing rather than hiding anything: the frame

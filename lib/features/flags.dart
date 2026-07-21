@@ -86,3 +86,12 @@ const bool kUseEntry2 = true;
 /// a re-skin - last name is collected, birth date becomes optional - so
 /// turning it off restores both the old UI and the old required-fields rule.
 const bool kUseAddPlayer2 = true;
+
+/// Edit Player, rebuilt on the 2.0 design system (4.11d).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Covers identity, photo and delete.
+///
+/// THE v1 SCREEN IS STILL THE ONLY WAY TO REACH TEAMS AND EVENTS, which have
+/// no 2.0 design yet. Turning this off is how a parent gets back to them
+/// until those are built.
+const bool kUseEditPlayer2 = true;

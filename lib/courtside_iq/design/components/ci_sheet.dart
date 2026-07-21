@@ -158,15 +158,21 @@ class CiSheetOptionRow extends StatelessWidget {
   const CiSheetOptionRow({
     super.key,
     required this.label,
-    required this.selected,
+    this.selected = false,
     this.onTap,
     this.showDivider = true,
+    this.destructive = false,
   });
 
   final String label;
   final bool selected;
   final VoidCallback? onTap;
   final bool showDivider;
+
+  /// Renders the label in the energy accent. Used by "Remove photo" and
+  /// nothing else so far - a row that takes something away should be
+  /// findable without being the loudest thing in the sheet.
+  final bool destructive;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +197,8 @@ class CiSheetOptionRow extends StatelessWidget {
                       child: Text(
                         label,
                         style: CiType.body.copyWith(
-                            color: c.text, fontWeight: CiWeight.medium),
+                            color: destructive ? c.accentEnergy : c.text,
+                            fontWeight: CiWeight.medium),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
