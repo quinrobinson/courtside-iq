@@ -48,7 +48,7 @@ Guidelines:
 
 function buildUserPrompt(args: {
   firstName: string;
-  ageBand: string;
+  ageBand: string | null;
   position: string | null;
   points: number;
   ppsaValue: number;
@@ -65,12 +65,12 @@ function buildUserPrompt(args: {
 
   return `Generate a game insight for ${args.firstName}'s recent game.
 
-Age band: ${args.ageBand}
+Age band: ${args.ageBand ?? "unknown (no birth date on file)"}
 Position: ${args.position ?? "unknown"}
 
 Game stats:
 - Points: ${args.points}
-- Scoring efficiency (PPSA): ${args.ppsaValue.toFixed(2)} — ${args.ppsaTierLabel ?? "not yet rated"} for ${args.ageBand}
+- Scoring efficiency (PPSA): ${args.ppsaValue.toFixed(2)} — ${args.ppsaTierLabel ?? "not yet rated"}${args.ageBand ? ` for ${args.ageBand}` : " (age unknown, so no age-relative tier)"}
 - ${astTovLine}
 - Effort + Disruption: ${args.disrupt} — ${args.disruptTierLabel ?? "not yet rated"}
 

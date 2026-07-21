@@ -38,7 +38,9 @@ class DevelopmentView extends StatelessWidget {
     this.trend,
     this.gamesLogged,
     this.gamesUntilUnlock,
+    this.needsBirthDate = false,
     this.onTrackGame,
+    this.onAddBirthDate,
     this.onAbout,
     this.onAboutGrowthIq,
   });
@@ -58,7 +60,15 @@ class DevelopmentView extends StatelessWidget {
   /// count: the threshold rule lives on the server and this is it answering.
   final int? gamesUntilUnlock;
 
+  /// True when the lock is a missing birth date rather than a game count.
+  ///
+  /// The two locks resolve differently, so they must not share copy: telling
+  /// a parent their story "unlocks in 2 games" when it actually needs a birth
+  /// date sends them to do the wrong thing.
+  final bool needsBirthDate;
+
   final VoidCallback? onTrackGame;
+  final VoidCallback? onAddBirthDate;
 
   /// "About this story", under the narrative.
   final VoidCallback? onAbout;
@@ -72,6 +82,12 @@ class DevelopmentView extends StatelessWidget {
     final i = insight;
     if (i == null) {
       return const Center(child: CircularProgressIndicator());
+    }
+    if (needsBirthDate) {
+      return _NeedsBirthDate(
+        firstName: firstName,
+        onAddBirthDate: onAddBirthDate,
+      );
     }
     if (i.belowThreshold) {
       return _Locked(
@@ -350,6 +366,52 @@ class _Locked extends StatelessWidget {
           style: CiButtonStyle.primary,
           expand: true,
           onPressed: onTrackGame,
+        ),
+      ],
+    );
+  }
+}
+
+/// Locked because the app does not know the player's age.
+///
+/// A separate state from the game-count lock, because logging more games will
+/// never resolve this one.
+class _NeedsBirthDate extends StatelessWidget {
+  const _NeedsBirthDate({required this.firstName, this.onAddBirthDate});
+
+  final String firstName;
+  final VoidCallback? onAddBirthDate;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final who = firstName.trim().isEmpty ? 'this player' : firstName.trim();
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+      children: [
+        const SizedBox(height: CiSpace.s12),
+        Text(
+          'Add a birth date first',
+          textAlign: TextAlign.center,
+          style: CiType.h3.copyWith(color: c.text),
+        ),
+        const SizedBox(height: CiSpace.s4),
+        Text(
+          // Says WHY rather than just refusing. The rating is withheld to
+          // avoid measuring a child against the wrong age group, and a parent
+          // who understands that is far more likely to fill it in.
+          'Ratings are measured against other players the same age, so we '
+          "need $who's birth date before we can score them.",
+          textAlign: TextAlign.center,
+          style: CiType.body.copyWith(color: c.textSoft, height: 1.5),
+        ),
+        const SizedBox(height: CiSpace.s7),
+        CiButton(
+          label: 'Add birth date',
+          style: CiButtonStyle.lime,
+          expand: true,
+          onPressed: onAddBirthDate,
         ),
       ],
     );

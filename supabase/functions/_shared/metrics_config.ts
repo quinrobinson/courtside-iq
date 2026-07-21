@@ -1,5 +1,6 @@
 // Age bands mirror the SQL get_age_band function.
-// Null birth date falls back to "11U-13U" (middle band).
+// A null birth date yields NO band - see getAgeBand in metrics.ts and
+// migration 20260721000000.
 export type AgeBand = "8U-10U" | "11U-13U" | "14U-18U";
 
 export interface PpsaThresholds {

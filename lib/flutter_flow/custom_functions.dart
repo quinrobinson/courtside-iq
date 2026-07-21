@@ -630,9 +630,11 @@ bool disruptSolid(int? a, [int? b]) {
 // string returned by the SQL get_age_band function ('8U-10U', '11U-13U',
 // '14U-18U').
 PpsaThresholds _ppsaThresholdsFor(String? ageBandString) {
-  final band = ageBandString == null
-      ? AgeBand.u18
-      : ageBandFromString(ageBandString);
+  // ageBandFromString now returns null for an unknown band rather than the
+  // middle one. These are v1 FlutterFlow callers on their way out in 4.24, so
+  // they keep their existing u18 fallback rather than gaining a locked state
+  // that the v1 screens have no way to render.
+  final band = ageBandFromString(ageBandString) ?? AgeBand.u18;
   return kPpsaThresholds[band]!;
 }
 

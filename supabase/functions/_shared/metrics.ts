@@ -24,11 +24,22 @@ export function ppsa(fgAttempted: number, ftAttempted: number, points: number): 
   return points / denominator;
 }
 
-export function ppsaActive(ppsaValue: number, shotAttempts: number, ageBand: AgeBand): boolean {
+// A NULL band yields no tier. These cutoffs are age-relative, so without an
+// age there is nothing to be relative to - see getAgeBand.
+export function ppsaActive(
+  ppsaValue: number,
+  shotAttempts: number,
+  ageBand: AgeBand | null,
+): boolean {
+  if (!ageBand) return false;
   return shotAttempts >= PPSA_MIN_ATTEMPTS && ppsaValue >= PPSA_THRESHOLDS[ageBand].solidMin;
 }
 
-export function ppsaTier(ppsaValue: number, ageBand: AgeBand): "Solid" | "Good" | "Elite" | null {
+export function ppsaTier(
+  ppsaValue: number,
+  ageBand: AgeBand | null,
+): "Solid" | "Good" | "Elite" | null {
+  if (!ageBand) return null;
   const t = PPSA_THRESHOLDS[ageBand];
   if (ppsaValue >= t.eliteMin) return "Elite";
   if (ppsaValue >= t.goodMin) return "Good";
@@ -68,9 +79,17 @@ export function astTovTier(assists: number, turnovers: number): "Solid" | "Good"
 }
 
 // birthDate should be an ISO date string (YYYY-MM-DD) or null.
-// NULL returns '11U-13U' (middle band fallback, mirrors get_age_band SQL function).
-export function getAgeBand(birthDate: string | null): AgeBand {
-  if (!birthDate) return "11U-13U";
+//
+// NULL returns NULL, mirroring get_age_band after migration
+// 20260721000000. It used to return '11U-13U'. That fallback scored a player
+// of unknown age against middle-school cutoffs while presenting the result as
+// age-normalised, which is the one thing this metric must not do.
+//
+// CALLERS MUST HANDLE NULL. The client locks Growth IQ outright; these
+// functions still produce an insight, but must not claim an age-relative tier
+// while doing it - see fallbackBand in generate-game-insight.
+export function getAgeBand(birthDate: string | null): AgeBand | null {
+  if (!birthDate) return null;
   const birth = new Date(birthDate);
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();

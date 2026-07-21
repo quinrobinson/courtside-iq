@@ -70,7 +70,7 @@ interface TrendSnapshot {
 
 function buildUserPrompt(args: {
   firstName: string;
-  ageBand: string;
+  ageBand: string | null;
   position: string | null;
   totalGames: number;
   snapshot: TrendSnapshot;
@@ -78,7 +78,7 @@ function buildUserPrompt(args: {
   const s = args.snapshot;
   return `Generate a 5-game development story for ${args.firstName}.
 
-Age band: ${args.ageBand}
+Age band: ${args.ageBand ?? "unknown (no birth date on file)"}
 Position: ${args.position ?? "unknown"}
 Games logged overall: ${args.totalGames}
 

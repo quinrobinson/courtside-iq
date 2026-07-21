@@ -2,15 +2,24 @@
 // Null birth date falls back to u13 (middle band).
 enum AgeBand { u10, u13, u18 }
 
-AgeBand ageBandFromString(String? band) {
-  switch (band) {
+/// Parses a band from the view, or NULL when there is no band to parse.
+///
+/// This returned the MIDDLE BAND for null until 2026-07-21, mirroring
+/// get_age_band's own fallback. Both are gone. Age normalisation is the whole
+/// premise of these thresholds, so scoring a player of unknown age against
+/// 11U-13U cutoffs produced a number that looked age-fair and was not - an
+/// 8-year-old and a 17-year-old were both measured against middle-school
+/// play. A rating we cannot stand behind is not shown at all.
+AgeBand? ageBandFromString(String? band) {
+  switch (band?.trim()) {
     case '8U-10U':
       return AgeBand.u10;
+    case '11U-13U':
+      return AgeBand.u13;
     case '14U-18U':
       return AgeBand.u18;
-    case '11U-13U':
     default:
-      return AgeBand.u13;
+      return null;
   }
 }
 

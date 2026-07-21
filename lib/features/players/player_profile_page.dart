@@ -340,6 +340,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
           player: player,
           insightFuture: _insightFuture,
           cached: _cachedInsight,
+          onAddBirthDate: _addBirthDate,
         ),
         _Games(future: _gamesFuture, playerId: _playerId),
       ],
@@ -537,25 +538,32 @@ class _Development extends StatelessWidget {
     required this.player,
     required this.insightFuture,
     required this.cached,
+    required this.onAddBirthDate,
   });
 
   final PlayerListEntry? player;
+  final ValueChanged<String> onAddBirthDate;
   final Future<PlayerInsightResponse>? insightFuture;
   final PlayerInsight? cached;
 
   @override
   Widget build(BuildContext context) {
+    final p = player;
     return FutureBuilder<PlayerInsightResponse>(
       future: insightFuture,
       builder: (context, snap) {
         return DevelopmentView(
-          firstName: player?.firstName ?? '',
+          firstName: p?.firstName ?? '',
           insight: snap.data?.insight ?? cached,
           growthIq: player?.growthIq,
           growthIqDelta: player?.growthIqDelta,
           trend: player?.trend,
           gamesLogged: player?.totalGames,
           gamesUntilUnlock: snap.data?.gamesUntilUnlock,
+          // The lock a parent cannot resolve by logging games.
+          needsBirthDate: p != null && !p.hasBirthDate,
+          onAddBirthDate:
+              p == null ? null : () => onAddBirthDate(p.playerId),
           onTrackGame: () => context.pushNamed(NewGameWidget.routeName),
           onAbout: () => showCiInfoSheet(
             context,

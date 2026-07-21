@@ -136,4 +136,54 @@ void main() {
     expect(find.text('61'), findsOneWidget);
     expect(find.text('Dipping'), findsNothing);
   });
+
+  testWidgets('a missing birth date does NOT say "unlocks in N games"',
+      (tester) async {
+    // The two locks resolve differently. Telling a parent to log games when
+    // the app actually needs a birth date sends them to do the wrong thing.
+    var tapped = 0;
+    await tester.pumpWidget(_host(DevelopmentView(
+      firstName: 'Jordan',
+      insight: _insight(belowThreshold: true),
+      gamesLogged: 3,
+      gamesUntilUnlock: 2,
+      needsBirthDate: true,
+      onAddBirthDate: () => tapped++,
+    )));
+
+    expect(find.text('Add a birth date first'), findsOneWidget);
+    expect(find.textContaining('unlocks in'), findsNothing);
+    expect(find.text('Track a Game'), findsNothing);
+
+    await tester.tap(find.text('Add birth date'));
+    expect(tapped, 1);
+  });
+
+  testWidgets('the birth-date lock says WHY, not just no', (tester) async {
+    await tester.pumpWidget(_host(DevelopmentView(
+      firstName: 'Jordan',
+      insight: _insight(belowThreshold: true),
+      needsBirthDate: true,
+      onAddBirthDate: () {},
+    )));
+
+    expect(
+        find.text('Ratings are measured against other players the same age, '
+            "so we need Jordan's birth date before we can score them."),
+        findsOneWidget);
+  });
+
+  testWidgets('with a birth date, the game-count lock is unchanged',
+      (tester) async {
+    await tester.pumpWidget(_host(DevelopmentView(
+      firstName: 'Maya',
+      insight: _insight(belowThreshold: true),
+      gamesLogged: 3,
+      gamesUntilUnlock: 2,
+    )));
+
+    expect(find.text("Maya's development story unlocks in 2 games."),
+        findsOneWidget);
+    expect(find.text('Add a birth date first'), findsNothing);
+  });
 }

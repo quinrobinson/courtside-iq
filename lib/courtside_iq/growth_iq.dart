@@ -45,6 +45,23 @@ class GrowthGame {
   const GrowthGame({this.ppsa, this.astTov, this.disrupt});
 }
 
+/// Why a Growth IQ could not be computed.
+///
+/// The UI needs this because the two locks read completely differently to a
+/// parent: one resolves by logging games, the other by entering a birth date,
+/// and telling someone their story "unlocks in 2 games" when it actually
+/// needs a birth date sends them to do the wrong thing.
+enum GrowthIqLock {
+  /// Fewer than kGrowthIqMinGames.
+  tooFewGames,
+
+  /// No age band, so nothing can be normalised.
+  noBirthDate,
+
+  /// Enough games, but no qualifying data in any family.
+  noQualifyingData,
+}
+
 /// Result of a Growth IQ evaluation.
 class GrowthIqResult {
   /// Display score, 40-99. Null when locked.
@@ -56,9 +73,12 @@ class GrowthIqResult {
 
   final GrowthTrend? trend;
 
-  /// True when the player has fewer than kGrowthIqMinGames games.
-  /// The UI shows the designed locked state, never a provisional number.
+  /// True when no score could be computed. The UI shows the designed locked
+  /// state, never a provisional number.
   final bool locked;
+
+  /// Why, when [locked]. Null otherwise.
+  final GrowthIqLock? lockReason;
 
   /// Games counted toward the current window.
   final int gamesUsed;
@@ -69,10 +89,17 @@ class GrowthIqResult {
     this.trend,
     required this.locked,
     required this.gamesUsed,
+    this.lockReason,
   });
 
-  static const GrowthIqResult lockedResult =
-      GrowthIqResult(locked: true, gamesUsed: 0);
+  static const GrowthIqResult lockedResult = GrowthIqResult(
+      locked: true, gamesUsed: 0, lockReason: GrowthIqLock.tooFewGames);
+
+  static const GrowthIqResult noBirthDate = GrowthIqResult(
+      locked: true, gamesUsed: 0, lockReason: GrowthIqLock.noBirthDate);
+
+  static const GrowthIqResult noData = GrowthIqResult(
+      locked: true, gamesUsed: 0, lockReason: GrowthIqLock.noQualifyingData);
 }
 
 /// Maps a raw metric value onto 0-1 by piecewise-linear interpolation across
@@ -173,7 +200,11 @@ double? abilityComposite(List<GrowthGame> games, AgeBand band) {
 /// [games] must be ordered oldest -> newest and contain every logged game.
 /// The current window is the last [kGrowthIqWindowGames]; the prior window is
 /// the [kGrowthIqWindowGames] before that, when available.
-GrowthIqResult growthIq(List<GrowthGame> games, AgeBand band) {
+GrowthIqResult growthIq(List<GrowthGame> games, AgeBand? band) {
+  // NO BAND, NO RATING. Checked before the game count because it is the more
+  // fundamental gap: logging more games will never resolve it.
+  if (band == null) return GrowthIqResult.noBirthDate;
+
   if (games.length < kGrowthIqMinGames) {
     return GrowthIqResult.lockedResult;
   }
@@ -184,7 +215,7 @@ GrowthIqResult growthIq(List<GrowthGame> games, AgeBand band) {
 
   if (ability == null) {
     // Enough games logged, but no qualifying data in any family.
-    return GrowthIqResult.lockedResult;
+    return GrowthIqResult.noData;
   }
 
   // Prior window, only when a full one exists. A partial prior window would

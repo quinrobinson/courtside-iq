@@ -130,14 +130,24 @@ void main() {
       expect(s.pointsPerGameLabel, '18.5 PPG');
     });
 
-    test('a null age band still produces a score', () {
-      // Only PPSA is age-banded, and a missing band must not lock the player
-      // out of the header entirely.
+    test('a null age band produces NO score, however many games', () {
+      // REVERSED 2026-07-21. This used to assert the opposite, on the
+      // reasoning that only PPSA is age-banded so a missing band should not
+      // lock a player out of the header.
+      //
+      // The trouble was what "missing band" meant: get_age_band returned
+      // '11U-13U' for a null birth date, so the app scored a player of unknown
+      // age against middle-school cutoffs and presented it as age-normalised.
+      // Age fairness is the entire premise of the number. A rating we cannot
+      // stand behind is not shown.
       final s = buildTodaySnapshots(
         players: [_player(band: null)],
         games: [for (var d = 1; d <= 10; d++) _game(day: d)],
       ).single;
-      expect(s.growthIq, isNotNull);
+      expect(s.growthIq, isNull);
+      // And so the player is absent from the header, exactly as one with too
+      // few games is.
+      expect(s.qualifiesForHeader, isFalse);
     });
   });
 }

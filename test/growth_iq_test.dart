@@ -163,4 +163,57 @@ void main() {
       }
     });
   });
+
+  group('an unknown age locks the rating', () {
+    // Age normalisation is the whole premise of Growth IQ. Scoring a player
+    // whose age we do not know against SOME band produces a number that looks
+    // age-fair and is not.
+    List<GrowthGame> tenGoodGames() => [
+          for (var i = 0; i < 10; i++)
+            const GrowthGame(ppsa: 1.1, astTov: 2.0, disrupt: 12),
+        ];
+
+    test('no band means no score, however much data there is', () {
+      final r = growthIq(tenGoodGames(), null);
+      expect(r.locked, isTrue);
+      expect(r.score, isNull);
+      expect(r.lockReason, GrowthIqLock.noBirthDate);
+    });
+
+    test('the same games DO score once a band is known', () {
+      final r = growthIq(tenGoodGames(), AgeBand.u13);
+      expect(r.locked, isFalse);
+      expect(r.score, isNotNull);
+    });
+
+    test('the reason distinguishes the two locks', () {
+      // They resolve differently - one by logging games, one by entering a
+      // birth date - so the UI must be able to tell them apart or it sends a
+      // parent to do the wrong thing.
+      expect(growthIq(const [], AgeBand.u13).lockReason,
+          GrowthIqLock.tooFewGames);
+      expect(growthIq(const [], null).lockReason, GrowthIqLock.noBirthDate);
+    });
+
+    test('a missing band beats a missing game count', () {
+      // Checked first because logging more games will never resolve it.
+      expect(growthIq(const [], null).lockReason, GrowthIqLock.noBirthDate);
+    });
+  });
+
+  group('ageBandFromString', () {
+    test('parses every real band', () {
+      expect(ageBandFromString('8U-10U'), AgeBand.u10);
+      expect(ageBandFromString('11U-13U'), AgeBand.u13);
+      expect(ageBandFromString('14U-18U'), AgeBand.u18);
+    });
+
+    test('returns null rather than the middle band', () {
+      // It returned AgeBand.u13 for null until 2026-07-21, mirroring the SQL
+      // fallback that this change removed.
+      expect(ageBandFromString(null), isNull);
+      expect(ageBandFromString(''), isNull);
+      expect(ageBandFromString('U14'), isNull);
+    });
+  });
 }
