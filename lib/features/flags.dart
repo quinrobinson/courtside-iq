@@ -64,6 +64,13 @@ const bool kUseNavBar2 = true;
 /// by turning it off.
 const bool kUsePlayers2 = true;
 
+/// Player Profile, rebuilt on the 2.0 design system (4.11b).
+///
+/// ON FOR REVIEW. The shell and tab control are 2.0; the Averages and Games
+/// tab CONTENTS are still the Phase 2 widgets on old tokens, re-skinned next.
+/// PlayerProfilePageV2 stays reachable by turning this off.
+const bool kUseProfile2 = true;
+
 /// Splash (Dot Burst) and Onboarding x3.
 ///
 /// ON FOR REVIEW, NOT YET VERIFIED. Also swaps the loading splash, so a

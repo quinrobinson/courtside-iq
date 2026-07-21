@@ -22,6 +22,7 @@ import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
 import '/features/home/today_page.dart';
 import '/features/players/players_list_page.dart';
+import '/features/players/player_profile_page.dart';
 import '/features/auth/auth_landing_page.dart';
 import '/features/auth/email_auth_page.dart';
 import '/features/auth/forgot_password_page.dart';
@@ -311,12 +312,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: PlayersProfileWidget.routeName,
         path: PlayersProfileWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => PlayerProfilePageV2(
-          playerId: params.getParam(
-            'playerID',
-            ParamType.String,
-          ) ?? '',
-        ),
+        // 4.11b: keeps the v1 route name and path so every existing
+        // navigation call reaches it unchanged.
+        builder: (context, params) {
+          final id = params.getParam('playerID', ParamType.String) ?? '';
+          return kUseProfile2
+              ? PlayerProfilePage(playerId: id)
+              : PlayerProfilePageV2(playerId: id);
+        },
       ),
       FFRoute(
         name: HelpCenterWidget.routeName,
