@@ -96,20 +96,25 @@ void main() {
         CiBadgeTone.good);
   });
 
-  testWidgets('a row with a chip is the SAME height as one without',
+  testWidgets('EVERY row is the same height, whatever the player has',
       (tester) async {
-    // Jada carried a "Building -13" chip and Jordan did not, so her row sat
-    // ~28pt taller and the list rhythm looked broken. The chip slot is
-    // reserved whether or not it is filled.
+    // Three configurations that all appeared on device at different heights:
+    // a full row with a chip, a scored row without one, and a brand-new
+    // player with no Growth IQ at all. A player joins the list with no data,
+    // so the rhythm cannot depend on how much they have.
     await _pump(tester,
         _entry(growthIq: 70, delta: -13, trend: GrowthTrend.building));
     final withChip = tester.getSize(find.byType(PlayerListRow)).height;
 
     await _pump(tester, _entry(growthIq: 87, delta: null, trend: null));
-    final withoutChip = tester.getSize(find.byType(PlayerListRow)).height;
+    final scoredNoChip = tester.getSize(find.byType(PlayerListRow)).height;
 
-    expect(withChip, withoutChip,
-        reason: 'rows must not change height with the chip');
+    await _pump(tester,
+        _entry(growthIq: null, delta: null, trend: null, games: 0, points: 0));
+    final brandNew = tester.getSize(find.byType(PlayerListRow)).height;
+
+    expect(scoredNoChip, withChip, reason: 'chip must not change height');
+    expect(brandNew, withChip, reason: 'a gaugeless row must not collapse');
   });
 
   testWidgets('the gauge still reserves its slot with no trend to show',

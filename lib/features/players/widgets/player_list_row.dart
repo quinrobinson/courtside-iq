@@ -31,6 +31,20 @@ import '/courtside_iq/players_list_builder.dart';
 /// screens show the same kind of chip and must not differ in height.
 const double _kChipHeight = 24;
 
+const double _kGaugeSize = 112;
+
+/// EVERY ROW IS THIS TALL, whatever the player has.
+///
+/// Reserving the chip slot alone was not enough: a player with no Growth IQ at
+/// all omits the whole gauge column, so the row collapsed to the left side and
+/// a brand-new player sat visibly shorter than the rest. A fixed height makes
+/// the list rhythm independent of how much data any one player happens to
+/// have - which is the point, since players join the list with none.
+///
+/// Sized to the tallest configuration: gauge + gap + chip, plus the padding.
+const double _kRowHeight =
+    _kGaugeSize + CiSpace.s2 + _kChipHeight + (_kRowPadding * 2);
+
 /// Vertical breathing room around each row's content.
 ///
 /// Deliberately generous: there are never more than three players, and the
@@ -55,7 +69,9 @@ class PlayerListRow extends StatelessWidget {
       button: onTap != null,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
+        child: Container(
+          height: _kRowHeight,
+          alignment: Alignment.center,
           padding: const EdgeInsets.fromLTRB(
               CiSpace.screen, _kRowPadding, CiSpace.screen, _kRowPadding),
           // CENTRED, not top-aligned. The gauge column is taller than the
@@ -178,9 +194,9 @@ class _GrowthGauge extends StatelessWidget {
     return Column(
       children: [
         DotGauge(
-          // 112: there are never more than three players, so the row can
-          // afford a gauge that fills its space rather than floating in it.
-          size: 112,
+          // There are never more than three players, so the row can afford a
+          // gauge that fills its space rather than floating in it.
+          size: _kGaugeSize,
           value: _gaugeValue(entry.growthIq!),
           child: Text('${entry.growthIq}',
               style: CiType.h1.copyWith(
