@@ -45,6 +45,7 @@ GameListRow _g({
   String name = 'Maya',
   DateTime? at,
   int points = 12,
+  bool live = false,
 }) =>
     GameListRow(
       gameId: id,
@@ -53,6 +54,7 @@ GameListRow _g({
       opponent: 'Hawks',
       playedAt: at ?? DateTime(2026, 5, 4),
       points: points,
+      isLive: live,
     );
 
 Future<void> _pump(
@@ -242,5 +244,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.widgetWithText(CiChip, 'May 4'), findsNothing);
     expect(find.widgetWithText(CiChip, 'All dates'), findsNothing);
+  });
+
+  testWidgets('a live game wears the LIVE pill, and only that one',
+      (tester) async {
+    await _pump(tester, [
+      _g(id: 'a', at: DateTime(2026, 5, 4), live: true),
+      _g(id: 'b', at: DateTime(2026, 5, 2)),
+    ]);
+
+    // One pill, on one row. There is at most one live game at a time.
+    expect(find.text('LIVE'), findsOneWidget);
+    expect(find.bySemanticsLabel('Live'), findsOneWidget);
+  });
+
+  testWidgets('no pill when nothing is live', (tester) async {
+    await _pump(tester, [_g(id: 'a'), _g(id: 'b', at: DateTime(2026, 5, 2))]);
+    expect(find.text('LIVE'), findsNothing);
   });
 }

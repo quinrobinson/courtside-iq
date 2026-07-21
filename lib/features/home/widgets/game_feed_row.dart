@@ -37,6 +37,7 @@ class GameFeedEntry {
     required this.assists,
     required this.steals,
     required this.turnovers,
+    this.isLive = false,
   });
 
   final String gameId;
@@ -60,6 +61,12 @@ class GameFeedEntry {
   final int assists;
   final int steals;
   final int turnovers;
+
+  /// The game is still being tracked. Draws the LIVE pill (683:2752).
+  ///
+  /// `games.game_live` is the source. There is at most one at a time, so this
+  /// is true for one row at most.
+  final bool isLive;
 
   /// "vs Northside Hawks  ·  Sat, Mar 8", dropping whichever half is missing.
   ///
@@ -156,6 +163,9 @@ class GameFeedRow extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // Top-aligned with the title, per the frame - the pill sits
+                  // at the row's top-right, not centred on the taller header.
+                  if (entry.isLive) const _LivePill(),
                 ],
               ),
               const SizedBox(height: CiSpace.s4),
@@ -176,6 +186,51 @@ class GameFeedRow extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The LIVE pill (683:2752): orange fill, a 5pt ink dot, "LIVE" SemiBold 11
+/// ink, radius 6, 8h/3v padding.
+///
+/// This is the one place orange means "happening now" rather than "attention".
+/// It reads because it is paired with the word LIVE and a dot, not left to the
+/// colour alone.
+class _LivePill extends StatelessWidget {
+  const _LivePill();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Semantics(
+      label: 'Live',
+      // container + exclude, or the inner "LIVE" merges over the label and a
+      // screen reader spells it out letter by letter.
+      container: true,
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: c.accentEnergy,
+          borderRadius: CiRadius.chipR,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(color: c.onAccent, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 5),
+            Text('LIVE',
+                style: CiType.badge.copyWith(
+                    color: c.onAccent,
+                    fontWeight: CiWeight.semiBold,
+                    letterSpacing: 0.3)),
+          ],
         ),
       ),
     );

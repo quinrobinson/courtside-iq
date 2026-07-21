@@ -48,6 +48,19 @@ class GamesRepository {
         .eq('user_id', uid)
         .order('created_at', ascending: false) as List;
 
+    // Live games, by id. A SEPARATE query rather than altering
+    // v_player_game_stats: that view is read by Today, the profile and the
+    // Averages tab, and adding a column to serve one screen is a change to
+    // all of them. There is at most one live game, so this is a tiny read.
+    final liveRows = await SupaFlow.client
+        .from('games')
+        .select('id')
+        .eq('user_id', uid)
+        .eq('game_live', true) as List;
+    final liveIds = {
+      for (final r in liveRows) r['id'] as String?,
+    }..removeWhere((id) => id == null);
+
     final names = <String, String>{};
     final photos = <String, String?>{};
     final roster = <GameRosterEntry>[];
@@ -62,9 +75,11 @@ class GamesRepository {
 
     final games = gameRows.map((r) {
       final playerId = r['player_id'] as String? ?? '';
+      final gameId = r['game_id'] as String? ?? '';
       return GameListRow(
-        gameId: r['game_id'] as String? ?? '',
+        gameId: gameId,
         playerId: playerId,
+        isLive: liveIds.contains(gameId),
         // Falls back to empty rather than a placeholder like "Unknown": the
         // row renders an avatar and a name, and inventing one would put a
         // word on screen that names no real child.

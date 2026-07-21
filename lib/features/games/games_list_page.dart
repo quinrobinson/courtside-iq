@@ -16,6 +16,11 @@
 // at most three, so it wraps and is hidden entirely when there is only one.
 // Dates is OPEN-ENDED - one chip per day a game was logged - so it scrolls,
 // or the filter block would grow taller than the list it filters.
+//
+// A live game shows the LIVE pill on its row (683:2752). RESUMING from the
+// list is deferred to 4.13: v1 resumes through a client-state flag with no
+// game id, and the 2.0 live tracker does not exist yet, so a live row taps to
+// Game Detail like any other rather than to an invented resume flow.
 
 import 'package:flutter/material.dart';
 
@@ -173,6 +178,7 @@ class _GamesListPageState extends State<GamesListPage> {
                                     assists: g.assists,
                                     steals: g.steals,
                                     turnovers: g.turnovers,
+                                    isLive: g.isLive,
                                   ),
                                   onTap: () => context.pushNamed(
                                     GameStatsWidget.routeName,

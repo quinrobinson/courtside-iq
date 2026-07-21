@@ -20,6 +20,9 @@ class GameListRow {
   final int steals;
   final int turnovers;
 
+  /// Still being tracked. At most one game is live at a time.
+  final bool isLive;
+
   const GameListRow({
     required this.gameId,
     required this.playerId,
@@ -32,6 +35,7 @@ class GameListRow {
     this.assists = 0,
     this.steals = 0,
     this.turnovers = 0,
+    this.isLive = false,
   });
 }
 
