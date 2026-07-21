@@ -89,9 +89,8 @@ const bool kUseAddPlayer2 = true;
 
 /// Edit Player, rebuilt on the 2.0 design system (4.11d).
 ///
-/// ON FOR REVIEW, NOT YET VERIFIED. Covers identity, photo and delete.
-///
-/// Covers identity, photo, delete, AND teams and events - the last two behind
-/// two rows that open sheets. Nothing from the v1 screen is left behind, so
-/// this flag is now a pure rollback rather than a feature trade.
+/// ON FOR REVIEW, NOT YET VERIFIED. Covers identity, photo, delete, and teams
+/// and events - the last two behind rows that open sheets. Nothing from the
+/// v1 screen is left behind, so this flag is a pure rollback rather than a
+/// feature trade.
 const bool kUseEditPlayer2 = true;
