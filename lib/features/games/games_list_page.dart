@@ -243,22 +243,23 @@ class _Loading extends StatelessWidget {
       const Center(child: CircularProgressIndicator());
 }
 
-/// Two different nothings.
+/// Measured from BOTH empty frames: No Games (206:1025) and No Games (Player
+/// Filter) (683:2910). They are the same layout - an 80 sunk circle with a 34
+/// basketball, ExtraBold 24, Medium 15 muted, and a lime "Start a game" - and
+/// differ ONLY in copy. An earlier version of this had the no-games case on an
+/// ink "Track a Game" button; that was invented, not read.
 ///
-/// A parent with no games at all needs an invitation. A parent whose FILTER
-/// emptied the list needs to know the games are still there - telling them to
-/// log their first game when they have twenty would read as data loss.
-/// Measured from Games — No Games (Player Filter) (683:2910): an 80 sunk
-/// circle with a 34 basketball, an ExtraBold 24 line, a Medium 15 muted
-/// paragraph, and a lime CTA.
-///
-/// THREE DIFFERENT NOTHINGS, and they must not share copy:
-///   no games at all       an invitation
+/// THREE NOTHINGS, none sharing copy:
+///   no games at all       "No games yet" - an invitation to the first game
 ///   a player with none    names them, and offers to start one FOR them
 ///   a filter that matched  says the games are still there
+///
 /// Telling a parent with twenty games to log their first would read as data
-/// loss; telling them "try a different filter" when they have none is a
-/// dead end.
+/// loss; telling a parent with none to "try a different filter" is a dead end.
+///
+/// The third case has no frame and is effectively unreachable - date chips are
+/// built from already-filtered games, so a date can never match zero. It is
+/// kept as a defensive fallback, not a designed surface.
 class _Empty extends StatelessWidget {
   const _Empty({required this.filtered, this.playerName});
 
@@ -279,11 +280,18 @@ class _Empty extends StatelessWidget {
             ? 'No games for $who yet'
             : 'No games match these filters';
     final body = !filtered
-        ? 'Track a game and it will show up here.'
+        ? 'Track your first game to see how your player performed and what it '
+            'means for their growth.'
         : forPlayer
             ? 'Track a game with $who to see how they performed and what it '
                 'means for their growth.'
             : 'Try a different player or date.';
+
+    // A designed empty state - no games at all, or a named player - gets the
+    // lime invitation. The undesigned filter fallback does not: it is a dead
+    // end, not an invitation, so it should not wear the button that starts a
+    // game.
+    final invites = !filtered || forPlayer;
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 45),
@@ -312,16 +320,17 @@ class _Empty extends StatelessWidget {
           style: CiType.rowTitle.copyWith(
               color: c.textMuted, fontWeight: CiWeight.medium, height: 1.45),
         ),
-        const SizedBox(height: CiSpace.s5),
-        CiButton(
-          // "Start a game", per the frame. Not "Track a Game": this offers to
-          // begin one now, which is what a parent looking at an empty list
-          // for their child is being invited to do.
-          label: forPlayer ? 'Start a game' : 'Track a Game',
-          style: forPlayer ? CiButtonStyle.lime : CiButtonStyle.primary,
-          expand: true,
-          onPressed: () => context.pushNamed(NewGameWidget.routeName),
-        ),
+        if (invites) ...[
+          const SizedBox(height: CiSpace.s5),
+          CiButton(
+            // "Start a game", per both frames - lime, offering to begin one
+            // now rather than the ink "Track a Game" this used to carry.
+            label: 'Start a game',
+            style: CiButtonStyle.lime,
+            expand: true,
+            onPressed: () => context.pushNamed(NewGameWidget.routeName),
+          ),
+        ],
         const SizedBox(height: CiSpace.s8),
       ],
     );

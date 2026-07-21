@@ -139,9 +139,17 @@ void main() {
 
   testWidgets('no games at all invites, rather than blaming a filter',
       (tester) async {
+    // Copy and button measured from 206:1025, not invented. The button is the
+    // same lime "Start a game" as the player-filter state - an earlier version
+    // had it on an ink "Track a Game", which was reasoned rather than read.
     await _pump(tester, const []);
     expect(find.text('No games yet'), findsOneWidget);
-    expect(find.text('Track a Game'), findsOneWidget);
+    expect(
+        find.text('Track your first game to see how your player performed and '
+            'what it means for their growth.'),
+        findsOneWidget);
+    expect(find.text('Start a game'), findsOneWidget);
+    expect(find.text('Track a Game'), findsNothing);
     expect(find.text('No games match these filters'), findsNothing);
   });
 
