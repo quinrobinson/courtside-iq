@@ -101,3 +101,10 @@ const bool kUseEditPlayer2 = true;
 /// ordered created_at ASCENDING, so it opened on the oldest game a parent had
 /// ever logged. Turning this off restores that.
 const bool kUseGames2 = true;
+
+/// New Game setup, rebuilt on the 2.0 design system (4.13).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Start Game hands off to the v1 live
+/// tracker with the same parameters v1's own setup passes, so the flow is
+/// whole while the 2.0 tracker is built.
+const bool kUseNewGame2 = true;

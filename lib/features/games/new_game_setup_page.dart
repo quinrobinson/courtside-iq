@@ -8,9 +8,12 @@
 //   form   TEAM (with a "+"), OPPONENT, EVENT · OPTIONAL (with a "+")
 //   cta    "Start Game", full width
 //
-// EVERYTHING BUT THE PLAYER IS OPTIONAL TO FILL IN, but only the event says so
-// on its label. Team and opponent are asked for plainly because a game without
-// them is harder to recognise later in a list; neither blocks the start.
+// PLAYER, TEAM AND OPPONENT ARE ALL REQUIRED; only the event is optional.
+// That is the frame's own convention - it marks exactly one field "OPTIONAL",
+// which is the design saying the others are not - and it matches v1, whose
+// Start button is disabled without all three. An earlier version here required
+// only the player, on the reasoning that a parent at tip-off should not be
+// blocked by a field. That was reasoning over reading.
 //
 // The "+" beside team and event adds one INLINE. A parent standing courtside
 // should not have to leave for the profile to add the team their kid just
@@ -108,6 +111,12 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
     if (picked != null && mounted) setState(() => _event = picked);
   }
 
+  /// Player, team and opponent. See the note at the top of the file.
+  bool get _canStart =>
+      _playerId != null &&
+      (_team?.trim().isNotEmpty ?? false) &&
+      _opponent.text.trim().isNotEmpty;
+
   void _start(List<PlayerListEntry> players) {
     final id = _playerId;
     if (id == null) return;
@@ -163,6 +172,9 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
                           label: 'Opponent',
                           controller: _opponent,
                           placeholder: 'Enter opponent name',
+                          // Start depends on this, so the button has to
+                          // re-evaluate as they type.
+                          onChanged: (_) => setState(() {}),
                         ),
                         const SizedBox(height: CiSpace.s5),
                         _PickerRow(
@@ -184,12 +196,8 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
                       child: CiButton(
                         label: 'Start Game',
                         expand: true,
-                        // Only the player is required. A game with no team or
-                        // opponent is still a game worth tracking, and a
-                        // parent at tip-off should not be blocked by a field.
-                        onPressed: _playerId == null
-                            ? null
-                            : () => _start(players),
+                        onPressed:
+                            _canStart ? () => _start(players) : null,
                       ),
                     ),
                   ),

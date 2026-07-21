@@ -49,72 +49,37 @@ Future<NewGameSetup?> _pump(
 }
 
 void main() {
-  testWidgets('Start is disabled until a player is chosen', (tester) async {
-    await _pump(tester, [_player('p1', 'Maya'), _player('p2', 'Jordan')]);
+  CiButton startButton(WidgetTester tester) => tester.widget<CiButton>(
+      find.ancestor(of: find.text('Start Game'), matching: find.byType(CiButton)));
 
-    final start = tester.widget<CiButton>(
-        find.ancestor(of: find.text('Start Game'), matching: find.byType(CiButton)));
-    expect(start.onPressed, isNull);
+  testWidgets('Start needs a player, a team AND an opponent', (tester) async {
+    // The frame marks exactly one field OPTIONAL, which is the design saying
+    // the others are not - and v1 disables Start without all three. An earlier
+    // version required only the player.
+    await _pump(tester, [_player('p1', 'Maya')]);
+    expect(startButton(tester).onPressed, isNull,
+        reason: 'a preselected player alone is not enough');
 
-    await tester.tap(find.bySemanticsLabel('Maya'));
+    await tester.enterText(find.byType(TextField), 'Hawks');
     await tester.pumpAndSettle();
-
-    final after = tester.widget<CiButton>(
-        find.ancestor(of: find.text('Start Game'), matching: find.byType(CiButton)));
-    expect(after.onPressed, isNotNull);
+    expect(startButton(tester).onPressed, isNull,
+        reason: 'still no team');
   });
 
   testWidgets('a single player is preselected', (tester) async {
     // Nothing to choose, so the tap has only one possible answer.
     await _pump(tester, [_player('p1', 'Maya')]);
-    final start = tester.widget<CiButton>(
-        find.ancestor(of: find.text('Start Game'), matching: find.byType(CiButton)));
-    expect(start.onPressed, isNotNull);
+    expect(find.bySemanticsLabel('Maya'), findsOneWidget);
+    // Team and event pickers become usable, which only happens once a player
+    // is selected.
+    expect(find.text('Select team'), findsOneWidget);
   });
 
-  testWidgets('only the player is required to start', (tester) async {
-    // A game with no team or opponent is still worth tracking, and a parent at
-    // tip-off should not be blocked by a field.
-    NewGameSetup? result;
-    await tester.pumpWidget(MaterialApp(
-      theme: CiTheme.base(),
-      home: NewGameSetupPage(
-        repository: _FakeRepo([_player('p1', 'Maya')]),
-        onStart: (s) => result = s,
-      ),
-    ));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Start Game'));
-    await tester.pumpAndSettle();
-
-    expect(result, isNotNull);
-    expect(result!.playerId, 'p1');
-    expect(result!.team, isNull);
-    expect(result!.opponent, isNull);
-    expect(result!.event, isNull);
-  });
-
-  testWidgets('an opponent is trimmed, and empty means none', (tester) async {
-    NewGameSetup? result;
-    await tester.pumpWidget(MaterialApp(
-      theme: CiTheme.base(),
-      home: NewGameSetupPage(
-        repository: _FakeRepo([_player('p1', 'Maya')]),
-        onStart: (s) => result = s,
-      ),
-    ));
-    await tester.pumpAndSettle();
-
+  testWidgets('whitespace is not an opponent', (tester) async {
+    await _pump(tester, [_player('p1', 'Maya')]);
     await tester.enterText(find.byType(TextField), '   ');
-    await tester.tap(find.text('Start Game'));
     await tester.pumpAndSettle();
-    expect(result!.opponent, isNull, reason: 'whitespace is not an opponent');
-
-    await tester.enterText(find.byType(TextField), '  Hawks  ');
-    await tester.tap(find.text('Start Game'));
-    await tester.pumpAndSettle();
-    expect(result!.opponent, 'Hawks');
+    expect(startButton(tester).onPressed, isNull);
   });
 
   testWidgets('the event label says it is optional; team does not',

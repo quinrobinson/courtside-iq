@@ -30,6 +30,7 @@ import '/features/auth/reset_password_page.dart';
 import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
 import '/features/games/games_list_page.dart';
+import '/features/games/new_game_setup_page.dart';
 import '/features/onboarding/onboarding_page.dart';
 import '/features/onboarding/splash_view.dart';
 import 'package:lock_orientation_library_opafp4/index.dart'
@@ -356,7 +357,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: NewGameWidget.routeName,
         path: NewGameWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => NewGameWidget(),
+        builder: (context, params) =>
+            kUseNewGame2 ? const _NewGameSetupRoute() : NewGameWidget(),
       ),
       FFRoute(
         name: AppAppearanceWidget.routeName,
@@ -676,5 +678,32 @@ extension GoRouterLocationExtension on GoRouter {
         ? lastMatch.matches
         : routerDelegate.currentConfiguration;
     return matchList.uri.toString();
+  }
+}
+
+
+/// Bridges the 2.0 setup screen to the v1 live tracker.
+///
+/// Start Game pushes GameStatTrackerWidget with EXACTLY the parameters v1's
+/// own setup passes - it takes no game id and creates nothing, so there is no
+/// hidden state to replicate. When the 2.0 tracker lands in 4.13 this is the
+/// one place that changes.
+class _NewGameSetupRoute extends StatelessWidget {
+  const _NewGameSetupRoute();
+
+  @override
+  Widget build(BuildContext context) {
+    return NewGameSetupPage(
+      onStart: (setup) => context.pushNamed(
+        GameStatTrackerWidget.routeName,
+        queryParameters: {
+          'playerName': serializeParam(setup.playerName, ParamType.String),
+          'oppName': serializeParam(setup.opponent, ParamType.String),
+          'playerID': serializeParam(setup.playerId, ParamType.String),
+          'eventSelected': serializeParam(setup.event, ParamType.String),
+          'playerTeam': serializeParam(setup.team, ParamType.String),
+        }.withoutNulls,
+      ),
+    );
   }
 }
