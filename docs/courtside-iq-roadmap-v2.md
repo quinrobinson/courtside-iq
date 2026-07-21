@@ -1173,7 +1173,43 @@ reason the two rules differ. See `CiBadge.growthTrend`.
 
   `[x] built` · `[x] wired` · `[x] device-verified`
 
-- **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
+- **4.11d Player management** - **BUILT AND WIRED 2026-07-21.** Position
+  `641:2183`, Birth Date `643:2188`, Add Player `302:1402`, Create sheet
+  `281:1303`, Edit Player `387:1901`, Photo `646:2192`, Birth Date Prompt
+  `647:2189`, caveat `649:2201`, plus teams and events (designed here, no v1
+  frame existed).
+
+  `[x] built` · `[x] wired` · `[~] device-verified` - everything through
+  teams and events is verified; the birth-date prompt and caveat are not.
+
+  **THREE FEATURES WERE FOUND DEAD OR DYING IN 2.0, none of them by looking:**
+  - the **birth-date prompt** is mounted only on v1's `home_widget`, so no
+    build with `kUseDashboardV2` on has asked for a birth date since Today
+    shipped. Now runs from `TodayPage`.
+  - **teams and events** had no 2.0 design at all and would have been lost at
+    cutover with `kUseEditPlayer2` on. Designed and built.
+  - a player added from the **nav bar** never refreshed the screen behind it,
+    which reads as a failed save.
+
+  The lesson is the same each time: a re-skin that only follows the frames
+  loses whatever the frames do not show. **Read the v1 screen's action code
+  AND check where its entry points are mounted.**
+
+  Product changes, all from the frames rather than invented:
+  - Add Player collects a **last name**, and **birth date became optional**
+  - the position picker commits on **Save** rather than on tap
+  - `event_type` shows as **Season / Tournament**; the stored Long-Term /
+    Short-Term is unchanged, and `event_types.dart` is the only place that
+    knows they differ
+  - **no rename** for teams or events: those `games` columns are denormalised
+    text, so a rename would not touch a single past game
+
+  Also fixed a latent `setState(() => _future = ...)` bug in four screens -
+  the arrow returns the assigned Future, which Flutter asserts against.
+
+- **4.11e Games tab event filter and insight spark** - NOW UNBLOCKED. Both
+  were deferred in 4.11b because events had no 2.0 home; they do now. Needs a
+  design pass, since neither is in frame `98:583`.
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
   (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
 
