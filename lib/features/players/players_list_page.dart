@@ -16,7 +16,12 @@ import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/player_gating.dart';
 import '/courtside_iq/players_list_builder.dart';
+import '/features/home/entitlement_status.dart';
+import '/features/home/widgets/today_promo_banner.dart';
+import '/features/players/widgets/player_gates.dart';
+import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/players/add_player_sheet.dart';
@@ -27,9 +32,16 @@ import 'players_repository.dart';
 import 'widgets/player_list_row.dart';
 
 class PlayersListPage extends StatefulWidget {
-  const PlayersListPage({super.key, this.repository = const PlayersRepository()});
+  const PlayersListPage({
+    super.key,
+    this.repository = const PlayersRepository(),
+    this.entitlementReader = fetchEntitlementStatus,
+  });
 
   final PlayersRepository repository;
+
+  /// Injectable so gating can be tested without RevenueCat.
+  final Future<EntitlementStatus> Function() entitlementReader;
 
   @override
   State<PlayersListPage> createState() => _PlayersListPageState();
@@ -38,16 +50,62 @@ class PlayersListPage extends StatefulWidget {
 class _PlayersListPageState extends State<PlayersListPage> {
   late Future<List<PlayerListEntry>> _future = widget.repository.load();
 
+  /// Client-side RevenueCat read. Starts at never - the safe default is to
+  /// invite rather than nag, and it must never tell a paying parent their
+  /// premium ended because a fetch was slow.
+  EntitlementStatus _entitlement = EntitlementStatus.never;
+
+  /// Known once the list resolves; gating needs it.
+  int _playerCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEntitlement();
+  }
+
+  Future<void> _loadEntitlement() async {
+    final status = await widget.entitlementReader();
+    if (mounted) setState(() => _entitlement = status);
+  }
+
   Future<void> _refresh() async {
     final next = widget.repository.load();
     setState(() => _future = next);
-    await next;
+    await Future.wait([next, _loadEntitlement()]);
+  }
+
+  void _openPaywall() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) => Padding(
+        padding: MediaQuery.viewInsetsOf(context),
+        child: const PaywallWidget(),
+      ),
+    );
   }
 
   Future<void> _addPlayer() async {
-    // Gating (free limit, 3-player cap) lands in 4.11a.2. For now the sheet
-    // opens directly, matching a premium user under the cap.
-    await showAddPlayerSheet(context, onPlayerAdded: _refresh);
+    final action = addPlayerAction(
+      isPremium: _entitlement == EntitlementStatus.premium,
+      playerCount: _playerCount,
+    );
+
+    switch (action) {
+      case AddPlayerAction.allowed:
+        await showAddPlayerSheet(context, onPlayerAdded: _refresh);
+      case AddPlayerAction.upgradeGate:
+        if (await showAddPlayerUpgradeGate(context) && mounted) {
+          _openPaywall();
+        }
+      case AddPlayerAction.capReached:
+        // "Manage players" just closes: they are already on the list, which
+        // is where a player is removed from. Sending them somewhere else
+        // would be a detour to where they already are.
+        await showPlayerCapReached(context);
+    }
   }
 
   void _openProfile(PlayerListEntry e) {
@@ -68,9 +126,19 @@ class _PlayersListPageState extends State<PlayersListPage> {
             future: _future,
             builder: (context, snap) {
               final players = snap.data;
+              // Kept for gating. Assigned during build rather than in a
+              // callback because the future resolves outside our control.
+              if (players != null) _playerCount = players.length;
               return Column(
                 children: [
                   _Header(onAdd: _addPlayer),
+                  // A lapsed parent keeps their players and their list; the
+                  // banner is the only difference, offering the way back.
+                  if (_entitlement == EntitlementStatus.lapsed)
+                    TodayPromoBanner(
+                      purpose: TodayPromoPurpose.lapse,
+                      onTap: _openPaywall,
+                    ),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: _refresh,

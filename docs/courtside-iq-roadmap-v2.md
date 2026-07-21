@@ -1057,8 +1057,21 @@ fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
   Building/Steady/Rising chip.
 - Averages from lifetime totals; Growth IQ from per-game rows, reusing the
   Today builder. Two queries, no per-player fan-out.
-- **4.11a.2 (gating) still to do:** free add-gate sheet, 3-player cap dialog,
-  premium-lapsed banner. Client-side entitlement, per the approved boundary.
+**4.11a.2 (gating) built 2026-07-20.** Client-side entitlement only - no
+Supabase, no prod, nothing touching the deferred subscriptions backfill.
+`[x] built` · `[x] wired` · `[ ] device-verified`
+
+- Free tier at 1 player -> upgrade gate SHEET ("Track more players").
+- Premium at 3 -> cap DIALOG ("You've reached 3 players"). **It does not
+  sell**: the parent already pays, so it offers management, not a purchase.
+- Lapsed -> the list is unchanged plus a lapse banner (reuses
+  `TodayPromoBanner`). Their players are never taken away.
+
+**THE TWO LIMITS COME FROM DIFFERENT PLACES.** Free = 1 mirrors
+`free_player_limit()` server-side. Premium = 3 is a **client-only product
+rule**: the migration states "Premium is unlimited via is_premium()", so the
+database will NOT refuse a fourth player for a premium user. Do not assume the
+server enforces the cap.
 
 **NOTE a header/list trend-word discrepancy.** The Today header (4.10a) labels
 trend Rising/Steady/**Dipping** from the delta SIGN. Growth IQ's own
