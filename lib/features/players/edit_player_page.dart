@@ -4,10 +4,10 @@
 // 88 avatar with a camera badge, the same four fields as Add Player, then
 // "Save changes" and a plain orange "Delete player".
 //
-// SCOPE: this frame covers identity, photo and delete. The v1 screen also
-// managed TEAMS and EVENTS, which have no 2.0 design; they are being designed
-// separately and are NOT dropped. Until then the v1 screen remains the only
-// place to reach them.
+// TEAMS AND EVENTS are two rows that open sheets, rather than v1's inline
+// accordions. They are the pick-lists behind logging a game, not the subject
+// of this screen, and keeping them behind a row is what stops identity being
+// buried. Designed and approved 2026-07-21.
 //
 // DELETE IS ONE STATEMENT, and that is a deliberate change. v1 deleted
 // player_game_stats and players CONCURRENTLY with Future.wait, which is a
@@ -32,6 +32,8 @@ import 'birth_date_sheet.dart';
 import 'delete_player_dialog.dart';
 import 'present_picker.dart';
 import 'profile_photo_sheet.dart';
+import 'teams_events_repository.dart';
+import 'teams_events_sheets.dart';
 
 class EditPlayerPage extends StatefulWidget {
   const EditPlayerPage({
@@ -39,9 +41,11 @@ class EditPlayerPage extends StatefulWidget {
     required this.playerId,
     this.onSaved,
     this.onDeleted,
+    this.teamsEvents = const TeamsEventsRepository(),
   });
 
   final String playerId;
+  final TeamsEventsRepository teamsEvents;
 
   /// Fired after a successful update, so the screen behind can refetch. The
   /// same rule the create sheet needed: a save nothing reflects reads as a
@@ -62,6 +66,10 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
   String? _position;
   DateTime? _birthDate;
   String? _photoUrl;
+
+  /// Counts only. The rows show them; the sheets own the lists.
+  int? _teamCount;
+  int? _eventCount;
 
   bool _loading = true;
   bool _saving = false;
@@ -100,6 +108,9 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
           .select('position_name')
           .order('id') as List;
 
+      final teams = await widget.teamsEvents.loadTeams(widget.playerId);
+      final events = await widget.teamsEvents.loadEvents(widget.playerId);
+
       if (!mounted) return;
       setState(() {
         _firstName.text = player?['first_name'] as String? ?? '';
@@ -110,6 +121,8 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
         _photoUrl = player?['player_profile_pic'] as String?;
         _positions =
             positions.map((r) => r['position_name'] as String).toList();
+        _teamCount = teams.length;
+        _eventCount = events.length;
         _loading = false;
       });
     } catch (_) {
@@ -197,6 +210,22 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = 'Could not update the photo. Please try again.');
+    }
+  }
+
+  /// Only the counts. Reloading the whole form would throw away anything the
+  /// parent had typed and not yet saved.
+  Future<void> _reloadCounts() async {
+    try {
+      final teams = await widget.teamsEvents.loadTeams(widget.playerId);
+      final events = await widget.teamsEvents.loadEvents(widget.playerId);
+      if (!mounted) return;
+      setState(() {
+        _teamCount = teams.length;
+        _eventCount = events.length;
+      });
+    } catch (_) {
+      // The sheet already reported anything that failed inside it.
     }
   }
 
@@ -340,6 +369,28 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
           'We use this to compare your player to others their age.',
           style: CiType.bodySm.copyWith(color: c.textMuted),
         ),
+        const SizedBox(height: CiSpace.s6),
+        const CiHairline(),
+        _ListRow(
+          label: 'Teams',
+          count: _teamCount,
+          noun: 'team',
+          onTap: () async {
+            final changed = await presentTeamsSheet(context,
+                playerId: widget.playerId, repository: widget.teamsEvents);
+            if (changed && mounted) _reloadCounts();
+          },
+        ),
+        _ListRow(
+          label: 'Events',
+          count: _eventCount,
+          noun: 'event',
+          onTap: () async {
+            final changed = await presentEventsSheet(context,
+                playerId: widget.playerId, repository: widget.teamsEvents);
+            if (changed && mounted) _reloadCounts();
+          },
+        ),
         if (_error != null) ...[
           const SizedBox(height: CiSpace.s4),
           Text(_error!, style: CiType.bodySm.copyWith(color: c.accentEnergy)),
@@ -469,6 +520,64 @@ class _PhotoWell extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A row that opens a list sheet, with the count it holds.
+///
+/// The hairlines here are FULL BLEED. Inset rules are the in-sheet
+/// convention; on a screen they run edge to edge.
+class _ListRow extends StatelessWidget {
+  const _ListRow({
+    required this.label,
+    required this.count,
+    required this.noun,
+    required this.onTap,
+  });
+
+  final String label;
+
+  /// Null while loading, so the row shows its name without claiming a number
+  /// it does not have yet.
+  final int? count;
+
+  final String noun;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final n = count;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          button: true,
+          child: InkWell(
+            onTap: onTap,
+            child: SizedBox(
+              height: 56,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(label,
+                        style: CiType.h4.copyWith(color: c.text)),
+                  ),
+                  if (n != null)
+                    Text(
+                      n == 0 ? 'None yet' : '$n ${n == 1 ? noun : '${noun}s'}',
+                      style: CiType.bodySm.copyWith(color: c.textMuted),
+                    ),
+                  const SizedBox(width: CiSpace.s2),
+                  Icon(Icons.chevron_right, size: 18, color: c.textMuted),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const CiHairline(),
+      ],
     );
   }
 }

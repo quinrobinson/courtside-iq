@@ -91,7 +91,7 @@ const bool kUseAddPlayer2 = true;
 ///
 /// ON FOR REVIEW, NOT YET VERIFIED. Covers identity, photo and delete.
 ///
-/// THE v1 SCREEN IS STILL THE ONLY WAY TO REACH TEAMS AND EVENTS, which have
-/// no 2.0 design yet. Turning this off is how a parent gets back to them
-/// until those are built.
+/// Covers identity, photo, delete, AND teams and events - the last two behind
+/// two rows that open sheets. Nothing from the v1 screen is left behind, so
+/// this flag is now a pure rollback rather than a feature trade.
 const bool kUseEditPlayer2 = true;
