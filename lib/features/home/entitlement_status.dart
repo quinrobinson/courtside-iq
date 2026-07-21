@@ -12,6 +12,8 @@
 
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '/auth/supabase_auth/auth_util.dart';
+
 const String kPremiumEntitlement = 'premium_users';
 
 enum EntitlementStatus {
@@ -51,9 +53,20 @@ EntitlementStatus entitlementStatus({
 /// Reads the current customer and maps it. Returns [EntitlementStatus.never]
 /// on any failure - the safe default is to invite rather than to nag, and a
 /// network blip must not tell a paying parent their premium has ended.
+///
+/// IDENTIFIES THE USER FIRST, and that is not optional. RevenueCat keeps
+/// whatever app-user id it was last given, so reading customer info without
+/// logging in returns the entitlement of whoever happened to be signed in
+/// before. On device that attributed a real purchase to a DIFFERENT account
+/// than the one signed in: the buyer stayed non-premium and the server
+/// rejected their next insert. The v1 dashboard called loginToRevenueCat on
+/// load; the 2.0 screens must do the equivalent.
 Future<EntitlementStatus> fetchEntitlementStatus() async {
   try {
-    final info = await Purchases.getCustomerInfo();
+    final uid = currentUserUid;
+    final info = uid.isEmpty
+        ? await Purchases.getCustomerInfo()
+        : (await Purchases.logIn(uid)).customerInfo;
     return entitlementStatusOf(info);
   } catch (_) {
     return EntitlementStatus.never;

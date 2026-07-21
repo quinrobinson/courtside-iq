@@ -103,12 +103,32 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
     final birthDate =
         '$_year-${_month!.toString().padLeft(2, '0')}-01';
 
-    await SupaFlow.client.from('players').insert({
-      'first_name':       _nameController.text.trim(),
-      'player_position':  _position!,
-      'user_id':          userId,
-      'birth_date':       birthDate,
-    });
+    // GUARDED. This insert can legitimately be REFUSED by the server: the
+    // players INSERT policy allows it only for a premium user or one under
+    // the free allowance. Unguarded, that refusal threw, _saving stayed true,
+    // and the button span forever with no explanation - which is how it
+    // presented on device.
+    try {
+      await SupaFlow.client.from('players').insert({
+        'first_name':       _nameController.text.trim(),
+        'player_position':  _position!,
+        'user_id':          userId,
+        'birth_date':       birthDate,
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      final refused = e.toString().contains('row-level security');
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(refused
+              // Says what to do, not what the database called it.
+              ? 'Your plan does not allow another player right now.'
+              : 'Could not add player: $e'),
+        ));
+      return;
+    }
 
     widget.onPlayerAdded?.call();
     if (mounted) Navigator.of(context).pop();

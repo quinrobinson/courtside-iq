@@ -1067,6 +1067,14 @@ Supabase, no prod, nothing touching the deferred subscriptions backfill.
 - Lapsed -> the list is unchanged plus a lapse banner (reuses
   `TodayPromoBanner`). Their players are never taken away.
 
+**REVENUECAT IDENTITY MUST BE SYNCED, and 4.10a shipped without it.** The v1
+`DashboardPage` called `loginToRevenueCat(uid)` on load; `TodayPage` did not.
+RevenueCat keeps whatever app-user id it was last given, so a real purchase on
+device was attributed to a DIFFERENT account than the one signed in - the buyer
+stayed non-premium and the `players` INSERT policy correctly refused their next
+player. `fetchEntitlementStatus()` now calls `Purchases.logIn(currentUserUid)`
+before reading. **Any future screen reading entitlement must go through it.**
+
 **THE TWO LIMITS COME FROM DIFFERENT PLACES.** Free = 1 mirrors
 `free_player_limit()` server-side. Premium = 3 is a **client-only product
 rule**: the migration states "Premium is unlimited via is_premium()", so the
