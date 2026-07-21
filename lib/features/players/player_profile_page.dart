@@ -40,6 +40,7 @@ import '/features/players/age_band_service.dart';
 import '/features/players/info_copy.dart';
 import '/features/players/widgets/age_band_notice.dart';
 import '/features/players/widgets/averages_view.dart';
+import '/features/players/full_breakdown_page.dart';
 import '/features/players/widgets/development_view.dart';
 import '/features/players/widgets/games_view.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
@@ -82,6 +83,10 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   /// be pure waste.
   Future<PlayerAverages>? _averagesFuture;
   Future<List<GameFeedEntry>>? _gamesFuture;
+
+  /// The raw per-game rows, kept so Full Breakdown can re-fold them without a
+  /// second round trip.
+  Future<List<AveragesGameRow>>? _gameRowsFuture;
 
   /// Set once the player's band is seen to differ from the one we last
   /// recorded. Cleared on dismiss and when switching players.
@@ -138,7 +143,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   }
 
   void _loadPlayerData() {
-    _averagesFuture = widget.repository.loadAverages(_playerId);
+    _gameRowsFuture = widget.repository.loadGameRows(_playerId);
+    _averagesFuture = _gameRowsFuture!.then(buildPlayerAverages);
     _gamesFuture = widget.repository.loadGames(_playerId);
     _insightFuture = _service.fetch(_playerId);
     _service.readCached(_playerId).then((cached) {
@@ -243,7 +249,12 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     return IndexedStack(
       index: _tab.index,
       children: [
-        _Averages(future: _averagesFuture, ageBand: player?.ageBand),
+        _Averages(
+          future: _averagesFuture,
+          ageBand: player?.ageBand,
+          playerName: player?.displayName ?? '',
+          rowsFuture: _gameRowsFuture,
+        ),
         _Development(
           player: player,
           insightFuture: _insightFuture,
@@ -385,10 +396,20 @@ class _Hero extends StatelessWidget {
 
 /// Binds the hoisted averages future to the 2.0 [AveragesView].
 class _Averages extends StatelessWidget {
-  const _Averages({required this.future, required this.ageBand});
+  const _Averages({
+    required this.future,
+    required this.ageBand,
+    required this.playerName,
+    required this.rowsFuture,
+  });
 
   final Future<PlayerAverages>? future;
   final String? ageBand;
+  final String playerName;
+
+  /// The same rows the averages were folded from. Full Breakdown is a
+  /// different arrangement of these numbers, not a different query.
+  final Future<List<AveragesGameRow>>? rowsFuture;
 
   @override
   Widget build(BuildContext context) {
@@ -401,8 +422,19 @@ class _Averages extends StatelessWidget {
         return AveragesView(
           averages: snap.data!,
           ageBand: ageBand,
-          // 4.11c builds both destinations. Until then the row is absent
-          // rather than dead.
+          // "View trends" is still absent: its destination is Stats & Trends,
+          // which is scoped out of 4.11. A button that goes nowhere is worse
+          // than no button.
+          onFullBreakdown: () async {
+            final rows = await rowsFuture;
+            if (rows == null || !context.mounted) return;
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => FullBreakdownPage(
+                playerName: playerName,
+                games: rows,
+              ),
+            ));
+          },
         );
       },
     );

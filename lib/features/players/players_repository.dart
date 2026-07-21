@@ -69,13 +69,16 @@ class PlayersRepository {
     return entries;
   }
 
-  /// Per-game rows for ONE player, newest first, folded into the Averages
-  /// tab's numbers.
+  /// Per-game rows for ONE player, newest first.
+  ///
+  /// Returns the ROWS, not the folded averages: the Averages tab and Full
+  /// Breakdown are two arrangements of exactly these numbers, and the profile
+  /// folds them once rather than querying twice.
   ///
   /// A separate query rather than a wider [load]: the list needs six columns
   /// for every player, this needs thirteen for one. Widening the list query to
   /// serve a screen the parent may never open makes every Players load slower.
-  Future<PlayerAverages> loadAverages(String playerId) async {
+  Future<List<AveragesGameRow>> loadGameRows(String playerId) async {
     final rows = await SupaFlow.client
         .from('v_player_game_stats')
         .select(
@@ -85,7 +88,7 @@ class PlayersRepository {
         .eq('player_id', playerId)
         .order('created_at', ascending: false) as List;
 
-    return buildPlayerAverages(rows
+    return rows
         .map((r) => AveragesGameRow(
               points: _int(r['points']),
               offReb: _int(r['off_reb']),
@@ -101,7 +104,7 @@ class PlayersRepository {
               ftMade: _int(r['ft_made']),
               ftAttempt: _int(r['ft_attempt']),
             ))
-        .toList());
+        .toList();
   }
 
   /// The player's games, newest first, as feed rows.

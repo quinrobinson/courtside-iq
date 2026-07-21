@@ -15,10 +15,9 @@ class _FakeRepo implements PlayersRepository {
   @override
   Future<List<PlayerListEntry>> load() async => _entries;
 
-  // The list never asks for averages or games; the profile does.
+  // The list never asks for per-game rows or games; the profile does.
   @override
-  Future<PlayerAverages> loadAverages(String playerId) async =>
-      buildPlayerAverages(const []);
+  Future<List<AveragesGameRow>> loadGameRows(String playerId) async => const [];
 
   @override
   Future<List<GameFeedEntry>> loadGames(String playerId) async => const [];
