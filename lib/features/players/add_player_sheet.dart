@@ -71,16 +71,26 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
   }
 
   Future<void> _loadPositions() async {
-    final rows = await SupaFlow.client
-        .from('player_positions_list')
-        .select('position_name')
-        .order('id');
-    if (!mounted) return;
-    setState(() {
-      _positions = (rows as List)
-          .map((r) => r['position_name'] as String)
-          .toList();
-    });
+    // Wrapped: an unhandled failure here left _positions empty, and an empty
+    // picker is indistinguishable from a picker that never opened. The error
+    // now surfaces instead of presenting as a dead control.
+    try {
+      final rows = await SupaFlow.client
+          .from('player_positions_list')
+          .select('position_name')
+          .order('id');
+      if (!mounted) return;
+      setState(() {
+        _positions = (rows as List)
+            .map((r) => r['position_name'] as String)
+            .toList();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('Could not load positions: $e')));
+    }
   }
 
   Future<void> _save() async {

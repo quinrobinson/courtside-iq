@@ -85,8 +85,8 @@ class _TodayPageState extends State<TodayPage> {
     await Future.wait([next, _loadEntitlement()]);
   }
 
-  void _openPaywall() {
-    showModalBottomSheet(
+  Future<void> _openPaywall() async {
+    await showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,
@@ -95,6 +95,12 @@ class _TodayPageState extends State<TodayPage> {
         child: const PaywallWidget(),
       ),
     );
+    // RE-READ AFTER THE PAYWALL CLOSES. Entitlement was fetched once on
+    // init, so a parent who subscribed came back to a screen that still
+    // believed they were on the free tier - the gate kept appearing until
+    // something else happened to refresh. A purchase must take effect the
+    // moment they return.
+    if (mounted) await _loadEntitlement();
   }
 
   @override

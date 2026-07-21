@@ -30,8 +30,25 @@ Future<T?> presentPickerSheet<T>(
   FocusScope.of(context).unfocus();
   await Future<void>.delayed(const Duration(milliseconds: 60));
   if (!context.mounted) return null;
+
+  // NOTHING TO PICK. Opening a sheet with an empty list produces a near-zero
+  // height sheet, which is indistinguishable from "the picker did not open" -
+  // exactly how a failed options load presents to a parent. Say so instead.
+  if (options.isEmpty) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(
+        content: Text('Could not load options. Check your connection.'),
+      ));
+    return null;
+  }
+
   return showModalBottomSheet<T>(
     context: context,
+    // ROOT NAVIGATOR. This sheet is opened from INSIDE another sheet (Add
+    // Player), and a nested sheet on the same navigator can end up behind its
+    // parent rather than above it. The root navigator puts it on top.
+    useRootNavigator: true,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => PickerSheet<T>(
