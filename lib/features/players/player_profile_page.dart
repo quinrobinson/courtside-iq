@@ -38,7 +38,6 @@ import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/players/add_player_flow.dart';
 import '/features/players/birth_date_gate.dart';
-import '/features/players/birth_date_nudges.dart';
 import '/features/players/birth_date_sheet.dart';
 import '/features/players/edit_player_page.dart';
 import '/features/players/age_band_service.dart';
@@ -290,17 +289,12 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                     onChanged: (i) =>
                         setState(() => _tab = ProfileTab.values[i]),
                   ),
-                  // Keyed on the BIRTH DATE, not the band. get_age_band()
-                  // returns '11U-13U' for a missing birth date, so the band is
-                  // never null and this banner could never have fired.
-                  if (player != null && !player.hasBirthDate)
-                    Padding(
-                      padding: const EdgeInsets.only(top: CiSpace.s4),
-                      child: BirthDateCaveat(
-                        firstName: player.firstName,
-                        onAdd: () => _addBirthDate(player.playerId),
-                      ),
-                    ),
+                  // NO CAVEAT BANNER HERE. It was designed to sit beside an
+                  // uncalibrated rating and say so - but since "no birth
+                  // date, no rating" landed, there is no uncalibrated rating
+                  // on any screen to caveat. The Development tab's empty
+                  // state is the ask now, and running both put the same
+                  // sentence on screen twice.
                   if (_showBandNotice && player?.ageBand != null)
                     AgeBandNotice(
                       firstName: player!.firstName,

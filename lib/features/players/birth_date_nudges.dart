@@ -1,17 +1,17 @@
 // Birth-date nudges — Phase 4.11d
 //
-// Two surfaces asking for the same thing at two volumes:
+// The proactive ask: a dialog on Today, at most once a week per player.
 //
-//   Birth Date Prompt (647:2189)   a dialog, shown at most once a week
-//   caveat banner (649:2201)       inline, wherever a rating is shown
+// THE CAVEAT BANNER (frame 649:2201) IS DELIBERATELY NOT HERE. It was
+// designed to sit beside an uncalibrated rating and say so, which was the
+// right answer while the app scored a player of unknown age against an
+// assumed band. Since "no birth date, no rating" landed there IS no
+// uncalibrated rating on any screen, so the banner had nothing left to
+// caveat - and on the Development tab it put the same sentence on screen
+// twice, above a full empty state saying it already.
 //
-// THE BANNER IS THE HONEST ONE. A rating computed without a birth date is not
-// age-normalised, which means it is not what the app says it is. The banner
-// sits next to that rating and says so. The dialog just asks.
-//
-// Both lead to the same birth date sheet. Neither blocks anything: a player
-// without a birth date keeps every screen, they just get a rating the app is
-// upfront about.
+// The Development tab's empty state is where the ask lives now. This dialog
+// is the only other one, and it blocks nothing.
 
 import 'package:flutter/material.dart';
 
@@ -76,64 +76,4 @@ Future<bool> showBirthDatePrompt(BuildContext context) async {
   );
   // Dismissed by tapping outside is a "not now", not a yes.
   return result ?? false;
-}
-
-/// The inline caveat, shown beside ratings computed without a birth date.
-///
-/// NAMES THE PLAYER. "these ratings" alone leaves a parent with two players
-/// guessing which one is uncalibrated.
-class BirthDateCaveat extends StatelessWidget {
-  const BirthDateCaveat({
-    super.key,
-    required this.firstName,
-    required this.onAdd,
-  });
-
-  final String firstName;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    // Possessive on BOTH branches. Without it the nameless case read "for
-    // your player age", which is not a sentence.
-    final who = firstName.trim().isEmpty
-        ? "your player's"
-        : "${firstName.trim()}'s";
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
-      child: Container(
-        decoration: BoxDecoration(
-          color: c.surfaceSunk,
-          borderRadius: CiRadius.chipR,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: CiSpace.s4),
-        constraints: const BoxConstraints(minHeight: 72),
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: CiSpace.s4),
-                child: Text(
-                  'Add a birth date to calibrate these ratings for $who age.',
-                  style: CiType.bodySm.copyWith(
-                      color: c.textSoft,
-                      fontWeight: CiWeight.medium,
-                      height: 1.36),
-                ),
-              ),
-            ),
-            const SizedBox(width: CiSpace.s3),
-            CiButton(
-              label: 'Add',
-              style: CiButtonStyle.lime,
-              size: CiButtonSize.sm,
-              onPressed: onAdd,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

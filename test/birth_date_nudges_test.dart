@@ -4,11 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/features/players/birth_date_nudges.dart';
 
-Widget _host(Widget child) => MaterialApp(
-      theme: CiTheme.base(),
-      home: CiSurface.light(child: Scaffold(body: child)),
-    );
-
 Future<bool?> _openPrompt(WidgetTester tester) async {
   bool? result;
   await tester.pumpWidget(MaterialApp(
@@ -75,36 +70,4 @@ void main() {
     });
   });
 
-  group('caveat', () {
-    testWidgets('names the player', (tester) async {
-      // "these ratings" alone leaves a parent with two players guessing which
-      // one is uncalibrated.
-      await tester.pumpWidget(_host(
-        BirthDateCaveat(firstName: 'Maya', onAdd: () {}),
-      ));
-      expect(
-          find.text("Add a birth date to calibrate these ratings for Maya's "
-              'age.'),
-          findsOneWidget);
-    });
-
-    testWidgets('still reads as a sentence with no name', (tester) async {
-      await tester.pumpWidget(_host(
-        BirthDateCaveat(firstName: '', onAdd: () {}),
-      ));
-      expect(
-          find.text("Add a birth date to calibrate these ratings for your "
-              "player's age."),
-          findsOneWidget);
-    });
-
-    testWidgets('the action reports', (tester) async {
-      var taps = 0;
-      await tester.pumpWidget(_host(
-        BirthDateCaveat(firstName: 'Maya', onAdd: () => taps++),
-      ));
-      await tester.tap(find.text('Add'));
-      expect(taps, 1);
-    });
-  });
 }

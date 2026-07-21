@@ -96,20 +96,26 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
 
   Future<void> _load() async {
     try {
-      final player = await SupaFlow.client
+      // CONCURRENT. These four are independent, and run one after another
+      // they stacked four round trips behind a bare spinner - which on a slow
+      // connection reads as a screen that failed to open.
+      final playerFuture = SupaFlow.client
           .from('players')
           .select('first_name, last_name, player_position, birth_date, '
               'player_profile_pic')
           .eq('id', widget.playerId)
           .maybeSingle();
-
-      final positions = await SupaFlow.client
+      final positionsFuture = SupaFlow.client
           .from('player_positions_list')
           .select('position_name')
-          .order('id') as List;
+          .order('id');
+      final teamsFuture = widget.teamsEvents.loadTeams(widget.playerId);
+      final eventsFuture = widget.teamsEvents.loadEvents(widget.playerId);
 
-      final teams = await widget.teamsEvents.loadTeams(widget.playerId);
-      final events = await widget.teamsEvents.loadEvents(widget.playerId);
+      final player = await playerFuture;
+      final positions = await positionsFuture as List;
+      final teams = await teamsFuture;
+      final events = await eventsFuture;
 
       if (!mounted) return;
       setState(() {
