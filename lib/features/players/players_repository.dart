@@ -12,6 +12,7 @@ import '/backend/supabase/supabase.dart';
 import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/courtside_iq/today_builder.dart' show TodayGameRow;
+import '/features/home/widgets/game_feed_row.dart' show GameFeedEntry;
 
 class PlayersRepository {
   const PlayersRepository();
@@ -101,6 +102,35 @@ class PlayersRepository {
               ftAttempt: _int(r['ft_attempt']),
             ))
         .toList());
+  }
+
+  /// The player's games, newest first, as feed rows.
+  Future<List<GameFeedEntry>> loadGames(String playerId) async {
+    final rows = await SupaFlow.client
+        .from('v_player_game_stats')
+        .select(
+          'game_id, created_at, opponent_team, event_name, '
+          'points, off_reb, def_reb, assist, steal, turnover',
+        )
+        .eq('player_id', playerId)
+        .order('created_at', ascending: false) as List;
+
+    return rows
+        .map((r) => GameFeedEntry(
+              gameId: r['game_id'] as String? ?? '',
+              // Unused on this tab: showPlayer is false, so the row never
+              // renders a name or an avatar.
+              playerName: '',
+              opponent: r['opponent_team'] as String?,
+              playedAt: _date(r['created_at']),
+              eventName: r['event_name'] as String?,
+              points: _int(r['points']),
+              rebounds: _int(r['off_reb']) + _int(r['def_reb']),
+              assists: _int(r['assist']),
+              steals: _int(r['steal']),
+              turnovers: _int(r['turnover']),
+            ))
+        .toList();
   }
 
   static TodayGameRow _toGameRow(dynamic r) => TodayGameRow(

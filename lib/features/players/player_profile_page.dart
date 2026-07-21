@@ -32,9 +32,10 @@ import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
-import '/features/player_insight/widgets/games_tab.dart';
+import '/features/home/widgets/game_feed_row.dart';
 import '/features/players/widgets/averages_view.dart';
 import '/features/players/widgets/development_view.dart';
+import '/features/players/widgets/games_view.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'players_repository.dart';
@@ -73,6 +74,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   /// a generation: the tab stays mounted, so refetching on every switch would
   /// be pure waste.
   Future<PlayerAverages>? _averagesFuture;
+  Future<List<GameFeedEntry>>? _gamesFuture;
 
   /// Rendered instantly when it matches the player's current game. See
   /// PlayerInsightService.readCached - it deliberately returns nothing when
@@ -88,6 +90,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
 
   void _loadPlayerData() {
     _averagesFuture = widget.repository.loadAverages(_playerId);
+    _gamesFuture = widget.repository.loadGames(_playerId);
     _insightFuture = _service.fetch(_playerId);
     _service.readCached(_playerId).then((cached) {
       if (mounted && cached != null) setState(() => _cachedInsight = cached);
@@ -165,8 +168,38 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
           insightFuture: _insightFuture,
           cached: _cachedInsight,
         ),
-        GamesTab(playerId: _playerId),
+        _Games(future: _gamesFuture, playerId: _playerId),
       ],
+    );
+  }
+}
+
+/// Binds the hoisted games future to the 2.0 [GamesView].
+class _Games extends StatelessWidget {
+  const _Games({required this.future, required this.playerId});
+
+  final Future<List<GameFeedEntry>>? future;
+  final String playerId;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<GameFeedEntry>>(
+      future: future,
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return GamesView(
+          games: snap.data!,
+          onOpenGame: (gameId) => context.pushNamed(
+            GameStatsWidget.routeName,
+            queryParameters: {
+              'playerID': serializeParam(playerId, ParamType.String),
+              'gameID': serializeParam(gameId, ParamType.String),
+            }.withoutNulls,
+          ),
+        );
+      },
     );
   }
 }

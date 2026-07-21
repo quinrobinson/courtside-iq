@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:courtside_i_q/courtside_iq/player_averages.dart';
 import 'package:courtside_i_q/courtside_iq/players_list_builder.dart';
 import 'package:courtside_i_q/features/home/entitlement_status.dart';
+import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
 import 'package:courtside_i_q/features/home/widgets/today_promo_banner.dart';
 import 'package:courtside_i_q/features/players/players_list_page.dart';
 import 'package:courtside_i_q/features/players/players_repository.dart';
@@ -14,10 +15,13 @@ class _FakeRepo implements PlayersRepository {
   @override
   Future<List<PlayerListEntry>> load() async => _entries;
 
-  // The list never asks for averages; the profile does.
+  // The list never asks for averages or games; the profile does.
   @override
   Future<PlayerAverages> loadAverages(String playerId) async =>
       buildPlayerAverages(const []);
+
+  @override
+  Future<List<GameFeedEntry>> loadGames(String playerId) async => const [];
 }
 
 PlayerListEntry _entry(String id) => PlayerListEntry(

@@ -31,6 +31,7 @@ class GameFeedEntry {
     this.playerPhotoUrl,
     this.opponent,
     this.playedAt,
+    this.eventName,
     required this.points,
     required this.rebounds,
     required this.assists,
@@ -45,6 +46,14 @@ class GameFeedEntry {
   /// Null when the game was logged without one.
   final String? opponent;
   final DateTime? playedAt;
+
+  /// The tournament or league the game belonged to.
+  ///
+  /// Fills the slot the frame labels "Home", which has no column behind it:
+  /// the schema has never recorded home or away. The event is the real
+  /// qualifier a parent has for a game, and it is already what the v1 tab
+  /// lets them filter by.
+  final String? eventName;
 
   final int points;
   final int rebounds;
@@ -64,18 +73,46 @@ class GameFeedEntry {
     ];
     return parts.join('  ·  ');
   }
+
+  /// Title when the row is already inside one player's profile: the opponent
+  /// carries the line, since repeating the player's name on every row of
+  /// their own profile says nothing.
+  String get opponentTitle {
+    final o = opponent?.trim();
+    return (o == null || o.isEmpty) ? 'Game' : 'vs $o';
+  }
+
+  /// "Sat, Mar 8 · Spring Classic", dropping whichever half is missing.
+  String get dateSubtitle {
+    final parts = <String>[
+      if (playedAt != null) DateFormat('EEE, MMM d').format(playedAt!),
+      if (eventName != null && eventName!.trim().isNotEmpty) eventName!.trim(),
+    ];
+    return parts.join(' · ');
+  }
 }
 
 class GameFeedRow extends StatelessWidget {
-  const GameFeedRow({super.key, required this.entry, this.onTap});
+  const GameFeedRow({
+    super.key,
+    required this.entry,
+    this.onTap,
+    this.showPlayer = true,
+  });
 
   final GameFeedEntry entry;
   final VoidCallback? onTap;
 
+  /// Off inside a player's own profile (the Games tab). Matches the frame's
+  /// `showPlayer` property: the avatar and name go, and the opponent takes
+  /// over the title line.
+  final bool showPlayer;
+
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    final subtitle = entry.subtitle;
+    final title = showPlayer ? entry.playerName : entry.opponentTitle;
+    final subtitle = showPlayer ? entry.subtitle : entry.dateSubtitle;
 
     return Semantics(
       button: onTap != null,
@@ -89,17 +126,19 @@ class GameFeedRow extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CiAvatar(
-                    name: entry.playerName,
-                    imageUrl: entry.playerPhotoUrl,
-                    size: 38,
-                  ),
-                  const SizedBox(width: CiSpace.s3),
+                  if (showPlayer) ...[
+                    CiAvatar(
+                      name: entry.playerName,
+                      imageUrl: entry.playerPhotoUrl,
+                      size: 38,
+                    ),
+                    const SizedBox(width: CiSpace.s3),
+                  ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(entry.playerName,
+                        Text(title,
                             style: CiType.rowTitle.copyWith(
                                 color: c.text,
                                 fontWeight: CiWeight.semiBold),
