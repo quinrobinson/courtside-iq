@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_metrics.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_info_sheet.dart';
 import 'package:courtside_i_q/features/players/info_copy.dart';
 
@@ -33,6 +34,23 @@ void main() {
 
     final button = tester.widget<CiButton>(find.byType(CiButton));
     expect(button.style, CiButtonStyle.lime);
+  });
+
+  testWidgets('has SQUARE top corners', (tester) async {
+    // The frames carry no radius. The first build applied the system's sheet
+    // radius because the system HAS one, not because these asked for it.
+    await tester.pumpWidget(_host(const CiInfoSheet(title: 'T', body: 'B')));
+
+    // Nothing in the sheet may carry the system's top-sheet radius. The
+    // grabber and the close button are legitimately rounded in their own
+    // shapes, so this targets the specific regression.
+    final rounded = tester
+        .widgetList<Container>(find.descendant(
+            of: find.byType(CiInfoSheet), matching: find.byType(Container)))
+        .where((x) =>
+            (x.decoration as BoxDecoration?)?.borderRadius ==
+            CiRadius.sheetTopR);
+    expect(rounded, isEmpty);
   });
 
   testWidgets('sizes to its content rather than pinning a height',

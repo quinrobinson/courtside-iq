@@ -11,9 +11,10 @@
 // Reached from the Averages tab's "Full Breakdown" button, per the entry
 // label in the frame gutter.
 //
-// LIGHT GROUND throughout, including the hero. This is the one screen in the
-// profile flow that is not topped with ink: it is a reference table, not a
-// place a parent lands, and the ink hero belongs to the profile it came from.
+// HYBRID GROUND, like every other screen in this flow: the hero is ink, the
+// table below it is light. An earlier version of this file made the hero
+// light on reasoning invented here rather than measured from 435:1923, which
+// is exactly the mistake the "measure, do not recall" rule exists to stop.
 
 import 'package:flutter/material.dart';
 
@@ -65,37 +66,43 @@ class _FullBreakdownPageState extends State<FullBreakdownPage> {
         final c = CiColors.of(context);
         final sections = buildBreakdown(widget.games, _window);
 
-        // No AnnotatedRegion: light screens inherit the app's dark status bar
-        // icons. Only ink screens override, and this one is light throughout.
         return Scaffold(
           backgroundColor: c.bg,
-          body: SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                _Hero(playerName: widget.playerName),
-                if (_windows.length > 1)
-                  CiSegmentedTabs(
-                    labels: [for (final w in _windows) w.label],
-                    index: _windows.indexOf(_window),
-                    onChanged: (i) => setState(() => _window = _windows[i]),
-                  )
-                else
-                  const CiHairline(),
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
+          body: Column(
+            children: [
+              _Hero(playerName: widget.playerName),
+              Expanded(
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Column(
                     children: [
-                      for (final s in sections) ...[
-                        CiSectionHeader(title: s.title),
-                        _Grid(tiles: s.tiles),
-                      ],
-                      const SizedBox(height: CiSpace.s8),
+                      if (_windows.length > 1)
+                        CiSegmentedTabs(
+                          labels: [for (final w in _windows) w.label],
+                          index: _windows.indexOf(_window),
+                          onChanged: (i) =>
+                              setState(() => _window = _windows[i]),
+                        )
+                      else
+                        const CiHairline(),
+                      Expanded(
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            for (final s in sections) ...[
+                              CiSectionHeader(title: s.title),
+                              _Grid(tiles: s.tiles),
+                            ],
+                            const SizedBox(height: CiSpace.s8),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       }),
@@ -110,41 +117,53 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    // 116 in the frame INCLUDING the status bar; this sits inside SafeArea,
-    // so it is the remainder.
-    return SizedBox(
-      height: 72,
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+    // Measured from 435:1923: ink ground, title SemiBold 17 white, the
+    // player's name Regular 14 muted beneath it, back button at 12 with the
+    // on-dark treatment.
+    return CiSurface.ink(
+      statusBar: true,
+      child: Builder(builder: (context) {
+        final c = CiColors.of(context);
+        return SafeArea(
+          bottom: false,
+          child: SizedBox(
+            // 116 in the frame INCLUDING the status bar, so this is the
+            // remainder below it.
+            height: 72,
+            child: Stack(
               children: [
-                Text('Full Breakdown',
-                    style: CiType.rowTitle.copyWith(color: c.text)),
-                const SizedBox(height: CiSpace.s1),
-                Text(playerName,
-                    style: CiType.bodySm.copyWith(color: c.textMuted),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Full Breakdown',
+                          style: CiType.h4.copyWith(color: c.text)),
+                      const SizedBox(height: CiSpace.s1),
+                      Text(playerName,
+                          style: CiType.bodySm.copyWith(color: c.textMuted),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: CiSpace.s3),
+                    child: CiIconButton(
+                      icon: Icons.chevron_left,
+                      onDark: true,
+                      semanticLabel: 'Back',
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: CiSpace.s3),
-              child: CiIconButton(
-                icon: Icons.chevron_left,
-                semanticLabel: 'Back',
-                onPressed: () => Navigator.of(context).maybePop(),
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }
@@ -167,7 +186,11 @@ class _Grid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final row in rows)
+        for (var r = 0; r < rows.length; r++) ...[
+          // BETWEEN rows as well as under the grid. Scoring is the only
+          // section with two rows, so a missing seam here showed up on exactly
+          // one section and read as a rendering bug.
+          if (r > 0) const CiHairline(),
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -179,14 +202,15 @@ class _Grid extends StatelessWidget {
                   // land on the same boundaries as the rows above. Scoring has
                   // five tiles, so the last row is always partial.
                   Expanded(
-                    child: i < row.length
-                        ? _Tile(tile: row[i])
+                    child: i < rows[r].length
+                        ? _Tile(tile: rows[r][i])
                         : const SizedBox.shrink(),
                   ),
                 ],
               ],
             ),
           ),
+        ],
         const CiHairline(),
       ],
     );

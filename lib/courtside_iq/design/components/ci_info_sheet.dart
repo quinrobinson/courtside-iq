@@ -59,11 +59,11 @@ class CiInfoSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: c.bg,
-        borderRadius: CiRadius.sheetTopR,
-      ),
+    // SQUARE TOP CORNERS. Measured from 648:2195 and 691:2845, which carry no
+    // radius at all - the earlier version applied CiRadius.sheetTopR because
+    // the system has a sheet radius, not because these sheets asked for one.
+    return ColoredBox(
+      color: c.bg,
       child: SafeArea(
         top: false,
         child: Column(

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_segmented_tabs.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/courtside_iq/player_averages.dart';
 import 'package:courtside_i_q/features/players/full_breakdown_page.dart';
 
@@ -85,6 +86,24 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('30.0'), findsOneWidget);
     expect(find.text('19.1'), findsNothing);
+  });
+
+  testWidgets('the hero is ink, not light', (tester) async {
+    // Measured from 435:1923. An earlier version made it light on reasoning
+    // invented in the code rather than read from the frame.
+    await _pump(tester, [_g()]);
+    final title = tester.widget<Text>(find.text('Full Breakdown'));
+    expect(title.style!.color, CiColors.onInk.text);
+  });
+
+  testWidgets('a multi-row section is seamed between its rows',
+      (tester) async {
+    // Scoring has five tiles, so it is the only section that wraps. The
+    // missing seam showed up on exactly that section and read as a bug.
+    await _pump(tester, [_g()]);
+    final hairlines = tester.widgetList<CiHairline>(find.byType(CiHairline));
+    // One between Scoring's two rows, plus one closing each of four grids.
+    expect(hairlines.length, greaterThanOrEqualTo(5));
   });
 
   testWidgets('a withheld value renders a dash, not a gap', (tester) async {
