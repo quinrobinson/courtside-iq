@@ -70,21 +70,24 @@ class CiBadge extends StatelessWidget {
   /// The Growth IQ trend chip: "Rising +5", "Dipping -13", "Steady +2".
   ///
   /// THE ONE PLACE THAT COLOURS A TREND:
-  ///   Rising   lime      - the only thing that earns the positive accent
-  ///   Steady   neutral   - no movement worth colouring
-  ///   Dipping  orange    - attention, not alarm
+  ///   Rising   lime     - the only thing that earns the positive accent
+  ///   Steady   neutral
+  ///   Dipping  neutral  - the WORD carries it, not the colour
   ///
-  /// Dipping WAS neutral, on the reasoning that an accent colour would read as
-  /// "something is wrong" about a child. Changed 2026-07-21 for two reasons.
-  /// It under-signalled: a parent asked twice why a 13-point drop looked like
-  /// nothing. And it was inconsistent - the Averages tiles on the SAME profile
-  /// already paint a declining stat orange via CiBadge.delta, so the app gave
-  /// two answers to "this went down" one tab apart.
+  /// Dipping was tried in orange on 2026-07-21 and reverted the same day. It
+  /// was jarring: Growth IQ is a composite judgement about a CHILD, sitting at
+  /// the top of the app every time their parent opens it, and an accent colour
+  /// there reads as "something is wrong with them" rather than "this number
+  /// moved down".
   ///
-  /// Orange, never red. Red is for errors and this is not one; the system has
-  /// no red token and should not gain one for this. The gentleness lives in
-  /// the WORD - "Dipping", never "Declining" - which is where it belongs. A
-  /// colour that hides the movement is not kindness, it is withholding.
+  /// This deliberately DIFFERS from the Averages tiles, which do paint a
+  /// declining stat orange via CiBadge.delta. That is not an oversight. "Free
+  /// throws are down 4%" is a narrow, actionable fact and orange helps a parent
+  /// find it. Growth IQ is the whole child in one number, and it does not get
+  /// the same treatment. Scope is the reason the two rules differ.
+  ///
+  /// The movement is never hidden: the chip says "Dipping -13" in words. What
+  /// the neutral tone withholds is the alarm, not the information.
   ///
   /// THE WORD AND THE NUMBER TRAVEL TOGETHER, always on this chip and never
   /// split across the gauge. Today and the profile briefly put the word inside
@@ -105,11 +108,9 @@ class CiBadge extends StatelessWidget {
     return CiBadge(
       key: key,
       label: [word, number].where((s) => s.isNotEmpty).join(' '),
-      tone: switch (trend) {
-        GrowthTrend.rising => CiBadgeTone.good,
-        GrowthTrend.steady => CiBadgeTone.neutral,
-        GrowthTrend.dipping => CiBadgeTone.energy,
-      },
+      tone: trend == GrowthTrend.rising
+          ? CiBadgeTone.good
+          : CiBadgeTone.neutral,
     );
   }
 

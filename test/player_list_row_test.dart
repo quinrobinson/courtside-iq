@@ -73,7 +73,7 @@ void main() {
     expect(find.textContaining('0.0'), findsNothing);
   });
 
-  testWidgets('a decline is visible, and never the positive accent',
+  testWidgets('a decline is neither the positive accent nor an alarm',
       (tester) async {
     // Lime is reserved for Rising. The word was "Building" until 2026-07-21,
     // when "Building -13" was read on device as saying the opposite of the
@@ -85,10 +85,10 @@ void main() {
     final badge = tester.widget<CiBadge>(find.byType(CiBadge));
     expect(badge.tone, isNot(CiBadgeTone.good),
         reason: 'a drop must not use the positive accent');
-    // Orange: attention, not alarm. It was neutral until 2026-07-21, which
-    // made a 13-point drop look like nothing had happened and disagreed with
-    // the Averages tiles one tab away. The gentleness lives in the word.
-    expect(badge.tone, CiBadgeTone.energy);
+    // And NOT an alarm tone either. Orange was tried on 2026-07-21 and
+    // reverted: this is a child's development shown to their parent, so "not
+    // climbing" must not read as "something is wrong". The word does the work.
+    expect(badge.tone, isNot(CiBadgeTone.energy));
   });
 
   testWidgets('a rise keeps the lime chip', (tester) async {

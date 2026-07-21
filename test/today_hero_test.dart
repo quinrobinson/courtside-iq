@@ -115,15 +115,16 @@ void main() {
       expect(delta.label, 'Rising +4');
     });
 
-    testWidgets('a drop is visible, and matches the Averages tiles',
+    testWidgets('a drop is neutral - the word carries it, not the colour',
         (tester) async {
-      // Orange, not neutral: a 13-point drop rendered in grey read as nothing
-      // happening, and the Averages tiles on the profile already paint a
-      // declining stat orange. Never red - see CiBadge.growthTrend.
+      // Orange was tried here and reverted: Growth IQ is a composite about a
+      // CHILD at the top of the app, and an accent there reads as "something
+      // is wrong with them". The chip still SAYS "Dipping -3".
       await _pump(tester, [_snap(delta: -3, trend: GrowthTrend.dipping)]);
       final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
       final delta = badges.firstWhere((b) => b.label.contains('3'));
-      expect(delta.tone, CiBadgeTone.energy);
+      expect(delta.tone, CiBadgeTone.neutral);
+      expect(delta.label, 'Dipping -3');
     });
 
     testWidgets('steady stays neutral - only a real dip is coloured',
