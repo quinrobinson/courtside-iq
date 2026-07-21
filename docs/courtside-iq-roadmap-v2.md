@@ -1041,10 +1041,30 @@ Figma pass before 4.10a can be considered done.**
 fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
 
 **4.11 sub-phasing (2026-07-20):**
-- **4.11a Players List** - list, empty, list-level gating. IN PROGRESS.
-- **4.11b Player Profile + tabs** - rebuild PlayerProfilePageV2. Carries the
-  three roadmap defects: keep the dedup fix, fix `readCached` ignoring game_id,
-  and exercise the claim row.
+- **4.11a Players List** - list, empty, list-level gating. **DONE and
+  device-verified 2026-07-20** (lapsed banner excepted, needs a real expired
+  subscription).
+- **4.11b Player Profile + tabs** - NEXT. Rebuild `PlayerProfilePageV2` (2291
+  lines, Phase 2, on the OLD tokens) onto 2.0. The behaviour is proven; this is
+  a re-skin plus three defects.
+
+  **Starting checklist for 4.11b:**
+  1. Read the v1 profile's action code BEFORE writing the replacement. That
+     habit caught four invisible behaviours in 4.9 and the RevenueCat identity
+     bug in 4.11a.
+  2. **Keep the insight dedup fix.** The v1 page swapped tab widgets by type,
+     remounting the Development tab and firing another paid Sonnet call on
+     every return. Whatever replaces the tab control must keep the tabs alive
+     or hoist the fetch above them.
+  3. **Fix `readCached` ignoring game_id.** It returns the player's most recent
+     insight regardless of which game produced it, so a stale narrative renders
+     instantly before the current one loads. Never fixed in v1.
+  4. **Exercise the server claim row.** The guard in `generate-player-insight`
+     has never actually raced - client dedup absorbed every duplicate before it
+     reached the server. Treat as unverified defence-in-depth.
+  5. Frames: Player Profile `93:211`, Averages `97:340`, Games `98:583`,
+     Development (Locked) `156:704`, Locked `663:2426`, Age-Band Transition
+     `687:2742`.
 - **4.11c Full Breakdown, About Growth IQ, info sheets.**
 - **4.11d Player management sheets** (Add/Edit/Position/Birth Date/Photo).
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
