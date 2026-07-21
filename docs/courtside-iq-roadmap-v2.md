@@ -1067,6 +1067,34 @@ Supabase, no prod, nothing touching the deferred subscriptions backfill.
 - Lapsed -> the list is unchanged plus a lapse banner (reuses
   `TodayPromoBanner`). Their players are never taken away.
 
+**CUTOVER BLOCKER: client and server disagree about who is premium.** Seen on
+device 2026-07-20 - the client allowed the add-player form while the server's
+INSERT policy refused it, for the same signed-in user, and both were right
+about the source they trusted.
+
+- The CLIENT reads RevenueCat, which **transfers purchases on `logIn`**, so a
+  subscription can follow a user onto a different account.
+- The SERVER reads `subscriptions`, populated only by the RevenueCat webhook
+  since it went live. **It was never backfilled**, so it does not know about
+  any subscription bought before that.
+
+**Do NOT "fix" this by gating on the server.** `is_premium()`, `player_count()`
+and `free_player_limit()` are all callable by `authenticated`, so it is
+technically easy - and on prod, where `subscriptions` is EMPTY, it would gate
+every existing paying subscriber at one player. The backfill is what actually
+resolves this; gating on server truth before it lands trades a confusing
+message for locking out real customers.
+
+Current stance: client gates optimistically, the server refuses authoritatively,
+and the refusal is now explained inline in the sheet. **Settle the trust model
+at 4E, after the backfill.** Likely landing point: server for writes, client for
+display.
+
+**TEST DATA NOTE:** a `subscriptions` row was seeded by hand on TEST for
+`testuser@mail.com` on 2026-07-20 (`last_event_type = 'MANUAL_TEST_SEED'`) so
+the add-player flow could be exercised. It mirrors what the webhook writes.
+Test only; delete it if you want to re-test the free-tier gate.
+
 **REVENUECAT IDENTITY MUST BE SYNCED, and 4.10a shipped without it.** The v1
 `DashboardPage` called `loginToRevenueCat(uid)` on load; `TodayPage` did not.
 RevenueCat keeps whatever app-user id it was last given, so a real purchase on
