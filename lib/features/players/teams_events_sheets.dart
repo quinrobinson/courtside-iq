@@ -172,7 +172,7 @@ class _EventsSheetState extends State<_EventsSheet> {
   }
 
   Future<void> _add() async {
-    final result = await showCiSheet<_NewEvent>(
+    final result = await showCiSheet<NewEvent>(
       context,
       child: const _AddEventSheet(),
     );
@@ -363,6 +363,21 @@ class _ManagedRow extends StatelessWidget {
   }
 }
 
+/// Adds a team. Public because the New Game setup flow adds one inline, from
+/// the same "+" the Teams sheet uses.
+Future<String?> presentAddTeamSheet(BuildContext context) => _presentNameSheet(
+      context,
+      title: 'Add team',
+      label: 'Team name',
+      placeholder: 'Northside Hawks',
+      cta: 'Add team',
+    );
+
+/// Adds an event. Name and TYPE, not name and date - `game_events` has no
+/// date column, and the type is what the app actually stores.
+Future<NewEvent?> presentAddEventSheet(BuildContext context) =>
+    showCiSheet<NewEvent>(context, child: const _AddEventSheet());
+
 /// A one-field sheet. Used for Add team.
 Future<String?> _presentNameSheet(
   BuildContext context, {
@@ -436,10 +451,10 @@ class _NameSheetState extends State<_NameSheet> {
   }
 }
 
-class _NewEvent {
+class NewEvent {
   final String name;
   final EventType type;
-  const _NewEvent(this.name, this.type);
+  const NewEvent(this.name, this.type);
 }
 
 class _AddEventSheet extends StatefulWidget {
@@ -478,7 +493,7 @@ class _AddEventSheetState extends State<_AddEventSheet> {
       cta: 'Add event',
       onCta: valid
           ? () => Navigator.of(context)
-              .pop(_NewEvent(_controller.text.trim(), _type))
+              .pop(NewEvent(_controller.text.trim(), _type))
           : null,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
