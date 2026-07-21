@@ -19,9 +19,16 @@ import '/index.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import 'create_sheet.dart';
 
+/// [onPlayerAdded] is how the SCREEN BEHIND THE SHEET learns to refetch.
+///
+/// Without it a player added from the nav bar saved correctly and then
+/// appeared nowhere until the parent pulled to refresh - which reads as the
+/// save having failed. The sheet cannot refresh the screen it was opened
+/// over; only the screen can.
 Future<void> handleCreateTap(
   BuildContext context, {
   PlayersRepository repository = const PlayersRepository(),
+  VoidCallback? onPlayerAdded,
 }) async {
   final players = await repository.load();
   if (!context.mounted) return;
@@ -46,6 +53,7 @@ Future<void> handleCreateTap(
         context,
         entitlement: entitlement,
         playerCount: players.length,
+        onPlayerAdded: onPlayerAdded,
         openPaywall: () => _openPaywall(context),
       );
   }

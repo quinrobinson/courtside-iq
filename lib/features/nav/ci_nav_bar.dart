@@ -38,13 +38,26 @@ enum CiNavTab {
 }
 
 class CiNavBar extends StatelessWidget {
-  const CiNavBar({super.key, required this.active, this.onCreate});
+  const CiNavBar({
+    super.key,
+    required this.active,
+    this.onCreate,
+    this.onPlayerAdded,
+  });
 
   final CiNavTab active;
 
-  /// Defaults to the 2.0 create sheet. Overridable so a screen can refresh
-  /// itself afterwards, and so tests can avoid the network.
+  /// Defaults to the 2.0 create sheet. Overridable so a screen can take the
+  /// whole interaction over, and so tests can avoid the network.
   final VoidCallback? onCreate;
+
+  /// Called after a player is successfully added from the create sheet.
+  ///
+  /// EVERY SCREEN THAT SHOWS PLAYERS MUST PASS THIS. The bar is shared
+  /// chrome and cannot know how to refresh the screen it sits under, so
+  /// without it the new player saves and then appears nowhere - which reads
+  /// as a failed save.
+  final VoidCallback? onPlayerAdded;
 
   static const double barHeight = 70;
 
@@ -77,7 +90,9 @@ class CiNavBar extends StatelessWidget {
                   onTap: () => _go(context, PlayersListWidget.routeName),
                 ),
                 _CreateButton(
-                  onTap: onCreate ?? () => handleCreateTap(context),
+                  onTap: onCreate ??
+                      () => handleCreateTap(context,
+                          onPlayerAdded: onPlayerAdded),
                 ),
                 _Tab(
                   icon: Icons.scoreboard_rounded,

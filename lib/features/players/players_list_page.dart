@@ -148,7 +148,7 @@ class _PlayersListPageState extends State<PlayersListPage> {
             },
           ),
           bottomNavigationBar: kUseNavBar2
-              ? const CiNavBar(active: CiNavTab.players)
+              ? CiNavBar(active: CiNavTab.players, onPlayerAdded: _refresh)
               : const CustomNavBarWidget(page: 'Players'),
         );
       }),

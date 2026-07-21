@@ -119,7 +119,7 @@ class CiColors extends ThemeExtension<CiColors> {
   /// Buttons are NOT this - they use [surfaceInvert] / ink.
   final Color surfaceDeep;
 
-  /// Input fill. Sunk grey on light ground, pure black on ink.
+  /// Input fill. WHITE on light ground, pure black on ink.
   ///
   /// This is a token rather than something [CiField] derives because the
   /// component kept getting the derivation wrong. It was first an
@@ -127,6 +127,12 @@ class CiColors extends ThemeExtension<CiColors> {
   /// theme brightness - which only makes sense if light and dark are modes a
   /// user switches between, and they are not. The palette knows which ground
   /// it is; the component should not be guessing.
+  ///
+  /// The light value was SUNK GREY until 2026-07-21, and that was a guess:
+  /// CiField was measured from Email Auth, which is on INK, so the light
+  /// ground had no measured answer. Add Player (595:14) gave it - white with
+  /// a 1px border. On device the grey read as DISABLED, which is exactly what
+  /// a filled-but-unbordered field looks like next to an enabled one.
   final Color fieldFill;
 
   final Color text;
@@ -181,7 +187,7 @@ class CiColors extends ThemeExtension<CiColors> {
     surfaceSunk: CiPalette.gray50,
     surfaceInvert: CiPalette.inkDefault,
     surfaceDeep: CiPalette.black,
-    fieldFill: CiPalette.gray50,
+    fieldFill: CiPalette.white,
     text: CiPalette.inkDefault,
     textSoft: CiPalette.gray700,
     textMuted: CiPalette.gray500,

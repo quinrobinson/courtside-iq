@@ -190,7 +190,7 @@ class _TodayPageState extends State<TodayPage> {
             // are gone. The v1 bar had neither, which is why the
             // home-indicator strip fell through to the ink scaffold.
             bottomNavigationBar: kUseNavBar2
-                ? const CiNavBar(active: CiNavTab.home)
+                ? CiNavBar(active: CiNavTab.home, onPlayerAdded: _refresh)
                 : ColoredBox(
                     color: c.bg,
                     child: const SafeArea(

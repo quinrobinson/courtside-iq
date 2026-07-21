@@ -322,8 +322,14 @@ void main() {
         return (container.decoration! as BoxDecoration).color!;
       }
 
+      // WHITE on light, with the 1px border doing the separating. It was
+      // sunk grey until 2026-07-21, which on device read as DISABLED - the
+      // light value had never been measured, because CiField was measured
+      // from an ink screen.
       await _pump(tester, const CiField(label: 'Email address'));
       expect(fillOf(tester), CiColors.onLight.fieldFill);
+      expect(fillOf(tester), CiColors.onLight.surface);
+      expect(fillOf(tester), isNot(CiColors.onLight.surfaceSunk));
 
       // Ink ground uses pure black, DEEPER than the #0F0F0F background. This
       // has been wrong twice: first an onDeepSurface flag every call site had

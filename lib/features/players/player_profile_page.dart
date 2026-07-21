@@ -136,6 +136,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     if (mounted) await _loadEntitlement();
   }
 
+  /// Refetches the switcher. A player added from this screen lands in that
+  /// row, so without this the avatar never appears where it was added from.
+  void _reloadPlayers() =>
+      setState(() => _playersFuture = widget.repository.load());
+
   Future<void> _addPlayer(List<PlayerListEntry> players) async {
     await runAddPlayerFlow(
       context,
@@ -143,9 +148,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       playerCount: players.length,
       // A player added from here lands in the switcher, so the list behind it
       // has to be refetched or the new avatar never appears.
-      onPlayerAdded: () => setState(() {
-        _playersFuture = widget.repository.load();
-      }),
+      onPlayerAdded: _reloadPlayers,
       openPaywall: _openPaywall,
     );
   }
@@ -256,7 +259,10 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             },
           ),
           bottomNavigationBar: kUseNavBar2
-              ? const CiNavBar(active: CiNavTab.players)
+              ? CiNavBar(
+                  active: CiNavTab.players,
+                  onPlayerAdded: _reloadPlayers,
+                )
               : null,
         );
       }),
