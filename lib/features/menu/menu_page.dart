@@ -28,6 +28,7 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/features/home/entitlement_status.dart';
+import 'account_repository.dart';
 
 /// "Courtside IQ · v2.0.0 (Build 250)", READ FROM THE BUNDLE.
 ///
@@ -65,6 +66,7 @@ class MenuPage extends StatefulWidget {
     super.key,
     this.entitlementReader = fetchEntitlementStatus,
     this.versionReader = readVersionLabel,
+    this.repository = const AccountRepository(),
     this.onSignOut,
     this.onOpenProfile,
     this.onOpenHelp,
@@ -74,6 +76,10 @@ class MenuPage extends StatefulWidget {
 
   final Future<EntitlementStatus> Function() entitlementReader;
   final Future<String> Function() versionReader;
+
+  /// THE NAME IS NOT IN AUTH. currentUserDisplayName is permanently empty in
+  /// this app, so reading it here showed "Your account" to everyone.
+  final AccountRepository repository;
 
   final Future<void> Function()? onSignOut;
   final VoidCallback? onOpenProfile;
@@ -88,6 +94,7 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   EntitlementStatus? _entitlement;
   String _version = '';
+  AccountProfile _profile = const AccountProfile();
 
   @override
   void initState() {
@@ -96,6 +103,9 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> _load() async {
+    final profile = await widget.repository.load();
+    if (mounted) setState(() => _profile = profile);
+
     final status = await widget.entitlementReader();
     if (mounted) setState(() => _entitlement = status);
     try {
@@ -149,7 +159,7 @@ class _MenuPageState extends State<MenuPage> {
             padding: EdgeInsets.zero,
             children: [
               const _Header(),
-              _ProfileRow(onTap: widget.onOpenProfile),
+              _ProfileRow(profile: _profile, onTap: widget.onOpenProfile),
               const CiHairline(),
               const CiSettingsGroupLabel(label: 'Account'),
               CiSettingsRow(
@@ -246,15 +256,16 @@ class _Header extends StatelessWidget {
 
 /// The account itself: avatar, name and email, opening Your Profile.
 class _ProfileRow extends StatelessWidget {
-  const _ProfileRow({this.onTap});
+  const _ProfileRow({required this.profile, this.onTap});
 
+  final AccountProfile profile;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    final email = currentUserEmail;
-    final name = currentUserDisplayName.trim();
+    final email = profile.email;
+    final name = profile.fullName;
 
     return Semantics(
       button: onTap != null,

@@ -33,6 +33,9 @@ import '/features/games/games_list_page.dart';
 import '/features/games/game_detail_page.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/custom_code/actions/index.dart' as actions;
+import '/features/menu/change_password_page.dart';
+import '/features/menu/edit_email_page.dart';
+import '/features/menu/edit_name_page.dart';
 import '/features/menu/menu_page.dart';
 import '/features/menu/your_profile_page.dart';
 import '/features/games/live_game_flow.dart';
@@ -256,7 +259,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: EditNameWidget.routeName,
         path: EditNameWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => EditNameWidget(
+        builder: (context, params) => kUseMenu2
+            ? const EditNamePage()
+            : EditNameWidget(
           userFirstName: params.getParam(
             'userFirstName',
             ParamType.String,
@@ -285,8 +290,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
                     context.pushNamed(EditNameWidget.routeName),
                 onEditEmail: () =>
                     context.pushNamed(EditEmailWidget.routeName),
-                // 4.15b and 4.15d. Left null so the rows render disabled
-                // rather than opening screens that do not exist yet.
+                onChangePassword: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const ChangePasswordPage())),
+                // onEditPhoto is 4.15's open question - there is no column to
+                // store one. onDeleteAccount is 4.15d.
               )
             : YourProfileWidget(
           userFirstName: params.getParam(
@@ -311,7 +319,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: EditEmailWidget.routeName,
         path: EditEmailWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => EditEmailWidget(
+        builder: (context, params) => kUseMenu2
+            ? const EditEmailPage()
+            : EditEmailWidget(
           userEmail: params.getParam(
             'userEmail',
             ParamType.String,

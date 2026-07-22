@@ -14,7 +14,7 @@
 
 import 'package:flutter/material.dart';
 
-import '/auth/supabase_auth/auth_util.dart';
+import 'account_repository.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
@@ -24,9 +24,10 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 
-class YourProfilePage extends StatelessWidget {
+class YourProfilePage extends StatefulWidget {
   const YourProfilePage({
     super.key,
+    this.repository = const AccountRepository(),
     this.onEditName,
     this.onEditEmail,
     this.onChangePassword,
@@ -34,9 +35,14 @@ class YourProfilePage extends StatelessWidget {
     this.onDeleteAccount,
   });
 
-  final VoidCallback? onEditName;
-  final VoidCallback? onEditEmail;
-  final VoidCallback? onChangePassword;
+  final Future<void> Function()? onEditName;
+  final Future<void> Function()? onEditEmail;
+  final Future<void> Function()? onChangePassword;
+
+  /// Null: there is nowhere to PUT a user photo. `public.users` has no photo
+  /// column - players have `player_profile_pic`, accounts have nothing - so
+  /// the badge the frame draws renders inert rather than opening a picker
+  /// whose result would be dropped. Needs a schema change to become real.
   final VoidCallback? onEditPhoto;
 
   /// Null until 4.15d builds the screen behind it. The row is still drawn -
@@ -44,13 +50,44 @@ class YourProfilePage extends StatelessWidget {
   /// when it is not.
   final VoidCallback? onDeleteAccount;
 
+  /// The name comes from public.users, not auth - see AccountRepository.
+  final AccountRepository repository;
+
+  @override
+  State<YourProfilePage> createState() => _YourProfilePageState();
+}
+
+class _YourProfilePageState extends State<YourProfilePage> {
+  AccountProfile _profile = const AccountProfile();
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  /// Reloaded when an edit screen pops, so a changed name is on screen before
+  /// the parent can wonder whether it took.
+  Future<void> _load() async {
+    final profile = await widget.repository.load();
+    if (mounted) setState(() => _profile = profile);
+  }
+
+  /// Opens an edit screen and reloads when it closes, so a changed name is
+  /// on screen before the parent can wonder whether it took.
+  Future<void> _open(Future<void> Function()? go) async {
+    if (go == null) return;
+    await go();
+    await _load();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CiSurface.light(
       child: Builder(builder: (context) {
         final c = CiColors.of(context);
-        final email = currentUserEmail;
-        final name = currentUserDisplayName.trim();
+        final email = _profile.email;
+        final name = _profile.fullName;
 
         return Scaffold(
           backgroundColor: c.bg,
@@ -66,9 +103,8 @@ class YourProfilePage extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     children: [
                       CiAvatar(
+                        // Initials only. See onEditPhoto.
                         name: name.isEmpty ? email : name,
-                        imageUrl:
-                            currentUserPhoto.isEmpty ? null : currentUserPhoto,
                         size: 88,
                       ),
                       Semantics(
@@ -77,7 +113,7 @@ class YourProfilePage extends StatelessWidget {
                         container: true,
                         excludeSemantics: true,
                         child: InkWell(
-                          onTap: onEditPhoto,
+                          onTap: widget.onEditPhoto,
                           customBorder: const CircleBorder(),
                           child: Container(
                             width: 30,
@@ -91,7 +127,10 @@ class YourProfilePage extends StatelessWidget {
                               border: Border.all(color: c.bg, width: 2),
                             ),
                             child: Icon(Icons.photo_camera_outlined,
-                                size: 15, color: c.textInvert),
+                                size: 15,
+                                color: widget.onEditPhoto == null
+                                    ? c.textMuted
+                                    : c.textInvert),
                           ),
                         ),
                       ),
@@ -116,13 +155,13 @@ class YourProfilePage extends StatelessWidget {
                 CiSettingsRow(
                   label: 'Name',
                   value: name.isEmpty ? 'Add your name' : name,
-                  onTap: onEditName,
+                  onTap: () => _open(widget.onEditName),
                 ),
                 const CiHairline(),
                 CiSettingsRow(
                   label: 'Email',
                   value: email,
-                  onTap: onEditEmail,
+                  onTap: () => _open(widget.onEditEmail),
                 ),
                 const CiHairline(),
                 CiSettingsRow(
@@ -130,7 +169,7 @@ class YourProfilePage extends StatelessWidget {
                   // uses the action as the value.
                   label: 'Password',
                   value: 'Change',
-                  onTap: onChangePassword,
+                  onTap: () => _open(widget.onChangePassword),
                 ),
                 const CiHairline(),
                 const SizedBox(height: 96),
@@ -140,14 +179,14 @@ class YourProfilePage extends StatelessWidget {
                   container: true,
                   excludeSemantics: true,
                   child: InkWell(
-                    onTap: onDeleteAccount,
+                    onTap: widget.onDeleteAccount,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: CiSpace.s3),
                       child: Text(
                         'Delete account',
                         textAlign: TextAlign.center,
                         style: CiType.rowTitle.copyWith(
-                            color: onDeleteAccount == null
+                            color: widget.onDeleteAccount == null
                                 // Muted while 4.15d is unbuilt: an accent on
                                 // a dead control invites a tap that does
                                 // nothing.
