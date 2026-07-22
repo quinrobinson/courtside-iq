@@ -4,8 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_confirm_dialog.dart';
-
-import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/features/players/delete_player_dialog.dart';
 
 Future<bool?> _open(WidgetTester tester, {String firstName = 'Maya'}) async {

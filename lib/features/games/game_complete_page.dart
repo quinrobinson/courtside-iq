@@ -5,17 +5,25 @@
 //   ink block  474 tall: "Game complete" ExtraBold 26, the matchup line,
 //              POINTS at Light 72, five stat columns, three shooting columns,
 //              all separated by #2e2e2e rules
-//   teaser     84 on limeWash: "Save to unlock <name>'s game insight"
+//   teaser     84 on limeWash: "Save to add this game to <name>'s
+//              development"
 //   actions    lime "Save Game", then a muted "Discard Game"
 //
 // A PURE RENDERER: it takes the finished stats and two callbacks. Saving is
 // the caller's job, because saving is where the offline queue and the insight
 // live and none of that belongs in a screen.
 //
-// THE TEASER IS A PROMISE. "Save to unlock Maya's game insight" is the app
-// committing to produce one, which is exactly why a game queued offline that
-// never generates its insight is a broken promise rather than a missing
-// nicety. See the save path.
+// THE TEASER NO LONGER PROMISES AN INSIGHT. It read "Save to unlock Maya's
+// game insight", which committed the app to producing one for THIS game - and
+// a quiet game earns no insight and no Development section, so the promise
+// was made and then silently not kept. The frame's copy, changed 2026-07-23.
+//
+// What saving reliably does is add to the history, and that is what the new
+// copy says. "Some games earn a closer read" keeps the insight honest: it is
+// a bonus when there is enough to say, not a debt.
+//
+// It is also the same argument the Remove Game dialog makes, deliberately -
+// the two moments that talk about why games are worth keeping should agree.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -301,10 +309,11 @@ class _InsightTeaser extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Save to unlock $who's game insight",
+                Text("Save to add this game to $who's development",
                     style: CiType.h4.copyWith(color: c.text)),
                 const SizedBox(height: CiSpace.s1),
-                Text('A development read on what this game means.',
+                Text('Every game you log builds the picture of how they are '
+                    'growing, and some games earn a closer read.',
                     style: CiType.bodySm.copyWith(color: c.textMuted)),
               ],
             ),

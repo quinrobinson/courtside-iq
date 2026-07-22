@@ -78,7 +78,13 @@ void main() {
 
     testWidgets('the teaser promises the insight by name', (tester) async {
       await _pumpComplete(tester);
-      expect(find.text("Save to unlock Maya's game insight"), findsOneWidget);
+      // NOT "unlock ... game insight". That promised a per-game insight the
+      // data may not support: a quiet game earns none, so the app committed
+      // to something it then silently did not do. Changed 2026-07-23.
+      expect(find.text("Save to add this game to Maya's development"),
+          findsOneWidget);
+      expect(find.textContaining('some games earn a closer read'),
+          findsOneWidget);
     });
 
     testWidgets('saving blocks a second tap', (tester) async {
