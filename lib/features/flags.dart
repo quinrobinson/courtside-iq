@@ -143,3 +143,11 @@ const bool kUseGameDetail2 = true;
 /// account and all its data gone, the feedback note kept with its email
 /// nulled. The photo badge stays inert - public.users has no column for one.
 const bool kUseMenu2 = true;
+
+/// Paywall + gate sheet (4.16).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Covers the carousel, its purchase states,
+/// and the gate sheet. Off falls back to the v1 PaywallWidget bottom sheet.
+/// A REAL PURCHASE is device + sandbox only; the flag gates the UI, not the
+/// entitlement - server-side enforcement stays deferred to cutover.
+const bool kUsePaywall2 = true;

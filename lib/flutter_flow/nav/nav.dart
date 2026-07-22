@@ -39,6 +39,7 @@ import '/features/menu/edit_email_page.dart';
 import '/features/menu/edit_name_page.dart';
 import '/features/menu/help_center_page.dart';
 import '/features/menu/menu_page.dart';
+import '/features/premium/paywall_launcher.dart';
 import '/features/menu/send_feedback_page.dart';
 import '/features/menu/your_profile_page.dart';
 import '/features/games/live_game_flow.dart';
@@ -183,6 +184,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
                     context.pushNamed(HelpCenterWidget.routeName),
                 onOpenFeedback: () =>
                     context.pushNamed(SendFeedbackWidget.routeName),
+                onOpenSubscription: () => showPaywall(context),
               )
             : MenuWidget(),
       ),

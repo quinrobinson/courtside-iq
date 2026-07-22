@@ -37,7 +37,7 @@ import '/features/flags.dart';
 import '/features/players/birth_date_gate.dart';
 import '/features/players/info_copy.dart';
 import '/features/nav/ci_nav_bar.dart';
-import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
+import '/features/premium/paywall_launcher.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import 'entitlement_status.dart';
 import 'widgets/today_promo_banner.dart';
@@ -164,15 +164,7 @@ class _TodayPageState extends State<TodayPage> {
       );
 
   Future<void> _openPaywall() async {
-    await showModalBottomSheet(
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) => Padding(
-        padding: MediaQuery.viewInsetsOf(context),
-        child: const PaywallWidget(),
-      ),
-    );
+    await showPaywall(context);
     // RE-READ AFTER THE PAYWALL CLOSES. Entitlement was fetched once on
     // init, so a parent who subscribed came back to a screen that still
     // believed they were on the free tier - the gate kept appearing until

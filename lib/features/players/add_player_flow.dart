@@ -12,8 +12,9 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/player_gating.dart';
-import '/features/home/entitlement_status.dart';
 import '/features/flags.dart';
+import '/features/premium/premium_gate_sheet.dart';
+import '/features/home/entitlement_status.dart';
 import '/features/players/add_player_sheet.dart';
 import '/features/players/add_player_sheet_v2.dart';
 import '/features/players/widgets/player_gates.dart';
@@ -65,7 +66,13 @@ Future<void> runAddPlayerFlow(
         context.goNamed(PlayersListWidget.routeName);
       }
     case AddPlayerAction.upgradeGate:
-      if (await showAddPlayerUpgradeGate(context) && context.mounted) {
+      // The 2.0 gate sheet (335:1881) behind the flag, the v1 gate otherwise.
+      // Either way, "See plans" hands to the injected openPaywall, which is
+      // what re-reads entitlement when it closes.
+      final wantsPlans = kUsePaywall2
+          ? (await showPremiumGateSheet(context) ?? false)
+          : await showAddPlayerUpgradeGate(context);
+      if (wantsPlans && context.mounted) {
         await openPaywall();
       }
     case AddPlayerAction.capReached:

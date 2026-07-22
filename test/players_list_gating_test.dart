@@ -75,7 +75,9 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Add player'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Track more players'), findsOneWidget);
+      // The 2.0 gate sheet (kUsePaywall2) - "A Premium feature", not v1's
+      // "Track more players". "See plans" still leads to the paywall.
+      expect(find.text('A Premium feature'), findsOneWidget);
       expect(find.text('See plans'), findsOneWidget);
     });
 
