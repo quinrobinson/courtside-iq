@@ -30,6 +30,7 @@ import '/features/auth/reset_password_page.dart';
 import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
 import '/features/games/games_list_page.dart';
+import '/features/games/live_game_flow.dart';
 import '/features/games/new_game_setup_page.dart';
 import '/features/onboarding/onboarding_page.dart';
 import '/features/onboarding/splash_view.dart';
@@ -682,27 +683,27 @@ extension GoRouterLocationExtension on GoRouter {
 }
 
 
-/// Bridges the 2.0 setup screen to the v1 live tracker.
+/// Setup into the 2.0 live game flow.
 ///
-/// Start Game pushes GameStatTrackerWidget with EXACTLY the parameters v1's
-/// own setup passes - it takes no game id and creates nothing, so there is no
-/// hidden state to replicate. When the 2.0 tracker lands in 4.13 this is the
-/// one place that changes.
+/// The flow is pushed rather than replacing this route, so backing out of the
+/// tracker returns to setup rather than dumping the parent on the games list
+/// with a half-started game.
 class _NewGameSetupRoute extends StatelessWidget {
   const _NewGameSetupRoute();
 
   @override
   Widget build(BuildContext context) {
     return NewGameSetupPage(
-      onStart: (setup) => context.pushNamed(
-        GameStatTrackerWidget.routeName,
-        queryParameters: {
-          'playerName': serializeParam(setup.playerName, ParamType.String),
-          'oppName': serializeParam(setup.opponent, ParamType.String),
-          'playerID': serializeParam(setup.playerId, ParamType.String),
-          'eventSelected': serializeParam(setup.event, ParamType.String),
-          'playerTeam': serializeParam(setup.team, ParamType.String),
-        }.withoutNulls,
+      onStart: (setup) => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => LiveGameFlow(
+            setup: setup,
+            // Finishing leaves the whole flow, setup included: the game is
+            // over, and the games list is where it now lives.
+            onFinished: () =>
+                context.goNamed(AllGamesWidget.routeName),
+          ),
+        ),
       ),
     );
   }

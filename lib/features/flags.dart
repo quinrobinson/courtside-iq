@@ -104,7 +104,8 @@ const bool kUseGames2 = true;
 
 /// New Game setup, rebuilt on the 2.0 design system (4.13).
 ///
-/// ON FOR REVIEW, NOT YET VERIFIED. Start Game hands off to the v1 live
-/// tracker with the same parameters v1's own setup passes, so the flow is
-/// whole while the 2.0 tracker is built.
+/// ON FOR REVIEW, NOT YET VERIFIED. Covers the WHOLE flow now - setup, the
+/// live tracker, pause, complete and save. Turning it off returns to v1's
+/// setup and tracker together, which is the only safe rollback: the two
+/// halves do not mix.
 const bool kUseNewGame2 = true;

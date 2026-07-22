@@ -1,0 +1,168 @@
+// The live game flow — Phase 4.13
+//
+// Setup hands over here, and this owns the sequence: track, pause, end, save.
+// Each screen stays a pure renderer; the ordering and the side effects live in
+// one place so no screen has to know what comes after it.
+//
+// THE SNAPSHOT IS THE UNIT OF TRUTH. It is written to the store on every tap
+// by the tracker, so a crash mid-game loses nothing, and it is what the save
+// path turns into rows.
+
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+
+import 'game_complete_page.dart';
+import 'game_paused_dialog.dart';
+import '/courtside_iq/live_game.dart';
+import 'live_game_store.dart';
+import 'live_tracker_page.dart';
+import 'new_game_setup_page.dart';
+import 'save_game.dart';
+
+class LiveGameFlow extends StatefulWidget {
+  const LiveGameFlow({
+    super.key,
+    required this.setup,
+    this.store = const LiveGameStore(),
+    this.saver = const GameSaver(),
+    this.onFinished,
+  });
+
+  final NewGameSetup setup;
+  final LiveGameStore store;
+  final GameSaver saver;
+
+  /// Called once the game is saved or discarded, so the caller can leave.
+  final VoidCallback? onFinished;
+
+  @override
+  State<LiveGameFlow> createState() => _LiveGameFlowState();
+}
+
+enum _Stage { tracking, complete }
+
+class _LiveGameFlowState extends State<LiveGameFlow> {
+  late LiveGameSnapshot _snapshot = LiveGameSnapshot(
+    playerId: widget.setup.playerId,
+    playerName: widget.setup.playerName,
+    opponent: widget.setup.opponent,
+    team: widget.setup.team,
+    event: widget.setup.event,
+    stats: const LiveGameStats(),
+    startedAt: DateTime.now(),
+  );
+
+  _Stage _stage = _Stage.tracking;
+  bool _saving = false;
+  bool _offline = false;
+  StreamSubscription<List<ConnectivityResult>>? _conn;
+
+  @override
+  void initState() {
+    super.initState();
+    _watchConnectivity();
+  }
+
+  @override
+  void dispose() {
+    _conn?.cancel();
+    super.dispose();
+  }
+
+  /// Display only. The queue keeps the game safe either way; this just lets
+  /// the tracker say so, which is the difference between a parent trusting
+  /// the app in a gym and force-quitting it.
+  Future<void> _watchConnectivity() async {
+    final conn = Connectivity();
+    void apply(List<ConnectivityResult> r) {
+      final off = r.every((x) => x == ConnectivityResult.none);
+      if (mounted && off != _offline) setState(() => _offline = off);
+    }
+
+    try {
+      apply(await conn.checkConnectivity());
+      _conn = conn.onConnectivityChanged.listen(apply);
+    } catch (_) {
+      // No connectivity plugin on this platform is not a reason to block a
+      // game. Assume online and let the queue sort it out.
+    }
+  }
+
+  Future<void> _pause() async {
+    final choice =
+        await showGamePausedDialog(context, snapshot: _snapshot);
+    if (!mounted) return;
+    if (choice == PausedChoice.end) setState(() => _stage = _Stage.complete);
+  }
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    final outcome = await widget.saver.save(_snapshot);
+    // The game is durable either way, so the in-progress copy goes now. Left
+    // behind, the next launch would offer to resume a game already saved.
+    await widget.store.clear();
+    if (!mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(SnackBar(
+      content: Text(outcome == SaveOutcome.synced
+          ? 'Game saved.'
+          // Not "failed". The game is on disk and will go up by itself.
+          : 'Game saved. It will sync when you are back online.'),
+    ));
+    widget.onFinished?.call();
+  }
+
+  Future<void> _discard() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard this game?'),
+        content: const Text(
+            'The stats you tracked will be deleted. This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Keep it'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await widget.store.clear();
+    if (mounted) widget.onFinished?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_stage == _Stage.complete) {
+      return GameCompletePage(
+        snapshot: _snapshot,
+        saving: _saving,
+        onSave: _save,
+        onDiscard: _discard,
+      );
+    }
+
+    return LiveTrackerPage(
+      snapshot: _snapshot,
+      store: widget.store,
+      offline: _offline,
+      onPause: (s) {
+        _snapshot = s;
+        _pause();
+      },
+      onEnd: (s) {
+        _snapshot = s;
+        setState(() => _stage = _Stage.complete);
+      },
+    );
+  }
+}
