@@ -138,6 +138,7 @@ const bool kUseGameDetail2 = true;
 /// 4.15c device-verified 2026-07-23: Help Center and Send Feedback, with a
 /// note reaching the feedback table.
 ///
-/// Delete account renders disabled until 4.15d, and the photo badge is inert
-/// because public.users has no column to store one.
+/// Delete account (4.15d) is wired to the delete-account Edge Function,
+/// deployed to TEST 2026-07-23. The photo badge stays inert because
+/// public.users has no column to store one.
 const bool kUseMenu2 = true;
