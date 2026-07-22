@@ -1767,6 +1767,34 @@ back and safe areas are cheap to honour while building and expensive to
 retrofit.
 | 4.15 | Menu/Account | Menu, subscription, settings |
 
+**4.15 COMPLETE 2026-07-23.** `[x] built` · `[x] wired` · `[x]
+device-verified`, all four sub-phases. 4.15d (Delete Account) verified in the
+database: account, players, games, stats, ai_usage and subscription gone; the
+feedback note kept with its email nulled; another account's feedback
+untouched.
+
+- **The delete took THREE tries and the fault was never the code.** GoTrue's
+  admin.deleteUser 500'd untraceably (its errors are not in the request
+  logs). Switching to a SECURITY DEFINER rpc surfaced the real error in the
+  POSTGRES log: ai_usage's SET NULL references re-validate mid-cascade and the
+  row fails its own game_id check once a sibling game is deleted. The rpc now
+  clears this account's ai_usage first. Lesson: a delete that cascades through
+  SET NULL FKs cannot be trusted until run against real data - an isolated
+  superuser delete does not exercise the re-validation.
+- **Terms** points at courtsideiq.app/terms on both platforms now.
+- **Version** reads from the bundle (package_info_plus).
+- **Menu had no nav bar** - the only tab without one. Added.
+- **feedback.rating holds the category** (Bug/Idea/...) where v1 stored a
+  tier. Worth a rename migration eventually.
+
+**PROD PROMOTION for 4.15d needs, IN ORDER and each with approval:**
+1. Check orphaned public.users rows: `select count(*) from public.users u
+   where not exists (select 1 from auth.users a where a.id = u.id);`
+2. Migration 20260723000000 (the auth.users cascades).
+3. Migrations 20260723000001 + 20260723000002 (delete_current_user).
+4. The orphaned delete-account edge function on TEST is unused (rpc replaced
+   it) - safe to leave or remove; never deploy it to prod.
+
 **4.15c DONE 2026-07-23.** Help Center and Send Feedback, device-verified.
 
 - **FOUR v1 HELP ANSWERS STATED THINGS THE APP DOES NOT DO**: the player
