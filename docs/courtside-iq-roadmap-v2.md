@@ -1248,8 +1248,24 @@ to do the wrong thing.
 - v1 FlutterFlow callers keep the old u18 fallback. They cannot render a
   locked state and are deleted in 4.24.
 
-**Still open from 4.11d:** deploy the two Edge Functions (needs approval), and
-promote migration `20260721000000` to prod at cutover.
+**Edge Functions DEPLOYED TO TEST 2026-07-22** with approval.
+`generate-game-insight` v7 -> v8, `generate-player-insight` v9 -> v10, both
+ACTIVE with `verify_jwt` true. This carried the `d7c194d` no-birth-date
+change, which had been sitting undeployed for three days: the SQL migration
+was applied to test, so `get_age_band()` already returned null, while the
+deployed TypeScript still assumed `11U-13U`. For a player with no birth date
+the client withheld the rating while the server generated an insight scored
+against middle-school cutoffs and named a band it did not know. Client and
+server now agree.
+
+Note for anyone reading the old wording: the functions themselves were never
+unbuilt. Both have been live on TEST since July and on PROD since 8 June -
+what was undeployed was one change to them.
+
+**Still open:** prod runs v1 of both, self-consistent with the live v1.3.2
+app. Promote them and migration `20260721000000` together at cutover, not
+before - the migration is what makes a null band possible, and the functions
+are what handle it.
 - **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
   (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
 
