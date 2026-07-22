@@ -27,6 +27,17 @@ import 'account_repository.dart';
 import 'ci_account_snackbar.dart';
 
 class ChangePasswordPage extends StatefulWidget {
+  /// A REAL ROUTE, not a Navigator.push.
+  ///
+  /// v1 has no change-password screen, so there was no FlutterFlow route to
+  /// switch and the first wiring pushed a bare MaterialPageRoute. It never
+  /// appeared: this app sets GoRouter.optionURLReflectsImperativeAPIs, and a
+  /// raw route pushed onto GoRouter's navigator is discarded the next time
+  /// the router rebuilds. Edit Name and Edit Email worked only because they
+  /// had v1 routes to push by name.
+  static const String routeName = 'ChangePassword';
+  static const String routePath = '/changePassword';
+
   const ChangePasswordPage({
     super.key,
     this.repository = const AccountRepository(),

@@ -290,9 +290,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
                     context.pushNamed(EditNameWidget.routeName),
                 onEditEmail: () =>
                     context.pushNamed(EditEmailWidget.routeName),
-                onChangePassword: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (_) => const ChangePasswordPage())),
+                onChangePassword: () =>
+                    context.pushNamed(ChangePasswordPage.routeName),
                 // onEditPhoto is 4.15's open question - there is no column to
                 // store one. onDeleteAccount is 4.15d.
               )
@@ -420,6 +419,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // back is a one-line revert rather than a routing change.
         builder: (context, params) =>
             kUseAuth2 ? const EmailAuthPage() : UserAuthEmailWidget(),
+      ),
+      FFRoute(
+        name: ChangePasswordPage.routeName,
+        path: ChangePasswordPage.routePath,
+        requireAuth: true,
+        builder: (context, params) => const ChangePasswordPage(),
       ),
       FFRoute(
         name: SendFeedbackWidget.routeName,
