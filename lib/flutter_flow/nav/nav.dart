@@ -36,6 +36,7 @@ import '/custom_code/actions/index.dart' as actions;
 import '/features/menu/change_password_page.dart';
 import '/features/menu/edit_email_page.dart';
 import '/features/menu/edit_name_page.dart';
+import '/features/menu/help_center_page.dart';
 import '/features/menu/menu_page.dart';
 import '/features/menu/your_profile_page.dart';
 import '/features/games/live_game_flow.dart';
@@ -372,7 +373,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: HelpCenterWidget.routeName,
         path: HelpCenterWidget.routePath,
-        builder: (context, params) => HelpCenterWidget(),
+        builder: (context, params) => kUseMenu2
+            ? HelpCenterPage(
+                onSendFeedback: () =>
+                    context.pushNamed(SendFeedbackWidget.routeName),
+              )
+            : HelpCenterWidget(),
       ),
       FFRoute(
         name: ResetSuccesfulWidget.routeName,

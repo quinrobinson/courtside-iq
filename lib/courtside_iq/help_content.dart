@@ -17,9 +17,17 @@
 //   THE STATS LIST predated the 2.0 tracker, which also records makes and
 //   misses per shot type and splits rebounds.
 //
-// Answers are PARAGRAPHS, never bullets, and carry no em dashes. Tier order
-// is Solid then Good then Elite, and Solid is the ENTRY level - it is the one
-// thing here that gets misread as a poor grade.
+// SIX BROAD ANSWERS, NOT TWELVE NARROW ONES. 507:1964 consolidates v1's list
+// into questions a parent would actually phrase, and that is the shape here.
+// The first answer is the frame's own copy, verbatim.
+//
+// TWO ARE ADDED beyond the frame, both carrying facts the frame predates:
+// what happens to a subscription when an account is deleted (the expensive
+// one - a parent who assumes it stops keeps being billed), and why a quiet
+// game earns no insight, which 2.0 made visible.
+//
+// Answers are PARAGRAPHS, never bullets, and carry no em dashes. Solid is the
+// ENTRY level - the one thing here that gets misread as a poor grade.
 
 class HelpTopic {
   const HelpTopic({required this.question, required this.answer});
@@ -27,185 +35,94 @@ class HelpTopic {
   final String answer;
 }
 
-class HelpSection {
-  const HelpSection({required this.title, required this.topics});
-  final String title;
-  final List<HelpTopic> topics;
-}
-
-const List<HelpSection> kHelpSections = [
-  HelpSection(
-    title: 'Using the app',
-    topics: [
-      HelpTopic(
-        question: 'What stats can I track?',
-        answer:
-            'Courtside IQ tracks the counting stats that matter for '
-            'development: points, rebounds split into offensive and '
-            'defensive, assists, steals, blocks and turnovers. It also '
-            'records makes and misses separately for two-pointers, '
-            'three-pointers and free throws, which is where the shooting '
-            'percentages and the scoring mix on each game come from.',
-      ),
-      HelpTopic(
-        question: 'How do I track a game?',
-        answer:
-            'Tap the plus button in the bottom navigation and choose New '
-            'Game. Pick the player, name the team and opponent, then start '
-            'tracking. Tap as the action happens and the app keeps the '
-            'running totals for you.',
-      ),
-      HelpTopic(
-        question: 'When should I use Courtside IQ?',
-        answer:
-            'It is built for use during a live game, which is where you will '
-            'get the most out of it. Tracking as it happens takes a tap per '
-            'play and saves you reconstructing a game afterwards from memory.',
-      ),
-      HelpTopic(
-        question: 'How many players can I add?',
-        answer:
-            'Every account can track one player for free. With a '
-            'subscription you can add up to three, which covers most '
-            'families with more than one kid playing. Each player keeps '
-            'their own game history and averages, so progress never gets '
-            'mixed together.',
-      ),
-    ],
+const List<HelpTopic> kHelpTopics = [
+  HelpTopic(
+    question: 'What do Solid, Good, and Elite mean?',
+    // 507:1964, verbatim. The last sentence does the work every other draft
+    // of this answer was circling.
+    answer:
+        'Every rating falls into one of three levels. Solid means your '
+        'player is handling the fundamentals well and building a base. Good '
+        "means they're performing above that base with real consistency. "
+        'Elite is the top level, where the skill has become a genuine '
+        'strength. All three are positive, they just mark different points '
+        'on the same growth path.',
   ),
-  HelpSection(
-    title: 'Ratings and insights',
-    topics: [
-      HelpTopic(
-        question: 'What is Growth IQ?',
-        answer:
-            'Growth IQ is a single number between 40 and 99 that answers one '
-            'question: how is this player developing. Most of it reflects '
-            'how they are performing for their age, and the rest reflects '
-            'whether they are improving. That mix is deliberate, because a '
-            'player having a quieter season while clearly getting better is '
-            'a different story from one who has plateaued. It updates as you '
-            'log games.',
-      ),
-      HelpTopic(
-        question: "Why doesn't my player have a Growth IQ yet?",
-        answer:
-            'There are two reasons it stays locked, and they need different '
-            'things from you. If you have logged fewer than five games, keep '
-            'logging, because the score needs enough history to mean '
-            'anything. If the player has no birth date on file, add one from '
-            'their profile. Growth IQ compares a player to others their own '
-            'age, so without an age there is nothing fair to compare '
-            'against, and we would rather show nothing than a number we '
-            'cannot stand behind.',
-      ),
-      HelpTopic(
-        question: "Why do you need my player's birth date?",
-        answer:
-            'Every rating in Courtside IQ is measured against players in the '
-            'same age band, so an eight-year-old is never held to a high '
-            "schooler's standard. The birth date is what puts them in the "
-            'right band. We use it for nothing else, it is never shared, and '
-            "you can add or change it any time from the player's profile.",
-      ),
-      HelpTopic(
-        question: 'What do Solid, Good and Elite mean?',
-        answer:
-            'They are the three levels a rating can reach, and Solid is the '
-            'starting point rather than a poor grade. Solid means a player '
-            'is doing the thing at a level that holds up for their age. Good '
-            'is a clear step above that, and Elite is the top of the range. '
-            'Every level is a real result, and most games for most players '
-            'land in Solid or Good.',
-      ),
-      HelpTopic(
-        question: "Why didn't this game get an insight?",
-        answer:
-            'Insights come from what happened in the game, so a very quiet '
-            'game does not produce one. If a player took only a couple of '
-            'shots or barely touched the ball, there is not enough there for '
-            'an honest read, and we would rather say nothing than pad it '
-            'out. The stats are still saved and still count toward their '
-            'averages and their Growth IQ.',
-      ),
-    ],
+  HelpTopic(
+    question: 'How are ratings calculated?',
+    answer:
+        'Every rating comes from what you log during a game: points, '
+        'rebounds split into offensive and defensive, assists, steals, '
+        'blocks, turnovers, and makes and misses for two-pointers, '
+        'three-pointers and free throws. Growth IQ pulls those together into '
+        'a single number between 40 and 99. Most of it reflects how your '
+        'player is performing for their age, and the rest reflects whether '
+        'they are improving, because a quieter season while clearly getting '
+        'better is a different story from having plateaued.',
   ),
-  HelpSection(
-    title: 'Subscription',
-    topics: [
-      HelpTopic(
-        question: 'What does the subscription include?',
-        answer:
-            'A subscription unlocks everything: live stat tracking, '
-            'unlimited game history, up to three player profiles, season '
-            'averages, Growth IQ and the AI read on each game.',
-      ),
-      HelpTopic(
-        question: 'How much does it cost?',
-        answer:
-            'You can choose between \$1.99 per week or \$5.99 per month. The '
-            'monthly plan is the better value across a season, and it is the '
-            'only one that comes with a free trial.',
-      ),
-      HelpTopic(
-        question: 'Is there a free trial?',
-        answer:
-            'Yes, on the monthly plan, and only if you have not subscribed '
-            'before. It runs for seven days and you are not charged until it '
-            'ends, so cancelling before then costs you nothing. The weekly '
-            'plan does not include a trial.',
-      ),
-      HelpTopic(
-        question: 'How do I manage or cancel my subscription?',
-        answer:
-            'Open Menu and tap Subscription to see your current plan. '
-            'Cancelling happens in the app store rather than in Courtside '
-            'IQ. On an iPhone or iPad, open Settings, tap your name, then '
-            'Subscriptions. On Android, open the Play Store, tap your '
-            'profile picture, then Payments and subscriptions. If you get '
-            'stuck, send us a note from Menu and we will help.',
-      ),
-      HelpTopic(
-        question: 'Can I get a refund?',
-        answer:
-            'Refunds are handled by the app store you subscribed through, '
-            'not by us. Request one from your purchase history there and '
-            'they will make the decision.',
-      ),
-    ],
+  HelpTopic(
+    question: "Why don't I see a rating yet?",
+    answer:
+        'There are two reasons a rating stays locked, and they need '
+        'different things from you. If you have logged fewer than five '
+        'games, keep logging, because the score needs enough history to mean '
+        'anything. If the player has no birth date on file, add one from '
+        'their profile. Ratings compare a player to others their own age, so '
+        'without an age there is nothing fair to compare against, and we '
+        'would rather show nothing than a number we cannot stand behind.',
   ),
-  HelpSection(
-    title: 'Your account',
-    topics: [
-      HelpTopic(
-        question: 'Is my data private?',
-        answer:
-            'Your stats and player information are stored securely and are '
-            'never sold or shared. You stay in control of your data, and you '
-            'can remove any of it at any time.',
-      ),
-      HelpTopic(
-        question: 'What happens if I delete my account?',
-        answer:
-            'Deleting your account removes your profile, every player on it, '
-            'their full game history and every insight written for them. '
-            'None of it can be recovered afterwards, so it is worth being '
-            'sure before you confirm.',
-      ),
-      HelpTopic(
-        question: 'Does deleting my account cancel my subscription?',
-        answer:
-            'No, and this is worth knowing before you delete anything. Your '
-            'subscription is billed by the app store rather than by us, so '
-            'removing your account here does not stop it. Cancel it in your '
-            'app store subscriptions first, then delete your account. If you '
-            'delete first you can still cancel afterwards from the same '
-            'place.',
-      ),
-    ],
+  HelpTopic(
+    question: 'How do I add another player?',
+    answer:
+        'Open the Players tab and tap the plus button. Every account can '
+        'track one player for free, and a subscription raises that to three, '
+        'which covers most families with more than one kid playing. Each '
+        'player keeps their own game history and averages, so progress never '
+        'gets mixed together.',
+  ),
+  HelpTopic(
+    question: 'How does my subscription work?',
+    answer:
+        'A subscription unlocks everything: live stat tracking, unlimited '
+        'game history, up to three players, season averages, Growth IQ and '
+        'the read on each game. It is \$1.99 per week or \$5.99 per month, '
+        'and the monthly plan is the better value across a season. The '
+        'monthly plan also comes with a seven day free trial if you have not '
+        'subscribed before, which the weekly plan does not. Cancelling and '
+        'refunds happen in the app store rather than in Courtside IQ: on an '
+        'iPhone or iPad open Settings, tap your name, then Subscriptions, '
+        'and on Android open the Play Store, tap your profile picture, then '
+        'Payments and subscriptions.',
+  ),
+  HelpTopic(
+    question: 'How is our data kept private?',
+    answer:
+        'Your stats and player information are stored securely and are never '
+        'sold or shared. A birth date is used for one thing only, putting a '
+        'player in the right age band so their ratings are fair, and it '
+        'never leaves your account. You stay in control of all of it and can '
+        'remove any of it at any time.',
+  ),
+  HelpTopic(
+    question: "Why didn't this game get an insight?",
+    answer:
+        'Insights come from what happened in the game, so a very quiet game '
+        'does not produce one. If a player took only a couple of shots or '
+        'barely touched the ball, there is not enough there for an honest '
+        'read, and we would rather say nothing than pad it out. The stats '
+        'are still saved and still count toward their averages and their '
+        'Growth IQ.',
+  ),
+  HelpTopic(
+    question: 'Does deleting my account cancel my subscription?',
+    answer:
+        'No, and this is worth knowing before you delete anything. Your '
+        'subscription is billed by the app store rather than by us, so '
+        'removing your account here does not stop it. Cancel it in your app '
+        'store subscriptions first, then delete your account. If you delete '
+        'first you can still cancel afterwards from the same place.',
   ),
 ];
 
-/// Every topic, flattened. For search and for tests.
-List<HelpTopic> get kHelpTopics =>
-    [for (final s in kHelpSections) ...s.topics];
+/// The footer beneath the list (507:1964), which opens Send Feedback.
+const String kHelpFooterPrompt = 'Still need help? Send us a note.';

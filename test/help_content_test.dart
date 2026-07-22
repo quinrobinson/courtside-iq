@@ -17,9 +17,9 @@ void main() {
       // mention of a free limit. A parent added their second child and hit an
       // upgrade gate the help center had told them was not there.
       final players = kHelpTopics
-          .firstWhere((t) => t.question.contains('How many players'));
+          .firstWhere((t) => t.question.contains('add another player'));
       expect(players.answer, contains('one player for free'));
-      expect(players.answer, contains('up to three'));
+      expect(players.answer, contains('raises that to three'));
       // And the numbers still match the code.
       expect(kFreePlayerLimit, 1);
       expect(kPremiumPlayerLimit, 3);
@@ -28,20 +28,20 @@ void main() {
     test('the trial is monthly-only and first-time-only', () {
       // v1 promised it to "every new subscriber". A weekly subscriber was
       // promised a trial they could never get.
-      final trial =
-          kHelpTopics.firstWhere((t) => t.question.contains('free trial'));
-      expect(trial.answer, contains('monthly plan'));
-      expect(trial.answer, contains('not subscribed before'));
-      expect(trial.answer, contains('weekly plan does not include'));
+      final sub = kHelpTopics
+          .firstWhere((t) => t.question.contains('subscription work'));
+      expect(sub.answer, contains('monthly plan also comes with'));
+      expect(sub.answer, contains('not subscribed before'));
+      expect(sub.answer, contains('weekly plan does not'));
     });
 
     test('cancelling is described as happening in the app store', () {
       // Not in Courtside IQ. The single most expensive thing to get wrong
       // here: a parent who believes we cancelled it keeps being billed.
-      final cancel = kHelpTopics
-          .firstWhere((t) => t.question.contains('manage or cancel'));
-      expect(cancel.answer, contains('app store'));
-      expect(cancel.answer, isNot(contains('Manage Your Subscription')));
+      final sub = kHelpTopics
+          .firstWhere((t) => t.question.contains('subscription work'));
+      expect(sub.answer, contains('app store'));
+      expect(sub.answer, isNot(contains('Manage Your Subscription')));
     });
 
     test('deleting an account is said NOT to cancel the subscription', () {
@@ -55,7 +55,7 @@ void main() {
       // Five games and a missing birth date need different things from the
       // parent. An answer naming only one leaves half of them stuck.
       final locked = kHelpTopics
-          .firstWhere((t) => t.question.contains("doesn't my player have"));
+          .firstWhere((t) => t.question.contains('see a rating yet'));
       expect(locked.answer, contains('five games'));
       expect(locked.answer, contains('birth date'));
     });
@@ -86,7 +86,9 @@ void main() {
           lessThan(tiers.answer.indexOf('Elite')));
       // Solid is the ENTRY level. This is the one thing here that gets
       // misread as a poor grade.
-      expect(tiers.answer, contains('starting point'));
+      // The frame's own line, and the one that makes the point: no level
+      // here is a bad result.
+      expect(tiers.answer, contains('All three are positive'));
     });
 
     test('every topic actually answers something', () {
@@ -104,5 +106,14 @@ void main() {
       final asked = kHelpTopics.map((t) => t.question.toLowerCase()).toList();
       expect(asked.toSet().length, asked.length);
     });
+  });
+
+  test('it follows the frame: eight broad topics, flat', () {
+    // 507:1964 consolidates v1's twelve narrow questions into six a parent
+    // would actually phrase. Two are added for facts the frame predates.
+    expect(kHelpTopics.length, 8);
+    for (final t in kHelpTopics) {
+      expect(t.question.length, lessThan(60), reason: t.question);
+    }
   });
 }
