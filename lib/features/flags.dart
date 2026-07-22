@@ -128,3 +128,12 @@ const bool kUseNewGame2 = true;
 /// working around the product rather than exploiting it. Turning this flag
 /// off restores the v1 gate along with the v1 screen.
 const bool kUseGameDetail2 = true;
+
+/// Menu and Your Profile, rebuilt on the 2.0 design system (4.15a).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. The two hubs only - the seven screens
+/// behind them are 4.15b through 4.15d and still route to their v1 versions,
+/// so this flag makes the hubs 2.0 while their destinations stay v1. That
+/// mix is deliberate and temporary; it is also why Delete account renders
+/// disabled rather than opening something that does not exist.
+const bool kUseMenu2 = true;

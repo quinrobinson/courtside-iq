@@ -31,6 +31,10 @@ import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
 import '/features/games/games_list_page.dart';
 import '/features/games/game_detail_page.dart';
+import '/auth/supabase_auth/auth_util.dart';
+import '/custom_code/actions/index.dart' as actions;
+import '/features/menu/menu_page.dart';
+import '/features/menu/your_profile_page.dart';
 import '/features/games/live_game_flow.dart';
 import '/features/games/new_game_setup_page.dart';
 import '/features/onboarding/onboarding_page.dart';
@@ -153,7 +157,28 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: MenuWidget.routeName,
         path: MenuWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => MenuWidget(),
+        builder: (context, params) => kUseMenu2
+            ? MenuPage(
+                // MIRRORS v1's SIGN-OUT EXACTLY, including the RevenueCat
+                // logout. Dropping that would leave the next account signed
+                // in on this device carrying the previous one's entitlement -
+                // the bug that once handed everyone premium.
+                onSignOut: () async {
+                  GoRouter.of(context).prepareAuthEvent();
+                  await authManager.signOut();
+                  GoRouter.of(context).clearRedirectLocation();
+                  final router = GoRouter.of(context);
+                  await actions.logoutOfRevenueCat();
+                  router.goNamed(UserAuthWidget.routeName);
+                },
+                onOpenProfile: () =>
+                    context.pushNamed(YourProfileWidget.routeName),
+                onOpenHelp: () =>
+                    context.pushNamed(HelpCenterWidget.routeName),
+                onOpenFeedback: () =>
+                    context.pushNamed(SendFeedbackWidget.routeName),
+              )
+            : MenuWidget(),
       ),
       FFRoute(
         name: UserAuthWidget.routeName,
@@ -254,7 +279,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: YourProfileWidget.routeName,
         path: YourProfileWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => YourProfileWidget(
+        builder: (context, params) => kUseMenu2
+            ? YourProfilePage(
+                onEditName: () =>
+                    context.pushNamed(EditNameWidget.routeName),
+                onEditEmail: () =>
+                    context.pushNamed(EditEmailWidget.routeName),
+                // 4.15b and 4.15d. Left null so the rows render disabled
+                // rather than opening screens that do not exist yet.
+              )
+            : YourProfileWidget(
           userFirstName: params.getParam(
             'userFirstName',
             ParamType.String,

@@ -84,3 +84,10 @@ abstract final class CiRadius {
 /// button, and text alone measures ~31, so without a shared floor the two
 /// headers sat 9pt apart - visible the moment a parent switches tabs.
 const double kCiListHeaderContentHeight = 40;
+
+/// Settings rows on Menu, Your Profile and every account sub-screen.
+///
+/// 52 from the Menu and Your Profile frames, which agree exactly. Shared so
+/// the two hubs and the seven screens behind them cannot drift the way the
+/// Players and Games headers did.
+const double kCiSettingsRowHeight = 52;
