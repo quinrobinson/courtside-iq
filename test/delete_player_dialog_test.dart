@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_confirm_dialog.dart';
+
+import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/features/players/delete_player_dialog.dart';
 
 Future<bool?> _open(WidgetTester tester, {String firstName = 'Maya'}) async {
@@ -95,5 +99,62 @@ void main() {
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
     expect(result, isTrue);
+  });
+
+  group('the shape it takes', () {
+    // It was a Material AlertDialog with small corner text buttons and Cancel
+    // first, built without reading 370:1886 and then extracted into a shared
+    // component - so the discard-game dialog inherited the error. These
+    // assert the frame's shape, not just its words.
+    Future<void> open(WidgetTester tester, {bool destructive = true}) async {
+      await tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showCiConfirmDialog(
+              context,
+              title: 'Discard this game?',
+              message: 'The stats you tracked will be deleted.',
+              confirmLabel: 'Discard',
+              cancelLabel: 'Keep it',
+              destructive: destructive,
+            ),
+            child: const Text('open'),
+          ),
+        ),
+      ));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('two full-width pills, not corner text buttons',
+        (tester) async {
+      await open(tester);
+      final buttons = tester.widgetList<CiButton>(find.byType(CiButton));
+      expect(buttons.length, 2);
+      expect(buttons.every((b) => b.expand), isTrue);
+    });
+
+    testWidgets('the confirming action comes FIRST', (tester) async {
+      await open(tester);
+      final confirm = tester.getTopLeft(find.text('Discard')).dy;
+      final cancel = tester.getTopLeft(find.text('Keep it')).dy;
+      expect(confirm, lessThan(cancel),
+          reason: 'the frame puts the action above Cancel');
+    });
+
+    testWidgets('destructive wears orange', (tester) async {
+      await open(tester);
+      expect(tester.widgetList<CiButton>(find.byType(CiButton)).first.style,
+          CiButtonStyle.orange);
+    });
+
+    testWidgets('a confirm that merely proceeds wears ink', (tester) async {
+      // The accent marks destruction. If every confirm took it there would be
+      // nothing left to mark the ones that cannot be undone.
+      await open(tester, destructive: false);
+      expect(tester.widgetList<CiButton>(find.byType(CiButton)).first.style,
+          CiButtonStyle.primary);
+    });
   });
 }

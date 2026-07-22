@@ -1,38 +1,35 @@
 // CiConfirmDialog — the app's one "are you sure?"
 //
-// Extracted from the delete-player dialog (Dialog — Confirm · Destructive,
-// 370:1886), which was the only styled confirm in the app. Everything else
-// that needed one reached for a raw Material AlertDialog and got the
-// framework's default typography and blue text - visibly not this app, and
-// always at the moment a parent is deciding whether to destroy something.
+// Measured from 370:1886 (destructive) and 371:1901 (neutral): a 312-wide
+// white dialog, radius 18, pt 28 / pb 20 / px 24, centered ExtraBold 19 title
+// over centered Medium 14 body, then two full-width pills stacked with 10
+// between them.
+//
+// THE CONFIRMING ACTION COMES FIRST, on top, and it is the filled one -
+// orange when it destroys something, ink when it merely proceeds. Cancel sits
+// beneath it in grey.
+//
+// That ordering is the frame's and it is worth stating why it is safe: the
+// destructive button is not the easy one to hit by accident, because reaching
+// this dialog at all took a deliberate tap on Discard or Delete. What the
+// parent needs here is to see plainly WHAT they are about to do, and burying
+// it under Cancel would make the dialog quieter than the act.
 //
 // A DISMISS IS ALWAYS NO. Tapping outside returns null and this reports
 // false. Consent has to be explicit, because the confirming action here is
 // the one that cannot be undone.
 //
-// DOES NOT MATCH THE APPROVED FRAMES. Verified against 370:1886 (destructive)
-// and 371:1901 (neutral) on 2026-07-22: both draw a CENTERED ExtraBold title,
-// centered muted body, then the CONFIRMING ACTION FIRST as a full-width pill -
-// orange when destructive, ink when not - with Cancel as a full-width grey
-// pill beneath it.
-//
-// This is a Material AlertDialog with small corner text buttons, Cancel
-// first, confirm in orange text. Wrong layout, wrong controls, wrong order.
-//
-// How it got here: delete_player_dialog was built without reading the frame,
-// and this component was extracted from it - so the error was shared to the
-// discard dialog rather than found. The paused and resume dialogs DO follow
-// the frames, which is why the confirms look foreign next to them.
-//
-// Fix is one component; both call sites follow. Copy is approved and should
-// carry over unchanged - see the gendered-pronoun note in
-// delete_player_dialog.
+// It was previously a Material AlertDialog with small corner text buttons and
+// Cancel first - built from reasoning without reading the frame, then
+// extracted into this component, so the error reached a second call site
+// instead of being found. Corrected 2026-07-22 against both frames.
 
 import 'package:flutter/material.dart';
 
 import '../tokens/ci_colors.dart';
 import '../tokens/ci_metrics.dart';
 import '../tokens/ci_type.dart';
+import 'ci_button.dart';
 
 /// Returns true only on an explicit confirm.
 Future<bool> showCiConfirmDialog(
@@ -42,38 +39,57 @@ Future<bool> showCiConfirmDialog(
   required String confirmLabel,
   String cancelLabel = 'Cancel',
 
-  /// Paints the confirming action in the energy accent. Off for a confirm
-  /// that merely proceeds - spending the accent on those would leave nothing
-  /// to distinguish the ones that destroy data.
+  /// Paints the confirming action orange. Off for a confirm that merely
+  /// proceeds, which takes ink instead (371:1901) - spending the accent on
+  /// those would leave nothing to mark the ones that destroy data.
   bool destructive = true,
 }) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (context) {
       final c = CiColors.of(context);
-      return AlertDialog(
+      return Dialog(
         backgroundColor: c.bg,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 39),
         shape: const RoundedRectangleBorder(borderRadius: CiRadius.dialogR),
-        title: Text(title, style: CiType.h3.copyWith(color: c.text)),
-        content: Text(
-          message,
-          style: CiType.body.copyWith(color: c.textSoft, height: 1.5),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+              CiSpace.screen, 28, CiSpace.screen, CiSpace.s5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: CiType.h3
+                    .copyWith(color: c.text, fontWeight: CiWeight.extraBold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: CiType.bodySm
+                    .copyWith(color: c.textSoft, height: 20 / 14),
+              ),
+              const SizedBox(height: 18),
+              CiButton(
+                label: confirmLabel,
+                style: destructive
+                    ? CiButtonStyle.orange
+                    : CiButtonStyle.primary,
+                expand: true,
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+              const SizedBox(height: 10),
+              CiButton(
+                label: cancelLabel,
+                style: CiButtonStyle.secondary,
+                expand: true,
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+            ],
+          ),
         ),
-        actionsPadding: const EdgeInsets.fromLTRB(
-            CiSpace.s4, 0, CiSpace.s4, CiSpace.s4),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(cancelLabel,
-                style: CiType.rowLabel.copyWith(color: c.text)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(confirmLabel,
-                style: CiType.rowLabel
-                    .copyWith(color: destructive ? c.accentEnergy : c.text)),
-          ),
-        ],
       );
     },
   );
