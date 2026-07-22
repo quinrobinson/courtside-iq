@@ -73,19 +73,18 @@ class PlayerListRow extends StatelessWidget {
           alignment: Alignment.topCenter,
           padding: const EdgeInsets.fromLTRB(
               CiSpace.screen, _kRowPadding, CiSpace.screen, _kRowPadding),
-          // TOP-ALIGNED, so the space above the name equals the space below
-          // the chip - the two the device review asked to match.
-          //
-          // Both columns end up filling the row height anyway: the gauge
-          // column is the tallest content, and the identity column is an
-          // Expanded Column defaulting to mainAxisSize.max. Stating `start`
-          // regardless, so the intent does not depend on that coincidence.
+          // The GAUGE stays top-aligned; the IDENTITY column is centred in the
+          // row. On device 2026-07-23 the name and stats read as sitting too
+          // high against the taller gauge, so the identity block now centres
+          // vertically while the gauge and its chip keep their place. The row
+          // is a fixed height, so this is stable regardless of content.
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
                       children: [

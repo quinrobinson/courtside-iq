@@ -19,7 +19,7 @@
 // blanked because it is the personal part. That is a judgement about
 // content, so it cannot be a foreign key.
 
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -45,10 +45,18 @@ Deno.serve(async (req: Request) => {
   const url = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+  // persistSession:false IS LOad-BEARING, not boilerplate. Without it,
+  // getUser(token) below makes the client adopt the caller's token as its
+  // own session - so the later admin.deleteUser goes out with the USER's
+  // Bearer token instead of the service-role key, GoTrue forbids it, and the
+  // whole thing fails as a 500. That was the first bug on test.
+  const admin = createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
   // Resolve the caller FROM THE TOKEN. This is the whole security model: the
   // account deleted below is the one that asked, and there is no parameter
   // that could say otherwise.
-  const admin = createClient(url, serviceKey);
   const { data: caller, error: authError } = await admin.auth.getUser(token);
   const uid = caller?.user?.id;
   if (authError || !uid) return json({ error: "invalid_token" }, 401);
@@ -75,7 +83,10 @@ Deno.serve(async (req: Request) => {
   const { error: deleteError } = await admin.auth.admin.deleteUser(uid);
   if (deleteError) {
     console.error("account delete failed", uid, deleteError.message);
-    return json({ error: "delete_failed" }, 500);
+    // `detail` is TEMPORARY and TEST-ONLY diagnostic. The caller is already
+    // authenticated as themselves, so it leaks nothing about anyone else -
+    // but strip it before this ever goes to prod. Remove with this comment.
+    return json({ error: "delete_failed", detail: deleteError.message }, 500);
   }
 
   console.log("account deleted", uid);

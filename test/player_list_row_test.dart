@@ -136,22 +136,23 @@ void main() {
     expect(tester.getSize(find.byType(CiBadge)).height, 24);
   });
 
-  testWidgets('space above the name equals space below the chip',
-      (tester) async {
-    // The two the device review asked to match. Centring made them differ,
-    // because the gauge column is taller than the identity column and centring
-    // pushed the name down by half that difference.
+  testWidgets('the identity block is centred in the row', (tester) async {
+    // Reversed on device 2026-07-23. It used to be top-aligned so the space
+    // above the name matched the space below the chip; the name and stats
+    // read as sitting too high against the taller gauge. Now the identity
+    // block (name down through the stats) centres vertically, while the gauge
+    // and chip keep their place.
     await _pump(tester,
         _entry(growthIq: 70, delta: -13, trend: GrowthTrend.dipping));
 
     final row = tester.getRect(find.byType(PlayerListRow));
     final name = tester.getRect(find.text('Maya Chen'));
-    final chip = tester.getRect(find.byType(CiBadge));
+    final stats = tester.getRect(find.text('PPG'));
 
     final above = name.top - row.top;
-    final below = row.bottom - chip.bottom;
+    final below = row.bottom - stats.bottom;
 
-    expect(below, closeTo(above, 1.0),
-        reason: 'above name $above, below chip $below');
+    expect(below, closeTo(above, 2.0),
+        reason: 'identity block should be centred: above $above, below $below');
   });
 }

@@ -222,10 +222,13 @@ class _AddPlayerSheetV2State extends State<AddPlayerSheetV2> {
               value: _birthDate == null ? null : _monthYear(_birthDate!),
               onTap: _pickBirthDate,
             ),
-            const SizedBox(height: CiSpace.s6),
+            // s2, not s6. At 24 the line floated free of the field and read
+            // as its own paragraph; helper text has to sit under the input it
+            // explains to belong to it.
+            const SizedBox(height: CiSpace.s2),
             Text(
               'We use this to compare your player to others their age.',
-              style: CiType.bodySm.copyWith(color: c.textMuted),
+              style: CiType.caption.copyWith(color: c.textMuted),
             ),
             if (_error != null) ...[
               const SizedBox(height: CiSpace.s4),

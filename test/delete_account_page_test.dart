@@ -133,6 +133,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.textContaining("didn't work"), findsOneWidget);
+    expect(find.textContaining('connection'), findsNothing);
     // Signing them out of an account that still exists would look exactly
     // like the deletion having worked.
     expect(signedOut, isFalse);

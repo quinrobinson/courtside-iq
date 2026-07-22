@@ -75,8 +75,12 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
 
     if (!ok) {
       setState(() => _deleting = false);
+      // NOT "check your connection". The failure is as likely to be the
+      // server as the network - the first attempt on test was a 500, not a
+      // dropped request - and blaming their signal sends them to fix the one
+      // thing that was fine.
       showAccountResult(context,
-          message: "That didn't work. Check your connection and try again.",
+          message: "That didn't work. Please try again in a moment.",
           success: false);
       return;
     }

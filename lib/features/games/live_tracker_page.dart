@@ -431,20 +431,26 @@ class _ShotRow extends StatelessWidget {
           const SizedBox(height: CiSpace.s3),
           Padding(
             padding: const EdgeInsets.only(left: 56),
+            // Two equal halves rather than a fixed gap. The minus buttons made
+            // each group wide enough to overflow a 360pt screen at a fixed s7
+            // gap; sharing the width means they cannot, at any stat size.
             child: Row(
               children: [
-                _UndoCount(
-                  label: 'Made',
-                  value: made,
-                  onUndo: onUndoMade,
-                  semanticLabel: 'Undo one made $label',
+                Expanded(
+                  child: _UndoCount(
+                    label: 'Made',
+                    value: made,
+                    onUndo: onUndoMade,
+                    semanticLabel: 'Undo one made $label',
+                  ),
                 ),
-                const SizedBox(width: CiSpace.s7),
-                _UndoCount(
-                  label: 'Missed',
-                  value: missed,
-                  onUndo: onUndoMissed,
-                  semanticLabel: 'Undo one missed $label',
+                Expanded(
+                  child: _UndoCount(
+                    label: 'Missed',
+                    value: missed,
+                    onUndo: onUndoMissed,
+                    semanticLabel: 'Undo one missed $label',
+                  ),
                 ),
               ],
             ),
@@ -471,30 +477,47 @@ class _UndoCount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    return Semantics(
-      button: value > 0,
-      label: semanticLabel,
-      container: true,
-      excludeSemantics: true,
-      child: InkWell(
-        // Nothing to undo at zero, so it is not a target.
-        onTap: value > 0 ? onUndo : null,
-        borderRadius: CiRadius.chipR,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: CiSpace.s2, vertical: CiSpace.s2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(label,
-                  style: CiType.caption.copyWith(color: c.textMuted)),
-              const SizedBox(width: CiSpace.s2),
-              Text('$value',
-                  style: CiType.rowLabel.copyWith(color: c.text)),
-            ],
+    // A VISIBLE MINUS BUTTON (724:3149), not tappable text. It was built as a
+    // bare "Made 4" with the whole thing tappable, so the correction control
+    // was invisible - there was no way to know a mis-tap could be undone. The
+    // frame draws a bordered square with a minus, and that is the affordance.
+    final enabled = value > 0;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CiType.caption.copyWith(color: c.textMuted)),
+        ),
+        const SizedBox(width: 0),
+        const SizedBox(width: CiSpace.s2),
+        Text('$value', style: CiType.rowLabel.copyWith(color: c.text)),
+        const SizedBox(width: CiSpace.s2),
+        Semantics(
+          button: enabled,
+          label: semanticLabel,
+          container: true,
+          excludeSemantics: true,
+          child: InkWell(
+            // Nothing to undo at zero, so it is not a target.
+            onTap: enabled ? onUndo : null,
+            borderRadius: CiRadius.chipR,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                borderRadius: CiRadius.chipR,
+                border: Border.all(
+                    color: enabled ? c.border : c.borderFaint),
+              ),
+              child: Icon(Icons.remove,
+                  size: 15, color: enabled ? c.text : c.textFaint),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

@@ -44,6 +44,7 @@ import 'widgets/today_promo_banner.dart';
 import 'widgets/today_skeleton.dart';
 import 'today_repository.dart';
 import '/features/games/live_game_flow.dart';
+import '/features/players/add_player_flow.dart';
 import '/features/games/live_game_store.dart';
 import '/features/games/resume_game_dialog.dart';
 import 'widgets/game_feed_row.dart';
@@ -148,6 +149,19 @@ class _TodayPageState extends State<TodayPage> {
     });
     await Future.wait([next, _loadEntitlement(), _readLive()]);
   }
+
+  /// Opens the add-player flow directly. On the empty home screen the button
+  /// used to push the PLAYERS LIST, so a parent tapped "Add player", landed
+  /// on the list, and had to tap "Add player" AGAIN. One tap now does it.
+  Future<void> _addPlayer() => runAddPlayerFlow(
+        context,
+        entitlement: _entitlement,
+        // Zero here by definition: this button only exists when the account
+        // has no players.
+        playerCount: 0,
+        onPlayerAdded: _refresh,
+        openPaywall: _openPaywall,
+      );
 
   Future<void> _openPaywall() async {
     await showModalBottomSheet(
@@ -304,9 +318,9 @@ class _TodayPageState extends State<TodayPage> {
     if (data == null) return const [];
     if (data.hasNoPlayers) {
       return [
-        light(const SliverFillRemaining(
+        light(SliverFillRemaining(
           hasScrollBody: false,
-          child: _AddFirstPlayer(),
+          child: _AddFirstPlayer(onAdd: _addPlayer),
         )),
       ];
     }
@@ -457,7 +471,9 @@ class _Message extends StatelessWidget {
 
 /// The Empty frame's body: a user with no players at all.
 class _AddFirstPlayer extends StatelessWidget {
-  const _AddFirstPlayer();
+  const _AddFirstPlayer({required this.onAdd});
+
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -491,7 +507,7 @@ class _AddFirstPlayer extends StatelessWidget {
             label: 'Add player',
             style: CiButtonStyle.lime,
             expand: true,
-            onPressed: () => context.pushNamed(PlayersListWidget.routeName),
+            onPressed: onAdd,
           ),
         ],
       ),
