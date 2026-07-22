@@ -135,7 +135,9 @@ const bool kUseGameDetail2 = true;
 /// Email and Change Password, including a rejected current password and a
 /// successful change.
 ///
-/// Help Center and Send Feedback still route to their v1 screens (4.15c).
+/// 4.15c device-verified 2026-07-23: Help Center and Send Feedback, with a
+/// note reaching the feedback table.
+///
 /// Delete account renders disabled until 4.15d, and the photo badge is inert
 /// because public.users has no column to store one.
 const bool kUseMenu2 = true;

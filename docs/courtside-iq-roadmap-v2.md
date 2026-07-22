@@ -1767,6 +1767,28 @@ back and safe areas are cheap to honour while building and expensive to
 retrofit.
 | 4.15 | Menu/Account | Menu, subscription, settings |
 
+**4.15c DONE 2026-07-23.** Help Center and Send Feedback, device-verified.
+
+- **FOUR v1 HELP ANSWERS STATED THINGS THE APP DOES NOT DO**: the player
+  limit as three for everyone (free is ONE, said twice), the free trial
+  promised to every new subscriber (monthly-only, first-time only), a
+  "Manage Your Subscription" button 2.0 renamed, and a stats list predating
+  the 2.0 tracker. None could be caught while the copy lived inside a
+  500-line widget. It is pure Dart now and the player-limit test reads
+  `kFreePlayerLimit`, so answer and code cannot drift.
+- **Reshaped to the frame:** six broad questions, not twelve narrow ones,
+  plus two carrying facts the frame predates - whether deleting an account
+  cancels the subscription, and why a quiet game earns no insight.
+- **Send Feedback drops v1's email field** and takes the session address.
+  A failed send KEEPS the message: the table is insert-only, so there is no
+  sent-items list to recover it from.
+- The confirmation sheet deliberately drops the frame's leftover "Position"
+  header and X, which came from the sheet it was duplicated from. **Worth
+  fixing in Figma.**
+- **`feedback.rating` now holds the category** (Bug / Idea / Question /
+  Other) where v1 stored Solid / Good / Elite. Reuse avoids a migration for
+  a rename; worth tidying later.
+
 **4.15a + 4.15b DONE 2026-07-23.** `[x] built` · `[x] wired` · `[x]
 device-verified`. Menu, Your Profile, Edit Name, Edit Email, Change Password.
 
