@@ -55,6 +55,15 @@ class _FakeAccount implements AccountRepository {
     passwords.add([currentPassword, newPassword]);
     return passwordOk;
   }
+
+  final deletes = <int>[];
+  bool deleteSucceeds = true;
+
+  @override
+  Future<bool> deleteAccount() async {
+    deletes.add(1);
+    return deleteSucceeds;
+  }
 }
 
 /// After a SAVE, not pumpAndSettle.

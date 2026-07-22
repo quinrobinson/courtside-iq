@@ -34,6 +34,7 @@ import '/features/games/game_detail_page.dart';
 import '/auth/supabase_auth/auth_util.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/features/menu/change_password_page.dart';
+import '/features/menu/delete_account_page.dart';
 import '/features/menu/edit_email_page.dart';
 import '/features/menu/edit_name_page.dart';
 import '/features/menu/help_center_page.dart';
@@ -294,8 +295,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
                     context.pushNamed(EditEmailWidget.routeName),
                 onChangePassword: () =>
                     context.pushNamed(ChangePasswordPage.routeName),
-                // onEditPhoto is 4.15's open question - there is no column to
-                // store one. onDeleteAccount is 4.15d.
+                onDeleteAccount: () =>
+                    context.pushNamed(DeleteAccountPage.routeName),
+                // onEditPhoto stays null: there is no column to store one.
               )
             : YourProfileWidget(
           userFirstName: params.getParam(
@@ -426,6 +428,25 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // back is a one-line revert rather than a routing change.
         builder: (context, params) =>
             kUseAuth2 ? const EmailAuthPage() : UserAuthEmailWidget(),
+      ),
+      FFRoute(
+        name: DeleteAccountPage.routeName,
+        path: DeleteAccountPage.routePath,
+        requireAuth: true,
+        builder: (context, params) => DeleteAccountPage(
+          // The account is gone, so there is no session to route with.
+          // Same teardown as Log out, including the RevenueCat logout:
+          // without it the next account on this device inherits the
+          // entitlement of the one just deleted.
+          onDeleted: () async {
+            GoRouter.of(context).prepareAuthEvent();
+            await authManager.signOut();
+            GoRouter.of(context).clearRedirectLocation();
+            final router = GoRouter.of(context);
+            await actions.logoutOfRevenueCat();
+            router.goNamed(UserAuthWidget.routeName);
+          },
+        ),
       ),
       FFRoute(
         name: ChangePasswordPage.routeName,

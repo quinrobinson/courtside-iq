@@ -122,4 +122,23 @@ class AccountRepository {
       return false;
     }
   }
+
+  /// Deletes the signed-in account. Returns false if it did not happen.
+  ///
+  /// GOES THROUGH AN EDGE FUNCTION because removing a row from auth.users
+  /// needs the service role, which cannot live in a client. The function
+  /// takes NO id: it deletes whoever the JWT says is calling, so there is no
+  /// parameter that could name somebody else's account.
+  ///
+  /// Everything the parent owns follows by cascade (migration
+  /// 20260723000000). The one thing handled by hand is feedback, where the
+  /// note is kept and the email blanked.
+  Future<bool> deleteAccount() async {
+    try {
+      final res = await SupaFlow.client.functions.invoke('delete-account');
+      return res.status == 200;
+    } catch (_) {
+      return false;
+    }
+  }
 }
