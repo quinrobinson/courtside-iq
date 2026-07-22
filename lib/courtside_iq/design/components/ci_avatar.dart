@@ -137,11 +137,21 @@ class CiAvatar extends StatelessWidget {
     );
   }
 
+  /// Initials take their colour from the FILL THEY SIT ON, not from
+  /// [selected].
+  ///
+  /// Keying them to `selected` was fine while that flag also decided the fill.
+  /// The ringed treatment broke it: those avatars are selected AND filled sunk
+  /// ink, so the initials came out ink-on-ink and vanished. Tying the colour
+  /// to the fill means the next treatment cannot reintroduce this.
+  Color _initialsColor(CiColors c) =>
+      (ringColor == null && selected) ? c.textInvert : c.text;
+
   Widget _initials(CiColors c) => Center(
         child: Text(
           initialsOf(name),
           style: CiType.rowLabel.copyWith(
-            color: selected ? c.textInvert : c.text,
+            color: _initialsColor(c),
             fontWeight: CiWeight.extraBold,
             fontSize: size * 0.35,
             height: 1,
