@@ -40,6 +40,7 @@ import '/features/menu/edit_name_page.dart';
 import '/features/menu/help_center_page.dart';
 import '/features/menu/menu_page.dart';
 import '/features/premium/paywall_launcher.dart';
+import '/features/premium/paywall_page.dart';
 import '/features/menu/send_feedback_page.dart';
 import '/features/menu/your_profile_page.dart';
 import '/features/games/live_game_flow.dart';
@@ -448,6 +449,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
             await actions.logoutOfRevenueCat();
             router.goNamed(UserAuthWidget.routeName);
           },
+        ),
+      ),
+      FFRoute(
+        name: PaywallPage.routeName,
+        path: PaywallPage.routePath,
+        requireAuth: true,
+        builder: (context, params) => PaywallPage(
+          onClose: () => context.pop(false),
+          onPurchased: () => context.pop(true),
+          onOpenTerms: () => launchURL('https://www.courtsideiq.app/terms'),
+          onOpenPrivacy: () =>
+              launchURL('https://www.courtsideiq.app/policy'),
         ),
       ),
       FFRoute(

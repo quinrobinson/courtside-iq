@@ -11,10 +11,10 @@
 // they go straight to the plans.
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import '/flutter_flow/flutter_flow_util.dart';
 
 import '/features/flags.dart';
-import '/features/menu/menu_page.dart' show kTermsUrl, kPrivacyUrl;
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import 'paywall_page.dart';
 import 'premium_gate_sheet.dart';
@@ -35,17 +35,10 @@ Future<bool> showPaywall(BuildContext context) async {
     return false;
   }
 
-  final purchased = await Navigator.of(context).push<bool>(
-    MaterialPageRoute(
-      fullscreenDialog: true,
-      builder: (context) => PaywallPage(
-        onClose: () => Navigator.of(context).pop(false),
-        onPurchased: () => Navigator.of(context).pop(true),
-        onOpenTerms: () => _open(kTermsUrl),
-        onOpenPrivacy: () => _open(kPrivacyUrl),
-      ),
-    ),
-  );
+  // pushNamed, NOT Navigator.push. A raw route under this app's GoRouter is
+  // discarded on the next rebuild - the Change Password bug. The paywall's
+  // FFRoute wires its own close/purchase/terms/privacy.
+  final purchased = await context.pushNamed<bool?>(PaywallPage.routeName);
   return purchased ?? false;
 }
 
@@ -54,10 +47,4 @@ Future<bool> showPremiumGate(BuildContext context) async {
   final wantsPlans = await showPremiumGateSheet(context);
   if (wantsPlans != true || !context.mounted) return false;
   return showPaywall(context);
-}
-
-Future<void> _open(String url) async {
-  final uri = Uri.tryParse(url);
-  if (uri == null) return;
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }

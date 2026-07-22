@@ -27,6 +27,13 @@ import 'paywall_repository.dart';
 import 'paywall_states.dart';
 
 class PaywallPage extends StatefulWidget {
+  /// A REAL ROUTE. Pushing this as a bare MaterialPageRoute onto GoRouter's
+  /// navigator - which is what showPaywall did first - is discarded on the
+  /// next router rebuild, exactly as Change Password was. So it pushes by
+  /// name, and the three entry points all reached a screen that vanished.
+  static const String routeName = 'Paywall';
+  static const String routePath = '/paywall';
+
   const PaywallPage({
     super.key,
     this.repository = const PaywallRepository(),
