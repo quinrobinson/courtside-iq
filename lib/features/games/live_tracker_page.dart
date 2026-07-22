@@ -282,12 +282,25 @@ class _Header extends StatelessWidget {
                 child: Text('PTS',
                     style: CiType.rowLabel.copyWith(color: c.textMuted)),
               ),
-              const Spacer(),
-              _MiniStat(value: s.rebounds, label: 'REB'),
-              _MiniStat(value: s.assists, label: 'AST'),
-              _MiniStat(value: s.steals, label: 'STL'),
-              _MiniStat(value: s.blocks, label: 'BLK'),
-              _MiniStat(value: s.turnovers, label: 'TO'),
+              // EQUAL SLOTS, not fixed left padding. With a 54pt points
+              // figure this row overflowed a 360pt screen by 62px on ordinary
+              // stats - a striped overflow on a large share of Android
+              // phones. It went unseen because the device it was verified on
+              // is wider.
+              Expanded(
+                child: Row(
+                  children: [
+                    for (final m in [
+                      (s.rebounds, 'REB'),
+                      (s.assists, 'AST'),
+                      (s.steals, 'STL'),
+                      (s.blocks, 'BLK'),
+                      (s.turnovers, 'TO'),
+                    ])
+                      Expanded(child: _MiniStat(value: m.$1, label: m.$2)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -306,18 +319,15 @@ class _MiniStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(left: CiSpace.s4),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('$value',
-              style: CiType.unit
-                  .copyWith(color: c.text, fontWeight: CiWeight.light)),
-          const SizedBox(height: 2),
-          Text(label, style: CiType.micro.copyWith(color: c.textMuted)),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$value',
+            style: CiType.unit
+                .copyWith(color: c.text, fontWeight: CiWeight.light)),
+        const SizedBox(height: 2),
+        Text(label, style: CiType.micro.copyWith(color: c.textMuted)),
+      ],
     );
   }
 }

@@ -111,3 +111,17 @@ const bool kUseGames2 = true;
 /// only safe rollback: the two halves do not mix. It also gives up resume -
 /// v1 resumes through a client-state flag with no game id.
 const bool kUseNewGame2 = true;
+
+/// Game Detail, rebuilt on the 2.0 design system (4.14).
+///
+/// ON FOR REVIEW, NOT YET VERIFIED. Switched at the ROUTE rather than at the
+/// five places that push it, so every entry point moves together and none can
+/// be left behind - which is exactly how the AddPlayerSheet got lost between
+/// 1.2 and 1.12.
+///
+/// It also carries a BEHAVIOUR CHANGE: Remove Game is offered to free users,
+/// where v1 hid it for anyone without a subscription. Approved 2026-07-23 on
+/// the reasoning that deleting games to stay under the free limit is already
+/// working around the product rather than exploiting it. Turning this flag
+/// off restores the v1 gate along with the v1 screen.
+const bool kUseGameDetail2 = true;

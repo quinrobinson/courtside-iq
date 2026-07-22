@@ -30,6 +30,7 @@ import '/features/auth/reset_password_page.dart';
 import '/features/auth/reset_successful_page.dart';
 import '/features/flags.dart';
 import '/features/games/games_list_page.dart';
+import '/features/games/game_detail_page.dart';
 import '/features/games/live_game_flow.dart';
 import '/features/games/new_game_setup_page.dart';
 import '/features/onboarding/onboarding_page.dart';
@@ -385,16 +386,19 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: GameStatsWidget.routeName,
         path: GameStatsWidget.routePath,
-        builder: (context, params) => GameStatsWidget(
-          playerID: params.getParam(
-            'playerID',
-            ParamType.String,
-          ),
-          gameID: params.getParam(
-            'gameID',
-            ParamType.String,
-          ),
-        ),
+        builder: (context, params) {
+          final gameId = params.getParam('gameID', ParamType.String) ?? '';
+          // Switched HERE, not at the five call sites that push this route.
+          // One flag, every entry point - the games list, Today, the profile
+          // Games tab and the profile's own row cannot drift apart.
+          if (kUseGameDetail2) {
+            return GameDetailPage(gameId: gameId);
+          }
+          return GameStatsWidget(
+            playerID: params.getParam('playerID', ParamType.String),
+            gameID: gameId,
+          );
+        },
       ),
       FFRoute(
         name: $lock_orientation_library_opafp4.HomePageWidget.routeName,
