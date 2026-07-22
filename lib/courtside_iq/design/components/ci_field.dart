@@ -37,6 +37,7 @@ class CiField extends StatefulWidget {
     this.helperText,
     this.enabled = true,
     this.onChanged,
+    this.maxLines = 1,
   });
 
   /// Rendered above the input, uppercased. Required - a field without a
@@ -63,6 +64,10 @@ class CiField extends StatefulWidget {
   final String? helperText;
   final bool enabled;
   final ValueChanged<String>? onChanged;
+
+  /// Rows of text. Above 1 the box grows to fit them and the trailing action
+  /// is not offered - "Show" beside a six-line message means nothing.
+  final int maxLines;
 
   @override
   State<CiField> createState() => _CiFieldState();
@@ -113,8 +118,12 @@ class _CiFieldState extends State<CiField> {
         Opacity(
           opacity: w.enabled ? 1 : 0.5,
           child: Container(
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: CiSpace.s4),
+            // A single line is a fixed 48. Multi-line sizes to its rows, so
+            // a message box does not scroll inside a 48pt slot.
+            height: w.maxLines > 1 ? null : 48,
+            padding: EdgeInsets.symmetric(
+                horizontal: CiSpace.s4,
+                vertical: w.maxLines > 1 ? CiSpace.s3 : 0),
             decoration: BoxDecoration(
               // The ground decides the fill, and the palette already knows
               // which ground it is on, so nothing is derived here. See
@@ -136,7 +145,11 @@ class _CiFieldState extends State<CiField> {
                     controller: w.controller,
                     obscureText: w.obscure,
                     enabled: w.enabled,
-                    keyboardType: w.keyboardType,
+                    keyboardType: w.maxLines > 1
+                        ? TextInputType.multiline
+                        : w.keyboardType,
+                    maxLines: w.maxLines,
+                    minLines: w.maxLines > 1 ? w.maxLines : null,
                     onChanged: w.onChanged,
                     style: CiType.rowTitle
                         .copyWith(color: c.text, fontWeight: CiWeight.regular),

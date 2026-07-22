@@ -38,6 +38,7 @@ import '/features/menu/edit_email_page.dart';
 import '/features/menu/edit_name_page.dart';
 import '/features/menu/help_center_page.dart';
 import '/features/menu/menu_page.dart';
+import '/features/menu/send_feedback_page.dart';
 import '/features/menu/your_profile_page.dart';
 import '/features/games/live_game_flow.dart';
 import '/features/games/new_game_setup_page.dart';
@@ -436,7 +437,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: SendFeedbackWidget.routeName,
         path: SendFeedbackWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => SendFeedbackWidget(),
+        builder: (context, params) =>
+            kUseMenu2 ? const SendFeedbackPage() : SendFeedbackWidget(),
       ),
       FFRoute(
         name: GameStatsWidget.routeName,
