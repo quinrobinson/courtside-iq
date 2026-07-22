@@ -26,6 +26,49 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/live_game.dart';
 import 'live_game_store.dart';
 
+/// The offline banner (654:2199): ink, 54 tall, under the header.
+///
+/// Says the stats are SAFE, not that something failed. A parent in a gym with
+/// no bars has done nothing wrong, and the queue means nothing is at risk -
+/// so the sentence leads with where the stats are, not with the problem.
+class OfflineBanner extends StatelessWidget {
+  const OfflineBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Container(
+      width: double.infinity,
+      height: 54,
+      color: c.bg,
+      padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: c.accentEnergy,
+              borderRadius: CiRadius.chipR,
+            ),
+            child: Text('OFFLINE',
+                style: CiType.badge.copyWith(
+                    color: c.onAccent, fontWeight: CiWeight.semiBold)),
+          ),
+          const SizedBox(width: CiSpace.s3),
+          Expanded(
+            child: Text(
+              "You're offline. Stats are saved here and sync when you "
+              'reconnect.',
+              style: CiType.caption.copyWith(color: c.textMuted),
+              maxLines: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class LiveTrackerPage extends StatefulWidget {
   const LiveTrackerPage({
     super.key,
@@ -33,6 +76,7 @@ class LiveTrackerPage extends StatefulWidget {
     this.store = const LiveGameStore(),
     this.onEnd,
     this.onPause,
+    this.offline = false,
   });
 
   final LiveGameSnapshot snapshot;
@@ -43,6 +87,10 @@ class LiveTrackerPage extends StatefulWidget {
   final ValueChanged<LiveGameSnapshot>? onEnd;
 
   final ValueChanged<LiveGameSnapshot>? onPause;
+
+  /// Shows the offline banner. Display only - the queue keeps the game safe
+  /// whether or not this is true.
+  final bool offline;
 
   @override
   State<LiveTrackerPage> createState() => _LiveTrackerPageState();
@@ -78,6 +126,7 @@ class _LiveTrackerPageState extends State<LiveTrackerPage> {
                   onEnd: () => widget.onEnd?.call(_snapshot),
                   onPause: () => widget.onPause?.call(_snapshot),
                 ),
+                if (widget.offline) const OfflineBanner(),
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.only(bottom: CiSpace.s8),

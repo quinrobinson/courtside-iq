@@ -171,4 +171,30 @@ void main() {
     expect(find.text('Maya'), findsOneWidget);
     expect(find.textContaining('vs '), findsNothing);
   });
+
+  testWidgets('the offline banner says the stats are SAFE', (tester) async {
+    // A parent in a gym with no bars has done nothing wrong, and the queue
+    // means nothing is at risk - so the sentence leads with where the stats
+    // are, not with the problem.
+    await tester.pumpWidget(MaterialApp(
+      theme: CiTheme.base(),
+      home: LiveTrackerPage(
+        snapshot: _snap(),
+        store: _SpyStore(),
+        offline: true,
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('OFFLINE'), findsOneWidget);
+    expect(
+        find.text("You're offline. Stats are saved here and sync when you "
+            'reconnect.'),
+        findsOneWidget);
+  });
+
+  testWidgets('no banner when there is signal', (tester) async {
+    await _pump(tester);
+    expect(find.text('OFFLINE'), findsNothing);
+  });
 }
