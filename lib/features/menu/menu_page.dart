@@ -14,7 +14,10 @@
 // comes back at the next sign-in. Painting it orange would rank it with
 // Delete account, which cannot be undone.
 
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
@@ -28,29 +31,43 @@ import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/features/home/entitlement_status.dart';
 
-/// Shown in the footer.
+/// "Courtside IQ · v2.0.0 (Build 250)", READ FROM THE BUNDLE.
 ///
-/// A CONST, NOT READ FROM THE BUNDLE. The app has no package_info dependency,
-/// so this has to be kept in step with pubspec by hand - which is exactly the
-/// two-sources-of-truth shape that has bitten this project twice. Flagged for
-/// a decision; injectable so swapping the source touches one default.
-const String kCiVersionLabel = 'Courtside IQ · v2.0';
+/// Not a const kept in step with pubspec by hand. A version string is the one
+/// piece of text a support conversation depends on being exactly right, and a
+/// hand-maintained copy is the two-sources-of-truth shape this project has
+/// been bitten by twice already.
+Future<String> readVersionLabel() async {
+  final info = await PackageInfo.fromPlatform();
+  return 'Courtside IQ · v${info.version} (Build ${info.buildNumber})';
+}
 
-/// Where the two legal links go, as v1 sends them.
+/// APPLE'S STANDARD EULA ON iOS ONLY.
 ///
-/// TERMS POINTS AT APPLE'S STANDARD EULA, which is what v1 does and is wrong
-/// on Android - a Play Store user is shown Apple's licence terms. Carried
-/// over unchanged here rather than fixed silently, because which terms apply
-/// is not a decision to make in a UI commit.
-const String kTermsUrl =
+/// Apple requires either your own EULA or theirs, and v1 uses theirs. Google
+/// has no equivalent, so a Play Store user shown Apple's licence terms is
+/// being shown terms that do not govern their copy of the app.
+String get termsUrl => defaultTargetPlatform == TargetPlatform.android
+    ? kAndroidTermsUrl
+    : kAppleEulaUrl;
+
+const String kAppleEulaUrl =
     'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+
+/// Courtside IQ's own terms, for Android.
+///
+/// Verified live 2026-07-23: the page exists and is a real Terms & Conditions
+/// document. Worth stating because the site is a Framer build that serves one
+/// <title> for every route, so a 200 alone would not have proved anything.
+const String kAndroidTermsUrl = 'https://www.courtsideiq.app/terms';
+
 const String kPrivacyUrl = 'https://www.courtsideiq.app/policy';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({
     super.key,
     this.entitlementReader = fetchEntitlementStatus,
-    this.versionLabel = kCiVersionLabel,
+    this.versionReader = readVersionLabel,
     this.onSignOut,
     this.onOpenProfile,
     this.onOpenHelp,
@@ -59,7 +76,7 @@ class MenuPage extends StatefulWidget {
   });
 
   final Future<EntitlementStatus> Function() entitlementReader;
-  final String versionLabel;
+  final Future<String> Function() versionReader;
 
   final Future<void> Function()? onSignOut;
   final VoidCallback? onOpenProfile;
@@ -73,6 +90,7 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   EntitlementStatus? _entitlement;
+  String _version = '';
 
   @override
   void initState() {
@@ -83,6 +101,13 @@ class _MenuPageState extends State<MenuPage> {
   Future<void> _load() async {
     final status = await widget.entitlementReader();
     if (mounted) setState(() => _entitlement = status);
+    try {
+      final version = await widget.versionReader();
+      if (mounted) setState(() => _version = version);
+    } catch (_) {
+      // A missing version line is a cosmetic loss. Failing the whole screen
+      // over it would not be.
+    }
   }
 
   /// The plan, or nothing until it is known.
@@ -150,7 +175,7 @@ class _MenuPageState extends State<MenuPage> {
               const CiSettingsGroupLabel(label: 'About'),
               CiSettingsRow(
                 label: 'Terms of Service',
-                onTap: () => _open(kTermsUrl),
+                onTap: () => _open(termsUrl),
               ),
               const CiHairline(),
               CiSettingsRow(
@@ -159,10 +184,12 @@ class _MenuPageState extends State<MenuPage> {
               ),
               const CiHairline(),
               const SizedBox(height: 22),
-              Text(widget.versionLabel,
-                  textAlign: TextAlign.center,
-                  style: CiType.rowLabel.copyWith(color: c.textFaint)),
-              const SizedBox(height: 10),
+              if (_version.isNotEmpty) ...[
+                Text(_version,
+                    textAlign: TextAlign.center,
+                    style: CiType.rowLabel.copyWith(color: c.textFaint)),
+                const SizedBox(height: 10),
+              ],
               Semantics(
                 button: true,
                 label: 'Log out',

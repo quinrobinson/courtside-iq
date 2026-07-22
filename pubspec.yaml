@@ -101,6 +101,7 @@ dependencies:
   purchases_flutter: 9.9.5
   realtime_client: 2.5.0
   rxdart: 0.27.7
+  package_info_plus: 8.0.2
   share_plus: 10.0.2
   share_plus_platform_interface: 5.0.0
   shared_preferences: 2.5.3
