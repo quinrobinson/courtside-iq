@@ -102,10 +102,12 @@ const bool kUseEditPlayer2 = true;
 /// ever logged. Turning this off restores that.
 const bool kUseGames2 = true;
 
-/// New Game setup, rebuilt on the 2.0 design system (4.13).
+/// New Game, rebuilt on the 2.0 design system (4.13).
 ///
-/// ON FOR REVIEW, NOT YET VERIFIED. Covers the WHOLE flow now - setup, the
-/// live tracker, pause, complete and save. Turning it off returns to v1's
-/// setup and tracker together, which is the only safe rollback: the two
-/// halves do not mix.
+/// DEVICE-VERIFIED 2026-07-22. Setup, the live tracker, pause, complete,
+/// save, the offline queue, and resuming a game after a force-quit.
+///
+/// Turning it off returns to v1's setup AND tracker together, which is the
+/// only safe rollback: the two halves do not mix. It also gives up resume -
+/// v1 resumes through a client-state flag with no game id.
 const bool kUseNewGame2 = true;

@@ -812,9 +812,11 @@ real gap was only the final save, which fired two inserts with no retry.
 Verified on device: tracked a game, airplane mode on, saved (reported success), airplane mode off,
 game synced unattended. Database confirmed exactly one game row and one stats row.
 
-**CARRY-OVER GAP for 4.13 / 4.14:** a game queued offline never receives its AI insight. Generation
-needs a server row so it is skipped while offline, and the later sync uploads the rows without
-triggering it. The 2.0 tracker rebuild should generate the insight after a successful sync.
+**CARRY-OVER GAP for 4.13 / 4.14 - CLOSED 2026-07-22.** A game queued offline never received its AI
+insight: generation needs a server row so it was skipped while offline, and the later sync uploaded
+the rows without triggering it. `uploadPendingGame` now requests the insight, which covers both an
+immediate save and a flush days later because both come through there. Failure to generate never
+fails the upload.
 
 **Still unbuilt: the UI surface.** The "Offline Scoring + Deferred Sync" frame exists in Figma but
 was drawn for the 2.0 tracker, so it was deliberately not retrofitted onto the FlutterFlow screen.
@@ -1645,6 +1647,53 @@ before writing the state.** Reasoning about what a screen "should" do produced
 wrong copy, a wrong button, a wrong ground, and one screen that could never be
 reached.
 | 4.13 | New Game | Create → Setup → Live Tracker → Complete |
+
+**4.13 DONE 2026-07-22.** `[x] built` · `[x] wired` · `[x] device-verified`
+(setup, tracker, pause, complete, save, offline queue, force-quit resume and
+discard all signed off on device).
+
+- **THE SAVE DEFECT.** The stats row carried a `user_id` that
+  `player_game_stats` does not have. The games row went up first, so the first
+  real save produced a game with no stats and told the parent it would "sync
+  when you are back online" on a phone with full signal. Every unit test
+  passed: they all assert on the map, and the map was fine. **A map is not a
+  row.** `game_columns.dart` now holds the schema, the save path builds
+  against it and the tests assert against it.
+- **The outbox is a CROSS-VERSION FORMAT.** Fixing the save path could not
+  reach the game already queued, because the queue stores the BUILT ROWS, not
+  the snapshot - the bad key was frozen on disk and would have failed all
+  eight retries before going quiet. The uploader now conforms rows to the
+  column list before sending, and logs what it drops.
+- **`game_live` is dead in 2.0.** v1 created the games row at tip-off; 2.0
+  writes nothing until Save, which is what makes tracking work with no signal.
+  So the column is never true and the 4.12 LIVE pill was unreachable code.
+  **The live row renders from the LOCAL SNAPSHOT instead** - same frames
+  (`683:2597`, `379:1901`), different source, and it survives a gym with no
+  bars. The frames imply a server row; they should be annotated, not changed.
+- **Resume was the last real gap.** `LiveGameStore.read()` existed and nothing
+  called it, so a force-quit left the game safe on disk and unreachable, which
+  from a parent's side is the same as losing it. It now leads both the Games
+  list and Today.
+- **Today shows it too**, which the frames do not specify. The Games list was
+  the only place, so the screen the app OPENS ON said nothing about a game in
+  progress. When it is the only game it replaces "No games yet".
+- **`_finish()` falls back to popping its own route.** Resume was pushed
+  without `onFinished`, so a successful save left the parent stranded on Game
+  Complete and Discard looked inert. No call site can strand the flow now.
+- **One LIVE badge, one confirm dialog.** LIVE was hand-rolled twice at
+  h19 in a system whose badge is h24; it is `CiBadge.live()` now, and `CiBadge`
+  gained a semantic label because a screen reader was spelling out L-I-V-E.
+  The raw Material `AlertDialog` behind Discard became `CiConfirmDialog`,
+  shared with delete-player rather than becoming a third implementation.
+- **Deferred:** `games.event_type` is still null on every row - threading the
+  event's type through would have changed `LiveGameSnapshot`'s serialization
+  while a real queued game sat on the user's device. Its `fromJson` must
+  tolerate the older format first.
+
+**Lesson from 4.13: check whether it is already designed.** I proposed a
+design pass for the resume affordance and was one step from rebuilding two
+frames that already existed in the file.
+
 | 4.14 | Game Detail | Hero, stat rows, shooting blocks, scoring mix, insight card, remove game |
 | 4.15 | Menu/Account | Menu, subscription, settings |
 | 4.16 | Premium/Paywall | Carousel ×3 + Loading / Processing / Error / Already-Premium |
