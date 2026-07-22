@@ -74,3 +74,66 @@ double? astTovRatio({required int assists, required int turnovers}) {
   if (turnovers == 0) return assists.toDouble();
   return assists / turnovers;
 }
+
+// --- Tiers -------------------------------------------------------------------
+//
+// PORTED FROM metrics.ts IN 4.14, where they had lived alone since Phase 1.
+// The server had them because it writes `tier_context` into the insight; the
+// client never needed them, because v1 only ever displayed that one stored
+// tier.
+//
+// Game Detail changed that. Its Development section rates all THREE metrics,
+// and the jsonb carries exactly one - the highlighted metric's. So the other
+// two have to be computed here.
+//
+// THE INSIGHT CARD USES THESE TOO, not `tier_context`. Otherwise the card can
+// read "SCORING EFFICIENCY · ELITE" above a row that says Good, which is the
+// same failure as the two trend classifiers that made one player read
+// "Dipping" on Today and "Building" on their profile. One classifier.
+//
+// NULL MEANS NO RATING, never a zero rating. A game below the data threshold
+// says nothing rather than something wrong.
+
+/// Solid, Good or Elite. The hierarchy STARTS at Solid - it is the entry
+/// level, not a weak score - and every level is meant to feel acceptable.
+enum GameTier { solid, good, elite }
+
+extension GameTierLabel on GameTier {
+  String get label => switch (this) {
+        GameTier.solid => 'Solid',
+        GameTier.good => 'Good',
+        GameTier.elite => 'Elite',
+      };
+}
+
+/// Scoring efficiency. Null without an age band: these cutoffs are
+/// age-relative, so without an age there is nothing to be relative to.
+GameTier? ppsaTier(double ppsaValue, AgeBand? ageBand) {
+  if (ageBand == null) return null;
+  final t = kPpsaThresholds[ageBand]!;
+  if (ppsaValue >= t.eliteMin) return GameTier.elite;
+  if (ppsaValue >= t.goodMin) return GameTier.good;
+  if (ppsaValue >= t.solidMin) return GameTier.solid;
+  return null;
+}
+
+/// Effort and disruption, from the weighted score.
+GameTier? disruptTier(int score) {
+  if (score < kDisruptActiveMin) return null;
+  if (score >= kDisruptEliteMin) return GameTier.elite;
+  if (score >= kDisruptGoodMin && score <= kDisruptGoodMax) return GameTier.good;
+  if (score <= kDisruptSolidMax) return GameTier.solid;
+  return null;
+}
+
+/// Playmaking. Elite needs BOTH a high ratio and enough assists to earn it -
+/// 4 assists to 1 turnover is elite, 4-to-1 off two assists is a small sample.
+GameTier? astTovTier({required int assists, required int turnovers}) {
+  if (assists < kAstTovMinAssists) return null;
+  final ratio = turnovers == 0 ? assists.toDouble() : assists / turnovers;
+  if (ratio >= kAstTovEliteMin && assists >= kAstTovEliteMinAssists) {
+    return GameTier.elite;
+  }
+  if (ratio >= kAstTovGoodMin) return GameTier.good;
+  return GameTier.solid;
+}
