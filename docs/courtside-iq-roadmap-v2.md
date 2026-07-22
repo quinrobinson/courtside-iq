@@ -1690,6 +1690,22 @@ discard all signed off on device).
   while a real queued game sat on the user's device. Its `fromJson` must
   tolerate the older format first.
 
+**OPEN DEFECT — confirm dialogs do not match their frames.** Raised on device
+2026-07-22. `CiConfirmDialog` (delete player, discard game) is a Material
+`AlertDialog` with small corner text buttons and Cancel first. Frames
+`370:1886` and `371:1901` both show a centered ExtraBold title, centered muted
+body, the CONFIRMING action first as a full-width pill (orange destructive /
+ink neutral), and Cancel as a full-width grey pill beneath.
+
+Wrong on layout, controls, order and colour. It was built from reasoning
+without reading the frame, then extracted into a shared component - so the
+error was propagated to a second call site instead of caught. The paused and
+resume dialogs (`459:1934`, `379:1901`) DO follow the pattern, which is what
+makes the confirms look foreign beside them.
+
+One component, two call sites. Approved copy carries over unchanged. Also
+check `371:1910` (Alert, single action) for the one-button variant.
+
 **Lesson from 4.13: check whether it is already designed.** I proposed a
 design pass for the resume affordance and was one step from rebuilding two
 frames that already existed in the file.

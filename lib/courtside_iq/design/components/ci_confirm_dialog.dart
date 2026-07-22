@@ -10,9 +10,23 @@
 // false. Consent has to be explicit, because the confirming action here is
 // the one that cannot be undone.
 //
-// Cancel reads first and is the plain choice; the destructive action is the
-// one wearing the accent. That ordering is deliberate and should not be
-// flipped per call site.
+// DOES NOT MATCH THE APPROVED FRAMES. Verified against 370:1886 (destructive)
+// and 371:1901 (neutral) on 2026-07-22: both draw a CENTERED ExtraBold title,
+// centered muted body, then the CONFIRMING ACTION FIRST as a full-width pill -
+// orange when destructive, ink when not - with Cancel as a full-width grey
+// pill beneath it.
+//
+// This is a Material AlertDialog with small corner text buttons, Cancel
+// first, confirm in orange text. Wrong layout, wrong controls, wrong order.
+//
+// How it got here: delete_player_dialog was built without reading the frame,
+// and this component was extracted from it - so the error was shared to the
+// discard dialog rather than found. The paused and resume dialogs DO follow
+// the frames, which is why the confirms look foreign next to them.
+//
+// Fix is one component; both call sites follow. Copy is approved and should
+// carry over unchanged - see the gendered-pronoun note in
+// delete_player_dialog.
 
 import 'package:flutter/material.dart';
 
