@@ -22,15 +22,33 @@ import 'new_game_setup_page.dart';
 import 'save_game.dart';
 
 class LiveGameFlow extends StatefulWidget {
+  /// A game starting now, from the setup screen.
   const LiveGameFlow({
     super.key,
-    required this.setup,
+    required NewGameSetup setup,
     this.store = const LiveGameStore(),
     this.saver = const GameSaver(),
     this.onFinished,
-  });
+  })  : _setup = setup,
+        _resuming = null;
 
-  final NewGameSetup setup;
+  /// A game already in progress, read back off disk.
+  ///
+  /// Resuming REPLAYS THE STORED SNAPSHOT rather than rebuilding one from a
+  /// setup, so the stats and the original start time come back intact. Losing
+  /// startedAt would date the game to whenever the parent happened to reopen
+  /// the app, which for a game tracked last night is the wrong day.
+  const LiveGameFlow.resume({
+    super.key,
+    required LiveGameSnapshot snapshot,
+    this.store = const LiveGameStore(),
+    this.saver = const GameSaver(),
+    this.onFinished,
+  })  : _setup = null,
+        _resuming = snapshot;
+
+  final NewGameSetup? _setup;
+  final LiveGameSnapshot? _resuming;
   final LiveGameStore store;
   final GameSaver saver;
 
@@ -44,15 +62,16 @@ class LiveGameFlow extends StatefulWidget {
 enum _Stage { tracking, complete }
 
 class _LiveGameFlowState extends State<LiveGameFlow> {
-  late LiveGameSnapshot _snapshot = LiveGameSnapshot(
-    playerId: widget.setup.playerId,
-    playerName: widget.setup.playerName,
-    opponent: widget.setup.opponent,
-    team: widget.setup.team,
-    event: widget.setup.event,
-    stats: const LiveGameStats(),
-    startedAt: DateTime.now(),
-  );
+  late LiveGameSnapshot _snapshot = widget._resuming ??
+      LiveGameSnapshot(
+        playerId: widget._setup!.playerId,
+        playerName: widget._setup!.playerName,
+        opponent: widget._setup!.opponent,
+        team: widget._setup!.team,
+        event: widget._setup!.event,
+        stats: const LiveGameStats(),
+        startedAt: DateTime.now(),
+      );
 
   _Stage _stage = _Stage.tracking;
   bool _saving = false;

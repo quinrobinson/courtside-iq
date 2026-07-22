@@ -33,6 +33,9 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/games_list_builder.dart';
+import 'live_game_flow.dart';
+import 'live_game_store.dart';
+import 'resume_game_dialog.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -40,9 +43,17 @@ import '/index.dart';
 import 'games_repository.dart';
 
 class GamesListPage extends StatefulWidget {
-  const GamesListPage({super.key, this.repository = const GamesRepository()});
+  const GamesListPage({
+    super.key,
+    this.repository = const GamesRepository(),
+    this.store = const LiveGameStore(),
+  });
 
   final GamesRepository repository;
+
+  /// Where an unfinished game lives. Read from disk, NOT from the server:
+  /// tracking writes no game row until Save, so there is nothing to fetch.
+  final LiveGameStore store;
 
   @override
   State<GamesListPage> createState() => _GamesListPageState();
@@ -58,12 +69,46 @@ class _GamesListPageState extends State<GamesListPage> {
   /// so the two cannot drift apart.
   void _newGame() => context.pushNamed(NewGameWidget.routeName);
 
+  /// The game still being tracked on this phone, if there is one.
+  LiveGameSnapshot? _live;
+
+  @override
+  void initState() {
+    super.initState();
+    _readLive();
+  }
+
+  Future<void> _readLive() async {
+    final live = await widget.store.read();
+    if (mounted) setState(() => _live = live);
+  }
+
   Future<void> _refresh() async {
     final next = widget.repository.load();
     setState(() {
       _future = next;
     });
-    await next;
+    await Future.wait([next, _readLive()]);
+  }
+
+  /// Open the resume dialog for the unfinished game.
+  ///
+  /// Both outcomes end with a reload: resuming returns here once the game is
+  /// saved or discarded, and discarding removes the row that was tapped.
+  Future<void> _openLive(LiveGameSnapshot snapshot) async {
+    final choice = await showResumeGameDialog(context, snapshot: snapshot);
+    if (!mounted || choice == null) return;
+
+    if (choice == ResumeChoice.discard) {
+      await widget.store.clear();
+      if (mounted) await _refresh();
+      return;
+    }
+
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
+    ));
+    if (mounted) await _refresh();
   }
 
   @override
@@ -107,6 +152,15 @@ class _GamesListPageState extends State<GamesListPage> {
               final dateId = reconcileSelection(_dateId, dates);
               final rows = filterGames(byPlayer, dateId: dateId);
 
+              // The unfinished game obeys the same filters as the list it
+              // sits in - a row that ignored them would look like a bug. It
+              // has no date, so any date filter excludes it: that filter is a
+              // question about days already played.
+              final live = _live;
+              final showLive = live != null &&
+                  dateId == kAllDatesKey &&
+                  (_playerId == kAllPlayersId || _playerId == live.playerId);
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -148,7 +202,7 @@ class _GamesListPageState extends State<GamesListPage> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: _refresh,
-                      child: rows.isEmpty
+                      child: rows.isEmpty && !showLive
                           ? _Empty(
                               // Naming the player turns "nothing here" into
                               // an answer to the question they just asked.
@@ -167,9 +221,35 @@ class _GamesListPageState extends State<GamesListPage> {
                               // Without it the list stopped mid-air against
                               // the nav bar, which reads as content cut off
                               // rather than a list that ended.
-                              itemCount: rows.length + 1,
+                              // The live game leads. It is the newest thing
+                              // that happened and the only row still
+                              // changing, so anything above it would be
+                              // stale by comparison.
+                              itemCount: rows.length + (showLive ? 1 : 0) + 1,
                               separatorBuilder: (_, __) => const CiHairline(),
                               itemBuilder: (context, i) {
+                                if (showLive) {
+                                  if (i == 0) {
+                                    return GameFeedRow(
+                                      entry: GameFeedEntry(
+                                        gameId: 'live',
+                                        playerName: live.playerName,
+                                        opponent: live.opponent,
+                                        // No date: it has not finished, so
+                                        // there is no day to name yet, and
+                                        // the LIVE pill takes that slot.
+                                        points: live.stats.points,
+                                        rebounds: live.stats.rebounds,
+                                        assists: live.stats.assists,
+                                        steals: live.stats.steals,
+                                        turnovers: live.stats.turnovers,
+                                        isLive: true,
+                                      ),
+                                      onTap: () => _openLive(live),
+                                    );
+                                  }
+                                  i -= 1;
+                                }
                                 if (i == rows.length) {
                                   return const SizedBox.shrink();
                                 }
