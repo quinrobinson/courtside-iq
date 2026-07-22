@@ -25,6 +25,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
@@ -53,6 +54,10 @@ class _GamesListPageState extends State<GamesListPage> {
   String _playerId = kAllPlayersId;
   String _dateId = kAllDatesKey;
 
+  /// Start a new game. Same destination as the empty state's "Start a game",
+  /// so the two cannot drift apart.
+  void _newGame() => context.pushNamed(NewGameWidget.routeName);
+
   Future<void> _refresh() async {
     final next = widget.repository.load();
     setState(() {
@@ -78,8 +83,11 @@ class _GamesListPageState extends State<GamesListPage> {
             if (data == null) {
               // The header still renders: it is the screen's identity and
               // does not depend on the games arriving.
-              return const Column(
-                children: [_Header(), Expanded(child: _Loading())],
+              return Column(
+                children: [
+                  _Header(onAdd: _newGame),
+                  const Expanded(child: _Loading()),
+                ],
               );
             }
 
@@ -102,7 +110,7 @@ class _GamesListPageState extends State<GamesListPage> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const _Header(),
+                  _Header(onAdd: _newGame),
                   // The chips must not touch the header. With one player the
                   // player row is hidden, so the DATE row would otherwise butt
                   // straight against the ink.
@@ -206,12 +214,17 @@ class _GamesListPageState extends State<GamesListPage> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  const _Header({required this.onAdd});
+
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
     // Deliberately identical to the Players list header. If one changes, both
-    // should.
+    // should - including the add button: a parent who learns "+" starts a
+    // player on one tab should not have to hunt for how to start a game on
+    // the next. The empty state's "Start a game" is the same action, but it
+    // disappears the moment there is one game in the list.
     return CiSurface.ink(
       statusBar: true,
       child: Builder(builder: (context) {
@@ -227,11 +240,20 @@ class _Header extends StatelessWidget {
             // kind of difference that reads as a bug rather than a choice.
             child: SizedBox(
               height: kCiListHeaderContentHeight,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Games',
-                    style: CiType.h2.copyWith(
-                        color: c.text, fontWeight: CiWeight.extraBold)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text('Games',
+                        style: CiType.h2.copyWith(
+                            color: c.text, fontWeight: CiWeight.extraBold)),
+                  ),
+                  CiIconButton(
+                    icon: Icons.add,
+                    onDark: true,
+                    semanticLabel: 'New game',
+                    onPressed: onAdd,
+                  ),
+                ],
               ),
             ),
           ),

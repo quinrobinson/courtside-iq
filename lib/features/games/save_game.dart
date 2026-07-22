@@ -55,8 +55,12 @@ class GameSaver {
         'game_live': false,
         'created_at': snapshot.startedAt.toUtc().toIso8601String(),
       },
+      // NO user_id HERE. player_game_stats does not have that column - it
+      // reaches the owner through game_id - and sending it made PostgREST
+      // reject the row. The games row had already gone up by then, so the
+      // first real save produced a game with no stats and a "will sync when
+      // you are back online" message on a phone with full signal.
       statsRow: {
-        'user_id': userId,
         'player_id': snapshot.playerId,
         'points': s.points,
         'two_made': s.twoMade,

@@ -225,7 +225,10 @@ class _Header extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 5),
-                    const _LiveDot(),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: _LiveChip(),
+                    ),
                   ],
                 ),
               ),
@@ -240,12 +243,21 @@ class _Header extends StatelessWidget {
                 label: 'End game',
                 container: true,
                 excludeSemantics: true,
+                // Same bordered treatment as Pause, at 40 tall with 16 of
+                // side padding (138:631). The two sit together, so anything
+                // less would leave them looking like different kinds of
+                // thing.
                 child: InkWell(
                   onTap: onEnd,
                   borderRadius: CiRadius.chipR,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: CiSpace.s3, vertical: CiSpace.s3),
+                  child: Container(
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: c.border),
+                      borderRadius: CiRadius.chipR,
+                    ),
+                    alignment: Alignment.center,
                     child: Text('End',
                         style: CiType.buttonSm.copyWith(color: c.text)),
                   ),
@@ -284,8 +296,15 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _LiveDot extends StatelessWidget {
-  const _LiveDot();
+/// The LIVE chip (138:628): a SOLID orange chip with ink text and an ink dot.
+///
+/// It was built as an orange dot beside orange text on the ink ground, which
+/// is the same two elements arranged to say much less. The frame fills the
+/// chip because this is the one moment the app is recording something that
+/// cannot be recovered later, and orange is the system's attention colour -
+/// spending it here is exactly what it is for.
+class _LiveChip extends StatelessWidget {
+  const _LiveChip();
 
   @override
   Widget build(BuildContext context) {
@@ -294,20 +313,29 @@ class _LiveDot extends StatelessWidget {
       label: 'Live',
       container: true,
       excludeSemantics: true,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 5,
-            height: 5,
-            decoration:
-                BoxDecoration(color: c.accentEnergy, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 5),
-          Text('LIVE',
-              style: CiType.badge.copyWith(
-                  color: c.accentEnergy, fontWeight: CiWeight.bold)),
-        ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: c.accentEnergy,
+          borderRadius: CiRadius.chipR,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 5,
+              height: 5,
+              // Ink on orange, not white: the chip carries the colour, and
+              // the marks on it read as one piece with the label.
+              decoration:
+                  BoxDecoration(color: c.onAccent, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 5),
+            Text('LIVE',
+                style: CiType.badge.copyWith(
+                    color: c.onAccent, fontWeight: CiWeight.bold)),
+          ],
+        ),
       ),
     );
   }
@@ -630,10 +658,22 @@ class _IconTap extends StatelessWidget {
       label: semanticLabel,
       container: true,
       excludeSemantics: true,
+      // A BORDERED 40 SQUARE, not a bare circular ripple. 138:621 draws the
+      // hairline, and on an all-ink screen it is the only thing that makes
+      // this read as a control rather than a decoration - which matters most
+      // for Pause, the one button a parent hunts for while watching a game.
       child: InkWell(
         onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(width: 40, height: 40, child: Center(child: child)),
+        borderRadius: CiRadius.chipR,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            border: Border.all(color: CiColors.of(context).border),
+            borderRadius: CiRadius.chipR,
+          ),
+          child: Center(child: child),
+        ),
       ),
     );
   }

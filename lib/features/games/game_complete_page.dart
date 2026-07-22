@@ -23,6 +23,7 @@ import 'package:intl/intl.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
+import '/courtside_iq/design/components/ci_spark.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -249,21 +250,22 @@ class _Shot extends StatelessWidget {
     // never happened - the same rule the Averages tab follows.
     final pct = attempted == 0 ? '—' : '${(made / attempted * 100).round()}%';
 
+    // CENTERED, AND NO EXTRA INSET. 291:1358-1366 divides the content width
+    // into three equal columns with centered text, exactly like the five
+    // stat columns directly above. Left-aligning these and padding them in
+    // pushed every figure off the shared grid, so the two rows read as
+    // belonging to different screens.
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: CiSpace.s3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(pct,
-                style: CiType.statSm.copyWith(
-                    color: attempted == 0 ? c.textFaint : c.text)),
-            const SizedBox(height: 2),
-            Text(label, style: CiType.bodyXs.copyWith(color: c.textMuted)),
-            Text('$made/$attempted',
-                style: CiType.caption.copyWith(color: c.textFaint)),
-          ],
-        ),
+      child: Column(
+        children: [
+          Text(pct,
+              style: CiType.statSm.copyWith(
+                  color: attempted == 0 ? c.textFaint : c.text)),
+          const SizedBox(height: 2),
+          Text(label, style: CiType.bodyXs.copyWith(color: c.textMuted)),
+          Text('$made/$attempted',
+              style: CiType.caption.copyWith(color: c.textFaint)),
+        ],
       ),
     );
   }
@@ -284,14 +286,29 @@ class _InsightTeaser extends StatelessWidget {
       color: c.accentGoodWash,
       padding: const EdgeInsets.symmetric(
           horizontal: CiSpace.screen, vertical: 18),
-      child: Column(
+      // The spark leads the line (443:1971, 22pt at the screen gutter, text
+      // from 58). Without it the promise is a sentence in a green box; with
+      // it, it carries the same mark the finished insight will.
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Save to unlock $who's game insight",
-              style: CiType.h4.copyWith(color: c.text)),
-          const SizedBox(height: CiSpace.s1),
-          Text('A development read on what this game means.',
-              style: CiType.bodySm.copyWith(color: c.textMuted)),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: CiSpark(size: 22, color: c.text),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Save to unlock $who's game insight",
+                    style: CiType.h4.copyWith(color: c.text)),
+                const SizedBox(height: CiSpace.s1),
+                Text('A development read on what this game means.',
+                    style: CiType.bodySm.copyWith(color: c.textMuted)),
+              ],
+            ),
+          ),
         ],
       ),
     );

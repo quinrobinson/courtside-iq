@@ -108,5 +108,42 @@ void main() {
       expect(g.statsRow['game_id'], g.gameId);
       expect(g.gameId, isNotEmpty);
     });
+
+    // THE COLUMNS THE DATABASE ACTUALLY HAS, transcribed from
+    // information_schema on test 2026-07-21.
+    //
+    // This group exists because of a real defect: the stats row carried a
+    // user_id that player_game_stats does not have. Every unit test passed -
+    // they all assert on the map, and the map was fine - while PostgREST
+    // rejected the row on a device. The games row went up first, so the
+    // result was a game with no stats and a save that reported itself queued
+    // on a phone with full signal.
+    //
+    // A map is not a row. Nothing else in the suite checks the key NAMES
+    // against the schema, so a typo or an invented column is invisible until
+    // a save fails in a gym. Update these lists when a migration changes the
+    // tables - a red test here means the two have drifted.
+    const gameColumns = {
+      'id', 'created_at', 'opponent_team', 'game_live', 'user_id',
+      'player_id', 'player_team_name', 'event_name', 'event_type',
+    };
+    const statsColumns = {
+      'id', 'game_id', 'player_id', 'points', 'fg_made', 'fg_attempt',
+      'two_made', 'two_attempt', 'three_made', 'three_attempt', 'ft_made',
+      'ft_attempt', 'off_reb', 'def_reb', 'assist', 'steal', 'turnover',
+      'block', 'off_foul', 'def_foul', 'game_insights',
+    };
+
+    test('every games key is a real games column', () async {
+      final g = await rowsFor(const LiveGameStats(twoMade: 3));
+      expect(g.gameRow.keys.toSet().difference(gameColumns), isEmpty,
+          reason: 'sending a column games does not have rejects the row');
+    });
+
+    test('every stats key is a real player_game_stats column', () async {
+      final g = await rowsFor(const LiveGameStats(twoMade: 3));
+      expect(g.statsRow.keys.toSet().difference(statsColumns), isEmpty,
+          reason: 'this is the exact check that user_id would have failed');
+    });
   });
 }
