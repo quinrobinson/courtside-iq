@@ -1766,6 +1766,36 @@ iPhone."** Android is deliberately deferred, but width, text scaling, system
 back and safe areas are cheap to honour while building and expensive to
 retrofit.
 | 4.15 | Menu/Account | Menu, subscription, settings |
+
+**4.15a + 4.15b DONE 2026-07-23.** `[x] built` · `[x] wired` · `[x]
+device-verified`. Menu, Your Profile, Edit Name, Edit Email, Change Password.
+
+- **THE NAME WAS NEVER GOING TO SHOW.** `AuthUserInfo` never populates
+  displayName in this app, so `currentUserDisplayName` is permanently empty -
+  the hubs would have read "Your account" for every user forever. The name is
+  in `public.users`. Found only because Edit Name forced the question of
+  where it is written.
+- **An email change is a REQUEST.** Supabase mails a link to the new address
+  and the account keeps signing in with the old one until it is clicked. Said
+  before the tap, not only after.
+- **Supabase never checks the old password.** `updateUser` trusts the
+  session, so the frame's Current password field would be decoration and
+  anyone holding an unlocked phone could lock the owner out. The repository
+  re-authenticates first.
+- **A raw MaterialPageRoute is discarded under GoRouter here.** Change
+  Password had no v1 route to inherit and pushed one; it vanished before a
+  frame rendered. Every 2.0 screen without a v1 counterpart needs its own
+  routeName - which is DELETE ACCOUNT in 4.15d.
+- **Success Confirmation (667:2553) is Send Feedback's**, not generic - it
+  reads "We read every note." Moved to 4.15c. It also still carries a stale
+  "Position" header in Figma.
+- **Terms now points at courtsideiq.app/terms on both platforms.** v1 sent
+  iOS to Apple's standard EULA, leaving Android users reading terms that did
+  not govern their copy. Apple requires a custom EULA to carry their minimum
+  terms - a condition on the PAGE, worth confirming before submission.
+- **Version reads from the bundle** (package_info_plus, approved).
+- **Open:** the profile photo badge is inert. `public.users` has no photo
+  column, so a picker would drop its result. Needs a schema change.
 | 4.16 | Premium/Paywall | Carousel ×3 + Loading / Processing / Error / Already-Premium |
 | 4.17 | Locked & lapsed | Development locked, Profile locked, Players lapsed, Age-band transition |
 

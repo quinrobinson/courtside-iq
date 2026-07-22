@@ -131,9 +131,11 @@ const bool kUseGameDetail2 = true;
 
 /// Menu and Your Profile, rebuilt on the 2.0 design system (4.15a).
 ///
-/// ON FOR REVIEW, NOT YET VERIFIED. The two hubs only - the seven screens
-/// behind them are 4.15b through 4.15d and still route to their v1 versions,
-/// so this flag makes the hubs 2.0 while their destinations stay v1. That
-/// mix is deliberate and temporary; it is also why Delete account renders
-/// disabled rather than opening something that does not exist.
+/// DEVICE-VERIFIED 2026-07-23 on iPhone: Menu, Your Profile, Edit Name, Edit
+/// Email and Change Password, including a rejected current password and a
+/// successful change.
+///
+/// Help Center and Send Feedback still route to their v1 screens (4.15c).
+/// Delete account renders disabled until 4.15d, and the photo badge is inert
+/// because public.users has no column to store one.
 const bool kUseMenu2 = true;
