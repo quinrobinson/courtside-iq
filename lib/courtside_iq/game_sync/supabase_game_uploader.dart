@@ -4,10 +4,13 @@
 // testable without a network. This file is the only place that knows the
 // database exists.
 
+import 'dart:developer' as dev;
+
 import 'package:uuid/uuid.dart';
 
 import '/backend/supabase/supabase.dart';
 import '/custom_code/actions/generate_game_insight.dart';
+import 'game_columns.dart';
 import 'game_sync_queue.dart';
 import 'pending_game.dart';
 
@@ -54,10 +57,28 @@ PendingGame buildPendingGame({
 Future<void> uploadPendingGame(PendingGame game) async {
   final client = SupaFlow.client;
 
-  await client.from('games').upsert(game.gameRow, onConflict: 'id');
+  // Conform BEFORE sending. A queued game holds the rows as they were built,
+  // so one written by an older build can carry a key this schema does not
+  // have - and a payload that cannot be fixed fails on every retry until the
+  // queue gives up. Logged, never silent: a dropped key is either a stale
+  // payload healing itself or a column list that has drifted from the
+  // database, and the second one needs a person.
+  final gameRow = conformToColumns(game.gameRow, kGameColumns);
+  final statsRow = conformToColumns(game.statsRow, kStatsColumns);
+  for (final (table, dropped) in [
+    ('games', gameRow.dropped),
+    ('player_game_stats', statsRow.dropped),
+  ]) {
+    if (dropped.isNotEmpty) {
+      dev.log('dropped unknown $table columns: ${dropped.join(', ')}',
+          name: 'GameSync');
+    }
+  }
+
+  await client.from('games').upsert(gameRow.row, onConflict: 'id');
   await client
       .from('player_game_stats')
-      .upsert(game.statsRow, onConflict: 'id');
+      .upsert(statsRow.row, onConflict: 'id');
 
   try {
     await generateGameInsight(game.gameId);

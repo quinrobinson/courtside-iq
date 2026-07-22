@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:courtside_i_q/courtside_iq/game_sync/game_columns.dart';
 import 'package:courtside_i_q/courtside_iq/game_sync/game_sync_queue.dart';
 import 'package:courtside_i_q/courtside_iq/game_sync/pending_game.dart';
 import 'package:courtside_i_q/courtside_iq/live_game.dart';
@@ -109,41 +110,46 @@ void main() {
       expect(g.gameId, isNotEmpty);
     });
 
-    // THE COLUMNS THE DATABASE ACTUALLY HAS, transcribed from
-    // information_schema on test 2026-07-21.
-    //
-    // This group exists because of a real defect: the stats row carried a
-    // user_id that player_game_stats does not have. Every unit test passed -
-    // they all assert on the map, and the map was fine - while PostgREST
-    // rejected the row on a device. The games row went up first, so the
-    // result was a game with no stats and a save that reported itself queued
-    // on a phone with full signal.
-    //
-    // A map is not a row. Nothing else in the suite checks the key NAMES
-    // against the schema, so a typo or an invented column is invisible until
-    // a save fails in a gym. Update these lists when a migration changes the
-    // tables - a red test here means the two have drifted.
-    const gameColumns = {
-      'id', 'created_at', 'opponent_team', 'game_live', 'user_id',
-      'player_id', 'player_team_name', 'event_name', 'event_type',
-    };
-    const statsColumns = {
-      'id', 'game_id', 'player_id', 'points', 'fg_made', 'fg_attempt',
-      'two_made', 'two_attempt', 'three_made', 'three_attempt', 'ft_made',
-      'ft_attempt', 'off_reb', 'def_reb', 'assist', 'steal', 'turnover',
-      'block', 'off_foul', 'def_foul', 'game_insights',
-    };
-
+    // The column lists live in lib/courtside_iq/game_sync/game_columns.dart,
+    // shared with the uploader that filters against them. Asserting on a
+    // copy here would let the two drift, which is the whole failure mode
+    // these tests exist to catch.
     test('every games key is a real games column', () async {
       final g = await rowsFor(const LiveGameStats(twoMade: 3));
-      expect(g.gameRow.keys.toSet().difference(gameColumns), isEmpty,
+      expect(g.gameRow.keys.toSet().difference(kGameColumns), isEmpty,
           reason: 'sending a column games does not have rejects the row');
     });
 
     test('every stats key is a real player_game_stats column', () async {
       final g = await rowsFor(const LiveGameStats(twoMade: 3));
-      expect(g.statsRow.keys.toSet().difference(statsColumns), isEmpty,
+      expect(g.statsRow.keys.toSet().difference(kStatsColumns), isEmpty,
           reason: 'this is the exact check that user_id would have failed');
+    });
+  });
+
+  group('a payload built by an older build', () {
+    // THE OUTBOX IS A CROSS-VERSION FORMAT. These rows are serialized to disk
+    // and may not be uploaded until a later build runs the flush, so the
+    // uploader has to cope with keys the current schema does not have.
+    //
+    // This is the exact shape of a real defect: the user_id fix to the save
+    // path could not reach the game already queued with user_id baked in, so
+    // it failed on every retry.
+    test('sheds a column the table no longer has', () {
+      final r = conformToColumns(
+        {'id': 's1', 'game_id': 'g1', 'points': 12, 'user_id': 'u1'},
+        kStatsColumns,
+      );
+      expect(r.dropped, {'user_id'});
+      expect(r.row.containsKey('user_id'), isFalse);
+      expect(r.row['points'], 12, reason: 'the real data must survive');
+    });
+
+    test('leaves a clean row completely alone', () {
+      const row = {'id': 's1', 'game_id': 'g1', 'points': 12};
+      final r = conformToColumns(row, kStatsColumns);
+      expect(r.dropped, isEmpty);
+      expect(identical(r.row, row), isTrue);
     });
   });
 }
