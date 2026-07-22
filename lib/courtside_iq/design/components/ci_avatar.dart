@@ -36,6 +36,8 @@ class CiAvatar extends StatelessWidget {
     this.imageUrl,
     this.size = 40,
     this.selected = true,
+    this.ringColor,
+    this.ringWidth = 1,
     this.shape = CiAvatarShape.circle,
     this.onTap,
   });
@@ -47,6 +49,15 @@ class CiAvatar extends StatelessWidget {
   final String? imageUrl;
 
   final double size;
+
+  /// An explicit ring, overriding the selected/unselected treatment.
+  ///
+  /// The New Game player tiles (286:1328) work the other way round from the
+  /// switcher: EVERY avatar is filled the same sunk ink, and the RING is what
+  /// changes - lime at 2pt for the chosen player, a dark grey hairline for the
+  /// rest. Passing a ring switches to that treatment.
+  final Color? ringColor;
+  final double ringWidth;
 
   /// Filled when selected, ringed outline when not. In a switcher this is
   /// which player is active.
@@ -102,10 +113,18 @@ class CiAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: selected ? c.surfaceInvert : Colors.transparent,
+        color: ringColor != null
+            ? c.surfaceSunk
+            : selected
+                ? c.surfaceInvert
+                : Colors.transparent,
         shape: rounded ? BoxShape.rectangle : BoxShape.circle,
         borderRadius: radius,
-        border: selected ? null : Border.all(color: c.borderStrong),
+        border: ringColor != null
+            ? Border.all(color: ringColor!, width: ringWidth)
+            : selected
+                ? null
+                : Border.all(color: c.borderStrong),
       ),
       child: child,
     );

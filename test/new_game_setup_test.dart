@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_avatar.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
 import 'package:courtside_i_q/courtside_iq/player_averages.dart';
 import 'package:courtside_i_q/courtside_iq/players_list_builder.dart';
@@ -98,5 +100,24 @@ void main() {
     await tester.tap(find.text('Select team'));
     await tester.pumpAndSettle();
     expect(find.text('Select team'), findsOneWidget);
+  });
+
+  testWidgets('the hero is ink, and the chosen player wears a lime ring',
+      (tester) async {
+    // Read from the frame: hero #0f0f0f, selected avatar ring #9dff00 at 2pt
+    // against #2e2e2e for the rest. Built on light first, by assumption.
+    await _pump(tester, [_player('p1', 'Maya'), _player('p2', 'Jordan')]);
+
+    final title = tester.widget<Text>(find.text('New Game'));
+    expect(title.style!.color, CiColors.onInk.text);
+
+    await tester.tap(find.bySemanticsLabel('Maya'));
+    await tester.pumpAndSettle();
+
+    final avatars = tester.widgetList<CiAvatar>(find.byType(CiAvatar)).toList();
+    final chosen = avatars.firstWhere((a) => a.ringWidth == 2);
+    expect(chosen.ringColor, CiColors.onInk.accentGood);
+    // Everyone else keeps the hairline.
+    expect(avatars.where((a) => a.ringWidth == 2).length, 1);
   });
 }

@@ -2,9 +2,10 @@
 //
 // Measured from 286:1328:
 //
-//   hero   212: back at 12/52, "New Game" SemiBold 17 centred, then the
-//          player tiles - avatar 54 over a name, 78 apart, the chosen one
-//          SemiBold and the rest Medium
+//   hero   INK (#0f0f0f), 212 tall: back at 12/52, "New Game" SemiBold 17
+//          centred, then the player tiles - avatar 54 over a name, 78 apart.
+//          Every avatar is filled sunk ink; the RING is what changes - lime
+//          2pt for the chosen player, a #2e2e2e hairline for the rest.
 //   form   TEAM (with a "+"), OPPONENT, EVENT · OPTIONAL (with a "+")
 //   cta    "Start Game", full width
 //
@@ -224,8 +225,13 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    return SafeArea(
+    // INK, and it claims the status bar. Built on light first - assumed, not
+    // read - which is the same miss as the Full Breakdown hero.
+    return CiSurface.ink(
+      statusBar: true,
+      child: Builder(builder: (context) {
+        final c = CiColors.of(context);
+        return SafeArea(
       bottom: false,
       child: Column(
         children: [
@@ -266,15 +272,21 @@ class _Hero extends StatelessWidget {
                 ),
             ],
           ),
+          const SizedBox(height: CiSpace.s6),
         ],
       ),
+        );
+      }),
     );
   }
 }
 
-/// Avatar over a name. The chosen one is SemiBold ink; the rest are Medium
-/// muted, and dimmed - selection has to survive a glance, and weight alone at
-/// 13pt does not carry across a phone held at arm's length in a gym.
+/// Avatar over a name, on the ink hero.
+///
+/// The RING carries the selection - lime at 2pt against a dark hairline - which
+/// is what the frame specifies and is also the only signal that survives a
+/// glance at a phone held at arm's length in a gym. The name weight follows,
+/// but weight alone at 13pt does not carry.
 class _PlayerTile extends StatelessWidget {
   const _PlayerTile({
     required this.player,
@@ -303,14 +315,12 @@ class _PlayerTile extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Opacity(
-                opacity: selected ? 1 : 0.45,
-                child: CiAvatar(
-                  name: player.displayName,
-                  imageUrl: player.profilePic,
-                  size: 54,
-                  selected: selected,
-                ),
+              CiAvatar(
+                name: player.displayName,
+                imageUrl: player.profilePic,
+                size: 54,
+                ringColor: selected ? c.accentGood : c.border,
+                ringWidth: selected ? 2 : 1.35,
               ),
               const SizedBox(height: CiSpace.s2),
               Text(
