@@ -51,9 +51,11 @@ class GamesView extends StatelessWidget {
 
     return ListView.separated(
       padding: EdgeInsets.zero,
-      // +1 for the header, which scrolls with the list rather than pinning
-      // above it - the frame puts it inside the feed.
-      itemCount: games.length + 1,
+      // +2: the header at index 0, and a zero-height item at the end. The
+      // trailing item exists only so the separator BEFORE it draws the rule
+      // that closes the last game - without it the list stopped mid-air, the
+      // one open thing from the earlier review.
+      itemCount: games.length + 2,
       // CiSectionHeader draws its own hairline, so adding one after it would
       // render a 2px double rule under the header.
       separatorBuilder: (context, i) => i == 0
@@ -67,6 +69,7 @@ class GamesView extends StatelessWidget {
                 '${games.length} ${games.length == 1 ? 'Game' : 'Games'}',
           );
         }
+        if (i == games.length + 1) return const SizedBox.shrink();
         final g = games[i - 1];
         return GameFeedRow(
           entry: g,

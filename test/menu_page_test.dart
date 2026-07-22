@@ -154,6 +154,12 @@ void main() {
 
   testWidgets('a bundle read that fails costs the line, not the screen',
       (tester) async {
+    tester.view.physicalSize = const Size(1080, 6000);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
     await tester.pumpWidget(MaterialApp(
       theme: CiTheme.base(),
       home: MenuPage(

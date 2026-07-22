@@ -125,18 +125,20 @@ class AccountRepository {
 
   /// Deletes the signed-in account. Returns false if it did not happen.
   ///
-  /// GOES THROUGH AN EDGE FUNCTION because removing a row from auth.users
-  /// needs the service role, which cannot live in a client. The function
-  /// takes NO id: it deletes whoever the JWT says is calling, so there is no
-  /// parameter that could name somebody else's account.
+  /// Calls the SECURITY DEFINER function delete_current_user (migration
+  /// 20260723000001). It takes NO id - it deletes auth.uid(), the caller
+  /// resolved from the verified JWT - so there is no parameter that could
+  /// name someone else's account.
   ///
-  /// Everything the parent owns follows by cascade (migration
-  /// 20260723000000). The one thing handled by hand is feedback, where the
-  /// note is kept and the email blanked.
+  /// This REPLACED an Edge Function that failed with an untraceable 500 on
+  /// test. The raw cascade delete was proven to work, so this uses that path
+  /// directly, and does the feedback anonymise and the delete in one
+  /// transaction rather than two. Everything the parent owns follows by
+  /// cascade (migration 20260723000000).
   Future<bool> deleteAccount() async {
     try {
-      final res = await SupaFlow.client.functions.invoke('delete-account');
-      return res.status == 200;
+      await SupaFlow.client.rpc('delete_current_user');
+      return true;
     } catch (_) {
       return false;
     }

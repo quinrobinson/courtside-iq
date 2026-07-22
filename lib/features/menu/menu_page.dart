@@ -28,6 +28,7 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/features/home/entitlement_status.dart';
+import '/features/nav/ci_nav_bar.dart';
 import 'account_repository.dart';
 
 /// "Courtside IQ · v2.0.0 (Build 250)", READ FROM THE BUNDLE.
@@ -216,6 +217,11 @@ class _MenuPageState extends State<MenuPage> {
               const SizedBox(height: CiSpace.s8),
             ],
           ),
+          // Menu is a TAB, and it was the only one of the four with no nav
+          // bar. Reaching it left a parent with no way to any other tab, so
+          // it read as the bar "disappearing" - it was never there. The other
+          // three set this; Menu was missed.
+          bottomNavigationBar: const CiNavBar(active: CiNavTab.menu),
         );
       }),
     );
