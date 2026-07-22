@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:courtside_i_q/courtside_iq/live_game.dart';
+import 'package:courtside_i_q/features/games/live_game_store.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
@@ -155,6 +159,67 @@ void main() {
       final banner = tester.widget<TodayPromoBanner>(find.byType(TodayPromoBanner));
       expect(banner.purpose, TodayPromoPurpose.lapse);
       expect(find.text('Your Premium has ended'), findsOneWidget);
+    });
+  });
+
+  group('an unfinished game on Today', () {
+    // Today was NOT showing it. The Games list was the only place, so a
+    // parent who reopened the app landed on a home screen that said nothing
+    // about the game they were in the middle of and had to know to go
+    // looking for it.
+    setUp(() => SharedPreferences.setMockInitialValues({}));
+
+    final live = LiveGameSnapshot(
+      playerId: 'p1',
+      playerName: 'Maya',
+      opponent: 'Northside Hawks',
+      stats: const LiveGameStats(twoMade: 6, assists: 3),
+      startedAt: DateTime(2026, 5, 4, 18),
+    );
+
+    Future<void> pump(WidgetTester tester, TodayData data) async {
+      await tester.pumpWidget(MaterialApp(
+        home: TodayPage(
+          repository: _FakeRepo(data),
+          entitlementReader: () async => EntitlementStatus.premium,
+        ),
+      ));
+      await tester.pumpAndSettle();
+    }
+
+    TodayData withGames() => TodayData(
+          headerPlayers: const [],
+          recentGames: const [
+            GameFeedEntry(
+              gameId: 'g1',
+              playerName: 'Maya Chen',
+              points: 22, rebounds: 7, assists: 5, steals: 3, turnovers: 2,
+            ),
+          ],
+          playerCount: 1,
+        );
+
+    testWidgets('leads Recent Games', (tester) async {
+      await const LiveGameStore().save(live);
+      await pump(tester, withGames());
+      expect(find.bySemanticsLabel('Live'), findsOneWidget);
+    });
+
+    testWidgets('is absent when nothing is being tracked', (tester) async {
+      await pump(tester, withGames());
+      expect(find.bySemanticsLabel('Live'), findsNothing);
+    });
+
+    testWidgets('replaces "No games yet" rather than contradicting it',
+        (tester) async {
+      // The empty message would sit directly under a row showing a game in
+      // progress and flatly deny it.
+      await const LiveGameStore().save(live);
+      await pump(tester,
+          const TodayData(headerPlayers: [], recentGames: [], playerCount: 1));
+
+      expect(find.bySemanticsLabel('Live'), findsOneWidget);
+      expect(find.text('No games yet'), findsNothing);
     });
   });
 

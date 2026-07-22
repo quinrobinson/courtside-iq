@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -165,7 +166,7 @@ class GameFeedRow extends StatelessWidget {
                   ),
                   // Top-aligned with the title, per the frame - the pill sits
                   // at the row's top-right, not centred on the taller header.
-                  if (entry.isLive) const _LivePill(),
+                  if (entry.isLive) CiBadge.live(),
                 ],
               ),
               const SizedBox(height: CiSpace.s4),
@@ -186,51 +187,6 @@ class GameFeedRow extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The LIVE pill (683:2752): orange fill, a 5pt ink dot, "LIVE" SemiBold 11
-/// ink, radius 6, 8h/3v padding.
-///
-/// This is the one place orange means "happening now" rather than "attention".
-/// It reads because it is paired with the word LIVE and a dot, not left to the
-/// colour alone.
-class _LivePill extends StatelessWidget {
-  const _LivePill();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    return Semantics(
-      label: 'Live',
-      // container + exclude, or the inner "LIVE" merges over the label and a
-      // screen reader spells it out letter by letter.
-      container: true,
-      excludeSemantics: true,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: c.accentEnergy,
-          borderRadius: CiRadius.chipR,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(color: c.onAccent, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 5),
-            Text('LIVE',
-                style: CiType.badge.copyWith(
-                    color: c.onAccent,
-                    fontWeight: CiWeight.semiBold,
-                    letterSpacing: 0.3)),
-          ],
         ),
       ),
     );

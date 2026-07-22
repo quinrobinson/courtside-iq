@@ -43,6 +43,9 @@ import 'entitlement_status.dart';
 import 'widgets/today_promo_banner.dart';
 import 'widgets/today_skeleton.dart';
 import 'today_repository.dart';
+import '/features/games/live_game_flow.dart';
+import '/features/games/live_game_store.dart';
+import '/features/games/resume_game_dialog.dart';
 import 'widgets/game_feed_row.dart';
 import 'widgets/today_hero.dart';
 
@@ -51,10 +54,15 @@ class TodayPage extends StatefulWidget {
     super.key,
     this.repository = const TodayRepository(),
     this.entitlementReader = fetchEntitlementStatus,
+    this.store = const LiveGameStore(),
   });
 
   /// Injectable so the screen can be tested without Supabase.
   final TodayRepository repository;
+
+  /// Where an unfinished game lives, read from disk. Nothing reaches the
+  /// server until Save, so there is no row to fetch for one.
+  final LiveGameStore store;
 
   /// Injectable so the screen can be tested without RevenueCat.
   final Future<EntitlementStatus> Function() entitlementReader;
@@ -71,10 +79,14 @@ class _TodayPageState extends State<TodayPage> {
   /// separate future so a slow entitlement read never delays the games.
   EntitlementStatus _entitlement = EntitlementStatus.never;
 
+  /// The game still being tracked on this phone, if there is one.
+  LiveGameSnapshot? _live;
+
   @override
   void initState() {
     super.initState();
     _loadEntitlement();
+    _readLive();
     // The v1 gate lives on home_widget, which this screen replaces, so
     // without this the birth-date prompt is dead on every 2.0 build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -92,6 +104,29 @@ class _TodayPageState extends State<TodayPage> {
     if (mounted) setState(() => _entitlement = status);
   }
 
+  Future<void> _readLive() async {
+    final live = await widget.store.read();
+    if (mounted) setState(() => _live = live);
+  }
+
+  /// Resume or discard the unfinished game. Same dialog the Games list uses -
+  /// a second way in, not a second design.
+  Future<void> _openLive(LiveGameSnapshot snapshot) async {
+    final choice = await showResumeGameDialog(context, snapshot: snapshot);
+    if (!mounted || choice == null) return;
+
+    if (choice == ResumeChoice.discard) {
+      await widget.store.clear();
+      if (mounted) await _refresh();
+      return;
+    }
+
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
+    ));
+    if (mounted) await _refresh();
+  }
+
   Future<void> _refresh() async {
     final next = widget.repository.load();
     // Block body, not an arrow: an arrow RETURNS the assigned Future, and
@@ -100,7 +135,7 @@ class _TodayPageState extends State<TodayPage> {
     setState(() {
       _future = next;
     });
-    await Future.wait([next, _loadEntitlement()]);
+    await Future.wait([next, _loadEntitlement(), _readLive()]);
   }
 
   Future<void> _openPaywall() async {
@@ -288,7 +323,47 @@ class _TodayPageState extends State<TodayPage> {
     ];
   }
 
+  /// The unfinished game, as a row for the top of Recent Games.
+  ///
+  /// TODAY GETS IT TOO. The Games list was the only place it appeared, which
+  /// meant a parent who reopened the app landed on a home screen that said
+  /// nothing about the game they were in the middle of - they had to know to
+  /// go looking. This is the screen the app opens on, so it is where an
+  /// unfinished game most needs to be visible.
+  Widget? _liveRow() {
+    final live = _live;
+    if (live == null) return null;
+    return GameFeedRow(
+      entry: GameFeedEntry(
+        gameId: 'live',
+        playerName: live.playerName,
+        opponent: live.opponent,
+        points: live.stats.points,
+        rebounds: live.stats.rebounds,
+        assists: live.stats.assists,
+        steals: live.stats.steals,
+        turnovers: live.stats.turnovers,
+        isLive: true,
+      ),
+      onTap: () => _openLive(live),
+    );
+  }
+
   List<Widget> _feedSlivers(BuildContext context, TodayData data) {
+    final liveRow = _liveRow();
+
+    if (data.recentGames.isEmpty && liveRow != null) {
+      // Nothing logged yet, but a game is in progress. The "No games yet"
+      // message would be a flat contradiction of the row above it.
+      return [
+        const SliverToBoxAdapter(
+            child: FeedSectionHeader(title: 'Recent Games')),
+        SliverToBoxAdapter(child: liveRow),
+        const SliverToBoxAdapter(child: FeedHairline()),
+        const SliverToBoxAdapter(child: SizedBox(height: CiSpace.s8)),
+      ];
+    }
+
     if (data.recentGames.isEmpty) {
       // Players exist but nothing has been logged. Not an error, and not the
       // no-players screen either.
@@ -305,6 +380,11 @@ class _TodayPageState extends State<TodayPage> {
 
     return [
       const SliverToBoxAdapter(child: FeedSectionHeader(title: 'Recent Games')),
+      // Ahead of the finished games: it is the only one still changing.
+      if (liveRow != null) ...[
+        SliverToBoxAdapter(child: liveRow),
+        const SliverToBoxAdapter(child: FeedHairline()),
+      ],
       SliverList.separated(
         itemCount: data.recentGames.length,
         separatorBuilder: (_, __) => const FeedHairline(),

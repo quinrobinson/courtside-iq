@@ -34,11 +34,21 @@ class CiBadge extends StatelessWidget {
     required this.label,
     this.tone = CiBadgeTone.neutral,
     this.icon,
+    this.dot = false,
+    this.semanticLabel,
   });
 
   final String label;
   final CiBadgeTone tone;
   final IconData? icon;
+
+  /// A 5pt filled dot before the label, in the label's own colour.
+  final bool dot;
+
+  /// Spoken instead of the label. Set it for any badge whose text is an
+  /// abbreviation or an all-caps word, which a screen reader otherwise reads
+  /// out one letter at a time.
+  final String? semanticLabel;
 
   /// Pick a tone from what a change MEANS, not from its sign.
   ///
@@ -114,6 +124,29 @@ class CiBadge extends StatelessWidget {
     );
   }
 
+  /// "LIVE" — a game being tracked right now.
+  ///
+  /// ORANGE MEANS "HAPPENING NOW" HERE, not "attention". It is the only place
+  /// in the app that uses it that way, and it earns it: this is the one state
+  /// a parent can lose data by ignoring.
+  ///
+  /// Built here rather than hand-rolled at each call site, which is what it
+  /// was: the games row and the tracker header each drew their own, at their
+  /// own size, neither of them the system's 24. A status pill and a filter
+  /// chip are different things, but two LIVE pills that disagree with each
+  /// other are just a mistake.
+  ///
+  /// The dot is not decoration. Orange alone would leave the meaning to
+  /// colour; the dot and the word carry it for anyone who cannot use that.
+  factory CiBadge.live({Key? key}) => CiBadge(
+        key: key,
+        label: 'LIVE',
+        tone: CiBadgeTone.energy,
+        dot: true,
+        // Without this a screen reader spells out L-I-V-E.
+        semanticLabel: 'Live',
+      );
+
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
@@ -126,7 +159,7 @@ class CiBadge extends StatelessWidget {
       CiBadgeTone.ghost => (Colors.transparent, c.text, c.border),
     };
 
-    return Container(
+    final badge = Container(
       height: 24,
       padding: const EdgeInsets.symmetric(horizontal: CiSpace.s2),
       decoration: BoxDecoration(
@@ -142,6 +175,14 @@ class CiBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (dot) ...[
+            Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 5),
+          ],
           if (icon != null) ...[
             Icon(icon, size: 12, color: fg),
             const SizedBox(width: 4),
@@ -149,6 +190,16 @@ class CiBadge extends StatelessWidget {
           Text(label, style: CiType.labelStrong.copyWith(color: fg)),
         ],
       ),
+    );
+
+    if (semanticLabel == null) return badge;
+    return Semantics(
+      label: semanticLabel,
+      // container + exclude, or the inner text merges over the label and the
+      // abbreviation is read out anyway.
+      container: true,
+      excludeSemantics: true,
+      child: badge,
     );
   }
 }

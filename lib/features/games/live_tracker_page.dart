@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -225,9 +226,9 @@ class _Header extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 5),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
-                      child: _LiveChip(),
+                      child: CiBadge.live(),
                     ),
                   ],
                 ),
@@ -292,51 +293,6 @@ class _Header extends StatelessWidget {
         ),
         Container(height: CiSpace.hairline, color: c.hairline),
       ],
-    );
-  }
-}
-
-/// The LIVE chip (138:628): a SOLID orange chip with ink text and an ink dot.
-///
-/// It was built as an orange dot beside orange text on the ink ground, which
-/// is the same two elements arranged to say much less. The frame fills the
-/// chip because this is the one moment the app is recording something that
-/// cannot be recovered later, and orange is the system's attention colour -
-/// spending it here is exactly what it is for.
-class _LiveChip extends StatelessWidget {
-  const _LiveChip();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    return Semantics(
-      label: 'Live',
-      container: true,
-      excludeSemantics: true,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: c.accentEnergy,
-          borderRadius: CiRadius.chipR,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 5,
-              height: 5,
-              // Ink on orange, not white: the chip carries the colour, and
-              // the marks on it read as one piece with the label.
-              decoration:
-                  BoxDecoration(color: c.onAccent, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 5),
-            Text('LIVE',
-                style: CiType.badge.copyWith(
-                    color: c.onAccent, fontWeight: CiWeight.bold)),
-          ],
-        ),
-      ),
     );
   }
 }

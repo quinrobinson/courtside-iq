@@ -13,6 +13,8 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
+import '/courtside_iq/design/components/ci_confirm_dialog.dart';
+
 import 'game_complete_page.dart';
 import 'game_paused_dialog.dart';
 import '/courtside_iq/live_game.dart';
@@ -132,31 +134,36 @@ class _LiveGameFlowState extends State<LiveGameFlow> {
           // Not "failed". The game is on disk and will go up by itself.
           : 'Game saved. It will sync when you are back online.'),
     ));
-    widget.onFinished?.call();
+    _finish();
   }
 
   Future<void> _discard() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Discard this game?'),
-        content: const Text(
-            'The stats you tracked will be deleted. This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Keep it'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Discard'),
-          ),
-        ],
-      ),
+    final confirmed = await showCiConfirmDialog(
+      context,
+      title: 'Discard this game?',
+      message: 'The stats you tracked will be deleted. This cannot be undone.',
+      confirmLabel: 'Discard',
+      cancelLabel: 'Keep it',
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
     await widget.store.clear();
-    if (mounted) widget.onFinished?.call();
+    if (mounted) _finish();
+  }
+
+  /// Leave the flow.
+  ///
+  /// Falls back to popping this route when the caller named no destination,
+  /// which is exactly how the RESUME path arrives here. Without it a parent
+  /// who resumed a game, saved it and watched "Game saved." appear was left
+  /// sitting on the Game Complete screen with no way forward - and Discard
+  /// looked like it did nothing at all.
+  void _finish() {
+    final onFinished = widget.onFinished;
+    if (onFinished != null) {
+      onFinished();
+      return;
+    }
+    Navigator.of(context).maybePop();
   }
 
   @override
