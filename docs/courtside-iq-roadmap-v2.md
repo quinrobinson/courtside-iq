@@ -1726,6 +1726,45 @@ design pass for the resume affordance and was one step from rebuilding two
 frames that already existed in the file.
 
 | 4.14 | Game Detail | Hero, stat rows, shooting blocks, scoring mix, insight card, remove game |
+
+**4.14 DONE 2026-07-23.** `[x] built` · `[x] wired` · `[x] device-verified`
+(all three entry points, a low-volume game, and Remove Game signed off on
+iPhone; Today's row fix landed after that pass and wants a glance).
+
+- **The database could not answer what the screen asks.** `game_insights`
+  stores ONE tier - `tier_context` for `highlight_metric` - and the frame
+  rates three. That is why the tier functions had only ever existed in
+  TypeScript: v1 displayed the server's single tier. `ppsaTier`,
+  `disruptTier` and `astTovTier` are now mirrored in `game_metrics.dart`.
+- **The insight card's eyebrow uses the COMPUTED tier**, not the stored one,
+  so it cannot say ELITE above a row saying Good.
+- **Absence is per-metric.** A game can clear the disruption floor and miss
+  the assist gate. A metric that falls short loses its row; only when none
+  qualify does the section go. Points, shooting and the scoring mix always
+  show - they are counts, not judgements.
+- **Remove Game opened to free users**, approved. v1 hid it without a
+  subscription. The dialog explains why keeping games matters rather than
+  warning them off, which is the same argument the save screen now makes.
+- **The save screen stopped promising an insight.** "Save to unlock Maya's
+  game insight" committed the app to producing one for a game that may earn
+  none. Now "some games earn a closer read". This also retired the plan to
+  generate on demand from Game Detail, so the card's loading and error states
+  (424:1904, 425:1909) are BUILT AND UNWIRED - sweep in 4.24 if nothing
+  claims them.
+
+**Two defects found here that were NOT in this item:**
+
+- **The live tracker header overflowed by 62px at 360pt** on ordinary stats,
+  shipped and signed off the day before. It survived device verification
+  because the verification device is wider than a large share of Android.
+  `narrow_screen_test.dart` now pumps both headers at 360.
+- **Today's recent-games rows pushed the games LIST, not the game**, since
+  4.10a. Tapping a specific game gave a list to search again.
+
+**Lesson from 4.14: "device-verified" has meant "verified on one wide
+iPhone."** Android is deliberately deferred, but width, text scaling, system
+back and safe areas are cheap to honour while building and expensive to
+retrofit.
 | 4.15 | Menu/Account | Menu, subscription, settings |
 | 4.16 | Premium/Paywall | Carousel ×3 + Loading / Processing / Error / Already-Premium |
 | 4.17 | Locked & lapsed | Development locked, Profile locked, Players lapsed, Age-band transition |

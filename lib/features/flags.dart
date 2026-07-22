@@ -114,7 +114,10 @@ const bool kUseNewGame2 = true;
 
 /// Game Detail, rebuilt on the 2.0 design system (4.14).
 ///
-/// ON FOR REVIEW, NOT YET VERIFIED. Switched at the ROUTE rather than at the
+/// DEVICE-VERIFIED 2026-07-23 on iPhone: all three entry points, a
+/// low-volume game correctly showing stats without ratings, and Remove Game.
+///
+/// Switched at the ROUTE rather than at the
 /// five places that push it, so every entry point moves together and none can
 /// be left behind - which is exactly how the AddPlayerSheet got lost between
 /// 1.2 and 1.12.
