@@ -5,7 +5,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -117,22 +116,12 @@ void main() {
     });
   });
 
-  group('the terms link', () {
-    // Apple requires its standard EULA or your own; v1 uses Apple's. Google
-    // has no equivalent, so a Play Store user sent to Apple's licence is
-    // reading terms that do not govern their copy of the app.
-    tearDown(() => debugDefaultTargetPlatformOverride = null);
-
-    test('iOS gets Apple\'s standard EULA', () {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      expect(termsUrl, kAppleEulaUrl);
-    });
-
-    test('Android gets Courtside IQ\'s own terms', () {
-      debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      expect(termsUrl, kAndroidTermsUrl);
-      expect(termsUrl, isNot(contains('apple.com')));
-    });
+  test('terms is one document for both stores', () {
+    // v1 sent iOS to Apple's standard EULA, which left an Android user
+    // reading terms that did not govern their copy. One page we control
+    // covers both, and can say what Apple's boilerplate does not.
+    expect(kTermsUrl, isNot(contains('apple.com')));
+    expect(kTermsUrl, 'https://www.courtsideiq.app/terms');
   });
 
   testWidgets('the version line waits for the bundle rather than guessing',

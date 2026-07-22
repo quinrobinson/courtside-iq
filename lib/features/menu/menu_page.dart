@@ -14,8 +14,6 @@
 // comes back at the next sign-in. Painting it orange would rank it with
 // Delete account, which cannot be undone.
 
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,24 +40,23 @@ Future<String> readVersionLabel() async {
   return 'Courtside IQ · v${info.version} (Build ${info.buildNumber})';
 }
 
-/// APPLE'S STANDARD EULA ON iOS ONLY.
+/// COURTSIDE IQ'S OWN TERMS, ON BOTH PLATFORMS.
 ///
-/// Apple requires either your own EULA or theirs, and v1 uses theirs. Google
-/// has no equivalent, so a Play Store user shown Apple's licence terms is
-/// being shown terms that do not govern their copy of the app.
-String get termsUrl => defaultTargetPlatform == TargetPlatform.android
-    ? kAndroidTermsUrl
-    : kAppleEulaUrl;
-
-const String kAppleEulaUrl =
-    'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
-
-/// Courtside IQ's own terms, for Android.
+/// v1 pointed iOS at Apple's standard EULA. Apple permits either theirs or
+/// your own, and Google has no equivalent - so Apple's left a Play Store user
+/// reading terms that did not govern their copy of the app.
 ///
-/// Verified live 2026-07-23: the page exists and is a real Terms & Conditions
-/// document. Worth stating because the site is a Framer build that serves one
-/// <title> for every route, so a 200 alone would not have proved anything.
-const String kAndroidTermsUrl = 'https://www.courtsideiq.app/terms';
+/// One document we control covers both stores and can say things Apple's
+/// boilerplate does not. Verified live 2026-07-23: the page is a real Terms &
+/// Conditions document. Worth checking because the site is a Framer build
+/// serving one <title> for every route, so a 200 proved nothing on its own -
+/// /eula and /terms-of-service 404, which is what showed the routing
+/// distinguishes real pages.
+///
+/// APPLE REQUIRES A CUSTOM EULA TO INCLUDE THEIR MINIMUM TERMS. That is a
+/// condition on the page's CONTENT, not on this link, and it is worth
+/// confirming before a 2.0 submission.
+const String kTermsUrl = 'https://www.courtsideiq.app/terms';
 
 const String kPrivacyUrl = 'https://www.courtsideiq.app/policy';
 
@@ -175,7 +172,7 @@ class _MenuPageState extends State<MenuPage> {
               const CiSettingsGroupLabel(label: 'About'),
               CiSettingsRow(
                 label: 'Terms of Service',
-                onTap: () => _open(termsUrl),
+                onTap: () => _open(kTermsUrl),
               ),
               const CiHairline(),
               CiSettingsRow(
