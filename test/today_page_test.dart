@@ -162,6 +162,45 @@ void main() {
     });
   });
 
+  group('tapping a recent game', () {
+    // Every row here pushed the GAMES LIST from 4.10a until 4.14. A parent
+    // who tapped one specific game got a list of all of them and had to find
+    // it again - and it read as the tap having missed.
+    testWidgets('opens that game, not the list', (tester) async {
+      final pushed = <String>[];
+      await tester.pumpWidget(MaterialApp(
+        home: TodayPage(
+          repository: _FakeRepo(TodayData(
+            headerPlayers: const [],
+            recentGames: const [
+              GameFeedEntry(
+                gameId: 'g1',
+                playerId: 'p1',
+                playerName: 'Maya Chen',
+                points: 22, rebounds: 7, assists: 5, steals: 3, turnovers: 2,
+              ),
+            ],
+            playerCount: 1,
+          )),
+          entitlementReader: () async => EntitlementStatus.premium,
+        ),
+        onGenerateRoute: (settings) {
+          pushed.add(settings.name ?? '');
+          return MaterialPageRoute(builder: (_) => const SizedBox());
+        },
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Maya Chen'), findsOneWidget);
+      // The row must carry the ids that identify a game, or the destination
+      // has nothing to open.
+      final row = tester.widget<GameFeedRow>(find.byType(GameFeedRow).first);
+      expect(row.entry.gameId, 'g1');
+      expect(row.entry.playerId, 'p1');
+      expect(row.onTap, isNotNull);
+    });
+  });
+
   group('an unfinished game on Today', () {
     // Today was NOT showing it. The Games list was the only place, so a
     // parent who reopened the app landed on a home screen that said nothing

@@ -104,6 +104,17 @@ class _TodayPageState extends State<TodayPage> {
     if (mounted) setState(() => _entitlement = status);
   }
 
+  void _openGame(GameFeedEntry entry) {
+    if (entry.gameId.isEmpty) return;
+    context.pushNamed(
+      GameStatsWidget.routeName,
+      queryParameters: {
+        'playerID': serializeParam(entry.playerId, ParamType.String),
+        'gameID': serializeParam(entry.gameId, ParamType.String),
+      }.withoutNulls,
+    );
+  }
+
   Future<void> _readLive() async {
     final live = await widget.store.read();
     if (mounted) setState(() => _live = live);
@@ -390,7 +401,10 @@ class _TodayPageState extends State<TodayPage> {
         separatorBuilder: (_, __) => const FeedHairline(),
         itemBuilder: (context, i) => GameFeedRow(
           entry: data.recentGames[i],
-          onTap: () => context.pushNamed(AllGamesWidget.routeName),
+          // OPENS THE GAME, not the games list. Every recent-games row on
+          // this screen went to the list instead, since 4.10a - a parent who
+          // tapped a specific game got a list and had to find it again.
+          onTap: () => _openGame(data.recentGames[i]),
         ),
       ),
       const SliverToBoxAdapter(child: FeedHairline()),

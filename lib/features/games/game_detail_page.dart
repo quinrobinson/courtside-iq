@@ -129,17 +129,19 @@ class _GameDetailPageState extends State<GameDetailPage> {
                             "coach's take in seconds.",
                       ),
                     ),
+                  // CiSectionHeader DRAWS ITS OWN CLOSING HAIRLINE. Adding
+                  // one after it put a double rule under every section
+                  // header on this screen.
                   if (v.showDevelopment) ...[
                     const CiSectionHeader(title: 'Development'),
-                    for (final d in v.development) ...[
-                      const CiHairline(),
-                      _DevelopmentRow(row: d),
+                    for (var i = 0; i < v.development.length; i++) ...[
+                      if (i > 0) const CiHairline(),
+                      _DevelopmentRow(row: v.development[i]),
                     ],
                     const CiHairline(),
                   ],
                   if (v.scoringMix.isNotEmpty) ...[
                     const CiSectionHeader(title: 'Scoring Mix'),
-                    const CiHairline(),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(CiSpace.screen,
                           CiSpace.s5, CiSpace.screen, CiSpace.s5),

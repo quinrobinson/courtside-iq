@@ -222,6 +222,27 @@ void main() {
     });
   });
 
+  testWidgets('a section header is closed by ONE rule, not two',
+      (tester) async {
+    // CiSectionHeader draws its own closing hairline. Adding another after it
+    // put a double rule under every section header on this screen.
+    await _pump(tester, _row());
+
+    final header = tester.getRect(find.text('Development'));
+    final rules = find
+        .byType(Container)
+        .evaluate()
+        .map((e) => tester.getRect(find.byWidget(e.widget)))
+        .where((r) =>
+            r.height <= 1.5 &&
+            r.top > header.bottom &&
+            r.top < header.bottom + 40)
+        .map((r) => r.top.round())
+        .toSet();
+    expect(rules.length, lessThanOrEqualTo(1),
+        reason: 'two hairlines within 40px below the header is the double rule');
+  });
+
   testWidgets('a game deleted elsewhere says so instead of failing',
       (tester) async {
     await _pump(tester, null);

@@ -160,6 +160,7 @@ class TodayRepository {
     final last = (r['last_name'] as String? ?? '').trim();
     return GameFeedEntry(
       gameId: r['game_id'] as String? ?? '',
+      playerId: r['player_id'] as String? ?? '',
       playerName: [first, last].where((s) => s.isNotEmpty).join(' '),
       playerPhotoUrl: r['player_profile_pic'] as String?,
       opponent: r['opponent_team'] as String?,

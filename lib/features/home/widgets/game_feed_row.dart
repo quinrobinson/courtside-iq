@@ -28,6 +28,7 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 class GameFeedEntry {
   const GameFeedEntry({
     required this.gameId,
+    this.playerId = '',
     required this.playerName,
     this.playerPhotoUrl,
     this.opponent,
@@ -42,6 +43,11 @@ class GameFeedEntry {
   });
 
   final String gameId;
+
+  /// Needed to open the game. Empty on rows built before 4.14, which is why
+  /// it defaults rather than being required.
+  final String playerId;
+
   final String playerName;
   final String? playerPhotoUrl;
 
