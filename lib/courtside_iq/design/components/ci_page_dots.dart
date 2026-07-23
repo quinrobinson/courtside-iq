@@ -44,6 +44,11 @@ class CiPageDots extends StatelessWidget {
     return Semantics(
       label: 'Page ${index + 1} of $count',
       child: Row(
+        // HUGS its dots. With the default max it filled the row and centred
+        // internally, so a parent's Align(centerLeft) did nothing - the
+        // paywall's dots stayed centred through two attempted fixes.
+        // Alignment is the parent's call now; a Column still centres it.
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           for (var i = 0; i < count; i++)

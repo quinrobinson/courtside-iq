@@ -58,6 +58,18 @@ class PaywallPage extends StatefulWidget {
   State<PaywallPage> createState() => _PaywallPageState();
 }
 
+/// THE PAYWALL'S GUTTER IS 20, not the app's 24.
+///
+/// Measured from 234:910: the card, the copy, the dots, the plan radios and
+/// the button all share x=20 (a 350-wide card on a 390 frame). At 24 the card
+/// rendered 342 wide, so it no longer matched its own 350x155 export and got
+/// scaled and cropped.
+const double _gutter = 20;
+
+/// The plan rows, from the frame's 82-tall blocks. They were ~69 with padding
+/// alone, which is what made them feel cramped against the price.
+const double _planRowHeight = 82;
+
 enum _Plan { monthly, weekly }
 
 class _PaywallPageState extends State<PaywallPage> {
@@ -186,7 +198,7 @@ class _PaywallPageState extends State<PaywallPage> {
           // lined up with anything.
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                CiSpace.screen, CiSpace.s2, CiSpace.screen, 0),
+                _gutter, CiSpace.s2, _gutter, 0),
             child: SizedBox(
               height: 40,
               child: Stack(
@@ -226,8 +238,7 @@ class _PaywallPageState extends State<PaywallPage> {
                 const SizedBox(height: CiSpace.s4),
                 // LEFT, under the copy, at the content gutter.
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+                  padding: const EdgeInsets.symmetric(horizontal: _gutter),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: CiPageDots(
@@ -261,7 +272,7 @@ class _PaywallPageState extends State<PaywallPage> {
           Container(height: CiSpace.hairline, color: c.hairline),
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s3),
+                _gutter, CiSpace.s5, _gutter, CiSpace.s3),
             child: CiButton(
               // Trial claim follows the plan, never the frame's fixed label.
               label: (_selectedPlan?.hasTrial ?? true)
@@ -298,7 +309,7 @@ class _Slide extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+      padding: const EdgeInsets.symmetric(horizontal: _gutter),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -369,9 +380,10 @@ class _PlanRow extends StatelessWidget {
         excludeSemantics: true,
         child: InkWell(
           onTap: enabled ? onTap : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: CiSpace.screen, vertical: CiSpace.s4),
+          child: Container(
+            height: _planRowHeight,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: _gutter),
             child: Row(
               children: [
                 _Radio(selected: selected),

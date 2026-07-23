@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_page_dots.dart';
 import 'package:courtside_i_q/features/premium/paywall_content.dart';
 import 'package:courtside_i_q/features/premium/paywall_page.dart';
 import 'package:courtside_i_q/features/premium/paywall_repository.dart';
@@ -236,5 +237,19 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: '$art failed to load');
     }
+  });
+
+  testWidgets('the page dots sit at the LEFT gutter, not centred',
+      (tester) async {
+    // Reported three times before it took. CiPageDots' Row was
+    // mainAxisAlignment.center at the default mainAxisSize.max, so it filled
+    // the width and centred internally - wrapping it in Align(centerLeft)
+    // aligned a widget that was already the full width, and did nothing.
+    await _pump(tester, _FakePaywallRepo());
+
+    final dots = tester.getRect(find.byType(CiPageDots));
+    expect(dots.left, closeTo(20, 0.5), reason: 'the frame gutter is 20');
+    expect(dots.width, lessThan(120),
+        reason: 'must hug its dots, not fill the row');
   });
 }

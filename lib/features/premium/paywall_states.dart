@@ -237,17 +237,21 @@ class PaywallSlideCard extends StatelessWidget {
       image: true,
       container: true,
       excludeSemantics: true,
-      child: ClipRRect(
-        borderRadius: CiRadius.sheetR,
+      // NO ClipRRect. The frame clips its own content at radius 18, so the
+      // export already carries rounded corners - clipping again at the
+      // sheet's 14 cut into them and left the corners uneven.
+      //
+      // ASPECT RATIO, not a fixed height. At a forced 155 with BoxFit.cover
+      // the artwork was scaled up and cropped, which ate the padding under
+      // the copy and made it sit low in the card.
+      child: AspectRatio(
+        aspectRatio: _w / _h,
         child: Image.asset(
           _asset,
-          width: double.infinity,
-          height: _h,
           // cacheWidth bounds the decode: the source is 1050 wide and would
           // otherwise sit in memory at full size for a 350pt slot.
           cacheWidth: (_w * 3).round(),
-          fit: BoxFit.cover,
-          alignment: Alignment.topCenter,
+          fit: BoxFit.contain,
           filterQuality: FilterQuality.medium,
         ),
       ),
