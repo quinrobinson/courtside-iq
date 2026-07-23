@@ -87,7 +87,7 @@ const List<HelpTopic> kHelpTopics = [
         'game history, up to three players, season averages, Growth IQ and '
         'the read on each game. It is \$1.99 per week or \$5.99 per month, '
         'and the monthly plan is the better value across a season. The '
-        'monthly plan also comes with a seven day free trial if you have not '
+        'monthly plan also comes with a 7-day free trial if you have not '
         'subscribed before, which the weekly plan does not. Cancelling and '
         'refunds happen in the app store rather than in Courtside IQ: on an '
         'iPhone or iPad open Settings, tap your name, then Subscriptions, '
