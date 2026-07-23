@@ -223,4 +223,18 @@ void main() {
       await tester.pumpAndSettle();
     }
   });
+
+  testWidgets('every slide card asset is registered and decodes',
+      (tester) async {
+    // The cards are Figma exports now. A missing or unregistered asset is a
+    // silent grey box on a paywall, so it is worth a test that the pubspec
+    // entry and the three files actually line up.
+    for (final art in PaywallSlideArt.values) {
+      await tester.pumpWidget(MaterialApp(
+        home: Center(child: PaywallSlideCard(art: art)),
+      ));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: '$art failed to load');
+    }
+  });
 }

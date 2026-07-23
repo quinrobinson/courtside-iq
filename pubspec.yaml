@@ -187,6 +187,7 @@ flutter:
     - assets/fonts/
     - assets/images/
     - assets/images/onboarding/
+    - assets/images/paywall/
     - assets/videos/
     - assets/audios/
     - assets/rive_animations/

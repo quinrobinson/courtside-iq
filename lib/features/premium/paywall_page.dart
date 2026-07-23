@@ -205,29 +205,38 @@ class _PaywallPageState extends State<PaywallPage> {
               ),
             ),
           ),
-          const SizedBox(height: CiSpace.s5),
-          // The swiping block. Fixed height so the pricing beneath never
-          // shifts as slides change size.
-          SizedBox(
-            height: 344,
-            child: PageView.builder(
-              controller: _pages,
-              itemCount: kPaywallSlides.length,
-              onPageChanged: (i) => setState(() => _slide = i),
-              itemBuilder: (context, i) => _Slide(slide: kPaywallSlides[i]),
+          // CENTRED IN WHAT IS LEFT, rather than packed under the header
+          // with all the slack dumped above the pricing. That gave the card
+          // no breathing room from the close/logo row and left a wide gap
+          // under the dots; splitting the slack puts air on both sides.
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 330,
+                  child: PageView.builder(
+                    controller: _pages,
+                    itemCount: kPaywallSlides.length,
+                    onPageChanged: (i) => setState(() => _slide = i),
+                    itemBuilder: (context, i) =>
+                        _Slide(slide: kPaywallSlides[i]),
+                  ),
+                ),
+                const SizedBox(height: CiSpace.s4),
+                // LEFT, under the copy, at the content gutter.
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: CiPageDots(
+                        count: kPaywallSlides.length, index: _slide),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: CiSpace.s4),
-          // LEFT, under the copy - the frame puts them at the content gutter,
-          // not centred.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: CiPageDots(count: kPaywallSlides.length, index: _slide),
-            ),
-          ),
-          const Spacer(),
           Container(height: CiSpace.hairline, color: c.hairline),
           _PlanRow(
             title: PaywallCopy.monthlyTitle,
