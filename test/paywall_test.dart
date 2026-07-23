@@ -24,13 +24,12 @@ class _FakePaywallRepo implements PaywallRepository {
     ),
     this.premium = false,
     this.purchaseOutcome = PurchaseOutcome.purchased,
-    this.restoreOutcome = PurchaseOutcome.failed,
   });
 
   final PaywallOffer offer;
   final bool premium;
   final PurchaseOutcome purchaseOutcome;
-  final PurchaseOutcome restoreOutcome;
+  static const restoreOutcome = PurchaseOutcome.failed;
   final purchased = <String>[];
 
   @override
