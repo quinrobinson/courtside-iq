@@ -88,17 +88,7 @@ class CiSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: c.borderStrong,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+            const CiSheetHandle(),
             Padding(
               padding:
                   const EdgeInsets.fromLTRB(CiSpace.screen, 18, CiSpace.s4, 0),
@@ -377,6 +367,36 @@ class CiSheetActionRow extends StatelessWidget {
                       Container(height: CiSpace.hairline, color: c.hairline),
                 ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The 36x4 grab bar at the top of a sheet.
+///
+/// THE APP DRAWS THIS, MATERIAL DOES NOT. The theme used to set
+/// `showDragHandle: true` as well, so every sheet built on CiSheet rendered
+/// TWO bars - Material's floating above the white panel because these sheets
+/// are shown with a transparent background. One handle, drawn inside the
+/// sheet where the frames put it.
+///
+/// Any sheet that does not use [CiSheet] must include this itself.
+class CiSheetHandle extends StatelessWidget {
+  const CiSheetHandle({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Center(
+        child: Container(
+          width: 36,
+          height: 4,
+          decoration: BoxDecoration(
+            color: CiColors.of(context).borderStrong,
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
       ),

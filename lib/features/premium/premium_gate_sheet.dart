@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_sheet.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -45,11 +46,15 @@ class _PremiumGateSheet extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
+          // Top padding is 0: the handle carries its own inset and has to
+          // sit at the top of the panel, not below the content margin.
           padding: const EdgeInsets.fromLTRB(
-              CiSpace.screen, CiSpace.s6, CiSpace.screen, CiSpace.s5),
+              CiSpace.screen, 0, CiSpace.screen, CiSpace.s5),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const CiSheetHandle(),
+              const SizedBox(height: CiSpace.s5),
               const CiLogoMark(size: 30),
               const SizedBox(height: CiSpace.s5),
               Text('A Premium feature',

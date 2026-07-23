@@ -15,6 +15,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_sheet.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -52,6 +53,7 @@ class _FeedbackSentSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+              const CiSheetHandle(),
             Container(
               width: 72,
               height: 72,

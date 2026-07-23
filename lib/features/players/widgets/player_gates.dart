@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_sheet.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -66,14 +67,7 @@ class _UpgradeGateSheet extends StatelessWidget {
               children: [
                 // Grab handle: this arrived from the bottom and can be
                 // dismissed by dragging, which the handle is what says.
-                Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: c.borderStrong,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                const CiSheetHandle(),
                 const SizedBox(height: CiSpace.s7),
                 DotBurst(
                   size: 120,

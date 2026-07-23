@@ -139,7 +139,11 @@ abstract final class CiTheme {
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: c.surface,
         shape: const RoundedRectangleBorder(borderRadius: CiRadius.sheetTopR),
-        showDragHandle: true,
+        // OFF. CiSheetHandle draws the bar inside the panel, where the frames
+        // put it. With this true as well, every sheet showed TWO - Material's
+        // floating above the white because these sheets use a transparent
+        // background.
+        showDragHandle: false,
       ),
 
       dialogTheme: DialogThemeData(
