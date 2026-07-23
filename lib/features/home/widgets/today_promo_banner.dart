@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
-import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -91,11 +90,15 @@ class TodayPromoBanner extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Just the mark, no dot burst: the burst around a small mark
-                // read as busy at this size. Larger and on its own it carries
-                // the brand more cleanly. The icon itself may change later.
+                // A premium mark, not the brand logo. The banner is about
+                // the subscription, so the leading glyph should say premium
+                // rather than say Courtside IQ - which every other surface
+                // already does. Outline, to sit with the nav icons.
+                //
+                // Alternatives, one word each: Icons.workspace_premium (a
+                // filled award badge) or Icons.star_outline.
                 if (!compact) ...[
-                  CiLogoMark(size: 32, color: c.text),
+                  Icon(Icons.diamond_outlined, size: 28, color: c.text),
                   const SizedBox(width: CiSpace.s4),
                 ],
                 Expanded(

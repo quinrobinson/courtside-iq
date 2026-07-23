@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_nav_icon.dart';
 import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/features/nav/ci_nav_bar.dart';
 
@@ -13,12 +14,13 @@ Future<void> _pump(WidgetTester tester, CiNavTab active) =>
       ),
     ));
 
-Icon _iconFor(WidgetTester tester, String label) => tester.widget<Icon>(
+Color _iconColor(WidgetTester tester, String label) =>
+    tester.widget<CiNavIconGlyph>(
       find.descendant(
         of: find.bySemanticsLabel(label),
-        matching: find.byType(Icon),
+        matching: find.byType(CiNavIconGlyph),
       ),
-    );
+    ).color;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -45,9 +47,9 @@ void main() {
     testWidgets('the active tab is ink and the rest are muted',
         (tester) async {
       await _pump(tester, CiNavTab.players);
-      expect(_iconFor(tester, 'Players').color, CiColors.onLight.text);
-      expect(_iconFor(tester, 'Home').color, CiColors.onLight.textMuted);
-      expect(_iconFor(tester, 'Games').color, CiColors.onLight.textMuted);
+      expect(_iconColor(tester, 'Players'), CiColors.onLight.text);
+      expect(_iconColor(tester, 'Home'), CiColors.onLight.textMuted);
+      expect(_iconColor(tester, 'Games'), CiColors.onLight.textMuted);
     });
 
     testWidgets('none active leaves every tab muted', (tester) async {
@@ -55,7 +57,7 @@ void main() {
       // must not light up an unrelated tab.
       await _pump(tester, CiNavTab.none);
       for (final label in ['Home', 'Players', 'Games', 'Menu']) {
-        expect(_iconFor(tester, label).color, CiColors.onLight.textMuted,
+        expect(_iconColor(tester, label), CiColors.onLight.textMuted,
             reason: label);
       }
     });
@@ -85,7 +87,7 @@ void main() {
           bottomNavigationBar: CiNavBar(active: CiNavTab.home, onCreate: () {}),
         ),
       ));
-      expect(_iconFor(tester, 'Home').color, CiColors.onLight.text);
+      expect(_iconColor(tester, 'Home'), CiColors.onLight.text);
     });
   });
 }

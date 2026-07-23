@@ -24,12 +24,16 @@ void main() {
     expect(find.byType(CiLogoMark), findsNothing);
   });
 
-  testWidgets('the full card keeps the mark and its own copy', (tester) async {
+  testWidgets('the full card leads with a premium mark, not the brand logo',
+      (tester) async {
     await tester.pumpWidget(_host(const TodayPromoBanner(
       purpose: TodayPromoPurpose.lapse,
     )));
 
-    expect(find.byType(CiLogoMark), findsOneWidget);
+    // A premium glyph (diamond), not the Courtside IQ logo: the banner is
+    // about the subscription. See today_promo_banner.
+    expect(find.byIcon(Icons.diamond_outlined), findsOneWidget);
+    expect(find.byType(CiLogoMark), findsNothing);
     expect(find.text('Renew to keep trends, insights, and the full story.'),
         findsOneWidget);
   });

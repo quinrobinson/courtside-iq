@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_info_sheet.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -486,7 +487,8 @@ class _AddFirstPlayer extends StatelessWidget {
               color: c.surfaceSunk,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.people_outline, color: c.textMuted, size: 28),
+            child: CiNavIconGlyph(
+                icon: CiNavIcon.players, color: c.textMuted, size: 30),
           ),
           const SizedBox(height: CiSpace.s5),
           Text('Add your first player',

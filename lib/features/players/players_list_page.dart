@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -266,7 +267,8 @@ class _EmptyState extends StatelessWidget {
             height: 64,
             decoration:
                 BoxDecoration(color: c.surfaceSunk, shape: BoxShape.circle),
-            child: Icon(Icons.people_outline, color: c.textMuted, size: 28),
+            child: CiNavIconGlyph(
+                icon: CiNavIcon.players, color: c.textMuted, size: 30),
           ),
         ),
         const SizedBox(height: CiSpace.s5),

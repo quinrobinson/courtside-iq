@@ -20,6 +20,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/features/nav/create_flow.dart';
@@ -78,13 +79,13 @@ class CiNavBar extends StatelessWidget {
                 _Tab(
                   // Rounded family throughout: the outlined icons read sharp,
                   // and the brand is round. Closer to the Figma marks too.
-                  icon: Icons.grid_view_rounded,
+                  icon: CiNavIcon.home,
                   label: 'Home',
                   selected: active == CiNavTab.home,
                   onTap: () => _go(context, HomeWidget.routeName),
                 ),
                 _Tab(
-                  icon: Icons.groups_rounded,
+                  icon: CiNavIcon.players,
                   label: 'Players',
                   selected: active == CiNavTab.players,
                   onTap: () => _go(context, PlayersListWidget.routeName),
@@ -95,13 +96,13 @@ class CiNavBar extends StatelessWidget {
                           onPlayerAdded: onPlayerAdded),
                 ),
                 _Tab(
-                  icon: Icons.scoreboard_rounded,
+                  icon: CiNavIcon.games,
                   label: 'Games',
                   selected: active == CiNavTab.games,
                   onTap: () => _go(context, AllGamesWidget.routeName),
                 ),
                 _Tab(
-                  icon: Icons.menu_rounded,
+                  icon: CiNavIcon.menu,
                   label: 'Menu',
                   selected: active == CiNavTab.menu,
                   onTap: () => _go(context, MenuWidget.routeName),
@@ -128,7 +129,7 @@ class _Tab extends StatelessWidget {
     required this.onTap,
   });
 
-  final IconData icon;
+  final CiNavIcon icon;
 
   /// Not rendered: the frame shows icons only. It names the target for a
   /// screen reader, which an icon alone cannot.
@@ -152,8 +153,8 @@ class _Tab extends StatelessWidget {
           // often while watching a game rather than the screen.
           width: 56,
           height: CiNavBar.barHeight,
-          child: Icon(
-            icon,
+          child: CiNavIconGlyph(
+            icon: icon,
             size: 24,
             // Active is ink, inactive is muted. Shape stays identical, so the
             // difference is carried by weight of colour alone - acceptable

@@ -101,6 +101,7 @@ dependencies:
   purchases_flutter: 9.9.5
   realtime_client: 2.5.0
   rxdart: 0.27.7
+  flutter_svg: 2.0.10+1
   package_info_plus: 8.0.2
   share_plus: 10.0.2
   share_plus_platform_interface: 5.0.0
@@ -188,6 +189,7 @@ flutter:
     - assets/images/
     - assets/images/onboarding/
     - assets/images/paywall/
+    - assets/icons/nav/
     - assets/videos/
     - assets/audios/
     - assets/rive_animations/
