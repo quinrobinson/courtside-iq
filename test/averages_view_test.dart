@@ -124,4 +124,82 @@ void main() {
         (c) => c.color == CiColors.onLight.hairline);
     expect(grid, isNotEmpty);
   });
+
+  group('the premium lock (4.17)', () {
+    // 663:2426. The averages themselves STAY - the frame leaves every number
+    // on screen and locks only the way deeper, which is what the lapse strip
+    // above already says: high-level stats only.
+    final averages = buildPlayerAverages([_g(points: 20), _g(points: 14)]);
+
+    testWidgets('a subscriber gets the real Breakdown button', (tester) async {
+      var opened = false;
+      await tester.pumpWidget(_host(AveragesView(
+        averages: averages,
+        onFullBreakdown: () => opened = true,
+      )));
+
+      expect(find.text('Full Breakdown'), findsOneWidget);
+      expect(find.text('Breakdown · Locked'), findsNothing);
+
+      await tester.tap(find.text('Full Breakdown'));
+      await tester.pumpAndSettle();
+      expect(opened, isTrue);
+    });
+
+    testWidgets('free or lapsed gets the locked chip instead', (tester) async {
+      await tester.pumpWidget(_host(AveragesView(
+        averages: averages,
+        locked: true,
+        onFullBreakdown: () {},
+        onLockedTap: () {},
+      )));
+
+      expect(find.text('Breakdown · Locked'), findsOneWidget);
+      expect(find.text('Full Breakdown'), findsNothing);
+    });
+
+    testWidgets('the locked chip opens plans, NOT the breakdown',
+        (tester) async {
+      var breakdown = false;
+      var plans = false;
+      await tester.pumpWidget(_host(AveragesView(
+        averages: averages,
+        locked: true,
+        onFullBreakdown: () => breakdown = true,
+        onLockedTap: () => plans = true,
+      )));
+
+      await tester.tap(find.text('Breakdown · Locked'));
+      await tester.pumpAndSettle();
+
+      expect(plans, isTrue);
+      expect(breakdown, isFalse,
+          reason: 'a locked control must not reach what it locks');
+    });
+
+    testWidgets('the averages stay visible while locked', (tester) async {
+      await tester.pumpWidget(_host(AveragesView(
+        averages: averages,
+        locked: true,
+        onFullBreakdown: () {},
+        onLockedTap: () {},
+      )));
+      // 17.0 PPG across the two games above: the numbers are not the premium
+      // part, the deeper arrangement of them is.
+      expect(find.text('17.0'), findsOneWidget);
+    });
+
+    testWidgets('it is still a button for a screen reader', (tester) async {
+      // A control that only LOOKS disabled must still announce what it does,
+      // or a parent using VoiceOver just finds a dead chip.
+      await tester.pumpWidget(_host(AveragesView(
+        averages: averages,
+        locked: true,
+        onFullBreakdown: () {},
+        onLockedTap: () {},
+      )));
+      expect(find.bySemanticsLabel('Breakdown, locked. Opens plans.'),
+          findsOneWidget);
+    });
+  });
 }

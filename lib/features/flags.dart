@@ -151,3 +151,9 @@ const bool kUseMenu2 = true;
 /// A REAL PURCHASE is device + sandbox only; the flag gates the UI, not the
 /// entitlement - server-side enforcement stays deferred to cutover.
 const bool kUsePaywall2 = true;
+
+// Premium locks on the player profile (4.17) have NO flag of their own: the
+// lock rides on the entitlement the profile already reads, whose default is
+// PREMIUM, so a subscriber never sees a lock flash while RevenueCat is still
+// answering. Turning kUsePaywall2 off leaves the lock but sends its tap to
+// the v1 paywall.

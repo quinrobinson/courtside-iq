@@ -30,6 +30,8 @@ class AveragesView extends StatelessWidget {
     this.ageBand,
     this.onViewTrends,
     this.onFullBreakdown,
+    this.locked = false,
+    this.onLockedTap,
   });
 
   final PlayerAverages averages;
@@ -43,6 +45,16 @@ class AveragesView extends StatelessWidget {
   /// than no button.
   final VoidCallback? onViewTrends;
   final VoidCallback? onFullBreakdown;
+
+  /// Premium content is not available to this parent (free or lapsed).
+  ///
+  /// The averages themselves STAY VISIBLE - 663:2426 leaves every number on
+  /// screen and locks only the way deeper. The lapse strip above already
+  /// explains it: high-level stats only.
+  final bool locked;
+
+  /// Where a locked chip goes: the paywall, not the breakdown.
+  final VoidCallback? onLockedTap;
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +117,16 @@ class AveragesView extends StatelessWidget {
                   const SizedBox(width: CiSpace.s3),
                 if (onFullBreakdown != null)
                   Expanded(
-                    child: CiButton(
-                      label: 'Full Breakdown',
-                      expand: true,
-                      onPressed: onFullBreakdown,
-                    ),
+                    child: locked
+                        ? _LockedChip(
+                            label: 'Breakdown',
+                            onTap: onLockedTap,
+                          )
+                        : CiButton(
+                            label: 'Full Breakdown',
+                            expand: true,
+                            onPressed: onFullBreakdown,
+                          ),
                   ),
               ],
             ),
@@ -186,6 +203,56 @@ class _Empty extends StatelessWidget {
           'Averages appear once a game is logged.',
           textAlign: TextAlign.center,
           style: CiType.body.copyWith(color: c.textMuted),
+        ),
+      ),
+    );
+  }
+}
+
+/// A premium action a parent cannot take yet (663:2426).
+///
+/// It READS as disabled but is still tappable, and that is deliberate: a
+/// dead control tells a parent nothing, while this one explains itself by
+/// opening the plans. The padlock and the word carry the meaning, so the
+/// state does not depend on colour alone.
+class _LockedChip extends StatelessWidget {
+  const _LockedChip({required this.label, this.onTap});
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Semantics(
+      button: true,
+      label: '$label, locked. Opens plans.',
+      container: true,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: CiRadius.pillR,
+        child: Container(
+          height: 48,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: c.surfaceSunk,
+            borderRadius: CiRadius.pillR,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_outline, size: 15, color: c.textMuted),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text('$label · Locked',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: CiType.buttonSm.copyWith(color: c.textMuted)),
+              ),
+            ],
+          ),
         ),
       ),
     );

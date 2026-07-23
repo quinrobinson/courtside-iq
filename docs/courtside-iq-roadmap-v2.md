@@ -1849,6 +1849,32 @@ device-verified`. Menu, Your Profile, Edit Name, Edit Email, Change Password.
 | 4.16 | Premium/Paywall | Carousel ×3 + Loading / Processing / Error / Already-Premium |
 | 4.17 | Locked & lapsed | Development locked, Profile locked, Players lapsed, Age-band transition |
 
+**4.17 BUILT 2026-07-23.** `[x] built` · `[x] wired` · `[ ] device-verified`.
+
+Most of this item was ALREADY DONE by 4.11 and the roadmap line did not say
+so: the lapse strips on the Players list and the profile, the Development
+data lock (156:704, "unlocks in N games" / no birth date), and the age-band
+notice all shipped then.
+
+What was actually missing: **nothing on the profile was premium-gated.** A
+free or lapsed parent had the full Breakdown. 663:2426 shows those actions as
+disabled "· Locked" chips over averages that all STAY VISIBLE - the strip
+says high-level stats only, and the frame means it.
+
+- Free AND lapsed both get the lock. The entitlement default is premium, so a
+  subscriber never sees a lock flash while RevenueCat is still answering.
+- The chip reads disabled but is TAPPABLE, and opens plans. A dead control
+  explains nothing.
+- The profile's paywall now goes through showPaywall, so renewing from here
+  reaches the 2.0 paywall rather than v1's sheet.
+
+**DELIBERATELY NOT BUILT: the "Trends · Locked" chip and the Trends teaser
+(331:1661).** Stats & Trends (307:1407) does not exist in 2.0 - it was scoped
+out of 4.11 - so a locked Trends chip would open the paywall and unlock into
+nothing. That is the "Save to unlock" promise this phase has already had to
+retract three times. Both remain a SEPARATE premium/trends item; build the
+screen first, then its lock.
+
 Each carries `[ ] built` · `[ ] wired` · `[ ] device-verified`.
 
 **Watch item:** paywall/onboarding snapshots are static clones of real screens. Fixing a source screen does **not** update them — re-clone on change.

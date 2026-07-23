@@ -31,6 +31,7 @@ import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/features/flags.dart';
 import '/features/home/entitlement_status.dart';
+import '/features/premium/paywall_launcher.dart';
 import '/features/home/widgets/today_promo_banner.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/player_insight/data/player_insight_service.dart';
@@ -47,7 +48,6 @@ import '/features/players/widgets/averages_view.dart';
 import '/features/players/full_breakdown_page.dart';
 import '/features/players/widgets/development_view.dart';
 import '/features/players/widgets/games_view.dart';
-import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'players_repository.dart';
@@ -124,15 +124,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   }
 
   Future<void> _openPaywall() async {
-    await showModalBottomSheet(
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) => Padding(
-        padding: MediaQuery.viewInsetsOf(context),
-        child: const PaywallWidget(),
-      ),
-    );
+    await showPaywall(context);
     // RE-READ AFTER THE PAYWALL CLOSES, the same rule as the Players list: a
     // parent who renews must not come back to a screen still telling them
     // their Premium has ended.
@@ -329,6 +321,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
           ageBand: player?.knownAgeBand,
           playerName: player?.displayName ?? '',
           rowsFuture: _gameRowsFuture,
+          // Free AND lapsed both lose the way deeper (663:2426). The default
+          // above is premium, so a subscriber never sees a lock flash while
+          // RevenueCat is still answering.
+          locked: _entitlement != EntitlementStatus.premium,
+          onLockedTap: _openPaywall,
         ),
         _Development(
           player: player,
@@ -482,7 +479,13 @@ class _Averages extends StatelessWidget {
     required this.ageBand,
     required this.playerName,
     required this.rowsFuture,
+    required this.locked,
+    required this.onLockedTap,
   });
+
+  /// Free or lapsed. The averages stay; only the way deeper is locked.
+  final bool locked;
+  final VoidCallback onLockedTap;
 
   final Future<PlayerAverages>? future;
   final String? ageBand;
@@ -503,6 +506,8 @@ class _Averages extends StatelessWidget {
         return AveragesView(
           averages: snap.data!,
           ageBand: ageBand,
+          locked: locked,
+          onLockedTap: onLockedTap,
           // "View trends" is still absent: its destination is Stats & Trends,
           // which is scoped out of 4.11. A button that goes nowhere is worse
           // than no button.
