@@ -71,7 +71,7 @@ class _UpgradeGateSheet extends StatelessWidget {
                 const SizedBox(height: CiSpace.s7),
                 DotBurst(
                   size: 120,
-                  innerRadius: 16 + DotBurst.ringGapFor(120),
+                  markSize: 32,
                   child: CiLogoMark(size: 32, color: c.text),
                 ),
                 const SizedBox(height: CiSpace.s5),

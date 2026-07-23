@@ -36,6 +36,7 @@ class DotBurst extends StatelessWidget {
     double? innerRadius,
     double? ringGap,
     double? dotSpacing,
+    this.markSize,
     this.glowOpacity = 0.16,
     this.color,
     this.child,
@@ -55,6 +56,16 @@ class DotBurst extends StatelessWidget {
   /// Overall square extent of the burst.
   final double size;
 
+  /// The diameter of the centred child, so the burst can space its first ring
+  /// ONE RING-GAP out from it - the same gap the rings have between each other.
+  ///
+  /// This is the whole rule: the space between the mark and the first ring
+  /// must match the space between rings. Passing markSize makes it correct by
+  /// construction, so a call site cannot hug the mark by forgetting the
+  /// formula - which three of them did. Ignored if [innerRadius] is set
+  /// explicitly.
+  final double? markSize;
+
   final double? _innerRadius;
   final double? _ringGap;
   final double? _dotSpacing;
@@ -63,7 +74,12 @@ class DotBurst extends StatelessWidget {
   double get _scale => size / _referenceSize;
 
   /// Radius of the first ring. Clears whatever sits in the middle.
-  double get innerRadius => _innerRadius ?? 62 * _scale;
+  ///
+  /// An explicit [_innerRadius] wins. Otherwise, if [markSize] is given, the
+  /// first ring sits one ring-gap out from the mark's edge. Only when neither
+  /// is given does it fall back to the scaled reference default.
+  double get innerRadius => _innerRadius ??
+      (markSize != null ? markSize! / 2 + ringGap : 62 * _scale);
 
   /// Distance between consecutive rings.
   double get ringGap => _ringGap ?? 34 * _scale;
@@ -74,11 +90,10 @@ class DotBurst extends StatelessWidget {
 
   /// The ring-to-ring gap for a given overall size.
   ///
-  /// A caller that centres a child of known size can set
-  /// `innerRadius: childRadius + DotBurst.ringGapFor(size)` so the first ring
-  /// sits one gap out from the child - the SAME gap the rings have between
-  /// each other. Without it the first ring hugs the child and the spacing
-  /// reads as uneven.
+  /// Prefer passing [markSize], which applies this exact spacing for you. This
+  /// stays for the rare caller that needs the raw number - a child whose
+  /// visual radius is not simply half its box, say - and wants to set
+  /// `innerRadius` by hand.
   static double ringGapFor(double size) => 34 * (size / _referenceSize);
 
   /// Peak alpha of the radial haze behind the dots, at the centre.

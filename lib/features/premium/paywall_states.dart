@@ -158,12 +158,15 @@ class PaywallAlreadyPremium extends StatelessWidget {
                 onPressed: onDone,
               ),
             ),
-            const Spacer(),
+            // Bias the block UP: 2 on top, 3 below. Two equal Spacers centred
+            // the burst in the whole height, which read as too low - the frame
+            // sits it in the upper third, between the close X and the label.
+            const Spacer(flex: 2),
             // THE DOT BURST, which was missing entirely. 244:943 centres a
             // 50pt mark in a 220 burst - the same pairing reset_successful
             // and check_email already use, so this is the app's celebratory
             // mark rather than a one-off.
-            const DotBurst(size: 220, child: CiLogoMark(size: 50)),
+            const DotBurst(size: 220, markSize: 50, child: CiLogoMark(size: 50)),
             const SizedBox(height: CiSpace.s6),
             Text('PREMIUM ACTIVE',
                 style: CiType.caption.copyWith(
@@ -184,7 +187,7 @@ class PaywallAlreadyPremium extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: CiType.body.copyWith(color: c.textMuted, height: 1.4)),
             ),
-            const Spacer(),
+            const Spacer(flex: 3),
             CiButton(
               label: 'Manage subscription',
               style: CiButtonStyle.secondary,

@@ -23,7 +23,7 @@ class ResetSuccessfulPage extends StatelessWidget {
     return AuthScaffold(
       centerText: true,
       header: const Center(
-        child: DotBurst(size: 220, child: CiLogoMark(size: 50)),
+        child: DotBurst(size: 220, markSize: 50, child: CiLogoMark(size: 50)),
       ),
       title: 'Password updated',
       subtitle: "You're all set. Sign in with your new password.",

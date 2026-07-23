@@ -144,6 +144,38 @@ void main() {
     });
   });
 
+  group('DotBurst spaces the first ring off the mark', () {
+    // The rule: the gap between the mark and the first ring must match the gap
+    // between rings. Four call sites got this wrong by passing no innerRadius,
+    // so the first ring hugged the mark. markSize makes it correct by
+    // construction, and these pin that so it cannot drift back.
+
+    test('markSize puts the first ring exactly one ring-gap off the mark edge',
+        () {
+      const b = DotBurst(size: 220, markSize: 50);
+      // mark radius 25, plus one ring gap. The gap the rings have between them.
+      expect(b.innerRadius, closeTo(25 + b.ringGap, 0.0001));
+    });
+
+    test('so the mark-to-ring gap equals the ring-to-ring gap', () {
+      const b = DotBurst(size: 220, markSize: 50);
+      final markToFirstRing = b.innerRadius - 25; // first ring radius - mark r
+      expect(markToFirstRing, closeTo(b.ringGap, 0.0001));
+    });
+
+    test('an explicit innerRadius still wins over markSize', () {
+      // The escape hatch for a child whose visual radius is not half its box.
+      const b = DotBurst(size: 220, markSize: 50, innerRadius: 90);
+      expect(b.innerRadius, 90);
+    });
+
+    test('without markSize it falls back to the scaled default', () {
+      // Unchanged behaviour for the bursts that carry no centred mark.
+      const b = DotBurst(size: 220);
+      expect(b.innerRadius, closeTo(62 * 220 / 390, 0.0001));
+    });
+  });
+
   group('DotBurst glow', () {
     // The frame carries a 220x220 ellipse on the burst's centre, behind every
     // dot. Figma's codegen exports no gradient fills, so the first build

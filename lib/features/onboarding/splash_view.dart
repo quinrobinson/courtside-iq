@@ -39,7 +39,6 @@ class SplashView extends StatelessWidget {
     // rings. Deriving innerRadius from the mark size is what makes the whole
     // thing resize evenly on any device.
     final markSize = width * 0.20;
-    final innerRadius = markSize / 2 + DotBurst.ringGapFor(width);
 
     return ColoredBox(
       // Not CiColors.of(context): this renders inside the router, above any
@@ -48,7 +47,7 @@ class SplashView extends StatelessWidget {
       child: Center(
         child: DotBurst(
           size: width,
-          innerRadius: innerRadius,
+          markSize: markSize,
           child: CiLogoMark(size: markSize, color: CiColors.onInk.text),
         ),
       ),

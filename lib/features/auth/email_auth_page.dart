@@ -35,6 +35,8 @@ import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_field.dart';
+import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -250,7 +252,20 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
                     semanticLabel: 'Back',
                     onPressed: () => Navigator.of(context).maybePop(),
                   ),
-                  const SizedBox(height: CiSpace.s8),
+                  // The mark, carried over from the auth landing so the two
+                  // screens read as one flow. Same 50-in-220 pairing and the
+                  // same gap above it; the form moves down to make room, which
+                  // is the intended trade. Centre-aligned inside a column that
+                  // otherwise starts at the left, like the landing's buttons.
+                  const SizedBox(height: CiSpace.s4),
+                  const Center(
+                    child: DotBurst(
+                      size: 220,
+                      markSize: 50,
+                      child: CiLogoMark(size: 50),
+                    ),
+                  ),
+                  const SizedBox(height: CiSpace.s6),
                   _ModeChips(mode: _mode, onChanged: _setMode),
                   const SizedBox(height: CiSpace.s6),
                   CiField(

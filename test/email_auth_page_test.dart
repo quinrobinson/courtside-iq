@@ -15,8 +15,19 @@ import 'package:courtside_i_q/features/auth/email_auth_page.dart';
 // the pure test or on device.
 
 Future<void> _pump(WidgetTester tester,
-        {AuthMode mode = AuthMode.signIn}) =>
-    tester.pumpWidget(MaterialApp(home: EmailAuthPage(initialMode: mode)));
+    {AuthMode mode = AuthMode.signIn}) async {
+  // A phone-tall viewport. The default 600pt is shorter than the screen now
+  // that the dot burst sits above the form, and the CTA scrolls below the fold
+  // there - a tap would miss it. On device the screen scrolls; the test just
+  // needs the whole column laid out at once.
+  tester.view.physicalSize = const Size(1170, 6000);
+  tester.view.devicePixelRatio = 3.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+  await tester.pumpWidget(MaterialApp(home: EmailAuthPage(initialMode: mode)));
+}
 
 Finder _fieldNamed(String label) => find.ancestor(
       of: find.text(label.toUpperCase()),

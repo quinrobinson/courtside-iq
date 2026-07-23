@@ -113,7 +113,7 @@ class _CheckEmailPageState extends State<CheckEmailPage> {
     return AuthScaffold(
       centerText: true,
       header: const Center(
-        child: DotBurst(size: 220, child: CiLogoMark(size: 50)),
+        child: DotBurst(size: 220, markSize: 50, child: CiLogoMark(size: 50)),
       ),
       title: 'Check your email',
       subtitle: _body,

@@ -146,6 +146,7 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
                       // 2026-07-19, deliberate deviation from the frame.
                       child: DotBurst(
                         size: 220,
+                        markSize: 50,
                         child: CiLogoMark(size: 50),
                       ),
                     ),
