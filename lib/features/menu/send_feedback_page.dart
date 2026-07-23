@@ -125,7 +125,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                         maxLines: 6,
                         onChanged: (_) => setState(() {}),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: CiSpace.s8),
                       CiButton(
                         label: 'Send feedback',
                         style: CiButtonStyle.lime,

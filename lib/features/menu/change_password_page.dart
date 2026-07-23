@@ -167,7 +167,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       const SizedBox(height: CiSpace.s4),
                       Text('Use at least 8 characters.',
                           style: CiType.rowLabel.copyWith(color: c.textFaint)),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: CiSpace.s8),
                       CiButton(
                         label: 'Update password',
                         style: CiButtonStyle.lime,

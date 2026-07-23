@@ -486,7 +486,7 @@ class _BestValue extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: CiSpace.s2, vertical: 2),
       decoration: BoxDecoration(
         // Outlined in the text colour, not filled. A dark fill on the dark
         // selected row made it disappear.

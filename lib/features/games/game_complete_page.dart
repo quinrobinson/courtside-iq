@@ -304,7 +304,7 @@ class _InsightTeaser extends StatelessWidget {
             padding: const EdgeInsets.only(top: 2),
             child: CiSpark(size: 22, color: c.text),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: CiSpace.s3),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

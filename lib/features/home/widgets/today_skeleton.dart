@@ -37,7 +37,7 @@ class _Bone extends StatelessWidget {
         // so the caller wraps each region in the right one.
         color: c.surfaceSunk,
         shape: circle ? BoxShape.circle : BoxShape.rectangle,
-        borderRadius: circle ? null : BorderRadius.circular(6),
+        borderRadius: circle ? null : CiRadius.chipR,
       ),
     );
   }

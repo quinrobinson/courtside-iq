@@ -46,7 +46,7 @@ class OfflineBanner extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: CiSpace.s2, vertical: 3),
             decoration: BoxDecoration(
               color: c.accentEnergy,
               borderRadius: CiRadius.chipR,
@@ -253,7 +253,7 @@ class _Header extends StatelessWidget {
                   borderRadius: CiRadius.chipR,
                   child: Container(
                     height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: CiSpace.s4),
                     decoration: BoxDecoration(
                       border: Border.all(color: c.border),
                       borderRadius: CiRadius.chipR,

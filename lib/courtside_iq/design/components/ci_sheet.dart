@@ -389,7 +389,7 @@ class CiSheetHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.only(top: CiSpace.s3),
       child: Center(
         child: Container(
           width: 36,

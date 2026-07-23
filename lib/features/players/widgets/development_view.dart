@@ -337,7 +337,7 @@ class _Locked extends StatelessWidget {
           children: [
             for (var i = 0; i < kMinGamesForStory; i++)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: CiSpace.s1),
                 child: Container(
                   width: 10,
                   height: 10,

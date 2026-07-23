@@ -129,7 +129,7 @@ class _EditEmailPageState extends State<EditEmailPage> {
                             'keep signing in with your current one until then.',
                         onChanged: (_) => setState(() => _error = null),
                       ),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: CiSpace.s9),
                       CiButton(
                         label: 'Save changes',
                         style: CiButtonStyle.lime,

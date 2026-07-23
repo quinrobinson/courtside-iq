@@ -113,7 +113,7 @@ class _EditNamePageState extends State<EditNamePage> {
                         keyboardType: TextInputType.name,
                         onChanged: (_) => setState(() {}),
                       ),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: CiSpace.s9),
                       CiButton(
                         label: 'Save changes',
                         style: CiButtonStyle.lime,

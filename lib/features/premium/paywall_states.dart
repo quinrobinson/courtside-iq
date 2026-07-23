@@ -93,7 +93,7 @@ class PaywallError extends StatelessWidget {
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 12, top: 4),
+              padding: const EdgeInsets.only(left: CiSpace.s3, top: CiSpace.s1),
               child: IconButton(
                 icon: Icon(Icons.close, size: 22, color: c.text),
                 onPressed: onClose,
