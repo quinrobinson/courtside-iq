@@ -181,23 +181,35 @@ class _PaywallPageState extends State<PaywallPage> {
     return SafeArea(
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 12, top: 4),
-              child: _IconTap(
-                semanticLabel: 'Close',
-                onTap: widget.onClose,
-                child: Icon(Icons.close, size: 22, color: c.text),
+          // ONE ROW: close at the left gutter, logo centred on the same
+          // line. They were stacked, so the logo sat below the X and neither
+          // lined up with anything.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+                CiSpace.screen, CiSpace.s2, CiSpace.screen, 0),
+            child: SizedBox(
+              height: 40,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const CiLogoMark(size: 26),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: _IconTap(
+                      semanticLabel: 'Close',
+                      onTap: widget.onClose,
+                      child: Icon(Icons.close, size: 18, color: c.text),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const CiLogoMark(size: 26),
           const SizedBox(height: CiSpace.s5),
           // The swiping block. Fixed height so the pricing beneath never
           // shifts as slides change size.
           SizedBox(
-            height: 320,
+            height: 344,
             child: PageView.builder(
               controller: _pages,
               itemCount: kPaywallSlides.length,
@@ -205,8 +217,16 @@ class _PaywallPageState extends State<PaywallPage> {
               itemBuilder: (context, i) => _Slide(slide: kPaywallSlides[i]),
             ),
           ),
-          const SizedBox(height: CiSpace.s5),
-          CiPageDots(count: kPaywallSlides.length, index: _slide),
+          const SizedBox(height: CiSpace.s4),
+          // LEFT, under the copy - the frame puts them at the content gutter,
+          // not centred.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: CiPageDots(count: kPaywallSlides.length, index: _slide),
+            ),
+          ),
           const Spacer(),
           Container(height: CiSpace.hairline, color: c.hairline),
           _PlanRow(
@@ -277,7 +297,7 @@ class _Slide extends StatelessWidget {
           const SizedBox(height: CiSpace.s4),
           Row(
             children: [
-              Icon(Icons.auto_awesome, size: 15, color: c.accentGood),
+              Icon(slide.icon, size: 15, color: c.accentGood),
               const SizedBox(width: 6),
               Text(slide.label,
                   style: CiType.caption.copyWith(
@@ -327,7 +347,12 @@ class _PlanRow extends StatelessWidget {
     final c = CiColors.of(context);
     return Opacity(
       opacity: enabled ? 1 : 0.4,
-      child: Semantics(
+      child: ColoredBox(
+        // The SELECTED row carries a lighter ground (the frame's 390x82
+        // #1a1a1a block). Without it the radio was the only thing marking
+        // the choice.
+        color: selected ? c.surfaceSunk : Colors.transparent,
+        child: Semantics(
         button: enabled,
         selected: selected,
         label: '$title, $price $per',
@@ -387,6 +412,7 @@ class _PlanRow extends StatelessWidget {
             ),
           ),
         ),
+        ),
       ),
     );
   }
@@ -433,7 +459,10 @@ class _BestValue extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: c.surfaceDeep,
+        // Outlined in the text colour, not filled. A dark fill on the dark
+        // selected row made it disappear.
+        color: Colors.transparent,
+        border: Border.all(color: c.text),
         borderRadius: CiRadius.chipR,
       ),
       child: Text(label,
@@ -492,11 +521,24 @@ class _IconTap extends StatelessWidget {
       label: semanticLabel,
       container: true,
       excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(width: 40, height: 40, child: Center(child: child)),
-      ),
+      // Bordered 40 square (the frame's IconButton, stroke #2e2e2e). A bare
+      // glyph read as unstyled next to the logo.
+      child: Builder(builder: (context) {
+        final c = CiColors.of(context);
+        return InkWell(
+          onTap: onTap,
+          borderRadius: CiRadius.chipR,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              border: Border.all(color: c.border),
+              borderRadius: CiRadius.chipR,
+            ),
+            child: Center(child: child),
+          ),
+        );
+      }),
     );
   }
 }

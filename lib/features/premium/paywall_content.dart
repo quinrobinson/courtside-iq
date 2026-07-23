@@ -7,7 +7,7 @@
 // Pure data, so the copy is one place and can be checked. Each slide names a
 // different reason to pay: the story, the trend, the single-game read.
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 /// Which example a slide shows in its card, so the screen can render the right
 /// mock without the content file importing widgets it does not need.
@@ -22,6 +22,16 @@ class PaywallSlide {
   });
 
   final PaywallSlideArt art;
+
+  /// The lime eyebrow icon, which DIFFERS PER SLIDE in the frames: a rising
+  /// line for what's working, a bar chart for scoring efficiency, a target
+  /// for the game insight. One shared sparkle on all three lost the point
+  /// that each slide sells a different thing.
+  IconData get icon => switch (art) {
+        PaywallSlideArt.story => Icons.show_chart,
+        PaywallSlideArt.trend => Icons.bar_chart,
+        PaywallSlideArt.insight => Icons.track_changes,
+      };
 
   /// The lime eyebrow above the headline: "WHAT'S WORKING", etc.
   final String label;

@@ -142,6 +142,22 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    testWidgets('a brand new parent with NO players still sees it',
+        (tester) async {
+      // This branch returned early before the banner sliver, so the parent
+      // most worth telling about premium was the only one who never saw it.
+      await tester.pumpWidget(MaterialApp(
+        home: TodayPage(
+          repository: _FakeRepo(const TodayData(
+              headerPlayers: [], recentGames: [], playerCount: 0)),
+          entitlementReader: () async => EntitlementStatus.never,
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.byType(TodayPromoBanner), findsOneWidget);
+      expect(find.text('Add your first player'), findsOneWidget);
+    });
+
     testWidgets('premium sees no banner', (tester) async {
       await pump(tester, EntitlementStatus.premium);
       expect(find.byType(TodayPromoBanner), findsNothing);

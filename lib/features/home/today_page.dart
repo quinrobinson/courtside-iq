@@ -310,6 +310,10 @@ class _TodayPageState extends State<TodayPage> {
     if (data == null) return const [];
     if (data.hasNoPlayers) {
       return [
+        // THE PROMO BANNER SHOWS HERE TOO. This branch returned early, so a
+        // brand new parent - the one most worth telling what premium is -
+        // was the only one who never saw it.
+        ..._promoSlivers(),
         light(SliverFillRemaining(
           hasScrollBody: false,
           child: _AddFirstPlayer(onAdd: _addPlayer),

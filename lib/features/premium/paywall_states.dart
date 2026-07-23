@@ -209,20 +209,25 @@ class PaywallSlideCard extends StatelessWidget {
   }
 }
 
-/// Shared card shell: fixed height, rounded, its own ground.
+/// Shared card shell: 155 tall on EVERY slide (the frame's ScreenMockup), so
+/// the three cards cannot disagree in height as the carousel swipes.
+///
+/// TEXT INSIDE A CARD READS FROM THE LIGHT PALETTE, not the page's. The cards
+/// sit on white or limeWash while the paywall is ink, so `CiColors.of(context)`
+/// here returns WHITE text - which is what made the story and insight copy
+/// invisible on device. CiColors.onLight is the ground the card actually has.
 class _Card extends StatelessWidget {
   const _Card({required this.color, required this.child});
 
   final Color color;
   final Widget child;
 
+  static const light = CiColors.onLight;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      // 132, trimmed from the frame's 155: the headline and body below it can
-      // each run two lines, and at 155 the block overflowed its slot on a
-      // 390pt screen.
-      height: 132,
+      height: 155,
       width: double.infinity,
       padding: const EdgeInsets.all(CiSpace.s4),
       decoration: BoxDecoration(
@@ -239,27 +244,27 @@ class _StoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
+    const light = _Card.light;
     return _Card(
-      color: c.accentGoodWash,
+      color: light.accentGoodWash,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.trending_up, size: 15, color: c.text),
+              Icon(Icons.show_chart, size: 14, color: light.text),
               const SizedBox(width: 6),
               Text("What's Working",
                   style: CiType.caption.copyWith(
-                      color: c.text, fontWeight: CiWeight.semiBold)),
+                      color: light.text, fontWeight: CiWeight.semiBold)),
             ],
           ),
           const SizedBox(height: CiSpace.s3),
           Text(
             "Maya's scoring efficiency keeps climbing. She's finishing "
             'strong inside and picking smarter shots every game.',
-            style: CiType.bodySm.copyWith(color: c.text, height: 1.4),
-            maxLines: 3,
+            style: CiType.bodySm.copyWith(color: light.text, height: 1.45),
+            maxLines: 4,
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -271,11 +276,14 @@ class _StoryCard extends StatelessWidget {
 class _TrendCard extends StatelessWidget {
   const _TrendCard();
 
+  /// The x-axis the frame labels. Static, like the rest of the mock.
+  static const _months = ['Apr 26', 'Apr 28', 'May 1', 'May 2', 'May 4'];
+
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
+    const light = _Card.light;
     return _Card(
-      color: c.surfaceInvert,
+      color: light.bg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -283,29 +291,52 @@ class _TrendCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('0.95',
-                  style: CiType.h2.copyWith(
-                      color: c.textInvert, fontWeight: CiWeight.bold)),
-              const SizedBox(width: CiSpace.s2),
-              Container(
+                  style: CiType.statMd.copyWith(
+                      color: light.text, fontWeight: CiWeight.light)),
+              const SizedBox(width: CiSpace.s3),
+              Flexible(
+                child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: c.accentGood,
+                  color: light.accentGood,
                   borderRadius: CiRadius.chipR,
                 ),
                 child: Text('Rising +0.12',
-                    style: CiType.caption.copyWith(
-                        color: c.onAccent, fontWeight: CiWeight.semiBold)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: CiType.micro.copyWith(
+                        color: light.onAccent,
+                        fontWeight: CiWeight.semiBold)),
+                ),
               ),
             ],
           ),
           const Spacer(),
           SizedBox(
-            height: 44,
+            height: 38,
             child: CustomPaint(
-              painter: _SparklinePainter(c.accentGood, c.borderStrong),
-              size: const Size(double.infinity, 44),
+              painter: _TrendPainter(
+                line: light.text,
+                end: light.accentGood,
+              ),
+              size: const Size(double.infinity, 38),
             ),
+          ),
+          const SizedBox(height: 6),
+          // Equal shares rather than spaceBetween: five labels at their
+          // natural width overflow a 360pt card.
+          Row(
+            children: [
+              for (final m in _months)
+                Expanded(
+                  child: Text(m,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: CiType.micro.copyWith(color: light.textMuted)),
+                ),
+            ],
           ),
         ],
       ),
@@ -318,31 +349,38 @@ class _InsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
+    const light = _Card.light;
     return _Card(
-      color: c.accentGoodWash,
+      color: light.accentGoodWash,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome, size: 14, color: c.text),
+              Icon(Icons.auto_awesome, size: 13, color: light.text),
               const SizedBox(width: 6),
               Text('Courtside IQ',
-                  style: CiType.caption.copyWith(
-                      color: c.text, fontWeight: CiWeight.semiBold)),
-              const Spacer(),
-              Text('SCORING EFFICIENCY · ELITE',
                   style: CiType.micro.copyWith(
-                      color: c.textMuted, fontWeight: CiWeight.semiBold)),
+                      color: light.text, fontWeight: CiWeight.semiBold)),
+              const Spacer(),
+              // INK, not muted grey. The frame sets this Bold 10 at #0f0f0f -
+              // it is a rating, and greying it made it read as a caption.
+              Flexible(
+                child: Text('SCORING EFFICIENCY · ELITE',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: CiType.micro.copyWith(
+                        color: light.text, fontWeight: CiWeight.bold)),
+              ),
             ],
           ),
           const SizedBox(height: CiSpace.s3),
           Text(
             "Maya's most efficient game of the season. She turned 14 shots "
-            'into 22 points and kept attacking the rim.',
-            style: CiType.bodySm.copyWith(color: c.text, height: 1.4),
-            maxLines: 3,
+            'into 22 points and kept attacking the rim instead of settling.',
+            style: CiType.bodySm.copyWith(color: light.text, height: 1.45),
+            maxLines: 4,
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -351,44 +389,52 @@ class _InsightCard extends StatelessWidget {
   }
 }
 
-/// A rising line with dots. Deterministic - a marketing sparkline, not data.
-class _SparklinePainter extends CustomPainter {
-  const _SparklinePainter(this.line, this.dot);
+/// A DOTTED line of small ink dots, larger ink dots at the readings, and a
+/// single lime dot at the end (the frame builds it from ~40 ellipses).
+///
+/// Dotted, not a solid stroke: the solid lime line it replaced read as a
+/// chart with a trend drawn ON it, when the point is the last reading.
+class _TrendPainter extends CustomPainter {
+  const _TrendPainter({required this.line, required this.end});
 
   final Color line;
-  final Color dot;
+  final Color end;
+
+  /// Five readings, dipping then climbing, as the frame draws.
+  static const _points = [0.62, 0.78, 0.70, 0.34, 0.12];
 
   @override
   void paint(Canvas canvas, Size size) {
-    const points = [0.7, 0.55, 0.62, 0.4, 0.25];
-    final step = size.width / (points.length - 1);
-    final path = Path();
-    for (var i = 0; i < points.length; i++) {
-      final x = step * i;
-      final y = size.height * points[i];
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
+    final ink = Paint()..color = line;
+    final step = size.width / (_points.length - 1);
+
+    Offset at(double t) {
+      final i = (t * (_points.length - 1)).clamp(0, _points.length - 1.0001);
+      final lo = i.floor();
+      final f = i - lo;
+      final y = _points[lo] + (_points[lo + 1] - _points[lo]) * f;
+      return Offset(size.width * t, size.height * y);
     }
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = line
-        ..strokeWidth = 2
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
-    );
-    for (var i = 0; i < points.length; i++) {
+
+    // The trail: small dots every ~6px along the interpolated path.
+    final dots = (size.width / 6).floor();
+    for (var i = 0; i <= dots; i++) {
+      canvas.drawCircle(at(i / dots), 1.5, ink);
+    }
+    // The readings themselves, slightly larger.
+    for (var i = 0; i < _points.length - 1; i++) {
       canvas.drawCircle(
-        Offset(step * i, size.height * points[i]),
-        2.5,
-        Paint()..color = i == points.length - 1 ? line : dot,
-      );
+          Offset(step * i, size.height * _points[i]), 2.0, ink);
     }
+    // The latest reading, in lime - the one the card is about.
+    canvas.drawCircle(
+      Offset(size.width, size.height * _points.last),
+      4,
+      Paint()..color = end,
+    );
   }
 
   @override
-  bool shouldRepaint(_SparklinePainter old) => false;
+  bool shouldRepaint(_TrendPainter old) =>
+      old.line != line || old.end != end;
 }

@@ -200,4 +200,27 @@ void main() {
       expect(result, isTrue);
     });
   });
+
+  testWidgets('fits a 360pt screen with the full-height cards',
+      (tester) async {
+    // The cards went back to the frame's 155 after being trimmed to fit. A
+    // RenderFlex overflow throws here, so pumping IS the assertion.
+    tester.view.physicalSize = const Size(1080, 6000);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    await tester.pumpWidget(MaterialApp(
+      theme: CiTheme.base(),
+      home: PaywallPage(repository: _FakePaywallRepo()),
+    ));
+    await tester.pumpAndSettle();
+
+    // And every slide, not just the first.
+    for (var i = 0; i < 2; i++) {
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+    }
+  });
 }
