@@ -1881,14 +1881,56 @@ Each carries `[ ] built` · `[ ] wired` · `[ ] device-verified`.
 
 ---
 
-## Phase 4D — Verification
+## Phase 4D — Polish and verification
 
-### 4.18 End-to-end passes
-Full journey on iOS and Android in `--release`. Offline tracking with wifi disabled mid-game. Entitlement: fresh / premium / lapsed / billing-issue. Growth IQ: <5 games, exactly 5, decline, age-band crossing.
+**Reordered 2026-07-23.** The original order verified before polishing and had
+no plan for the parents who already use v1. Both are fixed below: the cheap
+read-only checks come first, the device pass moves to LAST so it tests the
+thing that actually ships, and the upgrade experience becomes its own item.
+
+### 4.19 Copy audit — DO THIS FIRST
+Read-only, no device needed, and the errors it catches are the embarrassing
+kind to find after submission. No em dashes. Solid → Good → Elite ordering.
+Lowercase "app store". No screen displays a player attribute with no capture
+field. Prices and the trial rule match the store config. Every promise the app
+makes is one it can keep - this phase retracted three.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
-### 4.19 Copy audit
-No em dashes. Solid → Good → Elite ordering correct. Lowercase "app store". No screen displays a player attribute with no capture field.
+### 4.19b UI polish pass
+Icons and visual detail ONLY. No behaviour, no copy, no new state. Batched
+deliberately: a polish change mixed into feature work is the one nobody
+re-tests. Comes after the copy audit so text and icon are settled together,
+and before the device pass so 4.18 exercises the final look.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.19c "What's new in 2.0" for EXISTING parents
+**New item. The biggest gap in the original plan.**
+
+A parent who has used v1 for months opens 2.0 and every screen has moved. The
+onboarding built in 4.9 does not help them: it runs at SIGN-UP, and they are
+already signed in. Without something, the update reads as the app breaking.
+
+What it has to say, in this order: their data is safe and all still there;
+where the familiar things now live; what is genuinely new (Growth IQ, the
+development story, the rebuilt tracker). Reassurance BEFORE novelty - a parent
+worried their season is gone will not read a feature list.
+
+Needs a Figma pass before any code.
+
+**Detecting an upgrader is the hard part and it is not the same as "first
+launch".** A fresh install of 2.0 by a NEW parent must not see it. The test is
+a local flag absent AND the account already has players or games - that
+combination means an existing account meeting this UI for the first time,
+including on a new device.
+
+`[ ] designed` · `[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.18 End-to-end passes — DO THIS LAST
+Moved after polish so it verifies what ships rather than an intermediate
+state. Full journey on iOS and Android in `--release`. Offline tracking with
+wifi cut mid-game. Entitlement: fresh / premium / lapsed / billing-issue.
+Growth IQ: <5 games, exactly 5, decline, age-band crossing. Force-quit
+mid-game and resume. Delete an account.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ---
@@ -1897,36 +1939,85 @@ No em dashes. Solid → Good → Elite ordering correct. Lowercase "app store". 
 
 **Nothing here happens without explicit approval at the time.**
 
-### 4.20 Promote schema to prod
-Apply 4A migrations to prod in order. Requires 4.6 complete. Backup first.
+**THE ORDER IN THIS SECTION IS LOAD-BEARING.** 4.20a before 4.20b is not
+tidiness: reversing them takes premium away from every paying subscriber.
+
+### 4.20a Backfill subscribers into prod `subscriptions` — BEFORE ANY ENFORCEMENT
+Prod enforces nothing today: `subscriptions` does not exist there, so every
+paying parent is premium purely because nothing checks. 2.0 brings the check
+with it.
+
+Apply the table and webhook to prod, backfill every existing subscriber from
+RevenueCat, and VERIFY THE ROW COUNT against RevenueCat's active-subscriber
+count before anything reads it. `is_premium()` answers false for anyone
+missing, so a short backfill silently downgrades real customers.
+
+Use `scripts/entitlement_audit.py` as the read-only precedent. The RevenueCat
+key is loaded with `read -s`, never pasted - one was leaked that way already.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.20b Promote schema to prod
+Backup first. In order: the account-deletion cascades (20260723000000),
+delete_current_user (20260723000001, 20260723000002), the age-band null
+(20260721000000), then the entitlement RLS.
+
+**Check for orphaned rows before the cascades:**
+`select count(*) from public.users u where not exists (select 1 from auth.users a where a.id = u.id);`
+Test had none; prod has been live for months. A failure here is the right
+outcome - it means rows exist that this would otherwise make deletable.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ### 4.21 Deploy Edge Functions to prod
+generate-game-insight and generate-player-insight are on prod at v1 and need
+the no-birth-date change. revenuecat-webhook needs `--no-verify-jwt` and its
+shared secret set BEFORE the backfill, or renewals arrive at a closed door.
+delete-account is NOT deployed: the rpc replaced it.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
-### 4.22 Flip flags and ship
-`_kUseTestSupabase = false`. 2.0 routing flag on. Version `2.0.0`, build number above live. Local release pipeline (JDK 17 + FF keystore for Android, Transporter for iOS).
+### 4.24 Retire all v1 screens — GATES 4.22
+
+**Decision:** 2.0 ships with **zero** v1 screens.
+
+**This is the largest remaining item and the easiest to underestimate.**
+Deleting `lib/pages/` turns every route still pointing at a v1 screen into a
+CRASH rather than a stale screen, and several live paths still do: the v1
+paywall fallback, GameStatsWidget, AllGamesWidget, the menu sub-screens.
+
+- Confirm every entry in `docs/2-0-screen-coverage.md` is designed + built or
+  deliberately cut.
+- Remove the per-screen 2.0 flags - 2.0 becomes the only path.
+- Delete `lib/pages/`, its routes and orphaned widgets.
+- `flutter analyze` clean; grep for lingering `pages/` imports.
+- Re-run 4.18 after deletion. A missed route surfaces here as a crash.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.22 Flip flags and cut the build
+`_kUseTestSupabase = false`. Version `2.0.0`, build number above live. Local
+release pipeline (JDK 17 + FF keystore for Android, Transporter for iOS).
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ### 4.23 Store assets
-New screenshots, release notes, updated listing copy for the 2.0 UI.
+New screenshots, release notes and listing copy for the 2.0 UI. The release
+notes are the FIRST thing an existing parent reads about this change - they
+carry the same reassurance as 4.19c, in shorter form.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
-### 4.24 Retire all v1 screens
+### 4.25 Staged rollout and watch — NEW
+Do not ship 2.0 to everyone at once. This release changes every screen AND
+turns on entitlement enforcement that has never run in prod.
 
-**Decision:** 2.0 ships with **zero** v1 screens. The old FlutterFlow UI does not align with the new look and feel, so a partial migration is not an acceptable end state.
+- **iOS:** App Store Connect Phased Release (7-day ramp for automatic updates).
+- **Android:** Play staged rollout, starting small.
+- **Watch:** Crashlytics, and the support inbox for "where did my players go"
+  and "it says I am not premium". The second is the backfill failing, and it
+  is the one that costs customers.
+- **Hold the ramp** on either signal. Both stores allow pausing; neither
+  allows un-shipping.
 
-**Action:**
-- Confirm every entry in `docs/2-0-screen-coverage.md` is *designed + built* or *deliberately cut*. Nothing may still be *needs design*.
-- Remove the per-screen 2.0 routing flags — 2.0 becomes the only path, not the default path.
-- **Delete `lib/pages/`.** Remove its routes, imports, and any now-orphaned FlutterFlow widgets.
-- `flutter analyze` clean; grep for lingering `pages/` imports.
-- Full journey re-run on device after deletion — this is where a missed route surfaces as a crash rather than a stale screen.
-
-**Gate:** this item blocks 4.22. Do not cut the 2.0.0 build until `lib/pages/` is gone and the app still passes 4.18.
-
-**Design implication:** The visual inconsistency risk (a v1 dialog appearing inside a 2.0 flow) is eliminated by construction rather than by inspection.
-
+An existing FREE parent with more than one player keeps them - the policy is
+INSERT-only and removes nothing - but will meet a gate they have never seen
+when adding another. That is correct behaviour and still a support question
+worth expecting.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ---
@@ -1943,9 +2034,13 @@ known from the spike: two package bumps, three call sites, ~half a day. Ordering
 (keep this position).
 **PR 4:** 4.7 + 4.8 design system.
 **PR 5–13:** one per screen flow (4.9–4.17). Each is gated on its frames being *designed* in the coverage doc.
-**PR 14:** 4.18 + 4.19 verification fixes.
-**PR 15:** 4.24 v1 retirement — delete `lib/pages/`, re-verify.
-**PR 16:** 4E cutover and 2.0.0 ship.
+**PR 14:** 4.19 copy audit + 4.19b UI polish. Read-only checks and visual-only
+changes, no behaviour.
+**PR 15:** 4.19c "What's new in 2.0" — gated on its Figma pass.
+**PR 16:** 4.18 end-to-end passes on device, against the final look.
+**PR 17:** 4.24 v1 retirement — delete `lib/pages/`, re-run 4.18.
+**PR 18:** 4E cutover — backfill FIRST, then schema, functions, flags, staged
+rollout.
 
 **Figma design work runs in parallel** from PR 0 onward: every gap the audit finds gets designed and approved before its screen PR opens. Design is never the thing a code PR waits on mid-flight.
 
