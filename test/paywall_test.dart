@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_page_dots.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/dot_burst.dart';
 import 'package:courtside_i_q/features/premium/paywall_content.dart';
 import 'package:courtside_i_q/features/premium/paywall_page.dart';
 import 'package:courtside_i_q/features/premium/paywall_repository.dart';
@@ -250,5 +251,18 @@ void main() {
     expect(dots.left, closeTo(20, 0.5), reason: 'the frame gutter is 20');
     expect(dots.width, lessThan(120),
         reason: 'must hug its dots, not fill the row');
+  });
+
+  testWidgets('the already-premium screen wears the dot burst',
+      (tester) async {
+    // It was a bare 40pt mark. 244:943 centres a 50 in a 220 burst - the
+    // same pairing reset_successful and check_email use, so a subscriber
+    // gets the app's celebratory mark rather than a plain logo.
+    await _pump(tester, _FakePaywallRepo(premium: true));
+
+    expect(find.byType(DotBurst), findsOneWidget);
+    final burst = tester.widget<DotBurst>(find.byType(DotBurst));
+    expect(burst.size, 220);
+    expect(find.text("You're on Premium"), findsOneWidget);
   });
 }

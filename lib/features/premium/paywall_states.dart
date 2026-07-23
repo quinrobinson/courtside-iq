@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -158,7 +159,11 @@ class PaywallAlreadyPremium extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const CiLogoMark(size: 40),
+            // THE DOT BURST, which was missing entirely. 244:943 centres a
+            // 50pt mark in a 220 burst - the same pairing reset_successful
+            // and check_email already use, so this is the app's celebratory
+            // mark rather than a one-off.
+            const DotBurst(size: 220, child: CiLogoMark(size: 50)),
             const SizedBox(height: CiSpace.s6),
             Text('PREMIUM ACTIVE',
                 style: CiType.caption.copyWith(
@@ -169,9 +174,16 @@ class PaywallAlreadyPremium extends StatelessWidget {
                 style: CiType.h1
                     .copyWith(color: c.text, fontWeight: CiWeight.extraBold)),
             const SizedBox(height: CiSpace.s3),
-            Text("You have full access to every game's development story.",
-                textAlign: TextAlign.center,
-                style: CiType.body.copyWith(color: c.textMuted, height: 1.4)),
+            // 300 WIDE, from the frame. At full width it ran as one long
+            // line; the frame's narrower measure is what breaks it over two
+            // and gives the block its shape.
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: Text(
+                  "You have full access to every game's development story.",
+                  textAlign: TextAlign.center,
+                  style: CiType.body.copyWith(color: c.textMuted, height: 1.4)),
+            ),
             const Spacer(),
             CiButton(
               label: 'Manage subscription',
