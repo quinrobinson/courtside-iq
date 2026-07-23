@@ -415,7 +415,7 @@ class _Empty extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: CiNavIconGlyph(
-                icon: CiNavIcon.games, size: 30, color: c.textMuted),
+                icon: CiNavIcon.games, size: 28, color: c.textMuted),
           ),
         ),
         const SizedBox(height: CiSpace.s5),

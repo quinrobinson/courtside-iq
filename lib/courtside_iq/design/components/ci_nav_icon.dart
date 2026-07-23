@@ -46,11 +46,22 @@ class CiNavIconGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      icon.asset,
-      width: size,
-      height: size,
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    // Center + SizedBox, NOT a bare SvgPicture. A Container with a fixed size
+    // and no alignment - which both the nav tab and the empty-state circle
+    // are - hands its child TIGHT constraints, and SvgPicture fills them,
+    // ignoring width/height. That is why the icons filled the bar and
+    // overflowed the circle. Center loosens the constraints so the SizedBox
+    // holds, and a Material Icon was immune only because its glyph is sized
+    // by font size, not by the box.
+    return Center(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: SvgPicture.asset(
+          icon.asset,
+          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        ),
+      ),
     );
   }
 }

@@ -488,7 +488,7 @@ class _AddFirstPlayer extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: CiNavIconGlyph(
-                icon: CiNavIcon.players, color: c.textMuted, size: 30),
+                icon: CiNavIcon.players, color: c.textMuted, size: 28),
           ),
           const SizedBox(height: CiSpace.s5),
           Text('Add your first player',

@@ -155,7 +155,7 @@ class _Tab extends StatelessWidget {
           height: CiNavBar.barHeight,
           child: CiNavIconGlyph(
             icon: icon,
-            size: 24,
+            size: 22,
             // Active is ink, inactive is muted. Shape stays identical, so the
             // difference is carried by weight of colour alone - acceptable
             // here because the bar is five fixed, learnable positions.
