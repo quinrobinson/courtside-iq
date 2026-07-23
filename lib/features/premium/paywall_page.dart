@@ -25,6 +25,7 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import 'paywall_content.dart';
 import 'paywall_repository.dart';
 import 'paywall_states.dart';
+import 'subscription_management.dart';
 
 class PaywallPage extends StatefulWidget {
   /// A REAL ROUTE. Pushing this as a bare MaterialPageRoute onto GoRouter's
@@ -41,6 +42,7 @@ class PaywallPage extends StatefulWidget {
     this.onPurchased,
     this.onOpenTerms,
     this.onOpenPrivacy,
+    this.onManage = openStoreSubscriptions,
   });
 
   final PaywallRepository repository;
@@ -53,6 +55,10 @@ class PaywallPage extends StatefulWidget {
 
   final VoidCallback? onOpenTerms;
   final VoidCallback? onOpenPrivacy;
+
+  /// Opens the store's subscription page for an existing subscriber. Injected
+  /// so a test can assert it fires without launching anything.
+  final Future<void> Function() onManage;
 
   @override
   State<PaywallPage> createState() => _PaywallPageState();
@@ -175,8 +181,10 @@ class _PaywallPageState extends State<PaywallPage> {
           backgroundColor: c.bg,
           body: switch (_phase) {
             _Phase.loading => const PaywallLoading(),
-            _Phase.alreadyPremium =>
-              PaywallAlreadyPremium(onDone: widget.onPurchased),
+            _Phase.alreadyPremium => PaywallAlreadyPremium(
+                onManage: widget.onManage,
+                onDone: widget.onPurchased,
+              ),
             _Phase.processing => const PaywallProcessing(),
             _Phase.error => PaywallError(
                 onRetry: () => setState(() => _phase = _Phase.ready),

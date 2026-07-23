@@ -137,7 +137,7 @@ class PaywallAlreadyPremium extends StatelessWidget {
 
   /// Opens the store's subscription management. Apple and Google own
   /// cancellation, so "Manage" cannot happen in-app - it deep-links out.
-  final VoidCallback? onManage;
+  final Future<void> Function()? onManage;
 
   /// Leaves the paywall. A premium parent who landed here by a stale banner
   /// needs a way back that is not the store.
@@ -189,7 +189,7 @@ class PaywallAlreadyPremium extends StatelessWidget {
               label: 'Manage subscription',
               style: CiButtonStyle.secondary,
               expand: true,
-              onPressed: onManage,
+              onPressed: onManage == null ? null : () => onManage!(),
             ),
             const SizedBox(height: CiSpace.s3),
             TextButton(

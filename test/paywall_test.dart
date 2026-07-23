@@ -5,6 +5,7 @@
 // repository: the state routing, the price/plan mapping, the trial-aware CTA,
 // and the already-premium short-circuit.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +17,7 @@ import 'package:courtside_i_q/features/premium/paywall_page.dart';
 import 'package:courtside_i_q/features/premium/paywall_repository.dart';
 import 'package:courtside_i_q/features/premium/paywall_states.dart';
 import 'package:courtside_i_q/features/premium/premium_gate_sheet.dart';
+import 'package:courtside_i_q/features/premium/subscription_management.dart';
 
 class _FakePaywallRepo implements PaywallRepository {
   _FakePaywallRepo({
@@ -51,6 +53,7 @@ Future<_FakePaywallRepo> _pump(
   WidgetTester tester,
   _FakePaywallRepo repo, {
   VoidCallback? onPurchased,
+  Future<void> Function()? onManage,
 }) async {
   tester.view.physicalSize = const Size(1170, 6000);
   tester.view.devicePixelRatio = 3.0;
@@ -60,7 +63,11 @@ Future<_FakePaywallRepo> _pump(
   });
   await tester.pumpWidget(MaterialApp(
     theme: CiTheme.base(),
-    home: PaywallPage(repository: repo, onPurchased: onPurchased),
+    home: PaywallPage(
+      repository: repo,
+      onPurchased: onPurchased,
+      onManage: onManage ?? () async {},
+    ),
   ));
   await tester.pumpAndSettle();
   return repo;
@@ -264,5 +271,31 @@ void main() {
     final burst = tester.widget<DotBurst>(find.byType(DotBurst));
     expect(burst.size, 220);
     expect(find.text("You're on Premium"), findsOneWidget);
+  });
+
+  group('managing an existing subscription', () {
+    tearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    testWidgets('Manage subscription actually does something', (tester) async {
+      // It was wired to null, so the one action on the screen a subscriber
+      // lands on did nothing at all.
+      var opened = false;
+      await _pump(tester, _FakePaywallRepo(premium: true),
+          onManage: () async => opened = true);
+
+      await tester.tap(find.text('Manage subscription'));
+      await tester.pumpAndSettle();
+      expect(opened, isTrue);
+    });
+
+    test('it points at the right store per platform', () {
+      // Apple and Google own cancellation; sending an Android parent to
+      // Apple's account page would strand them.
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      expect(storeSubscriptionsUrl, kAppleSubscriptionsUrl);
+
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(storeSubscriptionsUrl, kPlaySubscriptionsUrl);
+    });
   });
 }
