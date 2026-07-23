@@ -61,7 +61,25 @@ EntitlementStatus entitlementStatus({
 /// than the one signed in: the buyer stayed non-premium and the server
 /// rejected their next insert. The v1 dashboard called loginToRevenueCat on
 /// load; the 2.0 screens must do the equivalent.
+/// DEV OVERRIDE. Null in every shipped build.
+///
+/// A lapse cannot be produced on demand: it comes from RevenueCat, not from
+/// our database, and a sandbox subscription takes about half an hour of
+/// accelerated renewals to expire on its own. Reviewing the lapsed surfaces
+/// that way is a 30-minute round trip per look.
+///
+/// Set this to [EntitlementStatus.lapsed], run, review, and set it BACK TO
+/// NULL. It is deliberately a plain const rather than a kDebugMode check,
+/// because device testing here runs in --release (FlutterFlow layouts throw
+/// debug asserts on iOS 26), so a debug-only guard would do nothing.
+///
+/// That makes it exactly as dangerous as kShowTokenGallery, so it is guarded
+/// the same way: a test asserts it is null, and the suite fails if it is
+/// committed set.
+const EntitlementStatus? kDebugForceEntitlement = null;
+
 Future<EntitlementStatus> fetchEntitlementStatus() async {
+  if (kDebugForceEntitlement != null) return kDebugForceEntitlement!;
   try {
     final uid = currentUserUid;
     final info = uid.isEmpty
