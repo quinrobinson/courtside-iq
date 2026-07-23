@@ -5,6 +5,8 @@
 // repository: the state routing, the price/plan mapping, the trial-aware CTA,
 // and the already-premium short-circuit.
 
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -297,5 +299,20 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       expect(storeSubscriptionsUrl, kPlaySubscriptionsUrl);
     });
+  });
+
+  test('the paywall reads premium from the SAME place as every screen', () {
+    // It called RevenueCat's isEntitled directly, which made the paywall the
+    // one place in the app answering "is this person premium" its own way.
+    // Surfaced on device: the profile said "Your Premium has ended" and the
+    // paywall it opened said "You're on Premium".
+    //
+    // Two answers to one question is how Today and the profile once disagreed
+    // about the same player's trend. This pins the shared read.
+    final source = File('lib/features/premium/paywall_repository.dart')
+        .readAsStringSync();
+    expect(source, contains('fetchEntitlementStatus()'));
+    expect(source, isNot(contains("isEntitled('premium_users')")),
+        reason: 'premium is decided in entitlement_status.dart, not here');
   });
 }

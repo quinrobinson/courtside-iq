@@ -19,6 +19,7 @@ import 'package:flutter/services.dart' show PlatformException;
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '/auth/supabase_auth/auth_util.dart';
+import '/features/home/entitlement_status.dart';
 import '/flutter_flow/revenue_cat_util.dart' as revenue_cat;
 
 /// One plan the paywall can sell.
@@ -104,10 +105,15 @@ class PaywallRepository {
 
   /// Whether the account is already premium, so the paywall can show the
   /// Already-Premium state rather than trying to sell to a subscriber.
-  Future<bool> isPremium() async {
-    final entitled = await revenue_cat.isEntitled('premium_users');
-    return entitled ?? false;
-  }
+  ///
+  /// THROUGH fetchEntitlementStatus, the same read every other screen uses.
+  /// It called RevenueCat's isEntitled directly at first, which made the
+  /// paywall the one place in the app deciding "premium" its own way - and
+  /// two answers to one question is how Today and the profile once disagreed
+  /// about the same player's trend. A parent whose profile says their premium
+  /// has ended must not tap Renew and be told they are already subscribed.
+  Future<bool> isPremium() async =>
+      await fetchEntitlementStatus() == EntitlementStatus.premium;
 
   Future<PurchaseOutcome> purchase(String packageId) async {
     final uid = currentUserUid;
