@@ -22,6 +22,9 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 /// caller opens the paywall; false or null on "Not now" or a dismiss.
 Future<bool?> showPremiumGateSheet(BuildContext context) {
   return showModalBottomSheet<bool>(
+    // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+    // renders inside the branch, leaving the tabs sitting over it.
+    useRootNavigator: true,
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

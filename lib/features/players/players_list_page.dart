@@ -21,7 +21,7 @@ import '/courtside_iq/players_list_builder.dart';
 import '/features/home/entitlement_status.dart';
 import '/features/home/widgets/today_promo_banner.dart';
 import '/features/players/add_player_flow.dart';
-import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
+import '/features/premium/paywall_launcher.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/players/players_revision.dart';
@@ -87,15 +87,11 @@ class _PlayersListPageState extends State<PlayersListPage> {
   }
 
   Future<void> _openPaywall() async {
-    await showModalBottomSheet(
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) => Padding(
-        padding: MediaQuery.viewInsetsOf(context),
-        child: const PaywallWidget(),
-      ),
-    );
+    // showPaywall, NOT a raw sheet with the v1 PaywallWidget. This screen
+    // built its own, so it ignored kUsePaywall2 and showed a FREE parent the
+    // v1 paywall on the primary conversion path - and, once the shell landed,
+    // showed it inside the branch navigator with the nav bar sitting over it.
+    await showPaywall(context);
     // RE-READ AFTER THE PAYWALL CLOSES. Entitlement was fetched once on
     // init, so a parent who subscribed came back to a screen that still
     // believed they were on the free tier - the gate kept appearing until

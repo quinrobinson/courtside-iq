@@ -22,6 +22,9 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 
 Future<void> showFeedbackSentSheet(BuildContext context) {
   return showModalBottomSheet<void>(
+    // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+    // renders inside the branch, leaving the tabs sitting over it.
+    useRootNavigator: true,
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

@@ -32,6 +32,9 @@ import '/courtside_iq/player_gating.dart';
 /// The free-tier upgrade gate. Returns true if the parent chose to see plans.
 Future<bool> showAddPlayerUpgradeGate(BuildContext context) async {
   final result = await showModalBottomSheet<bool>(
+    // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+    // renders inside the branch, leaving the tabs sitting over it.
+    useRootNavigator: true,
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

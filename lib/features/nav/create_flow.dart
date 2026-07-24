@@ -13,10 +13,10 @@ import 'package:flutter/material.dart';
 
 import '/features/home/entitlement_status.dart';
 import '/features/players/add_player_flow.dart';
+import '/features/premium/paywall_launcher.dart';
 import '/features/players/players_repository.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
-import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import 'create_sheet.dart';
 
 /// [onPlayerAdded] is how the SCREEN BEHIND THE SHEET learns to refetch.
@@ -59,14 +59,6 @@ Future<void> handleCreateTap(
   }
 }
 
-Future<void> _openPaywall(BuildContext context) async {
-  await showModalBottomSheet(
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    context: context,
-    builder: (context) => Padding(
-      padding: MediaQuery.viewInsetsOf(context),
-      child: const PaywallWidget(),
-    ),
-  );
-}
+/// The one paywall API. This used to build its own sheet around the v1
+/// PaywallWidget, which ignored kUsePaywall2 and put the nav bar over it.
+Future<void> _openPaywall(BuildContext context) => showPaywall(context);

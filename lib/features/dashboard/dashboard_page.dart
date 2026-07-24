@@ -619,6 +619,9 @@ class _UpgradeBanner extends StatelessWidget {
 
   static void _openPaywall(BuildContext context) {
     showModalBottomSheet<void>(
+      // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+      // renders inside the branch, leaving the tabs sitting over it.
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: CIColors.surface,
       enableDrag: false,

@@ -24,6 +24,9 @@ import 'premium_gate_sheet.dart';
 Future<bool> showPaywall(BuildContext context) async {
   if (!kUsePaywall2) {
     await showModalBottomSheet<void>(
+      // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+      // renders inside the branch, leaving the tabs sitting over it.
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,

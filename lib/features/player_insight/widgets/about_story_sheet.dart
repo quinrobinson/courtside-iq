@@ -10,6 +10,9 @@ class AboutStorySheet extends StatelessWidget {
 
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet<void>(
+      // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+      // renders inside the branch, leaving the tabs sitting over it.
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

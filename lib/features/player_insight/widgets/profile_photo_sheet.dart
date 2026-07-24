@@ -37,6 +37,9 @@ class ProfilePhotoEditor {
     required bool hasPhoto,
   }) async {
     final action = await showModalBottomSheet<_SheetAction>(
+      // Covers the nav bar: a sheet pushed on a shell BRANCH navigator
+      // renders inside the branch, leaving the tabs sitting over it.
+      useRootNavigator: true,
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
