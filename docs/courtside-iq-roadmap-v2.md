@@ -2094,7 +2094,45 @@ the icon is confirmed on a device.
 **Must land before 4.22 cuts the build**, and it feeds 4.23's store assets (the
 listing icon has to match the installed one).
 
-`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified (mark)` · `[ ] device-verified (icon)`
+Device-verified on iPhone 2026-07-24 (mark and icon), after which
+`AppIcon.appiconset` was deleted - the rollback it existed for is no longer
+needed, and it was still compiling two stray `AppIcon*.png` into the bundle.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
+
+### 4.19f Navigation transitions and a persistent nav shell
+**New item.** Two related complaints, both structural rather than cosmetic.
+
+**1. The bottom nav re-mounts on every tab change.** There is NO shell route
+(`ShellRoute` count in `nav.dart`: zero). Today, Players, Games, Menu and
+Player Profile each render their OWN `CiNavBar`, so `goNamed` replaces the
+whole scaffold - bar included - and the nav visibly reloads and animates with
+the page. The bar should stay fixed and only re-mount when moving to or from a
+screen that genuinely has no nav (auth, live tracker, paywall).
+
+Fix: a `StatefulShellRoute.indexedStack` owning one `CiNavBar`, with the four
+tabs as branches and the body swapping underneath. Two things follow for free:
+per-tab state and scroll position survive a tab switch, and pushed screens that
+should KEEP the nav (Player Profile, Game Detail, Trends - see the standing
+rule) keep it by living inside their branch instead of re-declaring the bar.
+Each tab screen then stops rendering its own bar.
+
+**2. Everything slides in from the right, and that is a default nobody chose.**
+`TransitionInfo.appDefault()` is `hasTransition: false`, which falls through to
+`MaterialPage`; on iOS that IS the Cupertino push slide. So the fly-in is
+inherited, not designed.
+
+Intended policy: **crossfade is the default**; the slide-from-right is RESERVED
+for genuine pushes that have a back affordance and a parent to return to - Edit
+Player, the account sub-screens, Game Detail. Tab switches must not slide at
+all once the shell lands, since the bar no longer moves. Keep it quick; a long
+fade on a tab switch reads as lag.
+
+Sequence the shell FIRST: it removes most of the offending transitions by
+construction, and doing the transition policy first would mean tuning
+animations that are about to be deleted.
+
+`[ ] designed` · `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate
