@@ -16,6 +16,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_ambient_glow.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/ci_page_dots.dart';
@@ -175,133 +176,159 @@ class _PaywallPageState extends State<PaywallPage> {
   Widget build(BuildContext context) {
     return CiSurface.ink(
       statusBar: true,
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return Scaffold(
-          backgroundColor: c.bg,
-          body: switch (_phase) {
-            _Phase.loading => const PaywallLoading(),
-            _Phase.alreadyPremium => PaywallAlreadyPremium(
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return Scaffold(
+            backgroundColor: c.bg,
+            body: switch (_phase) {
+              _Phase.loading => const PaywallLoading(),
+              _Phase.alreadyPremium => PaywallAlreadyPremium(
                 onManage: widget.onManage,
                 onDone: widget.onPurchased,
               ),
-            _Phase.processing => const PaywallProcessing(),
-            _Phase.error => PaywallError(
+              _Phase.processing => const PaywallProcessing(),
+              _Phase.error => PaywallError(
                 onRetry: () => setState(() => _phase = _Phase.ready),
                 onClose: widget.onClose,
               ),
-            _Phase.ready => _buildPaywall(context, c),
-          },
-        );
-      }),
+              _Phase.ready => _buildPaywall(context, c),
+            },
+          );
+        },
+      ),
     );
   }
 
   Widget _buildPaywall(BuildContext context, CiColors c) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // ONE ROW: close at the left gutter, logo centred on the same
-          // line. They were stacked, so the logo sat below the X and neither
-          // lined up with anything.
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                _gutter, CiSpace.s2, _gutter, 0),
-            child: SizedBox(
-              height: 40,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const CiLogoMark(size: 26),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: _IconTap(
-                      semanticLabel: 'Close',
-                      onTap: widget.onClose,
-                      child: Icon(Icons.close, size: 18, color: c.text),
-                    ),
+    return Stack(
+      children: [
+        // The signature lime wash behind the carousel. ONLY the top wash: the
+        // bottom one sat behind Start free trial and muddied the plans, so it
+        // was dropped on device review (same call as onboarding).
+        const Positioned.fill(
+          child: CiAmbientGlow(
+            washes: [CiGlowWash(cx: 0.10, cy: 0.22, radius: 0.82, alpha: 0.16)],
+          ),
+        ),
+        SafeArea(
+          child: Column(
+            children: [
+              // ONE ROW: close at the left gutter, logo centred on the same
+              // line. They were stacked, so the logo sat below the X and neither
+              // lined up with anything.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  _gutter,
+                  CiSpace.s2,
+                  _gutter,
+                  0,
+                ),
+                child: SizedBox(
+                  height: 40,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const CiLogoMark(size: 26),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: _IconTap(
+                          semanticLabel: 'Close',
+                          onTap: widget.onClose,
+                          child: Icon(Icons.close, size: 18, color: c.text),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          // CENTRED IN WHAT IS LEFT, rather than packed under the header
-          // with all the slack dumped above the pricing. That gave the card
-          // no breathing room from the close/logo row and left a wide gap
-          // under the dots; splitting the slack puts air on both sides.
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 330,
-                  child: PageView.builder(
-                    controller: _pages,
-                    itemCount: kPaywallSlides.length,
-                    onPageChanged: (i) => setState(() => _slide = i),
-                    itemBuilder: (context, i) =>
-                        _Slide(slide: kPaywallSlides[i]),
-                  ),
+              // CENTRED IN WHAT IS LEFT, rather than packed under the header
+              // with all the slack dumped above the pricing. That gave the card
+              // no breathing room from the close/logo row and left a wide gap
+              // under the dots; splitting the slack puts air on both sides.
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 330,
+                      child: PageView.builder(
+                        controller: _pages,
+                        itemCount: kPaywallSlides.length,
+                        onPageChanged: (i) => setState(() => _slide = i),
+                        itemBuilder: (context, i) =>
+                            _Slide(slide: kPaywallSlides[i]),
+                      ),
+                    ),
+                    const SizedBox(height: CiSpace.s4),
+                    // LEFT, under the copy, at the content gutter.
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: CiPageDots(
+                          count: kPaywallSlides.length,
+                          index: _slide,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: CiSpace.s4),
-                // LEFT, under the copy, at the content gutter.
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: CiPageDots(
-                        count: kPaywallSlides.length, index: _slide),
-                  ),
+              ),
+              Container(height: CiSpace.hairline, color: c.hairline),
+              _PlanRow(
+                title: PaywallCopy.monthlyTitle,
+                sub: PaywallCopy.monthlySub,
+                price: _monthlyPrice,
+                per: PaywallCopy.monthlyPer,
+                badge: PaywallCopy.bestValue,
+                selected: _selected == _Plan.monthly,
+                enabled: _offer.monthly != null,
+                onTap: () => setState(() => _selected = _Plan.monthly),
+              ),
+              Container(height: CiSpace.hairline, color: c.hairline),
+              _PlanRow(
+                title: PaywallCopy.weeklyTitle,
+                sub: PaywallCopy.weeklySub,
+                price: _weeklyPrice,
+                per: PaywallCopy.weeklyPer,
+                selected: _selected == _Plan.weekly,
+                enabled: _offer.weekly != null,
+                onTap: () => setState(() => _selected = _Plan.weekly),
+              ),
+              Container(height: CiSpace.hairline, color: c.hairline),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  _gutter,
+                  CiSpace.s5,
+                  _gutter,
+                  CiSpace.s3,
                 ),
-              ],
-            ),
+                child: CiButton(
+                  // Trial claim follows the plan, never the frame's fixed label.
+                  label: (_selectedPlan?.hasTrial ?? true)
+                      ? PaywallCopy.cta
+                      : PaywallCopy.ctaNoTrial,
+                  style: CiButtonStyle.lime,
+                  expand: true,
+                  onPressed: _offer.hasAny ? _buy : null,
+                ),
+              ),
+              Text(
+                paywallLegalLine(_monthlyPrice),
+                style: CiType.caption.copyWith(color: c.textFaint),
+              ),
+              const SizedBox(height: CiSpace.s3),
+              _Footer(
+                onRestore: _restore,
+                onTerms: widget.onOpenTerms,
+                onPrivacy: widget.onOpenPrivacy,
+              ),
+              const SizedBox(height: CiSpace.s4),
+            ],
           ),
-          Container(height: CiSpace.hairline, color: c.hairline),
-          _PlanRow(
-            title: PaywallCopy.monthlyTitle,
-            sub: PaywallCopy.monthlySub,
-            price: _monthlyPrice,
-            per: PaywallCopy.monthlyPer,
-            badge: PaywallCopy.bestValue,
-            selected: _selected == _Plan.monthly,
-            enabled: _offer.monthly != null,
-            onTap: () => setState(() => _selected = _Plan.monthly),
-          ),
-          Container(height: CiSpace.hairline, color: c.hairline),
-          _PlanRow(
-            title: PaywallCopy.weeklyTitle,
-            sub: PaywallCopy.weeklySub,
-            price: _weeklyPrice,
-            per: PaywallCopy.weeklyPer,
-            selected: _selected == _Plan.weekly,
-            enabled: _offer.weekly != null,
-            onTap: () => setState(() => _selected = _Plan.weekly),
-          ),
-          Container(height: CiSpace.hairline, color: c.hairline),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                _gutter, CiSpace.s5, _gutter, CiSpace.s3),
-            child: CiButton(
-              // Trial claim follows the plan, never the frame's fixed label.
-              label: (_selectedPlan?.hasTrial ?? true)
-                  ? PaywallCopy.cta
-                  : PaywallCopy.ctaNoTrial,
-              style: CiButtonStyle.lime,
-              expand: true,
-              onPressed: _offer.hasAny ? _buy : null,
-            ),
-          ),
-          Text(paywallLegalLine(_monthlyPrice),
-              style: CiType.caption.copyWith(color: c.textFaint)),
-          const SizedBox(height: CiSpace.s3),
-          _Footer(
-            onRestore: _restore,
-            onTerms: widget.onOpenTerms,
-            onPrivacy: widget.onOpenPrivacy,
-          ),
-          const SizedBox(height: CiSpace.s4),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -327,22 +354,32 @@ class _Slide extends StatelessWidget {
             children: [
               Icon(slide.icon, size: 15, color: c.accentGood),
               const SizedBox(width: 6),
-              Text(slide.label,
-                  style: CiType.caption.copyWith(
-                      color: c.accentGood, fontWeight: CiWeight.semiBold)),
+              Text(
+                slide.label,
+                style: CiType.caption.copyWith(
+                  color: c.accentGood,
+                  fontWeight: CiWeight.semiBold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: CiSpace.s3),
-          Text(slide.headline,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: CiType.h2
-                  .copyWith(color: c.text, fontWeight: CiWeight.extraBold)),
+          Text(
+            slide.headline,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: CiType.h2.copyWith(
+              color: c.text,
+              fontWeight: CiWeight.extraBold,
+            ),
+          ),
           const SizedBox(height: CiSpace.s3),
-          Text(slide.body,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: CiType.body.copyWith(color: c.textMuted, height: 1.4)),
+          Text(
+            slide.body,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: CiType.body.copyWith(color: c.textMuted, height: 1.4),
+          ),
         ],
       ),
     );
@@ -381,66 +418,75 @@ class _PlanRow extends StatelessWidget {
         // the choice.
         color: selected ? c.surfaceSunk : Colors.transparent,
         child: Semantics(
-        button: enabled,
-        selected: selected,
-        label: '$title, $price $per',
-        container: true,
-        excludeSemantics: true,
-        child: InkWell(
-          onTap: enabled ? onTap : null,
-          child: Container(
-            height: _planRowHeight,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: _gutter),
-            child: Row(
-              children: [
-                _Radio(selected: selected),
-                const SizedBox(width: CiSpace.s3),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(title,
+          button: enabled,
+          selected: selected,
+          label: '$title, $price $per',
+          container: true,
+          excludeSemantics: true,
+          child: InkWell(
+            onTap: enabled ? onTap : null,
+            child: Container(
+              height: _planRowHeight,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: _gutter),
+              child: Row(
+                children: [
+                  _Radio(selected: selected),
+                  const SizedBox(width: CiSpace.s3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                title,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: CiType.rowTitle.copyWith(
-                                    color: c.text,
-                                    fontWeight: CiWeight.semiBold)),
-                          ),
-                          if (badge != null) ...[
-                            const SizedBox(width: CiSpace.s2),
-                            _BestValue(label: badge!),
+                                  color: c.text,
+                                  fontWeight: CiWeight.semiBold,
+                                ),
+                              ),
+                            ),
+                            if (badge != null) ...[
+                              const SizedBox(width: CiSpace.s2),
+                              _BestValue(label: badge!),
+                            ],
                           ],
-                        ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          sub,
+                          style: CiType.caption.copyWith(color: c.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        price,
+                        style: CiType.h4.copyWith(
+                          color: c.text,
+                          fontWeight: CiWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 2),
-                      Text(sub,
-                          style:
-                              CiType.caption.copyWith(color: c.textMuted)),
+                      Text(
+                        per,
+                        style: CiType.caption.copyWith(color: c.textMuted),
+                      ),
                     ],
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(price,
-                        style: CiType.h4.copyWith(
-                            color: c.text, fontWeight: CiWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(per,
-                        style:
-                            CiType.caption.copyWith(color: c.textMuted)),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
         ),
       ),
     );
@@ -468,8 +514,7 @@ class _Radio extends StatelessWidget {
               child: Container(
                 width: 7,
                 height: 7,
-                decoration:
-                    BoxDecoration(color: c.bg, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: c.bg, shape: BoxShape.circle),
               ),
             )
           : null,
@@ -494,8 +539,7 @@ class _BestValue extends StatelessWidget {
         border: Border.all(color: c.text),
         borderRadius: CiRadius.chipR,
       ),
-      child: Text(label,
-          style: CiType.caption.copyWith(color: c.text)),
+      child: Text(label, style: CiType.caption.copyWith(color: c.text)),
     );
   }
 }
@@ -511,14 +555,13 @@ class _Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     Widget link(String label, VoidCallback? onTap) => InkWell(
-          onTap: onTap,
-          child: Text(label,
-              style: CiType.caption.copyWith(color: c.textMuted)),
-        );
+      onTap: onTap,
+      child: Text(label, style: CiType.caption.copyWith(color: c.textMuted)),
+    );
     Widget dot() => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: Text('·', style: CiType.caption.copyWith(color: c.textFaint)),
-        );
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Text('·', style: CiType.caption.copyWith(color: c.textFaint)),
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -552,22 +595,24 @@ class _IconTap extends StatelessWidget {
       excludeSemantics: true,
       // Bordered 40 square (the frame's IconButton, stroke #2e2e2e). A bare
       // glyph read as unstyled next to the logo.
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return InkWell(
-          onTap: onTap,
-          borderRadius: CiRadius.chipR,
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              border: Border.all(color: c.border),
-              borderRadius: CiRadius.chipR,
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return InkWell(
+            onTap: onTap,
+            borderRadius: CiRadius.chipR,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                border: Border.all(color: c.border),
+                borderRadius: CiRadius.chipR,
+              ),
+              child: Center(child: child),
             ),
-            child: Center(child: child),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

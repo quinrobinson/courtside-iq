@@ -33,7 +33,10 @@ class PaywallLoading extends StatelessWidget {
           SizedBox(
             width: 22,
             height: 22,
-            child: CircularProgressIndicator(strokeWidth: 2, color: c.accentGood),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: c.accentGood,
+            ),
           ),
         ],
       ),
@@ -54,16 +57,24 @@ class PaywallProcessing extends StatelessWidget {
           SizedBox(
             width: 26,
             height: 26,
-            child:
-                CircularProgressIndicator(strokeWidth: 2, color: c.accentGood),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: c.accentGood,
+            ),
           ),
           const SizedBox(height: CiSpace.s6),
-          Text('Completing your purchase',
-              style: CiType.rowTitle
-                  .copyWith(color: c.text, fontWeight: CiWeight.semiBold)),
+          Text(
+            'Completing your purchase',
+            style: CiType.rowTitle.copyWith(
+              color: c.text,
+              fontWeight: CiWeight.semiBold,
+            ),
+          ),
           const SizedBox(height: CiSpace.s2),
-          Text('This only takes a moment.',
-              style: CiType.bodySm.copyWith(color: c.textMuted)),
+          Text(
+            'This only takes a moment.',
+            style: CiType.bodySm.copyWith(color: c.textMuted),
+          ),
         ],
       ),
     );
@@ -108,14 +119,20 @@ class PaywallError extends StatelessWidget {
                 children: [
                   Icon(Icons.error_outline, size: 28, color: c.accentEnergy),
                   const SizedBox(height: CiSpace.s4),
-                  Text(title,
-                      textAlign: TextAlign.center,
-                      style: CiType.h4.copyWith(
-                          color: c.text, fontWeight: CiWeight.bold)),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: CiType.h4.copyWith(
+                      color: c.text,
+                      fontWeight: CiWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: CiSpace.s2),
-                  Text(message,
-                      textAlign: TextAlign.center,
-                      style: CiType.bodySm.copyWith(color: c.textMuted)),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: CiType.bodySm.copyWith(color: c.textMuted),
+                  ),
                   const SizedBox(height: CiSpace.s6),
                   CiButton(
                     label: 'Try again',
@@ -166,16 +183,28 @@ class PaywallAlreadyPremium extends StatelessWidget {
             // 50pt mark in a 220 burst - the same pairing reset_successful
             // and check_email already use, so this is the app's celebratory
             // mark rather than a one-off.
-            const DotBurst(size: 220, markSize: 50, child: CiLogoMark(size: 50)),
+            const DotBurst(
+              size: 220,
+              markSize: 50,
+              child: CiLogoMark(size: 50),
+            ),
             const SizedBox(height: CiSpace.s6),
-            Text('PREMIUM ACTIVE',
-                style: CiType.caption.copyWith(
-                    color: c.accentGood, fontWeight: CiWeight.semiBold)),
+            Text(
+              'PREMIUM ACTIVE',
+              style: CiType.caption.copyWith(
+                color: c.accentGood,
+                fontWeight: CiWeight.semiBold,
+              ),
+            ),
             const SizedBox(height: CiSpace.s3),
-            Text("You're on Premium",
-                textAlign: TextAlign.center,
-                style: CiType.h1
-                    .copyWith(color: c.text, fontWeight: CiWeight.extraBold)),
+            Text(
+              "You're on Premium",
+              textAlign: TextAlign.center,
+              style: CiType.h1.copyWith(
+                color: c.text,
+                fontWeight: CiWeight.extraBold,
+              ),
+            ),
             const SizedBox(height: CiSpace.s3),
             // 300 WIDE, from the frame. At full width it ran as one long
             // line; the frame's narrower measure is what breaks it over two
@@ -183,9 +212,10 @@ class PaywallAlreadyPremium extends StatelessWidget {
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 300),
               child: Text(
-                  "You have full access to every game's development story.",
-                  textAlign: TextAlign.center,
-                  style: CiType.body.copyWith(color: c.textMuted, height: 1.4)),
+                "You have full access to every game's development story.",
+                textAlign: TextAlign.center,
+                style: CiType.body.copyWith(color: c.textMuted, height: 1.4),
+              ),
             ),
             const Spacer(flex: 3),
             CiButton(
@@ -197,8 +227,10 @@ class PaywallAlreadyPremium extends StatelessWidget {
             const SizedBox(height: CiSpace.s3),
             TextButton(
               onPressed: onDone,
-              child: Text('Done',
-                  style: CiType.body.copyWith(color: c.textMuted)),
+              child: Text(
+                'Done',
+                style: CiType.body.copyWith(color: c.textMuted),
+              ),
             ),
             const SizedBox(height: CiSpace.s4),
           ],
@@ -229,21 +261,21 @@ class PaywallSlideCard extends StatelessWidget {
   static const _h = 155.0;
 
   String get _asset => switch (art) {
-        PaywallSlideArt.story => 'assets/images/paywall/slide_story.png',
-        PaywallSlideArt.trend => 'assets/images/paywall/slide_trend.png',
-        PaywallSlideArt.insight => 'assets/images/paywall/slide_insight.png',
-      };
+    PaywallSlideArt.story => 'assets/images/paywall/slide_story.png',
+    PaywallSlideArt.trend => 'assets/images/paywall/slide_trend.png',
+    PaywallSlideArt.insight => 'assets/images/paywall/slide_insight.png',
+  };
 
   /// What a screen reader says instead of describing a picture it cannot
   /// read. Each card IS the argument its slide is making.
   String get _semantics => switch (art) {
-        PaywallSlideArt.story =>
-          "An example insight: Maya's scoring efficiency keeps climbing.",
-        PaywallSlideArt.trend =>
-          'An example trend chart showing scoring efficiency rising to 0.95.',
-        PaywallSlideArt.insight =>
-          'An example game insight rated Elite for scoring efficiency.',
-      };
+    PaywallSlideArt.story =>
+      "An example insight: Maya's scoring efficiency keeps climbing.",
+    PaywallSlideArt.trend =>
+      'An example trend chart showing scoring efficiency rising to 0.95.',
+    PaywallSlideArt.insight =>
+      'An example game insight rated Elite for scoring efficiency.',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -252,22 +284,35 @@ class PaywallSlideCard extends StatelessWidget {
       image: true,
       container: true,
       excludeSemantics: true,
-      // NO ClipRRect. The frame clips its own content at radius 18, so the
-      // export already carries rounded corners - clipping again at the
-      // sheet's 14 cut into them and left the corners uneven.
+      // CLIP TO THE EXPORT'S OWN CORNER. The export is fully opaque ink with
+      // the card rounded at ~39 on a 1050-wide image; outside that rounding is
+      // ink, which read as black boxes once the ambient glow went in behind
+      // the carousel. Clipping at the sheet's 14 earlier cut into the corners
+      // and left them uneven - so clip at the EXPORT's radius instead (a hair
+      // over, to take the anti-aliased ink fringe with it).
       //
       // ASPECT RATIO, not a fixed height. At a forced 155 with BoxFit.cover
       // the artwork was scaled up and cropped, which ate the padding under
       // the copy and made it sit low in the card.
       child: AspectRatio(
         aspectRatio: _w / _h,
-        child: Image.asset(
-          _asset,
-          // cacheWidth bounds the decode: the source is 1050 wide and would
-          // otherwise sit in memory at full size for a 350pt slot.
-          cacheWidth: (_w * 3).round(),
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.medium,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final radius = constraints.maxWidth * 44 / 1050;
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(radius),
+              child: Image.asset(
+                _asset,
+                // cacheWidth bounds the decode: the source is 1050 wide and
+                // would otherwise sit in memory at full size for a 350pt slot.
+                cacheWidth: (_w * 3).round(),
+                // fill maps 1:1 onto the aspect-matched box so the clip lands
+                // exactly on the export's corners.
+                fit: BoxFit.fill,
+                filterQuality: FilterQuality.medium,
+              ),
+            );
+          },
         ),
       ),
     );

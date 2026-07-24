@@ -117,14 +117,35 @@ void main() {
   });
 
   group('slide composition', () {
-    testWidgets('owns the fade in code, with an eased multi-stop ramp',
+    testWidgets('the capture fades into the dark ground with an ink overlay',
         (tester) async {
-      // The exports are fully opaque and fade by darkening toward the
-      // background. A ramp painted into pixels cannot be smoothed from code,
-      // so the fade belongs here where the curve is tunable. A two-stop linear
-      // alpha ramp still reads as a band, hence the extra stops.
+      // Matches the Figma frames (ScreenMockup/fade): the fade is an INK
+      // gradient painted OVER the capture, not a transparency mask. It must end
+      // FULLY OPAQUE so the capture blends into the dark ground and the ambient
+      // glow behind stays hidden beneath it - a transparency mask would instead
+      // let the glow bleed through the capture's lower edge. It must also start
+      // clear and begin low, leaving most of the capture visible.
       await _pump(tester);
-      expect(find.byType(ShaderMask), findsWidgets);
+
+      final fades = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .map((d) => d.decoration)
+          .whereType<BoxDecoration>()
+          .map((b) => b.gradient)
+          .whereType<LinearGradient>()
+          .where((g) =>
+              g.begin == Alignment.topCenter && g.end == Alignment.bottomCenter)
+          .toList();
+
+      expect(fades, isNotEmpty, reason: 'the ink fade gradient is missing');
+      final fade = fades.first;
+      // Clear at the top, fully opaque at the base: blends to ink, not to
+      // nothing.
+      expect(fade.colors.first.a, closeTo(0, 0.001));
+      expect(fade.colors.last.a, closeTo(1, 0.001));
+      // Begins low - the fade should not eat the top half of the capture.
+      expect(fade.stops!.first, 0);
+      expect(fade.stops![1], greaterThan(0.5));
     });
 
     testWidgets('spacing comes off the scale, not from nudging',

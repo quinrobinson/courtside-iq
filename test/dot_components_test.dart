@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_ambient_glow.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_burst.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_gauge.dart';
 
@@ -201,6 +202,33 @@ void main() {
         ));
         expect(tester.takeException(), isNull, reason: 'glowOpacity=$o');
       }
+    });
+  });
+
+  group('CiAmbientGlow', () {
+    testWidgets('paints behind content without throwing, and is passive',
+        (tester) async {
+      // Shared by onboarding, the paywall and the Today hero. It must never
+      // eat taps meant for the content it sits behind.
+      await _pump(
+        tester,
+        const SizedBox(
+          width: 390,
+          height: 844,
+          child: Stack(children: [Positioned.fill(child: CiAmbientGlow())]),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.byType(IgnorePointer), findsWidgets);
+    });
+
+    test('the standard layout is two washes, one stronger than the other', () {
+      // A wash up-left behind the top content, a fainter one down-right.
+      final washes = CiAmbientGlow.kCiAmbientWashes;
+      expect(washes.length, 2);
+      expect(washes.first.alpha, greaterThan(washes.last.alpha));
+      // Low by design - depth behind the content, never neon.
+      expect(washes.first.alpha, lessThan(0.25));
     });
   });
 }

@@ -23,6 +23,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_ambient_glow.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/ci_page_dots.dart';
@@ -115,47 +116,71 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget build(BuildContext context) {
     return CiSurface.ink(
       statusBar: true,
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return Scaffold(
-          backgroundColor: c.bg,
-          body: SafeArea(
-            child: Column(
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return Scaffold(
+            backgroundColor: c.bg,
+            // The signature lime wash sits BEHIND everything, so onboarding does
+            // not open on flat black. ONLY the top wash: the bottom one tinted
+            // the zone where the capture fades into the dark, muddying the
+            // blend, so it was dropped on device review. (The paywall keeps
+            // both.)
+            body: Stack(
               children: [
-                _TopBar(onSkip: _continue),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _controller,
-                    itemCount: kOnboardingSlides.length,
-                    onPageChanged: (i) => setState(() => _index = i),
-                    itemBuilder: (context, i) =>
-                        _Slide(slide: kOnboardingSlides[i]),
+                const Positioned.fill(
+                  child: CiAmbientGlow(
+                    washes: [
+                      CiGlowWash(cx: 0.10, cy: 0.22, radius: 0.82, alpha: 0.16),
+                    ],
                   ),
                 ),
-                // The indicator sat flush against the body copy. Spacing comes
-                // off the scale, not from nudging until it looks right.
-                const SizedBox(height: CiSpace.s6),
-                CiPageDots(
-                  count: kOnboardingSlides.length,
-                  index: _index,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                      CiSpace.screen, CiSpace.s6, CiSpace.screen, CiSpace.s4),
-                  child: CiButton(
-                    label: 'Get Started',
-                    style: CiButtonStyle.lime,
-                    expand: true,
-                    onPressed: _continue,
+                SafeArea(
+                  child: Column(
+                    children: [
+                      _TopBar(onSkip: _continue),
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _controller,
+                          itemCount: kOnboardingSlides.length,
+                          onPageChanged: (i) => setState(() => _index = i),
+                          itemBuilder: (context, i) =>
+                              _Slide(slide: kOnboardingSlides[i]),
+                        ),
+                      ),
+                      // The indicator sat flush against the body copy. Spacing comes
+                      // off the scale, not from nudging until it looks right.
+                      const SizedBox(height: CiSpace.s6),
+                      CiPageDots(
+                        count: kOnboardingSlides.length,
+                        index: _index,
+                      ),
+                      Padding(
+                        // Top gap is s7 (32), matching the Figma frames' dots →
+                        // CTA measure; it read 8pt tight at s6.
+                        padding: const EdgeInsets.fromLTRB(
+                          CiSpace.screen,
+                          CiSpace.s7,
+                          CiSpace.screen,
+                          CiSpace.s4,
+                        ),
+                        child: CiButton(
+                          label: 'Get Started',
+                          style: CiButtonStyle.lime,
+                          expand: true,
+                          onPressed: _continue,
+                        ),
+                      ),
+                      _SignInFooter(onTap: _signIn),
+                      const SizedBox(height: CiSpace.s4),
+                    ],
                   ),
                 ),
-                _SignInFooter(onTap: _signIn),
-                const SizedBox(height: CiSpace.s4),
               ],
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }
@@ -170,13 +195,19 @@ class _TopBar extends StatelessWidget {
     final c = CiColors.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          CiSpace.screen, CiSpace.s3, CiSpace.s4, 0),
+        CiSpace.screen,
+        CiSpace.s3,
+        CiSpace.s4,
+        0,
+      ),
       child: Row(
         children: [
           // Balances the Skip button so the mark sits truly centred.
           const SizedBox(width: 56),
           // CiSpace.s7, not a hand-picked 34: sizes come off the scale too.
-          const Expanded(child: Center(child: CiLogoMark(size: CiSpace.s7))),
+          const Expanded(
+            child: Center(child: CiLogoMark(size: CiSpace.s7)),
+          ),
           GestureDetector(
             onTap: onSkip,
             behavior: HitTestBehavior.opaque,
@@ -185,9 +216,13 @@ class _TopBar extends StatelessWidget {
               child: Padding(
                 // Padded to a real touch target; the label alone is too short.
                 padding: const EdgeInsets.symmetric(
-                    vertical: CiSpace.s3, horizontal: CiSpace.s3),
-                child: Text('Skip',
-                    style: CiType.body.copyWith(color: c.textMuted)),
+                  vertical: CiSpace.s3,
+                  horizontal: CiSpace.s3,
+                ),
+                child: Text(
+                  'Skip',
+                  style: CiType.body.copyWith(color: c.textMuted),
+                ),
               ),
             ),
           ),
@@ -212,40 +247,72 @@ class _Slide extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: CiSpace.s5),
-            child: ShaderMask(
-              // THE FADE LIVES HERE, not in the exported image.
-              //
-              // The exports are fully opaque - alpha 255 everywhere - and fade
-              // by darkening toward #0F0F0F instead. A ramp painted into the
-              // pixels cannot be smoothed from code: anything added compounds
-              // with it and makes the falloff steeper, not gentler. Owning it
-              // here makes the curve a number we can tune.
-              //
-              // Many stops rather than two, because a linear alpha ramp still
-              // reads as a band. This approximates an ease: slow to start,
-              // quickest through the middle, slow to finish.
-              shaderCallback: (rect) => const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white,
-                  Colors.white,
-                  Color(0xE6FFFFFF),
-                  Color(0xB3FFFFFF),
-                  Color(0x66FFFFFF),
-                  Color(0x26FFFFFF),
-                  Colors.transparent,
-                ],
-                stops: [0, 0.42, 0.56, 0.70, 0.82, 0.92, 1],
-              ).createShader(rect),
-              blendMode: BlendMode.dstIn,
-              child: Image.asset(
-                slide.image,
-                fit: BoxFit.contain,
-                alignment: Alignment.topCenter,
-                // A missing asset must not blank the slide: the copy below
-                // still carries the message.
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            // CLIP THE CAPTURE TO THE CARD'S CORNERS. The export bakes an
+            // opaque ink background (alpha 255 everywhere) with the app card
+            // rounded at radius 61 on a 960-wide image. Left unclipped, those
+            // ink corners cover the glow and read as black squares against the
+            // lit margins. Constrain to the capture's own aspect so the box
+            // matches it exactly, then clip the TOP corners at the same radius
+            // so the ink comes off and the glow shows around the card.
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: AspectRatio(
+                aspectRatio: 960 / 1290,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // ~61 is where the ink meets the card, but clipping exactly
+                    // there leaves a 1-2px ink fringe (the anti-aliased clip
+                    // edge samples the ink just outside). 68 clips a hair INTO
+                    // the card corner - dark chrome, so invisible - taking the
+                    // fringe with it.
+                    final radius = constraints.maxWidth * 68 / 960;
+                    return ClipRRect(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(radius),
+                      ),
+                      child: Stack(
+                        fit: StackFit.passthrough,
+                        children: [
+                          Image.asset(
+                            slide.image,
+                            // fill (not cover): the box matches the capture
+                            // aspect exactly, so fill maps 1:1 with no crop and
+                            // the clip lands precisely on the card corners.
+                            fit: BoxFit.fill,
+                            alignment: Alignment.topCenter,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox.shrink(),
+                          ),
+                          // THE FADE, matching the Figma ScreenMockup/fade: an
+                          // INK gradient painted OVER the capture, not a
+                          // transparency mask, so it blends into the dark
+                          // ground rather than letting the glow bleed through
+                          // the lower edge. Clear until ~0.56, half at ~0.78,
+                          // full ink at the base.
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      c.bg.withValues(alpha: 0),
+                                      c.bg.withValues(alpha: 0),
+                                      c.bg.withValues(alpha: 0.5),
+                                      c.bg,
+                                    ],
+                                    stops: const [0, 0.558, 0.777, 1],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -255,13 +322,17 @@ class _Slide extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
           child: Column(
             children: [
-              Text(slide.title,
-                  textAlign: TextAlign.center,
-                  style: CiType.h1.copyWith(color: c.text)),
+              Text(
+                slide.title,
+                textAlign: TextAlign.center,
+                style: CiType.h1.copyWith(color: c.text),
+              ),
               const SizedBox(height: CiSpace.s3),
-              Text(slide.body,
-                  textAlign: TextAlign.center,
-                  style: CiType.body.copyWith(color: c.textMuted)),
+              Text(
+                slide.body,
+                textAlign: TextAlign.center,
+                style: CiType.body.copyWith(color: c.textMuted),
+              ),
             ],
           ),
         ),
@@ -304,7 +375,9 @@ class _SignInFooter extends StatelessWidget {
                 TextSpan(
                   text: 'Sign in',
                   style: CiType.bodySm.copyWith(
-                      color: c.accentGood, fontWeight: CiWeight.semiBold),
+                    color: c.accentGood,
+                    fontWeight: CiWeight.semiBold,
+                  ),
                 ),
               ],
             ),
