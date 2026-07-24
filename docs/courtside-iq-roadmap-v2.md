@@ -2157,10 +2157,24 @@ THREE TRAPS THIS TURNED UP, all worth remembering:
   is sitting on. Resetting the branch refreshes but pops the tab to its root.
   `players_revision.dart` announces instead, and screens reload themselves.
 
-Device-verified 2026-07-24: tab switching no longer moves or reloads the bar,
-tabs keep their state, and the slide is left to the edit screens.
+**REGRESSION FOUND ON DEVICE, and it is the one to remember.** The bottom nav
+was missing entirely on a cold start. `/` builds the home screen INLINE through
+`_entryScreen`, so under the shell it rendered Today with the shell nowhere in
+that subtree - and Today no longer draws its own bar. Only `/home` is inside
+the shell. Fixed with `shellEntryRedirect`, which hands `/` over to `/home`
+once a parent is signed in (and leaves `/` alone while auth resolves, so the
+splash still shows, and for a signed-out parent, who belongs on onboarding).
 
-`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
+Sign-in had the same shape of bug: it PUSHED `HomeWidget.routeName`, and
+pushing a shell route from outside stacks it on the root navigator above the
+shell. Now `goNamedAuth`, which is also what sign-in means.
+
+WHY NOTHING CAUGHT IT: every widget test mounts a screen directly and the
+router test built the table without ever starting at `/`. The lesson is that a
+shell changes what "the app starts here" means, and no screen-level test can
+see that. `router_shell_wiring_test.dart` now covers the entry redirect.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate

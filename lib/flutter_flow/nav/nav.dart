@@ -153,6 +153,21 @@ Widget _homeScreen() {
   return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
 }
 
+/// Where a signed-in parent at `/` has to be sent, and WHY (4.19f).
+///
+/// `/` builds the home screen INLINE through [_entryScreen]. That was fine
+/// when Today drew its own nav bar, but the shell owns the bar now and the
+/// shell is not in that subtree at all - so a cold start landed on Today with
+/// NO BOTTOM NAV. The route table's `/home` is the one inside the shell, so
+/// `/` has to hand over to it rather than render home itself.
+///
+/// Only when LOGGED IN: while auth is still resolving, `/` must stay put and
+/// show the splash, and a signed-out parent belongs on onboarding.
+String? shellEntryRedirect({required bool loggedIn, required String path}) {
+  if (!kUseNavShell || !loggedIn) return null;
+  return path == '/' ? HomeWidget.routePath : null;
+}
+
 GoRouter createRouter(AppStateNotifier appStateNotifier) {
   $lock_orientation_library_opafp4.initializeRoutes(
     homePageWidgetName: 'lock_orientation_library_opafp4.HomePage',
@@ -164,6 +179,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
     debugLogDiagnostics: false,
     refreshListenable: appStateNotifier,
     navigatorKey: appNavigatorKey,
+    redirect: (context, state) => shellEntryRedirect(
+      loggedIn: appStateNotifier.loggedIn,
+      path: state.uri.path,
+    ),
     errorBuilder: (context, state) => _entryScreen(appStateNotifier),
     routes: _buildRoutes([
       FFRoute(

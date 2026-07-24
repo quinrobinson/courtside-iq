@@ -153,7 +153,11 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
       // sign-in succeeds and the parent sits on the auth screen watching
       // nothing happen, which reads as a dead button.
       if (loggedIn) {
-        context.pushNamedAuth(
+        // goNamedAuth, not pushNamedAuth. Home lives inside the nav shell, and
+        // PUSHING a shell route from out here stacks it on the root navigator -
+        // Today would render above the shell, with no bottom nav. Replacing is
+        // also what sign-in means: there is no backing out into the auth screen.
+        context.goNamedAuth(
           HomeWidget.routeName,
           context.mounted,
         );

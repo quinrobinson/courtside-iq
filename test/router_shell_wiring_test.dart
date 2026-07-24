@@ -76,4 +76,28 @@ void main() {
       expect(names, contains(name), reason: '$name must still be routable');
     }
   });
+
+  group('the entry route hands Home over to the shell', () {
+    // THE REGRESSION THIS EXISTS FOR: '/' builds the home screen inline via
+    // _entryScreen, so under the shell a cold start rendered Today with NO
+    // bottom nav - the shell was not in that subtree. Every widget test still
+    // passed, because none of them starts the app at '/'.
+    test('a signed-in parent at / is sent to the shell-owned home route', () {
+      expect(
+        shellEntryRedirect(loggedIn: true, path: '/'),
+        HomeWidget.routePath,
+        reason: 'otherwise / renders Today outside the shell, with no nav bar',
+      );
+    });
+
+    test('a signed-out parent is left alone, and so is every other path', () {
+      // While auth resolves, / must stay put and show the splash; a signed-out
+      // parent belongs on onboarding, not bounced at the home route.
+      expect(shellEntryRedirect(loggedIn: false, path: '/'), isNull);
+      // Anything already routed is not our business.
+      expect(shellEntryRedirect(loggedIn: true, path: HomeWidget.routePath),
+          isNull);
+      expect(shellEntryRedirect(loggedIn: true, path: '/playersList'), isNull);
+    });
+  });
 }
