@@ -29,6 +29,7 @@ import 'package:go_router/go_router.dart';
 import '/features/flags.dart';
 import '/features/onboarding/first_run_gate.dart';
 import '/features/onboarding/whats_new_gate.dart';
+import '/features/players/players_revision.dart';
 import 'ci_nav_bar.dart';
 
 /// Branch order. This is the ONLY place the mapping between a tab and its
@@ -76,11 +77,13 @@ class CiNavShell extends StatelessWidget {
 
   /// A player added from the create sheet has to appear on the screen under
   /// the bar. Each screen used to pass its own refresh, which a SHARED bar
-  /// cannot do - it does not know what it is sitting on. Resetting the active
-  /// branch rebuilds that tab from its root, which re-runs its load.
-  void _onPlayerAdded() =>
-      navigationShell.goBranch(navigationShell.currentIndex,
-          initialLocation: true);
+  /// cannot do - it does not know what it is sitting on.
+  ///
+  /// It ANNOUNCES rather than navigating. Resetting the branch would also
+  /// refresh, but it pops that tab to its root, so adding a player from Player
+  /// Profile threw you back to the list. Screens subscribe and reload
+  /// themselves, leaving the stack untouched.
+  void _onPlayerAdded() => notifyPlayersChanged();
 
   @override
   Widget build(BuildContext context) {

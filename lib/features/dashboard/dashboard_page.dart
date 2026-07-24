@@ -784,13 +784,6 @@ class _LiveGameCalloutState extends State<_LiveGameCallout>
           if (s.liveOppTeam.isNotEmpty) 'oppName': s.liveOppTeam,
           if (s.livePlayerID.isNotEmpty) 'playerID': s.livePlayerID,
         },
-        extra: <String, dynamic>{
-          '__transition_info__': const TransitionInfo(
-            hasTransition: true,
-            transitionType: PageTransitionType.fade,
-            duration: Duration(milliseconds: 400),
-          ),
-        },
       ),
       child: Container(
         decoration: BoxDecoration(

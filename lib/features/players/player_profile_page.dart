@@ -35,6 +35,7 @@ import '/features/home/entitlement_status.dart';
 import '/features/premium/paywall_launcher.dart';
 import '/features/home/widgets/today_promo_banner.dart';
 import '/features/nav/ci_nav_bar.dart';
+import '/features/players/players_revision.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
@@ -117,6 +118,15 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     // check itself causes.
     _playersFuture!.then(_checkBandFor).catchError((_) {});
     _loadEntitlement();
+    // The shell's shared bar announces a player change rather than calling
+    // this screen's refresh directly - it cannot know what it is sitting on.
+    playersRevision.addListener(_reloadPlayers);
+  }
+
+  @override
+  void dispose() {
+    playersRevision.removeListener(_reloadPlayers);
+    super.dispose();
   }
 
   Future<void> _loadEntitlement() async {

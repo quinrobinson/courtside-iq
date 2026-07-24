@@ -156,13 +156,6 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
         context.pushNamedAuth(
           HomeWidget.routeName,
           context.mounted,
-          extra: <String, dynamic>{
-            '__transition_info__': const TransitionInfo(
-              hasTransition: true,
-              transitionType: PageTransitionType.fade,
-              duration: Duration(milliseconds: 400),
-            ),
-          },
         );
       }
     } finally {
@@ -353,13 +346,6 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
     // the parent had already typed here.
     context.pushNamed(
       ForgotPasswordWidget.routeName,
-      extra: <String, dynamic>{
-        '__transition_info__': const TransitionInfo(
-          hasTransition: true,
-          transitionType: PageTransitionType.fade,
-          duration: Duration(milliseconds: 400),
-        ),
-      },
     );
   }
 }

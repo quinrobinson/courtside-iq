@@ -24,6 +24,7 @@ import '/features/players/add_player_flow.dart';
 import '/pages/global/bottom_sheets/paywall/paywall_widget.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
+import '/features/players/players_revision.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
@@ -61,6 +62,15 @@ class _PlayersListPageState extends State<PlayersListPage> {
   void initState() {
     super.initState();
     _loadEntitlement();
+    // The shell's shared bar announces a player change rather than calling
+    // this screen's refresh directly - it cannot know what it is sitting on.
+    playersRevision.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    playersRevision.removeListener(_refresh);
+    super.dispose();
   }
 
   Future<void> _loadEntitlement() async {

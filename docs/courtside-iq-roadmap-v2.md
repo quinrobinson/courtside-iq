@@ -2128,11 +2128,36 @@ Player, the account sub-screens, Game Detail. Tab switches must not slide at
 all once the shell lands, since the bar no longer moves. Keep it quick; a long
 fade on a tab switch reads as lag.
 
-Sequence the shell FIRST: it removes most of the offending transitions by
-construction, and doing the transition policy first would mean tuning
-animations that are about to be deleted.
+**BUILT.** Shell first, then the policy, for the reason above.
 
-`[ ] designed` · `[ ] built` · `[ ] wired` · `[ ] device-verified`
+Part 1: `StatefulShellRoute.indexedStack` with one `CiNavBar` in `CiNavShell`;
+taps call `goBranch`, tapping the active tab pops that branch to its root. The
+landing gates moved from the Home route to wrap the SHELL - first-run has to
+cover the bar, and a gate inside the Home branch renders underneath it. Player
+Profile rides in the Players branch so it inherits the bar; Game Detail stays
+top-level because it renders none. Route names and paths are unchanged, so
+every `goNamed`/`pushNamed` still resolves and `kUseNavShell` reverts it all.
+
+Part 2: `TransitionInfo.appDefault()` is now a 200ms crossfade. It was
+`hasTransition: false`, which is NOT "no animation" - it falls through to
+MaterialPage, and on iOS that is the Cupertino slide. That is why everything
+flew in from the right, and why five screens had hand-rolled their own fade
+(all removed, they are the default now). `TransitionInfo.push()` +
+`slideInExtra()` opt the edit screens (Edit Name, Edit Email, Change Password,
+Delete Account) back into the slide.
+
+THREE TRAPS THIS TURNED UP, all worth remembering:
+- Collapsing a screen's bar condition to `kUseNavBar2 && !kUseNavShell` falls
+  through to the **v1 FlutterFlow bar**, not to no bar. The check is three-way
+  and the shell case must be tested first.
+- Today PUSHED its tab destinations (Menu, Players, Games). Under a shell a
+  push stacks the tab inside the current branch - Menu rendered with Home still
+  lit - so tab destinations must use `goNamed`.
+- A shared bar cannot call a screen's refresh, because it does not know what it
+  is sitting on. Resetting the branch refreshes but pops the tab to its root.
+  `players_revision.dart` announces instead, and screens reload themselves.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate

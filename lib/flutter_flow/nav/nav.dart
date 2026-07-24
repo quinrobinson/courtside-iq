@@ -283,12 +283,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         requireAuth: true,
         builder: (context, params) => kUseMenu2
             ? YourProfilePage(
-                onEditName: () => context.pushNamed(EditNameWidget.routeName),
-                onEditEmail: () => context.pushNamed(EditEmailWidget.routeName),
+                onEditName: () => context.pushNamed(EditNameWidget.routeName, extra: slideInExtra()),
+                onEditEmail: () => context.pushNamed(EditEmailWidget.routeName, extra: slideInExtra()),
                 onChangePassword: () =>
-                    context.pushNamed(ChangePasswordPage.routeName),
+                    context.pushNamed(ChangePasswordPage.routeName, extra: slideInExtra()),
                 onDeleteAccount: () =>
-                    context.pushNamed(DeleteAccountPage.routeName),
+                    context.pushNamed(DeleteAccountPage.routeName, extra: slideInExtra()),
                 // onEditPhoto stays null: there is no column to store one.
               )
             : YourProfileWidget(
@@ -748,8 +748,36 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => TransitionInfo(hasTransition: false);
+  /// A QUICK CROSSFADE, and this is the whole transition policy (4.19f).
+  ///
+  /// It used to be `hasTransition: false`, which falls through to MaterialPage
+  /// - and on iOS that IS the Cupertino push slide. So every screen in the app
+  /// flew in from the right by inheritance, not by choice, and screens that
+  /// wanted a fade had to hand-roll one (the auth screens all did).
+  ///
+  /// Fading is right for the default because most navigation here REPLACES
+  /// rather than pushes: tab destinations, sign-out, the end of a flow. A
+  /// slide implies "you can come back from this", and lying about that is what
+  /// made the app feel like a website moving between pages.
+  static TransitionInfo appDefault() => const TransitionInfo(
+        hasTransition: true,
+        transitionType: PageTransitionType.fade,
+        duration: Duration(milliseconds: 200),
+      );
+
+  /// Slide in from the right. RESERVED for a push with a back affordance and a
+  /// parent to return to - the edit screens. Opt in per call site with
+  /// [slideInExtra]; anything that does not is a crossfade.
+  static TransitionInfo push() => const TransitionInfo(
+        hasTransition: true,
+        transitionType: PageTransitionType.rightToLeft,
+        duration: Duration(milliseconds: 280),
+      );
 }
+
+/// `extra` that asks a push for the slide instead of the default crossfade.
+Map<String, dynamic> slideInExtra() =>
+    <String, dynamic>{kTransitionInfoKey: TransitionInfo.push()};
 
 class RootPageContext {
   const RootPageContext(this.isRootPage, [this.errorRoute]);

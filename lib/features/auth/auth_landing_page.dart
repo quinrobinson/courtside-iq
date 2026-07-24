@@ -78,13 +78,6 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
       context.goNamedAuth(
         HomeWidget.routeName,
         context.mounted,
-        extra: <String, dynamic>{
-          '__transition_info__': const TransitionInfo(
-            hasTransition: true,
-            transitionType: PageTransitionType.fade,
-            duration: Duration(milliseconds: 400),
-          ),
-        },
       );
     } finally {
       if (mounted && _busy) setState(() => _busy = false);
@@ -95,13 +88,6 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
     // pushNamed, not goNamed: back from the email form should land here.
     context.pushNamed(
       UserAuthEmailWidget.routeName,
-      extra: <String, dynamic>{
-        '__transition_info__': const TransitionInfo(
-          hasTransition: true,
-          transitionType: PageTransitionType.fade,
-          duration: Duration(milliseconds: 400),
-        ),
-      },
     );
   }
 
@@ -129,13 +115,6 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
                         semanticLabel: 'Back',
                         onPressed: () => context.pushNamed(
                           OnBoardWidget.routeName,
-                          extra: <String, dynamic>{
-                            '__transition_info__': const TransitionInfo(
-                              hasTransition: true,
-                              transitionType: PageTransitionType.fade,
-                              duration: Duration(milliseconds: 400),
-                            ),
-                          },
                         ),
                       ),
                     ),

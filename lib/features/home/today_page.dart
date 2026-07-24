@@ -37,6 +37,7 @@ import '/features/flags.dart';
 import '/features/players/birth_date_gate.dart';
 import '/features/players/info_copy.dart';
 import '/features/nav/ci_nav_bar.dart';
+import '/features/players/players_revision.dart';
 import '/features/menu/account_repository.dart';
 import '/features/premium/paywall_launcher.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
@@ -96,6 +97,9 @@ class _TodayPageState extends State<TodayPage> {
     _loadEntitlement();
     _loadAccount();
     _readLive();
+    // The shell's shared bar announces a player change rather than calling
+    // this screen's refresh directly - it cannot know what it is sitting on.
+    playersRevision.addListener(_refresh);
     // The v1 gate lives on home_widget, which this screen replaces, so
     // without this the birth-date prompt is dead on every 2.0 build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -106,6 +110,12 @@ class _TodayPageState extends State<TodayPage> {
         if (mounted) _refresh();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    playersRevision.removeListener(_refresh);
+    super.dispose();
   }
 
   Future<void> _loadEntitlement() async {
@@ -248,9 +258,13 @@ class _TodayPageState extends State<TodayPage> {
                                         ConnectionState.waiting &&
                                     data == null,
                                 userName: _userName,
+                                // goNamed, not pushNamed: these are TABS.
+                                // Under the shell a push would stack the tab
+                                // inside the Home branch - Menu rendered with
+                                // Home still lit - instead of switching to it.
                                 onProfile: () =>
-                                    context.pushNamed(MenuWidget.routeName),
-                                onPlayerTap: (s) => context.pushNamed(
+                                    context.goNamed(MenuWidget.routeName),
+                                onPlayerTap: (s) => context.goNamed(
                                   PlayersListWidget.routeName,
                                 ),
                                 onAboutGrowthIq: () => showCiInfoSheet(
@@ -452,7 +466,8 @@ class _TodayPageState extends State<TodayPage> {
       const SliverToBoxAdapter(child: FeedHairline()),
       SliverToBoxAdapter(
         child: _ViewAllGames(
-          onTap: () => context.pushNamed(AllGamesWidget.routeName),
+          // A tab, so switch to it rather than stacking it. See above.
+          onTap: () => context.goNamed(AllGamesWidget.routeName),
         ),
       ),
       // The frame closes the list with a hairline below View All Games, so

@@ -89,26 +89,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
   void _continue() {
     context.pushNamed(
       UserAuthWidget.routeName,
-      extra: <String, dynamic>{
-        '__transition_info__': const TransitionInfo(
-          hasTransition: true,
-          transitionType: PageTransitionType.fade,
-          duration: Duration(milliseconds: 400),
-        ),
-      },
     );
   }
 
   void _signIn() {
     context.pushNamed(
       UserAuthEmailWidget.routeName,
-      extra: <String, dynamic>{
-        '__transition_info__': const TransitionInfo(
-          hasTransition: true,
-          transitionType: PageTransitionType.fade,
-          duration: Duration(milliseconds: 400),
-        ),
-      },
     );
   }
 
