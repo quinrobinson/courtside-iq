@@ -17,7 +17,6 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_button.dart';
-import '/courtside_iq/design/components/ci_spark.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -52,45 +51,54 @@ class GameInsightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    final ground =
-        state == InsightState.error ? c.surfaceSunk : c.accentGoodWash;
+    final ground = state == InsightState.error
+        ? c.surfaceSunk
+        : c.accentGoodWash;
 
     return Container(
       width: double.infinity,
       color: ground,
       padding: const EdgeInsets.fromLTRB(
-          CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s5),
+        CiSpace.screen,
+        CiSpace.s5,
+        CiSpace.screen,
+        CiSpace.s5,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CiSpark(size: 16, color: c.text),
+              // The same AI-insight sparkle the profile's development sections
+              // carry, so "Claude read this" reads identically across the app.
+              Icon(Icons.auto_awesome, size: 16, color: c.text),
               const SizedBox(width: CiSpace.s2),
-              Flexible(
-                child: Text('Courtside IQ',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: CiType.caption.copyWith(color: c.textMuted)),
+              // "Courtside IQ" is a fixed short wordmark - let it be its natural
+              // width. It was Flexible, which (with the Spacer and a Flexible
+              // label) split the row three ways and squeezed the label to a
+              // third, ellipsising it even when it fit. The label now takes ALL
+              // the remaining width via Expanded and sits at the right edge, so
+              // it only ellipsises when it genuinely cannot fit.
+              Text(
+                'Courtside IQ',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: CiType.caption.copyWith(color: c.textMuted),
               ),
-              const Spacer(),
               if (label != null) ...[
                 const SizedBox(width: CiSpace.s3),
-                // FLEXIBLE, not a Spacer plus fixed text. "SCORING EFFICIENCY
-                // · ELITE" is the longest eyebrow the app can produce and it
-                // overflowed the row beside the wordmark. It ellipsises
-                // rather than wrapping: this is a label for the paragraph
-                // below, and two lines of it would compete with the insight
-                // it is labelling.
-                Flexible(
-                  child: Text(label!,
-                      textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: CiType.micro.copyWith(
-                          color: c.textMuted,
-                          fontWeight: CiWeight.semiBold,
-                          letterSpacing: 0.4)),
+                Expanded(
+                  child: Text(
+                    label!,
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: CiType.micro.copyWith(
+                      color: c.textMuted,
+                      fontWeight: CiWeight.semiBold,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
                 ),
               ],
             ],
@@ -129,8 +137,10 @@ class _Ready extends StatelessWidget {
               children: [
                 Icon(Icons.info_outline, size: 15, color: c.textMuted),
                 const SizedBox(width: 6),
-                Text('About insights',
-                    style: CiType.caption.copyWith(color: c.textMuted)),
+                Text(
+                  'About insights',
+                  style: CiType.caption.copyWith(color: c.textMuted),
+                ),
               ],
             ),
           ),
@@ -157,8 +167,7 @@ class _Loading extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Reading $who game...',
-            style: CiType.h4.copyWith(color: c.text)),
+        Text('Reading $who game...', style: CiType.h4.copyWith(color: c.text)),
         const SizedBox(height: CiSpace.s4),
         // Widths taper, so the block reads as a paragraph rather than a
         // loading bar that stalled.
@@ -199,16 +208,20 @@ class _Error extends StatelessWidget {
             Icon(Icons.error_outline, size: 18, color: c.accentEnergy),
             const SizedBox(width: CiSpace.s2),
             Expanded(
-              child: Text("We couldn't generate this insight",
-                  style: CiType.h4.copyWith(color: c.text)),
+              child: Text(
+                "We couldn't generate this insight",
+                style: CiType.h4.copyWith(color: c.text),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 6),
         // Leads with what is SAFE. The game is the thing a parent would fear
         // for, and it was never at risk.
-        Text("Check your connection. We'll keep your game saved.",
-            style: CiType.bodySm.copyWith(color: c.textMuted)),
+        Text(
+          "Check your connection. We'll keep your game saved.",
+          style: CiType.bodySm.copyWith(color: c.textMuted),
+        ),
         const SizedBox(height: CiSpace.s4),
         CiButton(
           label: 'Try again',

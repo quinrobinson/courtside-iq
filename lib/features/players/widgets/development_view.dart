@@ -147,8 +147,10 @@ class _Story extends StatelessWidget {
                     // The score only. See CiBadge.growthTrend: the word and
                     // the delta stay together on the chip rather than being
                     // split across the gauge and the chip.
-                    child: Text('$growthIq',
-                        style: CiType.statSm.copyWith(color: c.text)),
+                    child: Text(
+                      '$growthIq',
+                      style: CiType.statSm.copyWith(color: c.text),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 18),
@@ -158,12 +160,13 @@ class _Story extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (trend != null) ...[
-                      CiBadge.growthTrend(
-                          trend: trend!, delta: growthIqDelta),
+                      CiBadge.growthTrend(trend: trend!, delta: growthIqDelta),
                       const SizedBox(height: 10),
                     ],
-                    Text(insight.headline ?? '',
-                        style: CiType.body.copyWith(color: c.text)),
+                    Text(
+                      insight.headline ?? '',
+                      style: CiType.body.copyWith(color: c.text),
+                    ),
                   ],
                 ),
               ),
@@ -182,15 +185,9 @@ class _Story extends StatelessWidget {
         if (!insight.hasSplitNarrative && _has(insight.text))
           _WashBlock(title: 'The Story', body: insight.text!),
         if (_has(insight.whatsWorking))
-          _WashBlock(
-            title: "What's Working",
-            body: insight.whatsWorking!,
-          ),
+          _WashBlock(title: "What's Working", body: insight.whatsWorking!),
         if (_has(insight.needsDevelopment))
-          _WashBlock(
-            title: 'Room to Grow',
-            body: insight.needsDevelopment!,
-          ),
+          _WashBlock(title: 'Room to Grow', body: insight.needsDevelopment!),
         if (_has(insight.growthEdge))
           _FocusBlock(
             label: 'WATCH NEXT GAME',
@@ -225,12 +222,19 @@ class _WashBlock extends StatelessWidget {
       // 22 top / 32 bottom, measured from 128:608. The bottom is heavier on
       // purpose: it is what separates one narrative block from the next.
       padding: const EdgeInsets.fromLTRB(
-          CiSpace.screen, 22, CiSpace.screen, CiSpace.s7),
+        CiSpace.screen,
+        22,
+        CiSpace.screen,
+        CiSpace.s7,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              // THE spark for AI-written insight, shared with the game insight
+              // card so a parent sees one mark for "Claude read this". This is
+              // the reference; the game detail matches it.
               Icon(Icons.auto_awesome, size: 17, color: c.text),
               const SizedBox(width: CiSpace.s2),
               Text(title, style: CiType.buttonSm.copyWith(color: c.text)),
@@ -269,8 +273,10 @@ class _FocusBlock extends StatelessWidget {
             Text(focus!, style: CiType.statSm.copyWith(color: c.text)),
           ],
           const SizedBox(height: CiSpace.s2),
-          Text(body,
-              style: CiType.body.copyWith(color: c.textMuted, height: 1.48)),
+          Text(
+            body,
+            style: CiType.body.copyWith(color: c.textMuted, height: 1.48),
+          ),
         ],
       ),
     );
@@ -289,13 +295,17 @@ class _AboutRow extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-            horizontal: CiSpace.screen, vertical: CiSpace.s5),
+          horizontal: CiSpace.screen,
+          vertical: CiSpace.s5,
+        ),
         child: Row(
           children: [
             Icon(Icons.info_outline, size: 16, color: c.textMuted),
             const SizedBox(width: CiSpace.s2),
-            Text('About this story',
-                style: CiType.bodySm.copyWith(color: c.textMuted)),
+            Text(
+              'About this story',
+              style: CiType.bodySm.copyWith(color: c.textMuted),
+            ),
           ],
         ),
       ),
@@ -323,9 +333,8 @@ class _Locked extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
-    final remaining =
-        (gamesUntilUnlock ?? (kMinGamesForStory - gamesLogged))
-            .clamp(1, kMinGamesForStory);
+    final remaining = (gamesUntilUnlock ?? (kMinGamesForStory - gamesLogged))
+        .clamp(1, kMinGamesForStory);
     final name = firstName.isEmpty ? 'Their' : "$firstName's";
 
     return ListView(
@@ -350,9 +359,11 @@ class _Locked extends StatelessWidget {
           ],
         ),
         const SizedBox(height: CiSpace.s4),
-        Text('$gamesLogged of $kMinGamesForStory games logged',
-            textAlign: TextAlign.center,
-            style: CiType.bodySm.copyWith(color: c.textMuted)),
+        Text(
+          '$gamesLogged of $kMinGamesForStory games logged',
+          textAlign: TextAlign.center,
+          style: CiType.bodySm.copyWith(color: c.textMuted),
+        ),
         const SizedBox(height: CiSpace.s7),
         Text(
           '$name development story unlocks in $remaining '

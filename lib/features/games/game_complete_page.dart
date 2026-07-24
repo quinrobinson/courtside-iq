@@ -31,7 +31,6 @@ import 'package:intl/intl.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
-import '/courtside_iq/design/components/ci_spark.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -302,7 +301,7 @@ class _InsightTeaser extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 2),
-            child: CiSpark(size: 22, color: c.text),
+            child: Icon(Icons.auto_awesome, size: 22, color: c.text),
           ),
           const SizedBox(width: CiSpace.s3),
           Expanded(
