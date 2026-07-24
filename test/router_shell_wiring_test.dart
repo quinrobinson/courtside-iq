@@ -82,22 +82,40 @@ void main() {
     // _entryScreen, so under the shell a cold start rendered Today with NO
     // bottom nav - the shell was not in that subtree. Every widget test still
     // passed, because none of them starts the app at '/'.
-    test('a signed-in parent at / is sent to the shell-owned home route', () {
+    test('a signed-in, settled parent at / is sent to the shell-owned home', () {
       expect(
-        shellEntryRedirect(loggedIn: true, path: '/'),
+        shellEntryRedirect(loggedIn: true, loading: false, path: '/'),
         HomeWidget.routePath,
         reason: 'otherwise / renders Today outside the shell, with no nav bar',
       );
     });
 
+    test('NOT while loading, or Home caches the splash forever', () {
+      // The second regression: FFRoute swaps the splash in for a route's real
+      // content while loading, ONCE, at page-build time - and the shell's
+      // indexedStack then keeps that page alive. A Home branch entered
+      // mid-splash is built AS the splash and never rebuilds, so Home sits on
+      // the splash while every other tab, built later, works.
+      expect(
+        shellEntryRedirect(loggedIn: true, loading: true, path: '/'),
+        isNull,
+        reason: 'never enter a shell branch while the splash is substituted',
+      );
+    });
+
     test('a signed-out parent is left alone, and so is every other path', () {
-      // While auth resolves, / must stay put and show the splash; a signed-out
-      // parent belongs on onboarding, not bounced at the home route.
-      expect(shellEntryRedirect(loggedIn: false, path: '/'), isNull);
-      // Anything already routed is not our business.
-      expect(shellEntryRedirect(loggedIn: true, path: HomeWidget.routePath),
+      // A signed-out parent belongs on onboarding, not bounced at Home.
+      expect(shellEntryRedirect(loggedIn: false, loading: false, path: '/'),
           isNull);
-      expect(shellEntryRedirect(loggedIn: true, path: '/playersList'), isNull);
+      // Anything already routed is not our business.
+      expect(
+          shellEntryRedirect(
+              loggedIn: true, loading: false, path: HomeWidget.routePath),
+          isNull);
+      expect(
+          shellEntryRedirect(
+              loggedIn: true, loading: false, path: '/playersList'),
+          isNull);
     });
   });
 }

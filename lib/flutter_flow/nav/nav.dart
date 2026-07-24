@@ -161,10 +161,25 @@ Widget _homeScreen() {
 /// NO BOTTOM NAV. The route table's `/home` is the one inside the shell, so
 /// `/` has to hand over to it rather than render home itself.
 ///
-/// Only when LOGGED IN: while auth is still resolving, `/` must stay put and
-/// show the splash, and a signed-out parent belongs on onboarding.
-String? shellEntryRedirect({required bool loggedIn, required String path}) {
-  if (!kUseNavShell || !loggedIn) return null;
+/// NEVER WHILE [AppStateNotifier.loading], and this one is not obvious.
+/// [FFRoute]'s pageBuilder substitutes the splash for a route's real content
+/// while loading - ONCE, when the page is built. The shell's indexedStack then
+/// keeps that page alive for the life of the branch. So a Home branch entered
+/// mid-splash is built AS the splash and never rebuilds: Home is stuck on the
+/// splash forever while every other tab, built later, works fine.
+///
+/// The invariant is therefore: do not enter a shell branch while the router is
+/// still substituting a splash. `/` is outside the shell, so it can show the
+/// splash and rebuild out of it normally; only once loading is done does the
+/// hand-over happen, and the branch is built with real content.
+///
+/// Signed out is left alone too: that parent belongs on onboarding.
+String? shellEntryRedirect({
+  required bool loggedIn,
+  required bool loading,
+  required String path,
+}) {
+  if (!kUseNavShell || !loggedIn || loading) return null;
   return path == '/' ? HomeWidget.routePath : null;
 }
 
@@ -181,6 +196,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
     navigatorKey: appNavigatorKey,
     redirect: (context, state) => shellEntryRedirect(
       loggedIn: appStateNotifier.loggedIn,
+      loading: appStateNotifier.loading,
       path: state.uri.path,
     ),
     errorBuilder: (context, state) => _entryScreen(appStateNotifier),
@@ -726,10 +742,25 @@ class FFRoute {
                   ))
           : page;
 
+      // THE SPLASH STAND-IN GETS ITS OWN PAGE KEY (4.19f).
+      //
+      // While loading, the real content above is replaced by the splash. That
+      // used to be self-correcting because a route rebuilt on every visit. The
+      // shell's indexedStack keeps its branch pages ALIVE, so a page built as
+      // the splash stays the splash forever - Home sat on the splash while
+      // every other tab, built later, worked.
+      //
+      // A distinct key means the page is REPLACED rather than reused once
+      // loading finishes, so any route can recover - including one reached by
+      // deep link mid-splash, which the entry redirect cannot guard.
+      final pageKey = appStateNotifier.loading
+          ? ValueKey<String>('${state.pageKey.value}-loading')
+          : state.pageKey;
+
       final transitionInfo = state.transitionInfo;
       return transitionInfo.hasTransition
           ? CustomTransitionPage(
-              key: state.pageKey,
+              key: pageKey,
               name: state.name,
               child: child,
               transitionDuration: transitionInfo.duration,
@@ -748,7 +779,7 @@ class FFRoute {
                         child,
                       ),
             )
-          : MaterialPage(key: state.pageKey, name: state.name, child: child);
+          : MaterialPage(key: pageKey, name: state.name, child: child);
     },
     routes: routes,
   );
