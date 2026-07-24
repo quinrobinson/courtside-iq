@@ -274,15 +274,22 @@ class _TodayPageState extends State<TodayPage> {
               // and SafeArea wrapper this screen used to need for the v1 bar
               // are gone. The v1 bar had neither, which is why the
               // home-indicator strip fell through to the ink scaffold.
-              bottomNavigationBar: kUseNavBar2
-                  ? CiNavBar(active: CiNavTab.home, onPlayerAdded: _refresh)
-                  : ColoredBox(
-                      color: c.bg,
-                      child: const SafeArea(
-                        top: false,
-                        child: CustomNavBarWidget(page: 'Home'),
-                      ),
-                    ),
+              // Three cases, and the middle one is easy to lose: under the
+              // shell this screen renders NO bar, because the shell owns the
+              // only one. Collapsing that into `kUseNavBar2 && !kUseNavShell`
+              // fell through to the v1 bar instead of to nothing.
+              bottomNavigationBar: kUseNavShell
+                  ? null
+                  : kUseNavBar2
+                      ? CiNavBar(
+                          active: CiNavTab.home, onPlayerAdded: _refresh)
+                      : ColoredBox(
+                          color: c.bg,
+                          child: const SafeArea(
+                            top: false,
+                            child: CustomNavBarWidget(page: 'Home'),
+                          ),
+                        ),
             ),
           );
         },

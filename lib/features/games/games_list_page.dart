@@ -38,6 +38,7 @@ import 'live_game_flow.dart';
 import 'live_game_store.dart';
 import 'resume_game_dialog.dart';
 import '/features/home/widgets/game_feed_row.dart';
+import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -311,7 +312,8 @@ class _GamesListPageState extends State<GamesListPage> {
                 );
               },
             ),
-            bottomNavigationBar: const CiNavBar(active: CiNavTab.games),
+            bottomNavigationBar:
+                kUseNavShell ? null : const CiNavBar(active: CiNavTab.games),
           );
         },
       ),

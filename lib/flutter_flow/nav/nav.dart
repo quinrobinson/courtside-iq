@@ -23,6 +23,7 @@ import '/features/dashboard/dashboard_page.dart';
 import '/features/home/today_page.dart';
 import '/features/onboarding/first_run_gate.dart';
 import '/features/onboarding/whats_new_gate.dart';
+import '/features/nav/ci_nav_shell.dart';
 import '/features/players/players_list_page.dart';
 import '/features/players/player_profile_page.dart';
 import '/features/auth/auth_landing_page.dart';
@@ -133,14 +134,20 @@ Widget _entryScreen(AppStateNotifier appStateNotifier) {
 /// reachable by turning its successor off.
 Widget _homeScreen() {
   if (kUseToday2) {
-    // Today, optionally wrapped by two one-time landing gates. FirstRunGate
-    // welcomes a brand-new parent BEFORE they see Today; WhatsNewGate floats
-    // the 2.0 upgrade sheet OVER Today for an existing v1 user. They are
-    // mutually exclusive (first-run marks the upgrade sheet seen), so at most
-    // one fires. Each flag off falls straight through to Today - a safe revert.
+    // The two one-time landing gates: FirstRunGate welcomes a brand-new parent
+    // BEFORE they see Today; WhatsNewGate floats the 2.0 upgrade sheet OVER
+    // Today for an existing v1 user. They are mutually exclusive (first-run
+    // marks the upgrade sheet seen), so at most one fires.
+    //
+    // UNDER THE SHELL THEY WRAP THE SHELL INSTEAD (see ci_nav_shell.dart):
+    // first-run has to cover the nav bar, and a gate applied here would sit
+    // inside the Home branch and render underneath it. Applying them in both
+    // places would also mount each gate twice and fire its query twice.
     Widget home = const TodayPage();
-    if (kUseWhatsNew2) home = WhatsNewGate(child: home);
-    if (kUseFirstRun) home = FirstRunGate(child: home);
+    if (!kUseNavShell) {
+      if (kUseWhatsNew2) home = WhatsNewGate(child: home);
+      if (kUseFirstRun) home = FirstRunGate(child: home);
+    }
     return home;
   }
   return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
@@ -158,7 +165,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
     refreshListenable: appStateNotifier,
     navigatorKey: appNavigatorKey,
     errorBuilder: (context, state) => _entryScreen(appStateNotifier),
-    routes: [
+    routes: _buildRoutes([
       FFRoute(
         name: '_initialize',
         path: '/',
@@ -459,8 +466,57 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         builder: (context, params) =>
             $lock_orientation_library_opafp4.HomePageWidget(),
       ),
-    ].map((r) => r.toRoute(appStateNotifier)).toList(),
+    ], appStateNotifier),
   );
+}
+
+/// The four tabs the shell owns, in branch order, plus the pushed screens that
+/// belong to a tab and KEEP the bar.
+///
+/// Player Profile rides in the Players branch: it is pushed, it shows the bar
+/// today, and putting it in the branch means it inherits the shell's bar
+/// instead of drawing a second one. Game Detail is deliberately NOT here - it
+/// renders no bar today, so leaving it top-level keeps it identical.
+final _shellBranchRouteNames = <List<String>>[
+  [HomeWidget.routeName],
+  [PlayersListWidget.routeName, PlayersProfileWidget.routeName],
+  [AllGamesWidget.routeName],
+  [MenuWidget.routeName],
+];
+
+/// Wraps the tab routes in a [StatefulShellRoute] so one nav bar survives a
+/// tab change. See [kUseNavShell] and `ci_nav_shell.dart`.
+///
+/// ROUTE NAMES AND PATHS ARE UNCHANGED. The branches reuse the very same
+/// [FFRoute] definitions, so every `goNamed`/`pushNamed` in the app keeps
+/// working and turning the flag off restores the previous flat table exactly.
+List<RouteBase> _buildRoutes(
+  List<FFRoute> routes,
+  AppStateNotifier appStateNotifier,
+) {
+  if (!kUseNavShell) {
+    return routes.map((r) => r.toRoute(appStateNotifier)).toList();
+  }
+
+  final inShell = _shellBranchRouteNames.expand((b) => b).toSet();
+  GoRoute build(String name) =>
+      routes.firstWhere((r) => r.name == name).toRoute(appStateNotifier);
+
+  return [
+    // Everything the shell does not own stays top-level, so pushing it covers
+    // the shell and its bar - which is what these screens already did.
+    ...routes
+        .where((r) => !inShell.contains(r.name))
+        .map((r) => r.toRoute(appStateNotifier)),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) =>
+          CiNavShell(navigationShell: navigationShell),
+      branches: [
+        for (final names in _shellBranchRouteNames)
+          StatefulShellBranch(routes: [for (final n in names) build(n)]),
+      ],
+    ),
+  ];
 }
 
 extension NavParamExtensions on Map<String, String?> {

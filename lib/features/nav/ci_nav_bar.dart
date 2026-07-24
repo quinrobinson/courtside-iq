@@ -44,9 +44,19 @@ class CiNavBar extends StatelessWidget {
     required this.active,
     this.onCreate,
     this.onPlayerAdded,
+    this.onSelectTab,
   });
 
   final CiNavTab active;
+
+  /// How a tab tap is handled. Null keeps the original behaviour: `goNamed` to
+  /// that tab's route.
+  ///
+  /// The shell (4.19f) passes this so a tap switches BRANCH instead of
+  /// navigating. Routing between tabs is what tore the bar down and rebuilt it
+  /// on every tap; inside the shell the bar never moves, so it must not be the
+  /// thing issuing navigation either.
+  final void Function(CiNavTab tab)? onSelectTab;
 
   /// Defaults to the 2.0 create sheet. Overridable so a screen can take the
   /// whole interaction over, and so tests can avoid the network.
@@ -82,13 +92,15 @@ class CiNavBar extends StatelessWidget {
                   icon: CiNavIcon.home,
                   label: 'Home',
                   selected: active == CiNavTab.home,
-                  onTap: () => _go(context, HomeWidget.routeName),
+                  onTap: () =>
+                      _select(context, CiNavTab.home, HomeWidget.routeName),
                 ),
                 _Tab(
                   icon: CiNavIcon.players,
                   label: 'Players',
                   selected: active == CiNavTab.players,
-                  onTap: () => _go(context, PlayersListWidget.routeName),
+                  onTap: () => _select(
+                      context, CiNavTab.players, PlayersListWidget.routeName),
                 ),
                 _CreateButton(
                   onTap: onCreate ??
@@ -99,13 +111,15 @@ class CiNavBar extends StatelessWidget {
                   icon: CiNavIcon.games,
                   label: 'Games',
                   selected: active == CiNavTab.games,
-                  onTap: () => _go(context, AllGamesWidget.routeName),
+                  onTap: () => _select(
+                      context, CiNavTab.games, AllGamesWidget.routeName),
                 ),
                 _Tab(
                   icon: CiNavIcon.menu,
                   label: 'Menu',
                   selected: active == CiNavTab.menu,
-                  onTap: () => _go(context, MenuWidget.routeName),
+                  onTap: () =>
+                      _select(context, CiNavTab.menu, MenuWidget.routeName),
                 ),
               ],
             ),
@@ -115,10 +129,19 @@ class CiNavBar extends StatelessWidget {
     );
   }
 
+  /// Switches branch when the shell owns us, otherwise routes.
+  void _select(BuildContext context, CiNavTab tab, String routeName) {
+    final select = onSelectTab;
+    if (select != null) {
+      select(tab);
+      return;
+    }
+    _go(context, routeName);
+  }
+
   /// goNamed, never pushNamed. See the header.
   static void _go(BuildContext context, String routeName) =>
       context.goNamed(routeName);
-
 }
 
 class _Tab extends StatelessWidget {

@@ -151,9 +151,15 @@ class _PlayersListPageState extends State<PlayersListPage> {
                 );
               },
             ),
-            bottomNavigationBar: kUseNavBar2
-                ? CiNavBar(active: CiNavTab.players, onPlayerAdded: _refresh)
-                : const CustomNavBarWidget(page: 'Players'),
+            // Under the shell this screen renders NO bar - the shell owns the
+            // only one. The false branch here is the v1 bar, so the shell case
+            // has to be checked FIRST or it falls through to that.
+            bottomNavigationBar: kUseNavShell
+                ? null
+                : kUseNavBar2
+                    ? CiNavBar(
+                        active: CiNavTab.players, onPlayerAdded: _refresh)
+                    : const CustomNavBarWidget(page: 'Players'),
           );
         },
       ),

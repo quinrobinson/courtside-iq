@@ -72,6 +72,23 @@ const bool kUseWhatsNew2 = true;
 /// them.
 const bool kUseNavBar2 = true;
 
+/// Persistent bottom-nav shell (4.19f).
+///
+/// Puts Home, Players, Games and Menu inside a StatefulShellRoute so ONE
+/// CiNavBar survives a tab change instead of every screen rendering its own.
+/// Before this, `goNamed` replaced the whole scaffold - bar included - so the
+/// nav visibly reloaded and animated on every tab, which is the tell that made
+/// the app feel like a web page rather than an app. The indexed stack also
+/// keeps each tab's scroll position and state.
+///
+/// DERIVED, NOT SET BY HAND. The shell owns the bar for all four tabs at once,
+/// so it can only be on when all four tabs are the 2.0 screens - a v1 fallback
+/// renders its own FlutterFlow nav and would show a second bar under this one.
+/// Reverting any one tab flag therefore disengages the shell automatically and
+/// restores the per-screen bars.
+const bool kUseNavShell =
+    kUseToday2 && kUsePlayers2 && kUseGames2 && kUseMenu2;
+
 /// Players list, rebuilt on the 2.0 design system (4.11a).
 ///
 /// ON FOR REVIEW, NOT YET VERIFIED. The v1 PlayersListWidget stays reachable

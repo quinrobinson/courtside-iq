@@ -297,12 +297,14 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
               );
             },
           ),
-          bottomNavigationBar: kUseNavBar2
-              ? CiNavBar(
+          // No bar under the shell: this screen rides in the Players branch,
+          // so it inherits the shell's bar rather than drawing a second one.
+          bottomNavigationBar: kUseNavShell || !kUseNavBar2
+              ? null
+              : CiNavBar(
                   active: CiNavTab.players,
                   onPlayerAdded: _reloadPlayers,
-                )
-              : null,
+                ),
         );
       }),
     );
