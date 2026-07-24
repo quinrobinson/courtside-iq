@@ -27,12 +27,19 @@ device, and confirm with any web request before trusting an offline result.
 ## A. Fresh install (do first — this state is destroyed by everything else)
 
 - [ ] Cold start → Splash → onboarding (all three slides) → auth landing.
+- [ ] **Turn email confirmation ON for the test project before starting.**
+      Prod has it ON, and this pass exists to verify what SHIPS - with it off,
+      signup auto-confirms and you are testing a flow no real parent gets.
+      Reversible, and done once before (4.9b, 2026-07-19). Check the redirect
+      URL is set while you are in there. Existing confirmed accounts are
+      unaffected, so this only costs an email round-trip on new signups.
 - [ ] Sign UP with a new email. Confirm the "check your email" screen appears
       and names the address.
-      *Test Supabase has email confirmation OFF, so the account auto-confirms
-      and you land straight in. That is the environment, not a bug — to
-      actually exercise this screen, turn confirmation on for the test project
-      first.*
+- [ ] **Open the confirmation link and land back in the app.** Worth its own
+      line: this re-enters via a DEEP LINK straight to a route, with the
+      first-run gate sitting on that landing - the exact mechanism the nav
+      shell (4.19f) changed. Confirm the nav bar is present and first-run
+      behaves.
 - [ ] Guided first-run appears (Welcome → Add first player), is skippable, and
       does NOT appear again on the next launch.
 - [ ] Confirm the "What's new in 2.0" sheet does **not** appear for this new
