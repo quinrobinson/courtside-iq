@@ -2037,16 +2037,38 @@ widget requests AND parses it through the real `vg` parser. Any future
 asset-backed component needs the same treatment, or it can vanish silently on
 every surface at once.
 
-**PART 2 - APP ICON: still to do.** Derive it from `923:3279` (burst + mark)
-and regenerate the platform assets: the iOS `AppIcon` set (all sizes + the
-dark/tinted variants) and the Android adaptive icon (`ic_launcher`
-foreground/background). These are real files under `ios/` and `android/`, not
-FlutterFlow-managed, so they are ours to replace.
+**PART 2 - APP ICON: built.** Derived from `923:3279` (burst + mark).
+`flutter_launcher_icons` was already a dev dependency and configured, so this
+was a source swap plus one real gap closed.
+
+- `scripts/build_app_icon.dart` turns the Figma export into both sources. It
+  exists because the export tool caps at 4x and the frame is 240pt, so the
+  master arrives at **960 with alpha**: iOS needs **1024 and rejects alpha**, so
+  the artwork is flattened onto ink and resized.
+- **THE ANDROID ADAPTIVE ICON WAS MISSING ENTIRELY** (no `mipmap-anydpi-v26`),
+  so every modern launcher was shrink-masking the legacy square PNG. Now
+  `adaptive_icon_background: '#0F0F0F'` + a pre-inset foreground. **The inset is
+  the load-bearing part:** a launcher crops BOTH layers to the inner ~66%, so
+  handing it the full-bleed artwork would zoom the mask into the middle and cut
+  the burst off around the mark. The script scales the artwork to 75% of a
+  transparent 1024 canvas - above the 66.7% safe zone so a rounder mask cannot
+  reveal a rim of flat background, at the cost of only the outermost ring of
+  decorative dots. The background colour matches the artwork's ground so the
+  two layers meet invisibly.
+- Regenerated: 21 iOS PNGs (1024 verified alpha-free), 5 Android mipmaps, the
+  new adaptive XML + `ic_launcher_foreground` drawables, a new `colors.xml`,
+  and the web icons.
+
+**iOS 18 dark/tinted variants deliberately NOT done.** The pinned
+`flutter_launcher_icons 0.13.1` has no config keys for them (verified against
+the package source). Adding them needs a dependency bump, and the icon is
+already dark so a dark variant earns little. Left as its own later item rather
+than folded in here.
 
 **Must land before 4.22 cuts the build**, and it feeds 4.23's store assets (the
 listing icon has to match the installed one).
 
-`[x] designed` · `[x] built (mark)` · `[x] wired (mark)` · `[x] device-verified (mark)` · `[ ] app icon`
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified (mark)` · `[ ] device-verified (icon)`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate

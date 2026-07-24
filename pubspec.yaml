@@ -170,6 +170,13 @@ flutter_launcher_icons:
   web:
     generate: true
   image_path: 'assets/images/app_launcher_icon.png'
+  # Android adaptive icon (added 4.19e). Without these the launcher shrink-masks
+  # the legacy square PNG, which reads as dated beside other apps. The
+  # background matches the artwork's ink ground so the two layers meet
+  # invisibly; the foreground is pre-inset by scripts/build_app_icon.dart,
+  # because the launcher crops both layers to the inner ~66%.
+  adaptive_icon_background: '#0F0F0F'
+  adaptive_icon_foreground: 'assets/images/app_launcher_icon_foreground.png'
 
 
 # For information on the generic Dart part of this file, see the
