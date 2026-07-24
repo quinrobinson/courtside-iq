@@ -31,7 +31,16 @@ abstract class WhatsNew2Policy {
 class SupabaseWhatsNew2Policy implements WhatsNew2Policy {
   const SupabaseWhatsNew2Policy();
 
-  String? get _uid => SupaFlow.client.auth.currentUser?.id;
+  /// Null when there is no signed-in user OR when Supabase cannot be reached.
+  /// Defensive for the same reason as the first-run gate: this sits on the
+  /// landing path, where a throw takes out the screen every session starts on.
+  String? get _uid {
+    try {
+      return SupaFlow.client.auth.currentUser?.id;
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Future<bool> shouldShow() async {

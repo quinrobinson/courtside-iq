@@ -2169,10 +2169,29 @@ Sign-in had the same shape of bug: it PUSHED `HomeWidget.routeName`, and
 pushing a shell route from outside stacks it on the root navigator above the
 shell. Now `goNamedAuth`, which is also what sign-in means.
 
-WHY NOTHING CAUGHT IT: every widget test mounts a screen directly and the
-router test built the table without ever starting at `/`. The lesson is that a
-shell changes what "the app starts here" means, and no screen-level test can
-see that. `router_shell_wiring_test.dart` now covers the entry redirect.
+**A SECOND ONE FOLLOWED, same shape.** Home then sat on the SPLASH forever with
+the bar showing, while every other tab loaded. `FFRoute` substitutes the splash
+for a route's real content while loading - once, at page-build time - and the
+shell's indexedStack keeps branch pages ALIVE, so a Home branch entered
+mid-splash is built AS the splash and never rebuilds. The other tabs worked
+because they were built later. Fixed twice over: the entry redirect also waits
+for `!loading`, and the splash stand-in now gets its OWN page key so the page
+is replaced rather than reused - which also covers a route deep-linked into
+mid-splash, where no redirect can help.
+
+**THE REAL LESSON, and the fix for the class.** All three regressions shared a
+shape: the shell changed structure and LIFETIME assumptions, and nothing in the
+suite booted the app - every test mounts a screen directly or drives a
+synthetic router built in the test. `test/router_boot_test.dart` now boots the
+REAL route table at `/` and asserts what the entry path lands in. Both
+regressions were confirmed catchable by reintroducing each one and watching the
+matching test fail. It asserts routing STRUCTURE only: screens reach Supabase
+in initState and are not exercised.
+
+That harness also turned up a latent fragility worth keeping fixed: both
+landing gates read `SupaFlow.client` OUTSIDE their try, so an unreachable
+Supabase threw instead of declining - on the one path every session starts on.
+They now return null and decline.
 
 `[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
 

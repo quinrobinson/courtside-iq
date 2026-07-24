@@ -30,7 +30,21 @@ abstract class FirstRunPolicy {
 class SupabaseFirstRunPolicy implements FirstRunPolicy {
   const SupabaseFirstRunPolicy();
 
-  String? get _uid => SupaFlow.client.auth.currentUser?.id;
+  /// Null when there is no signed-in user OR when Supabase cannot be reached
+  /// at all.
+  ///
+  /// DEFENSIVE ON PURPOSE. This gate sits on the landing path, so a throw here
+  /// does not fail politely - it takes out the screen every session starts on.
+  /// `SupaFlow.client` asserts that Supabase was initialised, and that assert
+  /// was outside the try below, so the one thing this gate must never do was
+  /// exactly what it did. Declining is always a safe answer; throwing is not.
+  String? get _uid {
+    try {
+      return SupaFlow.client.auth.currentUser?.id;
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Future<bool> shouldShow() async {
