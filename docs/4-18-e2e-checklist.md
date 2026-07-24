@@ -16,6 +16,12 @@ feature order means rebuilding the same state four times.
       iOS 26, so a debug run fails for reasons that are not the app.
 - [ ] Run the whole list on **iOS and Android**. The nav, transitions, sheets
       and the back gesture differ; a pass on one is not a pass on both.
+- [ ] **Turn email confirmation ON for the test project before starting.**
+      Prod has it ON, and this pass exists to verify what SHIPS - with it off,
+      signup auto-confirms and you are testing a flow no real parent gets.
+      Reversible, and done once before (4.9b, 2026-07-19). Check the redirect
+      URL is set while you are in there. Existing confirmed accounts are
+      unaffected, so this only costs an email round-trip on new signups.
 
 **Offline means genuinely offline.** Airplane mode does NOT cut wifi on iOS,
 and on the simulator it cuts nothing at all - a "failed" request will quietly
@@ -27,12 +33,6 @@ device, and confirm with any web request before trusting an offline result.
 ## A. Fresh install (do first — this state is destroyed by everything else)
 
 - [ ] Cold start → Splash → onboarding (all three slides) → auth landing.
-- [ ] **Turn email confirmation ON for the test project before starting.**
-      Prod has it ON, and this pass exists to verify what SHIPS - with it off,
-      signup auto-confirms and you are testing a flow no real parent gets.
-      Reversible, and done once before (4.9b, 2026-07-19). Check the redirect
-      URL is set while you are in there. Existing confirmed accounts are
-      unaffected, so this only costs an email round-trip on new signups.
 - [ ] Sign UP with a new email. Confirm the "check your email" screen appears
       and names the address.
 - [ ] **Open the confirmation link and land back in the app.** Worth its own
