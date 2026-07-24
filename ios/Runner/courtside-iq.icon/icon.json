@@ -1,0 +1,64 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.20711,0.20711,0.20711,1.00000",
+      "display-p3:0.05884,0.05884,0.05884,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 0
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.7
+      }
+    }
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode" : "darken",
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "Logo Mark.svg",
+          "name" : "Logo Mark",
+          "position" : {
+            "scale" : 2.95,
+            "translation-in-points" : [
+              -1.9997959632581797,
+              0.1927013253991845
+            ]
+          }
+        },
+        {
+          "glass" : false,
+          "image-name" : "DotBurst.svg",
+          "name" : "DotBurst",
+          "position" : {
+            "scale" : 4.2,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

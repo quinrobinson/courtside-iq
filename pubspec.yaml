@@ -165,8 +165,13 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
-  ios: true
-  remove_alpha_ios: true
+  # iOS is NOT generated here (4.19e). The iOS icon is an Apple Icon Composer
+  # document, ios/Runner/courtside-iq.icon, compiled by Xcode via
+  # ASSETCATALOG_COMPILER_APPICON_NAME - that is what gives us the native
+  # light/dark/tinted variants this package cannot produce at 0.13.1. Leaving
+  # this true would regenerate AppIcon.appiconset and invite confusion about
+  # which icon actually ships.
+  ios: false
   web:
     generate: true
   image_path: 'assets/images/app_launcher_icon.png'

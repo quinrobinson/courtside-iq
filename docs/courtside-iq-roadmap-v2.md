@@ -2059,11 +2059,37 @@ was a source swap plus one real gap closed.
   new adaptive XML + `ic_launcher_foreground` drawables, a new `colors.xml`,
   and the web icons.
 
-**iOS 18 dark/tinted variants deliberately NOT done.** The pinned
-`flutter_launcher_icons 0.13.1` has no config keys for them (verified against
-the package source). Adding them needs a dependency bump, and the icon is
-already dark so a dark variant earns little. Left as its own later item rather
-than folded in here.
+**THE TWO PLATFORMS NOW DIVERGE ON PURPOSE, and this is the thing to know
+before touching either.** iOS ships an **Apple Icon Composer** document,
+`ios/Runner/courtside-iq.icon` (gradient ground + `Logo Mark` and `DotBurst`
+layers, with Apple's shadow/translucency). That is what supplies the native
+light/dark/tinted variants `flutter_launcher_icons 0.13.1` cannot produce - the
+gap that was originally going to be deferred. Android keeps generating from the
+Figma artwork; the two are separate uploads and do not have to match asset for
+asset.
+
+Wiring, so it is reproducible:
+- The `.icon` is registered in `project.pbxproj` as a resource of the Runner
+  target with `lastKnownFileType = folder.iconcomposer.icon` (the exact type is
+  from Xcode's own `StandardFileTypes.xcspec`; guessing it wrong makes Xcode
+  treat the bundle as a plain folder and silently skip the icon).
+- `ASSETCATALOG_COMPILER_APPICON_NAME` = `courtside-iq` in ALL THREE configs.
+- **`flutter_launcher_icons` is now `ios: false`.** Leaving it true would
+  regenerate `AppIcon.appiconset` and make it ambiguous which icon ships.
+- Needs **Xcode 26+** (verified on 26.4.1). This is a real toolchain floor: an
+  older Xcode cannot compile a `.icon`.
+
+VERIFIED BY BUILDING, not by the file being present: `flutter build ios
+--release --no-codesign` produces `CFBundleIconName = courtside-iq` and an
+`Assets.car` containing `IconGroup` / `IconImageStack` entries for
+`courtside-iq_Assets/DotBurst`, `Logo Mark` and the gradient - i.e. the LAYERED
+stack, which is what the variant rendering needs. A green build alone proves
+nothing here.
+
+`ios/Runner/Assets.xcassets/AppIcon.appiconset` is deliberately LEFT IN PLACE
+for now as an instant rollback (flip the build setting back). It is unused, but
+it does still compile two stray `AppIcon*.png` into the bundle - delete it once
+the icon is confirmed on a device.
 
 **Must land before 4.22 cuts the build**, and it feeds 4.23's store assets (the
 listing icon has to match the installed one).
