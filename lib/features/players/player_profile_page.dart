@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/courtside_iq/design/components/ci_info_sheet.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -146,11 +147,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       _reloadPlayers();
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(const SnackBar(
-            content: Text('Could not save that birth date. Please try again.'),
-          ));
+        showCiToast(context, 'Could not save that birth date. Please try again.',
+            type: CiToastType.error);
       }
     }
   }

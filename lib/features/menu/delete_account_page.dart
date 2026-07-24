@@ -27,7 +27,7 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import 'account_repository.dart';
-import 'ci_account_snackbar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 class DeleteAccountPage extends StatefulWidget {
   /// Its own route. Delete Account has no v1 screen to inherit one from, and
@@ -79,9 +79,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
       // server as the network - the first attempt on test was a 500, not a
       // dropped request - and blaming their signal sends them to fix the one
       // thing that was fine.
-      showAccountResult(context,
-          message: "That didn't work. Please try again in a moment.",
-          success: false);
+      showCiToast(context, "That didn't work. Please try again in a moment.",
+          type: CiToastType.error);
       return;
     }
 

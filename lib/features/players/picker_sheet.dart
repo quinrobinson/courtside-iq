@@ -1,5 +1,6 @@
 import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 /// Shared picker model used by AddPlayerSheet and EditPlayerSheet.
 ///
@@ -35,11 +36,8 @@ Future<T?> presentPickerSheet<T>(
   // height sheet, which is indistinguishable from "the picker did not open" -
   // exactly how a failed options load presents to a parent. Say so instead.
   if (options.isEmpty) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(
-        content: Text('Could not load options. Check your connection.'),
-      ));
+    showCiToast(context, 'Could not load options. Check your connection.',
+        type: CiToastType.error);
     return null;
   }
 

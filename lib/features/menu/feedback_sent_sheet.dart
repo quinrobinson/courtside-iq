@@ -47,40 +47,49 @@ class _FeedbackSentSheet extends StatelessWidget {
       color: c.bg,
       child: SafeArea(
         top: false,
-        child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-            CiSpace.screen, CiSpace.s7, CiSpace.screen, CiSpace.s6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-              const CiSheetHandle(),
-            Container(
-              width: 72,
-              height: 72,
-              decoration:
-                  BoxDecoration(color: c.accentGood, shape: BoxShape.circle),
-              child: Icon(Icons.check, size: 34, color: c.bg),
-            ),
-            const SizedBox(height: CiSpace.s6),
-            Text('Thanks, we\'ve got it',
-                textAlign: TextAlign.center,
-                style: CiType.h2
-                    .copyWith(color: c.text, fontWeight: CiWeight.extraBold)),
-            const SizedBox(height: CiSpace.s3),
-            Text(
-              "We read every note. If we need more, we'll reach out by email.",
-              textAlign: TextAlign.center,
-              style: CiType.body.copyWith(color: c.textSoft, height: 1.45),
-            ),
-            const SizedBox(height: CiSpace.s7),
-            CiButton(
-              label: 'Done',
-              style: CiButtonStyle.lime,
-              expand: true,
-              onPressed: () => Navigator.of(context).pop(),
+            // Grabber at the top of the sheet, then a full gap before the
+            // check. It used to sit ON the disc: the whole column was inset by
+            // s7 and nothing separated the handle from the 72pt circle.
+            const CiSheetHandle(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  CiSpace.screen, CiSpace.s6, CiSpace.screen, CiSpace.s6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                        color: c.accentGood, shape: BoxShape.circle),
+                    child: Icon(Icons.check, size: 34, color: c.bg),
+                  ),
+                  const SizedBox(height: CiSpace.s6),
+                  Text('Thanks, we\'ve got it',
+                      textAlign: TextAlign.center,
+                      style: CiType.h2.copyWith(
+                          color: c.text, fontWeight: CiWeight.extraBold)),
+                  const SizedBox(height: CiSpace.s3),
+                  Text(
+                    "We read every note. If we need more, we'll reach out by email.",
+                    textAlign: TextAlign.center,
+                    style:
+                        CiType.body.copyWith(color: c.textSoft, height: 1.45),
+                  ),
+                  const SizedBox(height: CiSpace.s7),
+                  CiButton(
+                    label: 'Done',
+                    style: CiButtonStyle.lime,
+                    expand: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
             ),
           ],
-          ),
         ),
       ),
     );

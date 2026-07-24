@@ -24,7 +24,7 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import 'account_repository.dart';
-import 'ci_account_snackbar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   /// A REAL ROUTE, not a Navigator.push.
@@ -111,7 +111,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     }
 
     Navigator.of(context).maybePop();
-    showAccountResult(context, message: 'Your password has been updated.');
+    showCiToast(context, 'Your password has been updated.',
+        type: CiToastType.success);
   }
 
   @override

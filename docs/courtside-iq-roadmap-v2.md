@@ -1975,6 +1975,28 @@ two gates can never both fire. Behind `kUseWhatsNew2`.
 
 `[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
 
+### 4.19d Toast / snackbar integration
+**New item.** The success + error toasts were designed (521:2009) but never
+built - the app still fired default snackbars, and one early account-confirm
+helper (`showAccountResult`) used full lime/orange backgrounds instead of the
+designed dark chip. Both broke consistency.
+
+Built `CiToast` + `showCiToast(type, actionLabel, onAction)` to the frame: a
+`#141414` chip (`CiPalette.inkRaised`), a 10pt status DOT carrying the meaning
+(lime = done, orange = problem, white = neutral/pending), white 14.5 Medium
+text, optional trailing action, floating above the tab bar with type-based
+auto-dismiss. Migrated the ~16 `lib/features/` call sites (auth, players, menu,
+premium, games); deleted `showAccountResult`. Left `lib/pages/` (legacy, 4.24
+deletion) and FlutterFlow's `showSnackbar` untouched. "Check your email"
+messages map to neutral (pending, not done); completed actions to success.
+
+Device-verified 2026-07-23: success (Edit Name), neutral (Edit Email), and
+error (Send Feedback in true airplane mode) all render the right dot on the
+dark chip. Also fixed a stray grabber-on-the-check overlap in the feedback-sent
+sheet (4.15c) found during the same pass.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
+
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate
 state. Full journey on iOS and Android in `--release`. Offline tracking with

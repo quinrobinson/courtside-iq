@@ -28,6 +28,11 @@ abstract final class CiPalette {
 
   /// The standard dark background. Buttons, dark screens, dark heroes.
   static const inkDefault = Color(0xFF0F0F0F);
+
+  /// The toast/snackbar chip (521:2009). A hair above [inkDefault] so it reads
+  /// as a raised object even when it floats over a dark screen. Fixed, not
+  /// ground-dependent: a toast is always dark with white text, on any ground.
+  static const inkRaised = Color(0xFF141414);
   static const inkSoft = Color(0xFF1A1A1A);
 
   // Neutrals

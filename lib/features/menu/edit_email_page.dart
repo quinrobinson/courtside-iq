@@ -23,7 +23,7 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/auth_validation.dart';
 import 'account_repository.dart';
-import 'ci_account_snackbar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 class EditEmailPage extends StatefulWidget {
   const EditEmailPage({super.key, this.repository = const AccountRepository()});
@@ -94,8 +94,10 @@ class _EditEmailPageState extends State<EditEmailPage> {
     Navigator.of(context).maybePop();
     // NOT "Email updated". It is not, and will not be until the link in that
     // message is opened.
-    showAccountResult(context,
-        message: 'Check $email for a link to confirm the change.');
+    // Neutral, not success: the change is pending until the link in that email
+    // is opened, so the dot must not claim "done".
+    showCiToast(context, 'Check $email for a link to confirm the change.',
+        type: CiToastType.neutral);
   }
 
   @override

@@ -23,7 +23,7 @@ import '/courtside_iq/design/components/ci_sub_page_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
-import 'ci_account_snackbar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import 'feedback_repository.dart';
 import 'feedback_sent_sheet.dart';
 
@@ -66,9 +66,9 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
       setState(() => _sending = false);
       // The message STAYS. They took time to write it, and losing it to a
       // failed request would be the app's fault landing on them.
-      showAccountResult(context,
-          message: "That didn't send. Check your connection and try again.",
-          success: false);
+      showCiToast(context,
+          "That didn't send. Check your connection and try again.",
+          type: CiToastType.error);
       return;
     }
 

@@ -1,6 +1,7 @@
 import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import 'picker_sheet.dart';
 
 const _sheetBg      = CIColors.surface;
@@ -95,9 +96,8 @@ class _AddPlayerSheetState extends State<AddPlayerSheet> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text('Could not load positions: $e')));
+      showCiToast(context, 'Could not load positions: $e',
+          type: CiToastType.error);
     }
   }
 

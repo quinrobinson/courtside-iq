@@ -14,6 +14,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_confirm_dialog.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 import 'game_complete_page.dart';
 import 'game_paused_dialog.dart';
@@ -126,14 +127,15 @@ class _LiveGameFlowState extends State<LiveGameFlow> {
     await widget.store.clear();
     if (!mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(SnackBar(
-      content: Text(outcome == SaveOutcome.synced
+    // Success either way. Not "failed" on the offline branch: the game is on
+    // disk and will go up by itself.
+    showCiToast(
+      context,
+      outcome == SaveOutcome.synced
           ? 'Game saved.'
-          // Not "failed". The game is on disk and will go up by itself.
-          : 'Game saved. It will sync when you are back online.'),
-    ));
+          : 'Game saved. It will sync when you are back online.',
+      type: CiToastType.success,
+    );
     _finish();
   }
 

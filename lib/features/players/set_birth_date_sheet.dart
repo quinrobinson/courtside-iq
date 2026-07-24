@@ -1,6 +1,7 @@
 import '/courtside_iq/design_tokens.dart';
 import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 const _sheetBg      = CIColors.surface;
 const _fieldBg      = CIColors.surfaceAlt;
@@ -81,9 +82,7 @@ class _SetBirthDateSheetState extends State<SetBirthDateSheet> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $e')),
-      );
+      showCiToast(context, 'Save failed: $e', type: CiToastType.error);
     }
   }
 

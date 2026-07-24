@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_sheet.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 /// Opens a single-choice sheet and returns the chosen option, or null.
 Future<T?> presentCiPicker<T>(
@@ -30,11 +31,8 @@ Future<T?> presentCiPicker<T>(
   // is indistinguishable from "the picker did not open" - which is exactly
   // how a failed options load presents to a parent. Say so instead.
   if (options.isEmpty) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(
-        content: Text('Could not load options. Check your connection.'),
-      ));
+    showCiToast(context, 'Could not load options. Check your connection.',
+        type: CiToastType.error);
     return null;
   }
 

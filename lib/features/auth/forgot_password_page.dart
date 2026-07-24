@@ -20,7 +20,7 @@ import 'package:flutter/material.dart';
 import '/courtside_iq/auth_validation.dart';
 import 'check_email_page.dart';
 import '/courtside_iq/design/components/ci_field.dart';
-import '/courtside_iq/design/tokens/ci_colors.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -111,14 +111,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   void _snack(String message, {bool isError = false}) {
-    const c = CiColors.onInk;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? c.accentEnergy : c.surfaceInvert,
-        behavior: SnackBarBehavior.floating,
-      ));
+    // Non-error here is "check your email", a pending step rather than a
+    // completed one, so it stays neutral rather than claiming success.
+    showCiToast(context, message,
+        type: isError ? CiToastType.error : CiToastType.neutral);
   }
 
   @override

@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_ambient_glow.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/ci_page_dots.dart';
@@ -167,9 +168,9 @@ class _PaywallPageState extends State<PaywallPage> {
   }
 
   void _snack(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+    // Neutral: the only caller is "nothing to restore", a soft outcome that is
+    // neither a win nor a failure.
+    showCiToast(context, message, type: CiToastType.neutral);
   }
 
   @override

@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 import '/courtside_iq/auth_validation.dart';
 import '/courtside_iq/design/components/ci_field.dart';
-import '/courtside_iq/design/tokens/ci_colors.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/flutter_flow_util.dart';
@@ -77,13 +77,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     setState(() => _busy = false);
 
     if (error != null && error.isNotEmpty) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(error),
-          backgroundColor: CiColors.onInk.accentEnergy,
-          behavior: SnackBarBehavior.floating,
-        ));
+      showCiToast(context, error, type: CiToastType.error);
       return;
     }
 

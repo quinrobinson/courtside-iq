@@ -18,8 +18,8 @@ import 'package:flutter/material.dart';
 
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/courtside_iq/design/components/dot_burst.dart';
-import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -89,17 +89,11 @@ class _CheckEmailPageState extends State<CheckEmailPage> {
     if (!mounted) return;
     setState(() => _busy = false);
 
-    const c = CiColors.onInk;
     final failed = error != null && error.isNotEmpty;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        // Same wording whichever purpose this is, and it does not claim an
-        // account exists.
-        content: Text(failed ? error : 'Sent. Check your email again.'),
-        backgroundColor: failed ? c.accentEnergy : c.surfaceInvert,
-        behavior: SnackBarBehavior.floating,
-      ));
+    // Neutral on success: "check your email" is a pending step, not a done
+    // action, and it does not claim an account exists.
+    showCiToast(context, failed ? error : 'Sent. Check your email again.',
+        type: failed ? CiToastType.error : CiToastType.neutral);
   }
 
   void _backToSignIn() {

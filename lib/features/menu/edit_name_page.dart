@@ -24,7 +24,7 @@ import '/courtside_iq/design/components/ci_sub_page_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import 'account_repository.dart';
-import 'ci_account_snackbar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 
 class EditNamePage extends StatefulWidget {
   const EditNamePage({
@@ -86,7 +86,8 @@ class _EditNamePageState extends State<EditNamePage> {
 
     widget.onSaved?.call();
     Navigator.of(context).maybePop();
-    showAccountResult(context, message: 'Your name has been updated.');
+    showCiToast(context, 'Your name has been updated.',
+        type: CiToastType.success);
   }
 
   @override

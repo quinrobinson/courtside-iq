@@ -36,6 +36,7 @@ import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -220,13 +221,13 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
       return false;
     } on AuthException catch (e) {
       if (!mounted) return true;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(e.message.contains('User already registered')
-              ? 'That email is already in use by a different account.'
-              : 'Error: ${e.message}'),
-        ));
+      showCiToast(
+        context,
+        e.message.contains('User already registered')
+            ? 'That email is already in use by a different account.'
+            : 'Error: ${e.message}',
+        type: CiToastType.error,
+      );
       return true;
     }
   }
