@@ -2016,31 +2016,37 @@ The icon is the **DotBurst + the mark**, which is the same brand hero the
 paywall and the 4.19c sheet use - so the icon and the in-app heroes have to
 stay in agreement.
 
-**FIRST QUESTION TO SETTLE, before any code:** export `923:3515` as SVG and
-diff it against the current painter. `CiLogoMark` draws the motif as a disc
-minus a full-height vertical channel and a right-side horizontal channel; the
-new mark reads as the same motif but the cut terminations look rounded. If it
-is only a constants change, keep the painter (it takes a colour and scales,
-which the old PNG could not). If the geometry genuinely changed, switch to a
-tinted SVG asset the way `CiNavIcon` does, rather than forcing the painter.
+**PART 1 - LOGO MARK: DONE, device-verified 2026-07-24.** The geometry changed,
+not just the corners: the vertical channel moved from `0.47` to centre and
+widened (`0.055 → 0.067`), and the cut terminations are rounded. That rounding
+is INTENTIONAL, including the fact that it stops reading as rounded at small
+sizes. So `CiLogoMark` moved from a `CustomPainter` to Figma's own SVG export
+rendered with `ColorFilter(srcIn)`: the shape is taken from the design rather
+than re-derived, while both standing rules still hold (vector scales, srcIn
+recolours). Public API unchanged, so all 13 call sites were untouched, and the
+old painter constants were DELETED rather than adjusted - they described the
+old mark. `923:3515` and `923:3228` are byte-identical, so there was no "which
+one is current" ambiguity. `DotBurst` needed no change: the path still fills
+its box as a full disc, so `markSize` ring spacing is unaffected.
 
-**The logo mark is the source, so it lands first.** When the user provides the
-updated mark:
-- Update the painted `CiLogoMark` (`lib/courtside_iq/design/components/ci_logo_mark.dart`).
-  It is a `CustomPainter`, so every place that draws it moves at once - Splash,
-  the DotBurst hero on the paywall and the 4.19c What's-new sheet, and the auth
-  screens. Re-screenshot those after the change; the mark's proportions feed
-  the burst's spacing.
-- Then derive the app icon from the new mark and regenerate the platform assets:
-  the iOS `AppIcon` set (all sizes + the dark/tinted variants) and the Android
-  adaptive icon (`ic_launcher` foreground/background). These are real files under
-  `ios/` and `android/`, not FlutterFlow-managed, so they are ours to replace.
+**TESTING GOTCHA WORTH KEEPING: flutter_svg does NOT surface a missing asset
+through `tester.takeException()`** - a deliberately bogus path renders an empty
+box and PASSES a "renders without throwing" test (verified with a probe).
+`test/ci_logo_mark_test.dart` therefore asserts the file exists at the path the
+widget requests AND parses it through the real `vg` parser. Any future
+asset-backed component needs the same treatment, or it can vanish silently on
+every surface at once.
+
+**PART 2 - APP ICON: still to do.** Derive it from `923:3279` (burst + mark)
+and regenerate the platform assets: the iOS `AppIcon` set (all sizes + the
+dark/tinted variants) and the Android adaptive icon (`ic_launcher`
+foreground/background). These are real files under `ios/` and `android/`, not
+FlutterFlow-managed, so they are ours to replace.
 
 **Must land before 4.22 cuts the build**, and it feeds 4.23's store assets (the
-listing icon has to match the installed one). Sequence: mark → in-app mark
-usages → app icon → platform assets.
+listing icon has to match the installed one).
 
-`[ ] designed` · `[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] designed` · `[x] built (mark)` · `[x] wired (mark)` · `[x] device-verified (mark)` · `[ ] app icon`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
@@ -133,16 +134,21 @@ void main() {
     testWidgets('takes the ground colour instead of being a black asset',
         (tester) async {
       // logo-mark.png is solid black, so on ink ground it vanished into the
-      // background. The painted mark reads the ground.
+      // background. The mark reads the ground instead.
+      //
+      // Asserts the CONTRACT (colour is inherited, and the mark is tintable),
+      // not the drawing mechanism - it moved from a CustomPainter to a tinted
+      // SVG in 4.19e and the guarantee is what matters, not how it is painted.
       await _pump(tester, isAndroid: false);
       final mark = tester.widget<CiLogoMark>(find.byType(CiLogoMark));
       expect(mark.color, isNull, reason: 'should inherit, not hardcode');
 
-      final painted = tester.widget<CustomPaint>(
+      final svg = tester.widget<SvgPicture>(
         find.descendant(
-            of: find.byType(CiLogoMark), matching: find.byType(CustomPaint)),
+            of: find.byType(CiLogoMark), matching: find.byType(SvgPicture)),
       );
-      expect(painted.painter, isNotNull);
+      expect(svg.colorFilter, isNotNull,
+          reason: 'must be tinted, or it renders as the flat asset colour');
     });
 
     testWidgets('burst matches the frame and the mark is the tuned size',
