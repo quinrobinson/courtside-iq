@@ -21,6 +21,7 @@ import '/index.dart';
 import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
 import '/features/home/today_page.dart';
+import '/features/onboarding/first_run_gate.dart';
 import '/features/players/players_list_page.dart';
 import '/features/players/player_profile_page.dart';
 import '/features/auth/auth_landing_page.dart';
@@ -130,7 +131,14 @@ Widget _entryScreen(AppStateNotifier appStateNotifier) {
 /// itself superseded HomeWidget - so the newest wins and each older one stays
 /// reachable by turning its successor off.
 Widget _homeScreen() {
-  if (kUseToday2) return const TodayPage();
+  if (kUseToday2) {
+    // The guided first-run wraps Today, so a brand-new parent is welcomed
+    // before they land on it. Off falls straight through to Today's own empty
+    // state - a safe revert.
+    return kUseFirstRun
+        ? const FirstRunGate(child: TodayPage())
+        : const TodayPage();
+  }
   return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
 }
 
@@ -181,8 +189,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
                 },
                 onOpenProfile: () =>
                     context.pushNamed(YourProfileWidget.routeName),
-                onOpenHelp: () =>
-                    context.pushNamed(HelpCenterWidget.routeName),
+                onOpenHelp: () => context.pushNamed(HelpCenterWidget.routeName),
                 onOpenFeedback: () =>
                     context.pushNamed(SendFeedbackWidget.routeName),
                 onOpenSubscription: () => showPaywall(context),
@@ -202,26 +209,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         path: GameStatTrackerWidget.routePath,
         requireAuth: true,
         builder: (context, params) => GameStatTrackerWidget(
-          playerName: params.getParam(
-            'playerName',
-            ParamType.String,
-          ),
-          oppName: params.getParam(
-            'oppName',
-            ParamType.String,
-          ),
-          playerID: params.getParam(
-            'playerID',
-            ParamType.String,
-          ),
-          eventSelected: params.getParam(
-            'eventSelected',
-            ParamType.String,
-          ),
-          playerTeam: params.getParam(
-            'playerTeam',
-            ParamType.String,
-          ),
+          playerName: params.getParam('playerName', ParamType.String),
+          oppName: params.getParam('oppName', ParamType.String),
+          playerID: params.getParam('playerID', ParamType.String),
+          eventSelected: params.getParam('eventSelected', ParamType.String),
+          playerTeam: params.getParam('playerTeam', ParamType.String),
         ),
       ),
       FFRoute(
@@ -236,10 +228,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         path: EditPlayerWidget.routePath,
         requireAuth: true,
         builder: (context, params) => EditPlayerWidget(
-          playerID: params.getParam(
-            'playerID',
-            ParamType.String,
-          ),
+          playerID: params.getParam('playerID', ParamType.String),
         ),
       ),
       FFRoute(
@@ -268,23 +257,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         builder: (context, params) => kUseMenu2
             ? const EditNamePage()
             : EditNameWidget(
-          userFirstName: params.getParam(
-            'userFirstName',
-            ParamType.String,
-          ),
-          userLastName: params.getParam(
-            'userLastName',
-            ParamType.String,
-          ),
-          userEmail: params.getParam(
-            'userEmail',
-            ParamType.String,
-          ),
-          userID: params.getParam(
-            'userID',
-            ParamType.String,
-          ),
-        ),
+                userFirstName: params.getParam(
+                  'userFirstName',
+                  ParamType.String,
+                ),
+                userLastName: params.getParam('userLastName', ParamType.String),
+                userEmail: params.getParam('userEmail', ParamType.String),
+                userID: params.getParam('userID', ParamType.String),
+              ),
       ),
       FFRoute(
         name: YourProfileWidget.routeName,
@@ -292,10 +272,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         requireAuth: true,
         builder: (context, params) => kUseMenu2
             ? YourProfilePage(
-                onEditName: () =>
-                    context.pushNamed(EditNameWidget.routeName),
-                onEditEmail: () =>
-                    context.pushNamed(EditEmailWidget.routeName),
+                onEditName: () => context.pushNamed(EditNameWidget.routeName),
+                onEditEmail: () => context.pushNamed(EditEmailWidget.routeName),
                 onChangePassword: () =>
                     context.pushNamed(ChangePasswordPage.routeName),
                 onDeleteAccount: () =>
@@ -303,23 +281,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
                 // onEditPhoto stays null: there is no column to store one.
               )
             : YourProfileWidget(
-          userFirstName: params.getParam(
-            'userFirstName',
-            ParamType.String,
-          ),
-          userLastName: params.getParam(
-            'userLastName',
-            ParamType.String,
-          ),
-          userEmail: params.getParam(
-            'userEmail',
-            ParamType.String,
-          ),
-          userID: params.getParam(
-            'userID',
-            ParamType.String,
-          ),
-        ),
+                userFirstName: params.getParam(
+                  'userFirstName',
+                  ParamType.String,
+                ),
+                userLastName: params.getParam('userLastName', ParamType.String),
+                userEmail: params.getParam('userEmail', ParamType.String),
+                userID: params.getParam('userID', ParamType.String),
+              ),
       ),
       FFRoute(
         name: EditEmailWidget.routeName,
@@ -328,23 +297,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         builder: (context, params) => kUseMenu2
             ? const EditEmailPage()
             : EditEmailWidget(
-          userEmail: params.getParam(
-            'userEmail',
-            ParamType.String,
-          ),
-          userFirstName: params.getParam(
-            'userFirstName',
-            ParamType.String,
-          ),
-          userLastName: params.getParam(
-            'userLastName',
-            ParamType.String,
-          ),
-          userID: params.getParam(
-            'userID',
-            ParamType.double,
-          ),
-        ),
+                userEmail: params.getParam('userEmail', ParamType.String),
+                userFirstName: params.getParam(
+                  'userFirstName',
+                  ParamType.String,
+                ),
+                userLastName: params.getParam('userLastName', ParamType.String),
+                userID: params.getParam('userID', ParamType.double),
+              ),
       ),
       FFRoute(
         name: ResetPasswordWidget.routeName,
@@ -352,16 +312,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // requireAuth stays: the recovery link establishes a session first,
         // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) =>
-            kUsePasswordReset2 ? const ResetPasswordPage() : ResetPasswordWidget(),
+        builder: (context, params) => kUsePasswordReset2
+            ? const ResetPasswordPage()
+            : ResetPasswordWidget(),
       ),
       FFRoute(
         name: ForgotPasswordWidget.routeName,
         path: ForgotPasswordWidget.routePath,
         // 4.9: keeps the v1 route name and path so existing navigation calls
         // reach it unchanged and the flag is a one-line revert.
-        builder: (context, params) =>
-            kUsePasswordReset2 ? const ForgotPasswordPage() : ForgotPasswordWidget(),
+        builder: (context, params) => kUsePasswordReset2
+            ? const ForgotPasswordPage()
+            : ForgotPasswordWidget(),
       ),
       FFRoute(
         name: PlayersProfileWidget.routeName,
@@ -392,22 +354,17 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // requireAuth stays: the recovery link establishes a session first,
         // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) =>
-            kUsePasswordReset2 ? const ResetSuccessfulPage() : ResetSuccesfulWidget(),
+        builder: (context, params) => kUsePasswordReset2
+            ? const ResetSuccessfulPage()
+            : ResetSuccesfulWidget(),
       ),
       FFRoute(
         name: EditPlayerPositionWidget.routeName,
         path: EditPlayerPositionWidget.routePath,
         requireAuth: true,
         builder: (context, params) => EditPlayerPositionWidget(
-          playerID: params.getParam(
-            'playerID',
-            ParamType.String,
-          ),
-          playerPosition: params.getParam(
-            'playerPosition',
-            ParamType.String,
-          ),
+          playerID: params.getParam('playerID', ParamType.String),
+          playerPosition: params.getParam('playerPosition', ParamType.String),
         ),
       ),
       FFRoute(
@@ -459,8 +416,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
           onClose: () => context.pop(false),
           onPurchased: () => context.pop(true),
           onOpenTerms: () => launchURL('https://www.courtsideiq.app/terms'),
-          onOpenPrivacy: () =>
-              launchURL('https://www.courtsideiq.app/policy'),
+          onOpenPrivacy: () => launchURL('https://www.courtsideiq.app/policy'),
         ),
       ),
       FFRoute(
@@ -498,17 +454,15 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         path: $lock_orientation_library_opafp4.HomePageWidget.routePath,
         builder: (context, params) =>
             $lock_orientation_library_opafp4.HomePageWidget(),
-      )
+      ),
     ].map((r) => r.toRoute(appStateNotifier)).toList(),
   );
 }
 
 extension NavParamExtensions on Map<String, String?> {
   Map<String, String> get withoutNulls => Map.fromEntries(
-        entries
-            .where((e) => e.value != null)
-            .map((e) => MapEntry(e.key, e.value!)),
-      );
+    entries.where((e) => e.value != null).map((e) => MapEntry(e.key, e.value!)),
+  );
 }
 
 extension NavigationExtensions on BuildContext {
@@ -519,15 +473,14 @@ extension NavigationExtensions on BuildContext {
     Map<String, String> queryParameters = const <String, String>{},
     Object? extra,
     bool ignoreRedirect = false,
-  }) =>
-      !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
-          ? null
-          : goNamed(
-              name,
-              pathParameters: pathParameters,
-              queryParameters: queryParameters,
-              extra: extra,
-            );
+  }) => !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
+      ? null
+      : goNamed(
+          name,
+          pathParameters: pathParameters,
+          queryParameters: queryParameters,
+          extra: extra,
+        );
 
   void pushNamedAuth(
     String name,
@@ -536,15 +489,14 @@ extension NavigationExtensions on BuildContext {
     Map<String, String> queryParameters = const <String, String>{},
     Object? extra,
     bool ignoreRedirect = false,
-  }) =>
-      !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
-          ? null
-          : pushNamed(
-              name,
-              pathParameters: pathParameters,
-              queryParameters: queryParameters,
-              extra: extra,
-            );
+  }) => !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
+      ? null
+      : pushNamed(
+          name,
+          pathParameters: pathParameters,
+          queryParameters: queryParameters,
+          extra: extra,
+        );
 
   void safePop() {
     // If there is only one route on the stack, navigate to the initial
@@ -561,8 +513,8 @@ extension GoRouterExtensions on GoRouter {
   AppStateNotifier get appState => AppStateNotifier.instance;
   void prepareAuthEvent([bool ignoreRedirect = false]) =>
       appState.hasRedirect() && !ignoreRedirect
-          ? null
-          : appState.updateNotifyOnAuthChange(false);
+      ? null
+      : appState.updateNotifyOnAuthChange(false);
   bool shouldRedirect(bool ignoreRedirect) =>
       !ignoreRedirect && appState.hasRedirect();
   void clearRedirectLocation() => appState.clearRedirectLocation();
@@ -580,7 +532,7 @@ extension _GoRouterStateExtensions on GoRouterState {
   TransitionInfo get transitionInfo {
     final possibleKeys = [
       '__transition_info__',
-      '__transition_info__lock_orientation_library_opafp4'
+      '__transition_info__lock_orientation_library_opafp4',
     ];
     for (final key in possibleKeys) {
       if (extraMap.containsKey(key)) {
@@ -609,24 +561,19 @@ class FFParameters {
       asyncParams.containsKey(param.key) && param.value is String;
   bool get hasFutures => state.allParams.entries.any(isAsyncParam);
   Future<bool> completeFutures() => Future.wait(
-        state.allParams.entries.where(isAsyncParam).map(
-          (param) async {
-            final doc = await asyncParams[param.key]!(param.value)
-                .onError((_, __) => null);
-            if (doc != null) {
-              futureParamValues[param.key] = doc;
-              return true;
-            }
-            return false;
-          },
-        ),
-      ).onError((_, __) => [false]).then((v) => v.every((e) => e));
+    state.allParams.entries.where(isAsyncParam).map((param) async {
+      final doc = await asyncParams[param.key]!(
+        param.value,
+      ).onError((_, __) => null);
+      if (doc != null) {
+        futureParamValues[param.key] = doc;
+        return true;
+      }
+      return false;
+    }),
+  ).onError((_, __) => [false]).then((v) => v.every((e) => e));
 
-  dynamic getParam<T>(
-    String paramName,
-    ParamType type, {
-    bool isList = false,
-  }) {
+  dynamic getParam<T>(String paramName, ParamType type, {bool isList = false}) {
     if (futureParamValues.containsKey(paramName)) {
       return futureParamValues[paramName];
     }
@@ -639,11 +586,7 @@ class FFParameters {
       return param;
     }
     // Return serialized value.
-    return deserializeParam<T>(
-      param,
-      type,
-      isList,
-    );
+    return deserializeParam<T>(param, type, isList);
   }
 }
 
@@ -665,72 +608,71 @@ class FFRoute {
   final List<GoRoute> routes;
 
   GoRoute toRoute(AppStateNotifier appStateNotifier) => GoRoute(
-        name: name,
-        path: path,
-        redirect: (context, state) {
-          if (appStateNotifier.shouldRedirect) {
-            final redirectLocation = appStateNotifier.getRedirectLocation();
-            appStateNotifier.clearRedirectLocation();
-            return redirectLocation;
-          }
+    name: name,
+    path: path,
+    redirect: (context, state) {
+      if (appStateNotifier.shouldRedirect) {
+        final redirectLocation = appStateNotifier.getRedirectLocation();
+        appStateNotifier.clearRedirectLocation();
+        return redirectLocation;
+      }
 
-          if (requireAuth && !appStateNotifier.loggedIn) {
-            appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
-            return '/onBoard';
-          }
-          return null;
-        },
-        pageBuilder: (context, state) {
-          fixStatusBarOniOS16AndBelow(context);
-          final ffParams = FFParameters(state, asyncParams);
-          final page = ffParams.hasFutures
-              ? FutureBuilder(
-                  future: ffParams.completeFutures(),
-                  builder: (context, _) => builder(context, ffParams),
-                )
-              : builder(context, ffParams);
-          // 4.9: the 2.0 splash is painted, so it fits any aspect ratio. The
-          // v1 asset was a fixed bitmap stretched with BoxFit.cover, which
-          // distorted on anything it was not drawn for.
-          final child = appStateNotifier.loading
-              ? (kUseEntry2
-                  ? const SplashView()
-                  : Container(
-                      color: Colors.transparent,
-                      child: Image.asset(
-                        'assets/images/App_Load_d.png',
-                        fit: BoxFit.cover,
+      if (requireAuth && !appStateNotifier.loggedIn) {
+        appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
+        return '/onBoard';
+      }
+      return null;
+    },
+    pageBuilder: (context, state) {
+      fixStatusBarOniOS16AndBelow(context);
+      final ffParams = FFParameters(state, asyncParams);
+      final page = ffParams.hasFutures
+          ? FutureBuilder(
+              future: ffParams.completeFutures(),
+              builder: (context, _) => builder(context, ffParams),
+            )
+          : builder(context, ffParams);
+      // 4.9: the 2.0 splash is painted, so it fits any aspect ratio. The
+      // v1 asset was a fixed bitmap stretched with BoxFit.cover, which
+      // distorted on anything it was not drawn for.
+      final child = appStateNotifier.loading
+          ? (kUseEntry2
+                ? const SplashView()
+                : Container(
+                    color: Colors.transparent,
+                    child: Image.asset(
+                      'assets/images/App_Load_d.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ))
+          : page;
+
+      final transitionInfo = state.transitionInfo;
+      return transitionInfo.hasTransition
+          ? CustomTransitionPage(
+              key: state.pageKey,
+              name: state.name,
+              child: child,
+              transitionDuration: transitionInfo.duration,
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      PageTransition(
+                        type: transitionInfo.transitionType,
+                        duration: transitionInfo.duration,
+                        reverseDuration: transitionInfo.duration,
+                        alignment: transitionInfo.alignment,
+                        child: child,
+                      ).buildTransitions(
+                        context,
+                        animation,
+                        secondaryAnimation,
+                        child,
                       ),
-                    ))
-              : page;
-
-          final transitionInfo = state.transitionInfo;
-          return transitionInfo.hasTransition
-              ? CustomTransitionPage(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: child,
-                  transitionDuration: transitionInfo.duration,
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) =>
-                          PageTransition(
-                    type: transitionInfo.transitionType,
-                    duration: transitionInfo.duration,
-                    reverseDuration: transitionInfo.duration,
-                    alignment: transitionInfo.alignment,
-                    child: child,
-                  ).buildTransitions(
-                    context,
-                    animation,
-                    secondaryAnimation,
-                    child,
-                  ),
-                )
-              : MaterialPage(
-                  key: state.pageKey, name: state.name, child: child);
-        },
-        routes: routes,
-      );
+            )
+          : MaterialPage(key: state.pageKey, name: state.name, child: child);
+    },
+    routes: routes,
+  );
 }
 
 class TransitionInfo {
@@ -763,10 +705,8 @@ class RootPageContext {
         location != rootPageContext?.errorRoute;
   }
 
-  static Widget wrap(Widget child, {String? errorRoute}) => Provider.value(
-        value: RootPageContext(true, errorRoute),
-        child: child,
-      );
+  static Widget wrap(Widget child, {String? errorRoute}) =>
+      Provider.value(value: RootPageContext(true, errorRoute), child: child);
 }
 
 extension GoRouterLocationExtension on GoRouter {
@@ -778,7 +718,6 @@ extension GoRouterLocationExtension on GoRouter {
     return matchList.uri.toString();
   }
 }
-
 
 /// Setup into the 2.0 live game flow.
 ///
@@ -797,8 +736,7 @@ class _NewGameSetupRoute extends StatelessWidget {
             setup: setup,
             // Finishing leaves the whole flow, setup included: the game is
             // over, and the games list is where it now lives.
-            onFinished: () =>
-                context.goNamed(AllGamesWidget.routeName),
+            onFinished: () => context.goNamed(AllGamesWidget.routeName),
           ),
         ),
       ),

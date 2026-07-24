@@ -50,6 +50,13 @@ const bool kUsePasswordReset2 = true;
 /// one-line revert to a working screen.
 const bool kUseToday2 = true;
 
+/// Guided first-run (4.9). After a new parent signs up and confirms their
+/// email, a two-step Welcome -> Add first player flow, shown ONCE (zero
+/// players, not seen before) and skippable. It wraps the 2.0 Today via a gate,
+/// so it only runs when [kUseToday2] is on; off falls straight through to
+/// Today's own "add your first player" empty state, so this is a safe revert.
+const bool kUseFirstRun = true;
+
 /// Bottom navigation, rebuilt on the 2.0 design system.
 ///
 /// Shared chrome across Home, Players, Games and Menu, so this is the flag

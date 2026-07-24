@@ -60,7 +60,8 @@ class FFAppState extends ChangeNotifier {
           await secureStorage.getInt('ff_liveThreeMade') ?? _liveThreeMade;
     });
     await _safeInitAsync(() async {
-      _liveThreeAttempt = await secureStorage.getInt('ff_liveThreeAttempt') ??
+      _liveThreeAttempt =
+          await secureStorage.getInt('ff_liveThreeAttempt') ??
           _liveThreeAttempt;
     });
     await _safeInitAsync(() async {
@@ -122,8 +123,14 @@ class FFAppState extends ChangeNotifier {
     await _safeInitAsync(() async {
       _ratingDate = await secureStorage.read(key: 'ff_ratingDate') != null
           ? DateTime.fromMillisecondsSinceEpoch(
-              (await secureStorage.getInt('ff_ratingDate'))!)
+              (await secureStorage.getInt('ff_ratingDate'))!,
+            )
           : _ratingDate;
+    });
+    await _safeInitAsync(() async {
+      _firstRunSeenUids =
+          await secureStorage.getStringList('ff_firstRunSeenUids') ??
+          _firstRunSeenUids;
     });
   }
 
@@ -133,6 +140,17 @@ class FFAppState extends ChangeNotifier {
   }
 
   late FlutterSecureStorage secureStorage;
+
+  /// Users who have completed or skipped the guided first-run on THIS device,
+  /// by id. Per-user, so a second account signing in on the same device still
+  /// gets its own welcome. The gate lives in first_run_gate.dart.
+  List<String> _firstRunSeenUids = [];
+  bool firstRunSeen(String userId) => _firstRunSeenUids.contains(userId);
+  Future<void> markFirstRunSeen(String userId) async {
+    if (_firstRunSeenUids.contains(userId)) return;
+    _firstRunSeenUids = [..._firstRunSeenUids, userId];
+    await secureStorage.setStringList('ff_firstRunSeenUids', _firstRunSeenUids);
+  }
 
   String _userName = '';
   String get userName => _userName;
