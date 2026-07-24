@@ -1,0 +1,120 @@
+# 4.18 — End-to-end verification checklist
+
+The roadmap states 4.18 as a paragraph. This is that paragraph turned into an
+order you can actually work through on a device.
+
+**Grouped by SETUP, not by feature.** Several of these need the app in a
+specific state (fresh install, offline, a particular entitlement), and the
+expensive part is getting into that state - not the tapping. Doing them in
+feature order means rebuilding the same state four times.
+
+## Before you start
+
+- [ ] `lib/backend/supabase/supabase.dart` → `_kUseTestSupabase = true`.
+      Everything below writes data. On prod it would write real parent data.
+- [ ] Build with `--release`. FlutterFlow layouts throw debug-only asserts on
+      iOS 26, so a debug run fails for reasons that are not the app.
+- [ ] Run the whole list on **iOS and Android**. The nav, transitions, sheets
+      and the back gesture differ; a pass on one is not a pass on both.
+
+**Offline means genuinely offline.** Airplane mode does NOT cut wifi on iOS,
+and on the simulator it cuts nothing at all - a "failed" request will quietly
+succeed and the test silently passes. Turn wifi OFF explicitly, on a physical
+device, and confirm with any web request before trusting an offline result.
+
+---
+
+## A. Fresh install (do first — this state is destroyed by everything else)
+
+- [ ] Cold start → Splash → onboarding (all three slides) → auth landing.
+- [ ] Sign UP with a new email. Confirm the "check your email" screen appears
+      and names the address.
+      *Test Supabase has email confirmation OFF, so the account auto-confirms
+      and you land straight in. That is the environment, not a bug — to
+      actually exercise this screen, turn confirmation on for the test project
+      first.*
+- [ ] Guided first-run appears (Welcome → Add first player), is skippable, and
+      does NOT appear again on the next launch.
+- [ ] Confirm the "What's new in 2.0" sheet does **not** appear for this new
+      user. If it does, the first-run/upgrade mutual exclusion is broken.
+
+## B. Existing-user upgrade path
+
+- [ ] Sign in as an account that already has players and has never seen 2.0 on
+      this device. The **What's new in 2.0** sheet should appear once, over
+      Today, and never again after dismissing.
+- [ ] Confirm the guided first-run does NOT also fire.
+
+## C. The core journey (online, premium-by-default)
+
+- [ ] Add a player, with and without a birth date.
+- [ ] New Game: setup → live tracker → complete → save → Game Detail.
+- [ ] Game Detail: insight card, tier badges, share sheet, Remove Game.
+- [ ] Player Profile: all three tabs, Full Breakdown, View Trends, both info
+      sheets, the age-band notice.
+- [ ] Menu: edit name, edit email, change password (including a rejected
+      current password), Help Center, Send Feedback.
+- [ ] Toasts: success (Edit Name), neutral (Edit Email), error (see D).
+
+## D. Offline (wifi OFF, physical device)
+
+- [ ] Track a full game with the network down. Stats must keep recording.
+- [ ] Save it offline → confirm it is queued and the copy says it will sync.
+- [ ] Restore the network → confirm it syncs and appears in Games.
+- [ ] **Known gap, do not log as new:** a game queued offline never receives
+      its AI insight. Generation needs a server row, so it is skipped while
+      offline and the later sync does not trigger it. Logged against 4C.
+- [ ] Error toast: with the network down, Send Feedback → orange dot, ~5s.
+
+## E. Force-quit and resume
+
+- [ ] Start a game, record several stats, force-quit mid-game.
+- [ ] Relaunch → the resume prompt offers the in-progress game and restores
+      the stat line.
+- [ ] Resume, finish, save. Confirm no duplicate game is created.
+
+## F. Growth IQ edge cases
+
+Needs seeded data, so expect to add games in bulk.
+
+- [ ] Fewer than 5 games → no score, the below-threshold state shows instead.
+- [ ] Exactly 5 games → the score activates.
+- [ ] A declining run → the delta reads down, and the copy stays encouraging.
+- [ ] Age-band crossing → ratings freeze per the product rule rather than
+      silently re-rating history.
+- [ ] A zero-performance game → NO rating at all, not a "zero" rating.
+
+## G. Entitlement states
+
+**Read this before testing:** on test, the `subscriptions` table is EMPTY by
+deliberate decision, so `is_premium()` returns false for everyone and the
+paywall bypass is open. The RLS limit is built and verified but has no data to
+act on. So "free" behaviour here is not what prod will do after the 4.20a
+backfill — verify the UI, and treat enforcement as unverified until then.
+
+- [ ] Fresh / never subscribed → paywall entry points, gate sheet, upgrade
+      banner.
+- [ ] Premium → no locks, no banners, paywall shows the Already-Premium state.
+- [ ] Lapsed → the lapse banner and its "Renew" wording.
+- [ ] Billing issue → the correct state, not a generic error.
+- [ ] A real sandbox purchase (device + sandbox account only). Restore
+      purchases with nothing to restore → neutral toast.
+
+## H. Destructive, last
+
+- [ ] Delete account. Confirm the account and its data are gone, and that the
+      feedback row survives with its email nulled.
+- [ ] Confirm the app returns to a clean signed-out state, not a broken shell.
+
+---
+
+## Re-run triggers
+
+Re-run the affected sections when any of these land, because each one changes
+what "what ships" means:
+
+- **4.19f (nav shell + transitions)** — re-run A, B, C. It changes navigation
+  structure and every screen transition.
+- **4.24 (delete `lib/pages/`)** — re-run EVERYTHING. A missed route surfaces
+  as a crash, and that is the whole point of doing it again.
+- **4.20a (prod subscriptions backfill)** — re-run G against real enforcement.
