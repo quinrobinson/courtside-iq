@@ -1997,6 +1997,32 @@ sheet (4.15c) found during the same pass.
 
 `[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
 
+### 4.19e App icon + logo mark refresh
+**New item.** The store app icon predates 2.0 and needs redesigning, and there
+is an updated logo mark coming from the user.
+
+**Per the standing rule, the icon is designed and approved in Figma before any
+code.** Add an "App Icon" area to the 2.0 file (icon grid at the required
+sizes, light/dark/tinted iOS variants), not a one-off canvas frame.
+
+**The logo mark is the source, so it lands first.** When the user provides the
+updated mark:
+- Update the painted `CiLogoMark` (`lib/courtside_iq/design/components/ci_logo_mark.dart`).
+  It is a `CustomPainter`, so every place that draws it moves at once - Splash,
+  the DotBurst hero on the paywall and the 4.19c What's-new sheet, and the auth
+  screens. Re-screenshot those after the change; the mark's proportions feed
+  the burst's spacing.
+- Then derive the app icon from the new mark and regenerate the platform assets:
+  the iOS `AppIcon` set (all sizes + the dark/tinted variants) and the Android
+  adaptive icon (`ic_launcher` foreground/background). These are real files under
+  `ios/` and `android/`, not FlutterFlow-managed, so they are ours to replace.
+
+**Must land before 4.22 cuts the build**, and it feeds 4.23's store assets (the
+listing icon has to match the installed one). Sequence: mark → in-app mark
+usages → app icon → platform assets.
+
+`[ ] designed` · `[ ] built` · `[ ] wired` · `[ ] device-verified`
+
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate
 state. Full journey on iOS and Android in `--release`. Offline tracking with
