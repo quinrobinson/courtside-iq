@@ -5,10 +5,9 @@ import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_avatar.dart';
 import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 
-/// Initials must contrast with the FILL THEY SIT ON. Keying them to `selected`
-/// worked only while that flag also decided the fill; the ringed treatment
-/// filled sunk ink while still counting as selected, and the initials came out
-/// ink-on-ink and vanished.
+/// Initials must contrast with the FILL THEY SIT ON, per avatar style. The
+/// neutral default is a light-grey chip with ink initials on ANY ground; the
+/// switcher's filled state inverts; ringed and outlined read the ground.
 Future<Color> _initialsColor(
   WidgetTester tester, {
   required Widget avatar,
@@ -39,21 +38,41 @@ void main() {
     expect(color, CiColors.onInk.text);
   });
 
-  testWidgets('an unringed selected avatar still inverts', (tester) async {
-    // The switcher treatment: a white fill, so the initials go ink.
+  testWidgets('the neutral default shows ink initials on its grey fill, on any '
+      'ground', (tester) async {
+    // The app-wide default. Ground-independent: grey chip, ink initials.
     final color = await _initialsColor(
       tester,
       onInk: true,
       avatar: const CiAvatar(name: 'Maya Chen', size: 40),
     );
-    expect(color, CiColors.onInk.textInvert);
+    expect(color, CiPalette.inkDefault);
   });
 
-  testWidgets('an unselected avatar reads on the ground', (tester) async {
+  testWidgets('a filled (switcher active) avatar inverts', (tester) async {
+    // The switcher treatment: a white fill on ink, so the initials go ink.
     final color = await _initialsColor(
       tester,
       onInk: true,
-      avatar: const CiAvatar(name: 'Maya Chen', size: 40, selected: false),
+      avatar: const CiAvatar(
+        name: 'Maya Chen',
+        size: 40,
+        style: CiAvatarStyle.filled,
+      ),
+    );
+    expect(color, CiColors.onInk.textInvert);
+  });
+
+  testWidgets('an outlined (switcher inactive) avatar reads the ground',
+      (tester) async {
+    final color = await _initialsColor(
+      tester,
+      onInk: true,
+      avatar: const CiAvatar(
+        name: 'Maya Chen',
+        size: 40,
+        style: CiAvatarStyle.outlined,
+      ),
     );
     expect(color, CiColors.onInk.text);
   });

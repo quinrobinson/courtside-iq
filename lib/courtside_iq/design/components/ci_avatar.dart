@@ -29,13 +29,26 @@ import '../tokens/ci_type.dart';
 /// circle floating next to a square.
 enum CiAvatarShape { circle, rounded }
 
+/// How an avatar is filled.
+///
+/// [neutral] is the DEFAULT and by far the most common: a plain identity chip
+/// in a list, a dialog or a profile. It is a light-grey fill with ink initials
+/// and a hairline border, and it is GROUND-INDEPENDENT - the same on ink or on
+/// light - so it reads identically everywhere it appears. This was the app-wide
+/// inconsistency: the default used to be [filled] (an ink chip with white
+/// initials), which is only right for the ACTIVE avatar in a switcher.
+///
+/// [filled] and [outlined] are the switcher's selected / unselected states, set
+/// explicitly by CiPlayerSwitcher. Nothing else should need them.
+enum CiAvatarStyle { neutral, filled, outlined }
+
 class CiAvatar extends StatelessWidget {
   const CiAvatar({
     super.key,
     required this.name,
     this.imageUrl,
     this.size = 40,
-    this.selected = true,
+    this.style = CiAvatarStyle.neutral,
     this.ringColor,
     this.ringWidth = 1,
     this.shape = CiAvatarShape.circle,
@@ -59,9 +72,8 @@ class CiAvatar extends StatelessWidget {
   final Color? ringColor;
   final double ringWidth;
 
-  /// Filled when selected, ringed outline when not. In a switcher this is
-  /// which player is active.
-  final bool selected;
+  /// Defaults to [CiAvatarStyle.neutral]. The switcher overrides it.
+  final CiAvatarStyle style;
 
   /// Circle for a player, rounded square for the header profile.
   final CiAvatarShape shape;
@@ -113,18 +125,10 @@ class CiAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: ringColor != null
-            ? c.surfaceSunk
-            : selected
-                ? c.surfaceInvert
-                : Colors.transparent,
+        color: _fill(c),
         shape: rounded ? BoxShape.rectangle : BoxShape.circle,
         borderRadius: radius,
-        border: ringColor != null
-            ? Border.all(color: ringColor!, width: ringWidth)
-            : selected
-                ? null
-                : Border.all(color: c.borderStrong),
+        border: _border(c),
       ),
       child: child,
     );
@@ -137,15 +141,44 @@ class CiAvatar extends StatelessWidget {
     );
   }
 
-  /// Initials take their colour from the FILL THEY SIT ON, not from
-  /// [selected].
-  ///
-  /// Keying them to `selected` was fine while that flag also decided the fill.
-  /// The ringed treatment broke it: those avatars are selected AND filled sunk
-  /// ink, so the initials came out ink-on-ink and vanished. Tying the colour
-  /// to the fill means the next treatment cannot reintroduce this.
-  Color _initialsColor(CiColors c) =>
-      (ringColor == null && selected) ? c.textInvert : c.text;
+  /// The ring treatment (New Game tiles) overrides the style: a sunk fill so
+  /// the RING carries the state. Otherwise the fill follows the style, with
+  /// neutral's grey/border/ink FIXED to the palette so it is identical on any
+  /// ground.
+  Color _fill(CiColors c) {
+    if (ringColor != null) return c.surfaceSunk;
+    return switch (style) {
+      CiAvatarStyle.neutral => CiPalette.gray50,
+      CiAvatarStyle.filled => c.surfaceInvert,
+      CiAvatarStyle.outlined => Colors.transparent,
+    };
+  }
+
+  Border? _border(CiColors c) {
+    if (ringColor != null) {
+      return Border.all(color: ringColor!, width: ringWidth);
+    }
+    return switch (style) {
+      // 1px at 40, scaling with the avatar (the 88 profile carries ~2.2, per
+      // the frame).
+      CiAvatarStyle.neutral =>
+        Border.all(color: CiPalette.gray150, width: size / 40),
+      CiAvatarStyle.filled => null,
+      CiAvatarStyle.outlined => Border.all(color: c.borderStrong),
+    };
+  }
+
+  /// Initials take their colour from the FILL they sit on. Neutral's ink is
+  /// fixed to the palette (dark on grey, any ground); the switcher's filled
+  /// state inverts, and everything else reads the ground's text colour.
+  Color _initialsColor(CiColors c) {
+    if (ringColor != null) return c.text;
+    return switch (style) {
+      CiAvatarStyle.neutral => CiPalette.inkDefault,
+      CiAvatarStyle.filled => c.textInvert,
+      CiAvatarStyle.outlined => c.text,
+    };
+  }
 
   Widget _initials(CiColors c) => Center(
         child: Text(
@@ -195,7 +228,9 @@ class CiPlayerSwitcher extends StatelessWidget {
           CiAvatar(
             name: names[i],
             imageUrl: i < imageUrls.length ? imageUrls[i] : null,
-            selected: i == index,
+            style: i == index
+                ? CiAvatarStyle.filled
+                : CiAvatarStyle.outlined,
             onTap: () => onSelected(i),
           ),
         ],
