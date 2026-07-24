@@ -2193,7 +2193,33 @@ landing gates read `SupaFlow.client` OUTSIDE their try, so an unreachable
 Supabase threw instead of declining - on the one path every session starts on.
 They now return null and decline.
 
-`[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
+**A THIRD AND FOURTH CLASS, found by checking the paywall on a FREE account.**
+Screens that must COVER the bar were landing in a shell BRANCH navigator
+instead of above the shell, by two different routes: `Navigator.of(context)`
+pushes onto the branch (the live tracker), and GoRouter's imperative push
+appends to the CURRENT match list, so even a top-level route pushed from a
+branch renders inside it (the paywall). Fixed with `rootNavigator: true` and a
+new `FFRoute.parentNavigatorKey` naming `appNavigatorKey`. Game Detail is
+deliberately NOT pinned - it keeps the bar per the standing rule, and the test
+asserts that distinction both ways.
+
+That check also found a bug that PREDATES the shell: the Players list, the
+create flow and the dashboard each built their own sheet around the v1
+`PaywallWidget` rather than calling `showPaywall`, so they ignored
+`kUsePaywall2` and showed a FREE parent the v1 paywall on the primary
+conversion path. And `showModalBottomSheet` defaults to
+`useRootNavigator: false`, so all ten raw sheets rendered inside the branch
+with the tabs over them. Both are now guarded by source-scanning tests: these
+are properties of how the app is WIRED, and a widget test only proves the one
+path it pumps.
+
+Device-verified 2026-07-24, every item confirmed explicitly: cold start shows
+the bar, sign-out/in shows it, tapping the active tab pops to root, the live
+tracker and paywall have none, onboarding and first-run have none, and on a
+FREE account the add-player gate reaches the 2.0 paywall with no bar from both
+the Players list and the create sheet.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate
