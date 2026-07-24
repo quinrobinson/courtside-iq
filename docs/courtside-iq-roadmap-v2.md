@@ -2001,9 +2001,28 @@ sheet (4.15c) found during the same pass.
 **New item.** The store app icon predates 2.0 and needs redesigning, and there
 is an updated logo mark coming from the user.
 
-**Per the standing rule, the icon is designed and approved in Figma before any
-code.** Add an "App Icon" area to the 2.0 file (icon grid at the required
-sizes, light/dark/tinted iOS variants), not a one-off canvas frame.
+**THE ASSETS EXIST. Branding page `923:3219`** in `uvHb6HXvIVFwzSSXPtEVoc`
+(added 2026-07-24, so this item is unblocked):
+
+| Asset | Node | Notes |
+|---|---|---|
+| Logo frame | `923:3226` | 1920x1080, holds the mark + wordmark |
+| **Logo Mark** | `923:3515` | VECTOR 174x174 - the updated mark |
+| `Subtract` | `923:3228` | VECTOR 174x174 - second mark vector, confirm which is current before porting |
+| **COURTSIDE.IQ wordmark** | `923:3229` | GROUP 969x102, 12 vectors |
+| **App Icon** | `923:3279` | 240x240: a `DotBurst` group (`923:3297`) + the mark (`923:3514`, 93x93) |
+
+The icon is the **DotBurst + the mark**, which is the same brand hero the
+paywall and the 4.19c sheet use - so the icon and the in-app heroes have to
+stay in agreement.
+
+**FIRST QUESTION TO SETTLE, before any code:** export `923:3515` as SVG and
+diff it against the current painter. `CiLogoMark` draws the motif as a disc
+minus a full-height vertical channel and a right-side horizontal channel; the
+new mark reads as the same motif but the cut terminations look rounded. If it
+is only a constants change, keep the painter (it takes a colour and scales,
+which the old PNG could not). If the geometry genuinely changed, switch to a
+tinted SVG asset the way `CiNavIcon` does, rather than forcing the painter.
 
 **The logo mark is the source, so it lands first.** When the user provides the
 updated mark:
