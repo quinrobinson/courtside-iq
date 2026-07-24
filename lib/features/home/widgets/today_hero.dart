@@ -176,6 +176,59 @@ class _HeroGlow extends StatelessWidget {
   }
 }
 
+/// The account button, top-right of the hero. Measured from 65:8: a 40 rounded
+/// square (radius 6), a translucent white fill (white at 8% - the "lighter
+/// grey" on ink), a 1px white border, white content.
+///
+/// With a name it shows one or two initials. With NONE - the common case,
+/// since the name lives in public.users and may be unset - it shows a settings
+/// glyph, because the button taps into the account. This REPLACES the initials
+/// fallback's "?", which read as a broken avatar on a white box.
+class _AccountAvatar extends StatelessWidget {
+  const _AccountAvatar({required this.name, this.onTap});
+
+  final String? name;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const c = CiColors.onInk;
+    final trimmed = (name ?? '').trim();
+    final initials = trimmed.isEmpty ? null : CiAvatar.initialsOf(trimmed);
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Semantics(
+        button: true,
+        label: 'Account',
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: c.text.withValues(alpha: 0.08),
+            borderRadius: CiRadius.chipR,
+            // White at 16%, per 65:8 - a faint edge, NOT the solid white I had.
+            border: Border.all(color: c.text.withValues(alpha: 0.16)),
+          ),
+          child: Center(
+            child: initials == null
+                ? Icon(Icons.settings_outlined, size: 20, color: c.text)
+                : Text(
+                    initials,
+                    style: CiType.rowLabel.copyWith(
+                      color: c.text,
+                      fontWeight: CiWeight.extraBold,
+                      height: 1,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _GlowPainter extends CustomPainter {
   const _GlowPainter(this.color);
 
@@ -236,9 +289,13 @@ class _BrandRow extends StatelessWidget {
           children: [
             CiLogoMark(size: 20, color: c.text),
             const SizedBox(width: CiSpace.s2),
-            Text('Courtside IQ',
-                style: CiType.rowLabel.copyWith(
-                    color: c.text, fontWeight: CiWeight.semiBold)),
+            Text(
+              'Courtside IQ',
+              style: CiType.rowLabel.copyWith(
+                color: c.text,
+                fontWeight: CiWeight.semiBold,
+              ),
+            ),
             const Spacer(),
             CiIconButton(
               icon: Icons.notifications_none,
@@ -247,13 +304,7 @@ class _BrandRow extends StatelessWidget {
               onPressed: onNotifications,
             ),
             const SizedBox(width: CiSpace.s3),
-            CiAvatar(
-              name: userName ?? '',
-              imageUrl: userPhotoUrl,
-              // Rounded square, to pair with the bell icon button beside it.
-              shape: CiAvatarShape.rounded,
-              onTap: onProfile,
-            ),
+            _AccountAvatar(name: userName, onTap: onProfile),
           ],
         ),
       ),
@@ -289,19 +340,23 @@ class _GrowthBlock extends StatelessWidget {
             DotGaugeTapTarget(
               onTap: onGaugeTap,
               child: DotGauge(
-              size: 120,
-              // The gauge takes 0..1. Growth IQ runs 40..99, so a raw /100
-              // would leave the ring looking barely started at a genuinely
-              // good score. Map the real range onto the full sweep.
-              value: growthIqGaugeValue(snapshot.growthIq!),
-              // THE SCORE ONLY. The trend word used to sit under it here and
-              // the delta rode the chip to the right, which split one fact
-              // across two places - the number lost the word explaining it.
-              // Both now travel together on the chip.
-              child: Text('${snapshot.growthIq}',
-                  style: CiType.h2
-                      .copyWith(color: c.text, fontWeight: CiWeight.light)),
-            ),
+                size: 120,
+                // The gauge takes 0..1. Growth IQ runs 40..99, so a raw /100
+                // would leave the ring looking barely started at a genuinely
+                // good score. Map the real range onto the full sweep.
+                value: growthIqGaugeValue(snapshot.growthIq!),
+                // THE SCORE ONLY. The trend word used to sit under it here and
+                // the delta rode the chip to the right, which split one fact
+                // across two places - the number lost the word explaining it.
+                // Both now travel together on the chip.
+                child: Text(
+                  '${snapshot.growthIq}',
+                  style: CiType.h2.copyWith(
+                    color: c.text,
+                    fontWeight: CiWeight.light,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: CiSpace.s4),
             Expanded(
@@ -312,11 +367,15 @@ class _GrowthBlock extends StatelessWidget {
                   // carousel, "Growth IQ" alone leaves the second one
                   // unattributed - the headline usually mentions a name, but
                   // it is AI-written and cannot be relied on to.
-                  Text("${snapshot.firstName}'s Growth IQ",
-                      style: CiType.rowLabel.copyWith(
-                          color: c.textMuted, fontWeight: CiWeight.semiBold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
+                  Text(
+                    "${snapshot.firstName}'s Growth IQ",
+                    style: CiType.rowLabel.copyWith(
+                      color: c.textMuted,
+                      fontWeight: CiWeight.semiBold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: CiSpace.s2),
                   Expanded(
                     child: Text(
@@ -348,7 +407,9 @@ class _GrowthBlock extends StatelessWidget {
                       // Players list for the same player's same drop.
                       if (snapshot.trend != null)
                         CiBadge.growthTrend(
-                            trend: snapshot.trend!, delta: delta),
+                          trend: snapshot.trend!,
+                          delta: delta,
+                        ),
                     ],
                   ),
                 ],

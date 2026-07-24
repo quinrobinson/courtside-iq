@@ -84,125 +84,141 @@ class _YourProfilePageState extends State<YourProfilePage> {
   @override
   Widget build(BuildContext context) {
     return CiSurface.light(
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        final email = _profile.email;
-        final name = _profile.fullName;
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          final email = _profile.email;
+          final name = _profile.fullName;
 
-        return Scaffold(
-          backgroundColor: c.bg,
-          body: SafeArea(
-            bottom: false,
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                const CiSubPageHeader(title: 'Your Profile'),
-                const SizedBox(height: CiSpace.s6),
-                Center(
-                  child: Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      CiAvatar(
-                        // Initials only. See onEditPhoto.
-                        name: name.isEmpty ? email : name,
-                        size: 88,
-                      ),
-                      Semantics(
-                        button: true,
-                        label: 'Change photo',
-                        container: true,
-                        excludeSemantics: true,
-                        child: InkWell(
-                          onTap: widget.onEditPhoto,
-                          customBorder: const CircleBorder(),
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: c.surfaceDeep,
-                              shape: BoxShape.circle,
-                              // A ring in the page colour, so the badge reads
-                              // as sitting ON the avatar rather than being
-                              // part of it.
-                              border: Border.all(color: c.bg, width: 2),
-                            ),
-                            child: Icon(Icons.photo_camera_outlined,
-                                size: 15,
-                                color: widget.onEditPhoto == null
-                                    ? c.textMuted
-                                    : c.textInvert),
-                          ),
+          return Scaffold(
+            backgroundColor: c.bg,
+            body: SafeArea(
+              bottom: false,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  const CiSubPageHeader(title: 'Your Profile'),
+                  const SizedBox(height: CiSpace.s6),
+                  Center(
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CiAvatar(
+                          // Initials only. See onEditPhoto.
+                          name: name.isEmpty ? email : name,
+                          size: 88,
                         ),
-                      ),
-                    ],
+                        // HIDDEN until photo upload exists. A camera badge that
+                        // opens nothing is a broken control; it returns the
+                        // moment onEditPhoto is wired (its own item - needs a
+                        // picker, a storage bucket and an avatar column).
+                        if (widget.onEditPhoto != null)
+                          Semantics(
+                            button: true,
+                            label: 'Change photo',
+                            container: true,
+                            excludeSemantics: true,
+                            child: InkWell(
+                              onTap: widget.onEditPhoto,
+                              customBorder: const CircleBorder(),
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: c.surfaceDeep,
+                                  shape: BoxShape.circle,
+                                  // A ring in the page colour, so the badge reads
+                                  // as sitting ON the avatar rather than being
+                                  // part of it.
+                                  border: Border.all(color: c.bg, width: 2),
+                                ),
+                                child: Icon(
+                                  Icons.photo_camera_outlined,
+                                  size: 15,
+                                  color: widget.onEditPhoto == null
+                                      ? c.textMuted
+                                      : c.textInvert,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: CiSpace.s5),
-                Text(
-                  name.isEmpty ? 'Your account' : name,
-                  textAlign: TextAlign.center,
-                  style: CiType.h2
-                      .copyWith(color: c.text, fontWeight: CiWeight.extraBold),
-                ),
-                if (email.isNotEmpty) ...[
-                  const SizedBox(height: CiSpace.s1),
-                  Text(email,
+                  const SizedBox(height: CiSpace.s5),
+                  Text(
+                    name.isEmpty ? 'Your account' : name,
+                    textAlign: TextAlign.center,
+                    style: CiType.h2.copyWith(
+                      color: c.text,
+                      fontWeight: CiWeight.extraBold,
+                    ),
+                  ),
+                  if (email.isNotEmpty) ...[
+                    const SizedBox(height: CiSpace.s1),
+                    Text(
+                      email,
                       textAlign: TextAlign.center,
-                      style: CiType.body.copyWith(color: c.textMuted)),
-                ],
-                const SizedBox(height: CiSpace.s7),
-                const CiHairline(),
-                CiSettingsRow(
-                  label: 'Name',
-                  value: name.isEmpty ? 'Add your name' : name,
-                  onTap: () => _open(widget.onEditName),
-                ),
-                const CiHairline(),
-                CiSettingsRow(
-                  label: 'Email',
-                  value: email,
-                  onTap: () => _open(widget.onEditEmail),
-                ),
-                const CiHairline(),
-                CiSettingsRow(
-                  // No value to show and nothing safe to show, so the frame
-                  // uses the action as the value.
-                  label: 'Password',
-                  value: 'Change',
-                  onTap: () => _open(widget.onChangePassword),
-                ),
-                const CiHairline(),
-                const SizedBox(height: 96),
-                Semantics(
-                  button: true,
-                  label: 'Delete account',
-                  container: true,
-                  excludeSemantics: true,
-                  child: InkWell(
-                    onTap: widget.onDeleteAccount,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: CiSpace.s3),
-                      child: Text(
-                        'Delete account',
-                        textAlign: TextAlign.center,
-                        style: CiType.rowTitle.copyWith(
+                      style: CiType.body.copyWith(color: c.textMuted),
+                    ),
+                  ],
+                  const SizedBox(height: CiSpace.s7),
+                  const CiHairline(),
+                  CiSettingsRow(
+                    label: 'Name',
+                    value: name.isEmpty ? 'Add your name' : name,
+                    onTap: () => _open(widget.onEditName),
+                  ),
+                  const CiHairline(),
+                  CiSettingsRow(
+                    label: 'Email',
+                    value: email,
+                    onTap: () => _open(widget.onEditEmail),
+                  ),
+                  const CiHairline(),
+                  CiSettingsRow(
+                    // No value to show and nothing safe to show, so the frame
+                    // uses the action as the value.
+                    label: 'Password',
+                    value: 'Change',
+                    onTap: () => _open(widget.onChangePassword),
+                  ),
+                  const CiHairline(),
+                  const SizedBox(height: 96),
+                  Semantics(
+                    button: true,
+                    label: 'Delete account',
+                    container: true,
+                    excludeSemantics: true,
+                    child: InkWell(
+                      onTap: widget.onDeleteAccount,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: CiSpace.s3,
+                        ),
+                        child: Text(
+                          'Delete account',
+                          textAlign: TextAlign.center,
+                          style: CiType.rowTitle.copyWith(
                             color: widget.onDeleteAccount == null
                                 // Muted while 4.15d is unbuilt: an accent on
                                 // a dead control invites a tap that does
                                 // nothing.
                                 ? c.textFaint
                                 : c.accentEnergy,
-                            fontWeight: CiWeight.semiBold),
+                            fontWeight: CiWeight.semiBold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: CiSpace.s8),
-              ],
+                  const SizedBox(height: CiSpace.s8),
+                ],
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

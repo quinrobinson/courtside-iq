@@ -31,13 +31,13 @@ import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
-import '/auth/supabase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import '/features/flags.dart';
 import '/features/players/birth_date_gate.dart';
 import '/features/players/info_copy.dart';
 import '/features/nav/ci_nav_bar.dart';
+import '/features/menu/account_repository.dart';
 import '/features/premium/paywall_launcher.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import 'entitlement_status.dart';
@@ -84,10 +84,17 @@ class _TodayPageState extends State<TodayPage> {
   /// The game still being tracked on this phone, if there is one.
   LiveGameSnapshot? _live;
 
+  /// The signed-in parent's name, for the header avatar's initials. Loaded
+  /// from public.users (via AccountRepository), NOT currentUserDisplayName,
+  /// which is permanently empty in this app - passing it left the avatar
+  /// showing a "?" for everyone.
+  String _userName = '';
+
   @override
   void initState() {
     super.initState();
     _loadEntitlement();
+    _loadAccount();
     _readLive();
     // The v1 gate lives on home_widget, which this screen replaces, so
     // without this the birth-date prompt is dead on every 2.0 build.
@@ -104,6 +111,11 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> _loadEntitlement() async {
     final status = await widget.entitlementReader();
     if (mounted) setState(() => _entitlement = status);
+  }
+
+  Future<void> _loadAccount() async {
+    final profile = await const AccountRepository().load();
+    if (mounted) setState(() => _userName = profile.fullName);
   }
 
   void _openGame(GameFeedEntry entry) {
@@ -134,9 +146,11 @@ class _TodayPageState extends State<TodayPage> {
       return;
     }
 
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
-    ));
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
+      ),
+    );
     if (mounted) await _refresh();
   }
 
@@ -148,21 +162,21 @@ class _TodayPageState extends State<TodayPage> {
     setState(() {
       _future = next;
     });
-    await Future.wait([next, _loadEntitlement(), _readLive()]);
+    await Future.wait([next, _loadEntitlement(), _readLive(), _loadAccount()]);
   }
 
   /// Opens the add-player flow directly. On the empty home screen the button
   /// used to push the PLAYERS LIST, so a parent tapped "Add player", landed
   /// on the list, and had to tap "Add player" AGAIN. One tap now does it.
   Future<void> _addPlayer() => runAddPlayerFlow(
-        context,
-        entitlement: _entitlement,
-        // Zero here by definition: this button only exists when the account
-        // has no players.
-        playerCount: 0,
-        onPlayerAdded: _refresh,
-        openPaywall: _openPaywall,
-      );
+    context,
+    entitlement: _entitlement,
+    // Zero here by definition: this button only exists when the account
+    // has no players.
+    playerCount: 0,
+    onPlayerAdded: _refresh,
+    openPaywall: _openPaywall,
+  );
 
   Future<void> _openPaywall() async {
     await showPaywall(context);
@@ -178,98 +192,101 @@ class _TodayPageState extends State<TodayPage> {
   Widget build(BuildContext context) {
     // The PAGE is light ground; the hero paints its own ink.
     return CiSurface.light(
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          // Light icons: the hero is ink, so the global dark default would put
-          // the clock and signal bars black on near-black. See CiSystemUi.
-          value: CiSystemUi.onInk,
-          child: Scaffold(
-            // Transparent: the two-tone backdrop below owns the ground, not
-            // the scaffold. A SINGLE scaffold colour cannot be ink at the top
-            // and light at the bottom, and both overscroll ends reveal it -
-            // which is why every earlier attempt fixed one end and broke the
-            // other.
-            backgroundColor: Colors.transparent,
-            body: FutureBuilder<TodayData>(
-              future: _future,
-              builder: (context, snap) {
-                // Hero first, always. It carries the brand bar, so a bare
-                // spinner would blank the top of the app on every open.
-                final data = snap.data;
-                return Stack(
-                  children: [
-                    // TWO-TONE BACKDROP behind the transparent scroll view.
-                    // Light fills everything, so the BOTTOM overscroll reveals
-                    // light. A tall ink cap is anchored to the top, so the TOP
-                    // overscroll reveals ink under the dark hero. The cap's
-                    // lower seam sits at 360, always behind the opaque hero and
-                    // feed, so it is never seen - the content fills the viewport
-                    // in every state, guaranteeing at least that much cover.
-                    Positioned.fill(child: ColoredBox(color: c.bg)),
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 360,
-                      child: ColoredBox(color: CiColors.onInk.bg),
-                    ),
-                    RefreshIndicator(
-                  onRefresh: _refresh,
-                  // Sits on the ink overscroll, so both match it.
-                  color: CiColors.onInk.text,
-                  backgroundColor: CiColors.onInk.surfaceSunk,
-                    child: CustomScrollView(
-                      // Always scrollable, or pull-to-refresh dies whenever
-                      // the content is shorter than the screen - exactly the
-                      // empty states.
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: TodayHero(
-                            snapshots: data?.headerPlayers ?? const [],
-                            loading: snap.connectionState ==
-                                    ConnectionState.waiting &&
-                                data == null,
-                            userName: currentUserDisplayName,
-                            onProfile: () =>
-                                context.pushNamed(MenuWidget.routeName),
-                            onPlayerTap: (s) => context.pushNamed(
-                              PlayersListWidget.routeName,
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            // Light icons: the hero is ink, so the global dark default would put
+            // the clock and signal bars black on near-black. See CiSystemUi.
+            value: CiSystemUi.onInk,
+            child: Scaffold(
+              // Transparent: the two-tone backdrop below owns the ground, not
+              // the scaffold. A SINGLE scaffold colour cannot be ink at the top
+              // and light at the bottom, and both overscroll ends reveal it -
+              // which is why every earlier attempt fixed one end and broke the
+              // other.
+              backgroundColor: Colors.transparent,
+              body: FutureBuilder<TodayData>(
+                future: _future,
+                builder: (context, snap) {
+                  // Hero first, always. It carries the brand bar, so a bare
+                  // spinner would blank the top of the app on every open.
+                  final data = snap.data;
+                  return Stack(
+                    children: [
+                      // TWO-TONE BACKDROP behind the transparent scroll view.
+                      // Light fills everything, so the BOTTOM overscroll reveals
+                      // light. A tall ink cap is anchored to the top, so the TOP
+                      // overscroll reveals ink under the dark hero. The cap's
+                      // lower seam sits at 360, always behind the opaque hero and
+                      // feed, so it is never seen - the content fills the viewport
+                      // in every state, guaranteeing at least that much cover.
+                      Positioned.fill(child: ColoredBox(color: c.bg)),
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 360,
+                        child: ColoredBox(color: CiColors.onInk.bg),
+                      ),
+                      RefreshIndicator(
+                        onRefresh: _refresh,
+                        // Sits on the ink overscroll, so both match it.
+                        color: CiColors.onInk.text,
+                        backgroundColor: CiColors.onInk.surfaceSunk,
+                        child: CustomScrollView(
+                          // Always scrollable, or pull-to-refresh dies whenever
+                          // the content is shorter than the screen - exactly the
+                          // empty states.
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: TodayHero(
+                                snapshots: data?.headerPlayers ?? const [],
+                                loading:
+                                    snap.connectionState ==
+                                        ConnectionState.waiting &&
+                                    data == null,
+                                userName: _userName,
+                                onProfile: () =>
+                                    context.pushNamed(MenuWidget.routeName),
+                                onPlayerTap: (s) => context.pushNamed(
+                                  PlayersListWidget.routeName,
+                                ),
+                                onAboutGrowthIq: () => showCiInfoSheet(
+                                  context,
+                                  title: InfoCopy.growthIqTitle,
+                                  body: InfoCopy.growthIqBody,
+                                ),
+                              ),
                             ),
-                            onAboutGrowthIq: () => showCiInfoSheet(
-                              context,
-                              title: InfoCopy.growthIqTitle,
-                              body: InfoCopy.growthIqBody,
-                            ),
-                          ),
+                            // Everything below the hero is light ground, whatever
+                            // state it is in.
+                            ..._bodySlivers(context, c, snap, data),
+                          ],
                         ),
-                        // Everything below the hero is light ground, whatever
-                        // state it is in.
-                        ..._bodySlivers(context, c, snap, data),
-                      ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+              // CiNavBar owns its own ground and safe area, so the ColoredBox
+              // and SafeArea wrapper this screen used to need for the v1 bar
+              // are gone. The v1 bar had neither, which is why the
+              // home-indicator strip fell through to the ink scaffold.
+              bottomNavigationBar: kUseNavBar2
+                  ? CiNavBar(active: CiNavTab.home, onPlayerAdded: _refresh)
+                  : ColoredBox(
+                      color: c.bg,
+                      child: const SafeArea(
+                        top: false,
+                        child: CustomNavBarWidget(page: 'Home'),
+                      ),
                     ),
-                  ),
-                  ],
-                );
-              },
             ),
-            // CiNavBar owns its own ground and safe area, so the ColoredBox
-            // and SafeArea wrapper this screen used to need for the v1 bar
-            // are gone. The v1 bar had neither, which is why the
-            // home-indicator strip fell through to the ink scaffold.
-            bottomNavigationBar: kUseNavBar2
-                ? CiNavBar(active: CiNavTab.home, onPlayerAdded: _refresh)
-                : ColoredBox(
-                    color: c.bg,
-                    child: const SafeArea(
-                      top: false,
-                      child: CustomNavBarWidget(page: 'Home'),
-                    ),
-                  ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 
@@ -282,30 +299,34 @@ class _TodayPageState extends State<TodayPage> {
     TodayData? data,
   ) {
     Widget light(Widget sliver) => DecoratedSliver(
-          decoration: BoxDecoration(color: c.bg),
-          sliver: sliver,
-        );
+      decoration: BoxDecoration(color: c.bg),
+      sliver: sliver,
+    );
 
     if (snap.connectionState == ConnectionState.waiting && data == null) {
       // The screen's own outline, not a spinner: Today has a fixed shape, so
       // showing it reads as "arriving" and holds the layout still.
       return [
         light(const SliverToBoxAdapter(child: TodayFeedSkeleton())),
-        light(const SliverFillRemaining(
-          hasScrollBody: false,
-          child: SizedBox.shrink(),
-        )),
+        light(
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: SizedBox.shrink(),
+          ),
+        ),
       ];
     }
     if (snap.hasError) {
       return [
-        light(const SliverFillRemaining(
-          hasScrollBody: false,
-          child: _Message(
-            title: 'Could not load your games',
-            body: 'Pull down to try again.',
+        light(
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: _Message(
+              title: 'Could not load your games',
+              body: 'Pull down to try again.',
+            ),
           ),
-        )),
+        ),
       ];
     }
     if (data == null) return const [];
@@ -315,10 +336,12 @@ class _TodayPageState extends State<TodayPage> {
         // brand new parent - the one most worth telling what premium is -
         // was the only one who never saw it.
         ..._promoSlivers(),
-        light(SliverFillRemaining(
-          hasScrollBody: false,
-          child: _AddFirstPlayer(onAdd: _addPlayer),
-        )),
+        light(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: _AddFirstPlayer(onAdd: _addPlayer),
+          ),
+        ),
       ];
     }
 
@@ -379,7 +402,8 @@ class _TodayPageState extends State<TodayPage> {
       // message would be a flat contradiction of the row above it.
       return [
         const SliverToBoxAdapter(
-            child: FeedSectionHeader(title: 'Recent Games')),
+          child: FeedSectionHeader(title: 'Recent Games'),
+        ),
         SliverToBoxAdapter(child: liveRow),
         const SliverToBoxAdapter(child: FeedHairline()),
         const SliverToBoxAdapter(child: SizedBox(height: CiSpace.s8)),
@@ -453,13 +477,17 @@ class _Message extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(title,
-              textAlign: TextAlign.center,
-              style: CiType.h3.copyWith(color: c.text)),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: CiType.h3.copyWith(color: c.text),
+          ),
           const SizedBox(height: CiSpace.s2),
-          Text(body,
-              textAlign: TextAlign.center,
-              style: CiType.body.copyWith(color: c.textMuted)),
+          Text(
+            body,
+            textAlign: TextAlign.center,
+            style: CiType.body.copyWith(color: c.textMuted),
+          ),
         ],
       ),
     );
@@ -488,12 +516,17 @@ class _AddFirstPlayer extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: CiNavIconGlyph(
-                icon: CiNavIcon.players, color: c.textMuted, size: 28),
+              icon: CiNavIcon.players,
+              color: c.textMuted,
+              size: 28,
+            ),
           ),
           const SizedBox(height: CiSpace.s5),
-          Text('Add your first player',
-              textAlign: TextAlign.center,
-              style: CiType.h3.copyWith(color: c.text)),
+          Text(
+            'Add your first player',
+            textAlign: TextAlign.center,
+            style: CiType.h3.copyWith(color: c.text),
+          ),
           const SizedBox(height: CiSpace.s2),
           Text(
             'Courtside IQ turns every game into a clear picture of how your player is developing. Add your player to begin.',
@@ -529,9 +562,13 @@ class _ViewAllGames extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
         child: Row(
           children: [
-            Text('View All Games',
-                style: CiType.rowTitle.copyWith(
-                    color: c.text, fontWeight: CiWeight.semiBold)),
+            Text(
+              'View All Games',
+              style: CiType.rowTitle.copyWith(
+                color: c.text,
+                fontWeight: CiWeight.semiBold,
+              ),
+            ),
             const Spacer(),
             Icon(Icons.chevron_right, color: c.textMuted, size: 20),
           ],
