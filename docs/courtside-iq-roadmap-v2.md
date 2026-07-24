@@ -1579,6 +1579,18 @@ own pass.
 
 - Splash and Onboarding x3 built and routed behind `kUseEntry2`.
   `[x] built` · `[x] wired` · `[x] device-verified`
+- **Guided First-Run built and gated (2026-07-23).** After a new parent
+  confirms email (or signs up on an auto-confirm env), a two-step Welcome →
+  Add first player, shown ONCE and skippable. The gate lives at `_homeScreen()`
+  in nav — the one seam every landing passes through, including the
+  email-confirmation deep link — and triggers on `playerCount == 0 && !seen`
+  with a per-user local flag in `FFAppState`, behind `kUseFirstRun`. Files:
+  `first_run_flow.dart`, `first_run_gate.dart`.
+  `[x] built` · `[x] wired` · `[x] device-verified`
+- **Onboarding VISUAL PASS is now done (4.19b), superseding the "good-for-now"
+  note below:** the ambient lime glow, the ink-overlay fade (replacing the
+  baked-gradient concern below), the capture's corner clip, and the spacing all
+  landed and are device-verified.
 - **Native splash checked on device: no white or coloured flash before the dot
   burst.** The earlier concern about LaunchScreen.storyboard did not
   materialise, so nothing to fix there.
@@ -1901,7 +1913,36 @@ Icons and visual detail ONLY. No behaviour, no copy, no new state. Batched
 deliberately: a polish change mixed into feature work is the one nobody
 re-tests. Comes after the copy audit so text and icon are settled together,
 and before the device pass so 4.18 exercises the final look.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+**Done 2026-07-23** (device-verified across several passes). Figma-authored
+first where a surface changed. Covered:
+- Figma nav icons + aligned empty states + premium banner; nav icons sized
+  correctly; clean split player icon.
+- Dot-burst spacing baked into the component (first ring one gap off the mark);
+  ambient lime glow (`CiAmbientGlow`) behind onboarding + the paywall carousel
+  (top wash only), onboarding capture clipped to the card radius and fading to
+  ink, dots→CTA spacing.
+- 13 stray spacing/radius literals tokenised.
+- Today account avatar reads the real name (public.users), Figma-styled with a
+  settings-glyph default; the inert profile camera badge hidden.
+- **App-wide neutral `CiAvatar`** (light-grey chip, ink initials, hairline
+  border) - the switcher opts into its filled/outlined states.
+- Shared `CiEmptyState` so Players + Games are identical by construction.
+- Dead Today bell removed; Create sheet uses the nav glyphs.
+- Already-Premium: burst centred between close and label, boxed close.
+- Game Detail: insight tag ellipsis fixed + right-aligned; box stats
+  right-aligned + tight with PTS on their baseline; AI spark standardised on
+  `auto_awesome`; full game share (matchup, date, box line, shooting %,
+  insight, development).
+
+**Deferred out of 4.19b — its own item: profile photo upload.** The Your
+Profile camera badge is hidden until this exists (a badge that opens nothing is
+a broken control). Needs the `image_picker` dependency, a Supabase Storage
+`avatars` bucket, an `avatar_url` column on `public.users`, and pick → upload →
+show wiring; `CiAvatar`/`TodayHero` already accept an `imageUrl`, so the render
+side is ready. The badge returns automatically the moment `onEditPhoto` is
+wired. `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ### 4.19c "What's new in 2.0" for EXISTING parents
 **New item. The biggest gap in the original plan.**
