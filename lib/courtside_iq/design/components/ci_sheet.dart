@@ -90,8 +90,12 @@ class CiSheet extends StatelessWidget {
           children: [
             const CiSheetHandle(),
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(CiSpace.screen, 18, CiSpace.s4, 0),
+              padding: const EdgeInsets.fromLTRB(
+                CiSpace.screen,
+                18,
+                CiSpace.s4,
+                0,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -100,8 +104,10 @@ class CiSheet extends StatelessWidget {
                       // Aligns the title's optical centre with the close
                       // button, which is 40 tall against a 24 cap height.
                       padding: const EdgeInsets.only(top: CiSpace.s2),
-                      child: Text(title,
-                          style: CiType.h3.copyWith(color: c.text)),
+                      child: Text(
+                        title,
+                        style: CiType.h3.copyWith(color: c.text),
+                      ),
                     ),
                   ),
                   const SizedBox(width: CiSpace.s3),
@@ -118,7 +124,11 @@ class CiSheet extends StatelessWidget {
             if (cta != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                    CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s6),
+                  CiSpace.screen,
+                  CiSpace.s5,
+                  CiSpace.screen,
+                  CiSpace.s6,
+                ),
                 child: CiButton(
                   label: cta!,
                   // Lime on every sheet in the set. These buttons complete a
@@ -179,34 +189,29 @@ class CiSheetOptionRow extends StatelessWidget {
             SizedBox(
               height: 56,
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+                padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         label,
                         style: CiType.body.copyWith(
-                            color: destructive ? c.accentEnergy : c.text,
-                            fontWeight: CiWeight.medium),
+                          color: destructive ? c.accentEnergy : c.text,
+                          fontWeight: CiWeight.medium,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (selected)
-                      Icon(Icons.check, size: 22, color: c.text),
+                    if (selected) Icon(Icons.check, size: 22, color: c.text),
                   ],
                 ),
               ),
             ),
             if (showDivider)
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: CiSpace.screen),
-                child: Container(
-                  height: CiSpace.hairline,
-                  color: c.hairline,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+                child: Container(height: CiSpace.hairline, color: c.hairline),
               ),
           ],
         ),
@@ -293,14 +298,25 @@ class _CiOptionSheetState<T> extends State<CiOptionSheet<T>> {
 class CiSheetActionRow extends StatelessWidget {
   const CiSheetActionRow({
     super.key,
-    required this.icon,
+    this.icon,
+    this.leading,
     required this.title,
     required this.subtitle,
     this.onTap,
     this.showDivider = false,
-  });
+  }) : assert(
+         icon != null || leading != null,
+         'CiSheetActionRow needs an icon or a leading widget',
+       );
 
-  final IconData icon;
+  /// A Material glyph. Ignored when [leading] is given.
+  final IconData? icon;
+
+  /// A custom leading widget (e.g. a CiNavIconGlyph), centred in the 48 badge
+  /// in place of [icon] - so a row can carry the app's own drawn icons rather
+  /// than the nearest Material approximation.
+  final Widget? leading;
+
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
@@ -323,7 +339,11 @@ class CiSheetActionRow extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                    CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s5),
+                  CiSpace.screen,
+                  CiSpace.s5,
+                  CiSpace.screen,
+                  CiSpace.s5,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -333,7 +353,7 @@ class CiSheetActionRow extends StatelessWidget {
                         color: c.surfaceSunk,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(icon, size: 24, color: c.text),
+                      child: leading ?? Icon(icon, size: 24, color: c.text),
                     ),
                     const SizedBox(width: CiSpace.s3),
                     Expanded(
@@ -341,16 +361,19 @@ class CiSheetActionRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(title,
-                              style: CiType.h4.copyWith(color: c.text),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
+                          Text(
+                            title,
+                            style: CiType.h4.copyWith(color: c.text),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           const SizedBox(height: 2),
-                          Text(subtitle,
-                              style:
-                                  CiType.bodySm.copyWith(color: c.textMuted),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
+                          Text(
+                            subtitle,
+                            style: CiType.bodySm.copyWith(color: c.textMuted),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -361,10 +384,10 @@ class CiSheetActionRow extends StatelessWidget {
               ),
               if (showDivider)
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: CiSpace.screen),
-                  child:
-                      Container(height: CiSpace.hairline, color: c.hairline),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: CiSpace.screen,
+                  ),
+                  child: Container(height: CiSpace.hairline, color: c.hairline),
                 ),
             ],
           ),

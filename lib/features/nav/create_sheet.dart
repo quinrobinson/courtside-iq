@@ -22,7 +22,9 @@
 
 import 'package:flutter/material.dart';
 
+import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_sheet.dart';
+import '/courtside_iq/design/tokens/ci_colors.dart';
 
 /// Opens the create sheet. Returns the chosen action, or null if dismissed.
 Future<CreateChoice?> presentCreateSheet(
@@ -45,6 +47,7 @@ class CreateSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = CiColors.of(context);
     return CiSheet(
       title: 'Create',
       child: Column(
@@ -52,21 +55,29 @@ class CreateSheet extends StatelessWidget {
         children: [
           if (hasPlayers)
             CiSheetActionRow(
-              icon: Icons.sports_basketball_rounded,
+              // The bottom-nav Games glyph, not a Material basketball, so a
+              // parent sees the same icon for "game" here and in the nav.
+              leading: CiNavIconGlyph(
+                icon: CiNavIcon.games,
+                color: c.text,
+                size: 24,
+              ),
               title: 'New game',
               subtitle: 'Track a game for a player',
               showDivider: true,
-              onTap: () =>
-                  Navigator.of(context).pop(CreateChoice.newGame),
+              onTap: () => Navigator.of(context).pop(CreateChoice.newGame),
             ),
           CiSheetActionRow(
-            icon: Icons.groups_rounded,
+            leading: CiNavIconGlyph(
+              icon: CiNavIcon.players,
+              color: c.text,
+              size: 24,
+            ),
             title: 'New player',
             // States the cap up front, so the limit is not a surprise
             // discovered by hitting it.
             subtitle: 'Add a player to track (up to 3)',
-            onTap: () =>
-                Navigator.of(context).pop(CreateChoice.newPlayer),
+            onTap: () => Navigator.of(context).pop(CreateChoice.newPlayer),
           ),
         ],
       ),

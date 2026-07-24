@@ -41,14 +41,13 @@ class TodayHero extends StatefulWidget {
     this.loading = false,
     this.userName,
     this.userPhotoUrl,
-    this.onNotifications,
     this.onProfile,
     this.onPlayerTap,
     this.onAboutGrowthIq,
   });
 
   /// While true, the content region is a grey skeleton. The brand bar stays
-  /// real - the logo, bell and profile do not depend on the pending data.
+  /// real - the logo and profile do not depend on the pending data.
   final bool loading;
 
   /// Already filtered and ordered by [headerSnapshots]. Empty renders the
@@ -58,7 +57,6 @@ class TodayHero extends StatefulWidget {
   final String? userName;
   final String? userPhotoUrl;
 
-  final VoidCallback? onNotifications;
   final VoidCallback? onProfile;
 
   /// Tapping the Growth IQ block opens that player.
@@ -122,7 +120,6 @@ class _TodayHeroState extends State<TodayHero> {
                 _BrandRow(
                   userName: widget.userName,
                   userPhotoUrl: widget.userPhotoUrl,
-                  onNotifications: widget.onNotifications,
                   onProfile: widget.onProfile,
                 ),
                 if (widget.loading)
@@ -266,16 +263,10 @@ class _GlowPainter extends CustomPainter {
 }
 
 class _BrandRow extends StatelessWidget {
-  const _BrandRow({
-    this.userName,
-    this.userPhotoUrl,
-    this.onNotifications,
-    this.onProfile,
-  });
+  const _BrandRow({this.userName, this.userPhotoUrl, this.onProfile});
 
   final String? userName;
   final String? userPhotoUrl;
-  final VoidCallback? onNotifications;
   final VoidCallback? onProfile;
 
   @override
@@ -297,13 +288,8 @@ class _BrandRow extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            CiIconButton(
-              icon: Icons.notifications_none,
-              onDark: true,
-              semanticLabel: 'Notifications',
-              onPressed: onNotifications,
-            ),
-            const SizedBox(width: CiSpace.s3),
+            // No notifications bell: the app has no alerts feature, so it was a
+            // control that did nothing. Removed rather than left inert.
             _AccountAvatar(name: userName, onTap: onProfile),
           ],
         ),
