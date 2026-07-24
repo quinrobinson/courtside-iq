@@ -22,6 +22,7 @@ import '/features/player_insight/player_profile_page.dart';
 import '/features/dashboard/dashboard_page.dart';
 import '/features/home/today_page.dart';
 import '/features/onboarding/first_run_gate.dart';
+import '/features/onboarding/whats_new_gate.dart';
 import '/features/players/players_list_page.dart';
 import '/features/players/player_profile_page.dart';
 import '/features/auth/auth_landing_page.dart';
@@ -132,12 +133,15 @@ Widget _entryScreen(AppStateNotifier appStateNotifier) {
 /// reachable by turning its successor off.
 Widget _homeScreen() {
   if (kUseToday2) {
-    // The guided first-run wraps Today, so a brand-new parent is welcomed
-    // before they land on it. Off falls straight through to Today's own empty
-    // state - a safe revert.
-    return kUseFirstRun
-        ? const FirstRunGate(child: TodayPage())
-        : const TodayPage();
+    // Today, optionally wrapped by two one-time landing gates. FirstRunGate
+    // welcomes a brand-new parent BEFORE they see Today; WhatsNewGate floats
+    // the 2.0 upgrade sheet OVER Today for an existing v1 user. They are
+    // mutually exclusive (first-run marks the upgrade sheet seen), so at most
+    // one fires. Each flag off falls straight through to Today - a safe revert.
+    Widget home = const TodayPage();
+    if (kUseWhatsNew2) home = WhatsNewGate(child: home);
+    if (kUseFirstRun) home = FirstRunGate(child: home);
+    return home;
   }
   return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
 }

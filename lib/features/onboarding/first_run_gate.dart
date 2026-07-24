@@ -44,7 +44,16 @@ class SupabaseFirstRunPolicy implements FirstRunPolicy {
               as List;
       // Only a brand-new, player-less account is welcomed. Anyone with a
       // player already knows the app; Today's empty state covers the rest.
-      return rows.isEmpty;
+      final isNew = rows.isEmpty;
+      // A user welcomed here is new to 2.0, so the "What's new in 2.0" upgrade
+      // sheet - which is for v1 upgraders - must never reach them. Marking it
+      // seen the moment we know they are new keeps the two landing gates
+      // mutually exclusive: without it, a new parent who adds a player in
+      // first-run would then have a player and trip the upgrade gate on the
+      // same landing. Done in the real policy (not the gate widget) so it stays
+      // out of the injected-fake path the tests use.
+      if (isNew) await FFAppState().markWhatsNew2Seen(uid);
+      return isNew;
     } catch (_) {
       // A failed count must not trap the parent in a welcome they can't leave.
       return false;

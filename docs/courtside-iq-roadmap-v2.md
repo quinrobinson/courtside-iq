@@ -1964,7 +1964,16 @@ a local flag absent AND the account already has players or games - that
 combination means an existing account meeting this UI for the first time,
 including on a new device.
 
-`[ ] designed` · `[ ] built` · `[ ] wired` · `[ ] device-verified`
+**Built as a single dark, celebratory sheet (`CiWhatsNewSheet`).** A DotBurst +
+CiLogoMark hero carries the "fresh look" so it stopped being a flat bullet, then
+four rows: Everything's safe, Growth IQ, Development story (the AI spark, kept to
+the AI row), A faster live tracker. `whatsNew2Seen` per-uid in FFAppState
+(`ff_whatsNew2SeenUids`, version-tagged). `WhatsNewGate` floats it over Today at
+`_homeScreen()`, nested in FirstRunGate. Mutual exclusion lives in
+`SupabaseFirstRunPolicy`: welcoming a new parent marks this sheet seen, so the
+two gates can never both fire. Behind `kUseWhatsNew2`.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate

@@ -57,6 +57,13 @@ const bool kUseToday2 = true;
 /// Today's own "add your first player" empty state, so this is a safe revert.
 const bool kUseFirstRun = true;
 
+/// "What's new in 2.0" upgrade sheet (4.19c). A one-time dark takeover shown to
+/// EXISTING v1 users on their first 2.0 landing: a DotBurst hero and four rows
+/// (data safe, Growth IQ, development story, faster tracker). Wraps Today via a
+/// gate, mutually exclusive with the guided first-run, so a brand-new parent
+/// never sees it. Off falls straight through to Today - a safe revert.
+const bool kUseWhatsNew2 = true;
+
 /// Bottom navigation, rebuilt on the 2.0 design system.
 ///
 /// Shared chrome across Home, Players, Games and Menu, so this is the flag
