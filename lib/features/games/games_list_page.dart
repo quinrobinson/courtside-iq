@@ -25,9 +25,9 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_empty_state.dart';
 import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
-import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -106,190 +106,215 @@ class _GamesListPageState extends State<GamesListPage> {
       return;
     }
 
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
-    ));
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
+      ),
+    );
     if (mounted) await _refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     return CiSurface.light(
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return Scaffold(
-          backgroundColor: c.bg,
-          // No SafeArea here: the ink header claims the status bar itself,
-          // exactly as the Players list does. Wrapping the page would leave a
-          // white strip above a black header.
-          body: FutureBuilder<GamesData>(
-            future: _future,
-            builder: (context, snap) {
-            final data = snap.data;
-            if (data == null) {
-              // The header still renders: it is the screen's identity and
-              // does not depend on the games arriving.
-              return Column(
-                children: [
-                  _Header(onAdd: _newGame),
-                  const Expanded(child: _Loading()),
-                ],
-              );
-            }
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return Scaffold(
+            backgroundColor: c.bg,
+            // No SafeArea here: the ink header claims the status bar itself,
+            // exactly as the Players list does. Wrapping the page would leave a
+            // white strip above a black header.
+            body: FutureBuilder<GamesData>(
+              future: _future,
+              builder: (context, snap) {
+                final data = snap.data;
+                if (data == null) {
+                  // The header still renders: it is the screen's identity and
+                  // does not depend on the games arriving.
+                  return Column(
+                    children: [
+                      _Header(onAdd: _newGame),
+                      const Expanded(child: _Loading()),
+                    ],
+                  );
+                }
 
-              final all = data.games;
-            // From the ROSTER, so a player with no games still gets a chip -
-            // and the "No games for X yet" state is reachable at all.
-            final players = playerOptions(data.roster);
-              // The player filter narrows what dates are even possible, so
-              // the date chips are built from the ALREADY-FILTERED rows. A
-              // chip that yields nothing is a dead control the parent
-              // cannot explain.
-              final byPlayer = filterGames(all, playerId: _playerId);
-              final dates = dateOptions(byPlayer);
+                final all = data.games;
+                // From the ROSTER, so a player with no games still gets a chip -
+                // and the "No games for X yet" state is reachable at all.
+                final players = playerOptions(data.roster);
+                // The player filter narrows what dates are even possible, so
+                // the date chips are built from the ALREADY-FILTERED rows. A
+                // chip that yields nothing is a dead control the parent
+                // cannot explain.
+                final byPlayer = filterGames(all, playerId: _playerId);
+                final dates = dateOptions(byPlayer);
 
-              // A selection can outlive its chip - a deleted game, or a
-              // player filter that removed that day entirely.
-              final dateId = reconcileSelection(_dateId, dates);
-              final rows = filterGames(byPlayer, dateId: dateId);
+                // A selection can outlive its chip - a deleted game, or a
+                // player filter that removed that day entirely.
+                final dateId = reconcileSelection(_dateId, dates);
+                final rows = filterGames(byPlayer, dateId: dateId);
 
-              // The unfinished game obeys the same filters as the list it
-              // sits in - a row that ignored them would look like a bug. It
-              // has no date, so any date filter excludes it: that filter is a
-              // question about days already played.
-              final live = _live;
-              final showLive = live != null &&
-                  dateId == kAllDatesKey &&
-                  (_playerId == kAllPlayersId || _playerId == live.playerId);
+                // The unfinished game obeys the same filters as the list it
+                // sits in - a row that ignored them would look like a bug. It
+                // has no date, so any date filter excludes it: that filter is a
+                // question about days already played.
+                final live = _live;
+                final showLive =
+                    live != null &&
+                    dateId == kAllDatesKey &&
+                    (_playerId == kAllPlayersId || _playerId == live.playerId);
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _Header(onAdd: _newGame),
-                  // The chips must not touch the header. With one player the
-                  // player row is hidden, so the DATE row would otherwise butt
-                  // straight against the ink.
-                  if (players.isNotEmpty || dates.isNotEmpty)
-                    const SizedBox(height: CiSpace.s3),
-                  if (players.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: CiSpace.s3),
-                      child: CiChipBar(
-                        labels: [for (final p in players) p.label],
-                        index: players.indexWhere((p) => p.id == _playerId),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: CiSpace.screen),
-                        onChanged: (i) => setState(() {
-                          _playerId = players[i].id;
-                          // The date may not exist for the new player.
-                          _dateId = kAllDatesKey;
-                        }),
-                      ),
-                    ),
-                  if (dates.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: CiSpace.s3),
-                      child: CiChipBar(
-                        labels: [for (final d in dates) d.label],
-                        index: dates.indexWhere((d) => d.id == dateId),
-                        scrollable: true,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: CiSpace.screen),
-                        onChanged: (i) =>
-                            setState(() => _dateId = dates[i].id),
-                      ),
-                    ),
-                  const CiHairline(),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: _refresh,
-                      child: rows.isEmpty && !showLive
-                          ? _Empty(
-                              // Naming the player turns "nothing here" into
-                              // an answer to the question they just asked.
-                              playerName: _playerId.isEmpty
-                                  ? null
-                                  : players
-                                      .firstWhere((p) => p.id == _playerId,
-                                          orElse: () => const GameFilterOption(
-                                              id: '', label: ''))
-                                      .label,
-                              filtered: all.isNotEmpty,
-                            )
-                          : ListView.separated(
-                              padding: EdgeInsets.zero,
-                              // +1 so the LAST row is closed by a rule too.
-                              // Without it the list stopped mid-air against
-                              // the nav bar, which reads as content cut off
-                              // rather than a list that ended.
-                              // The live game leads. It is the newest thing
-                              // that happened and the only row still
-                              // changing, so anything above it would be
-                              // stale by comparison.
-                              itemCount: rows.length + (showLive ? 1 : 0) + 1,
-                              separatorBuilder: (_, __) => const CiHairline(),
-                              itemBuilder: (context, i) {
-                                if (showLive) {
-                                  if (i == 0) {
-                                    return GameFeedRow(
-                                      entry: GameFeedEntry(
-                                        gameId: 'live',
-                                        playerName: live.playerName,
-                                        opponent: live.opponent,
-                                        // No date: it has not finished, so
-                                        // there is no day to name yet, and
-                                        // the LIVE pill takes that slot.
-                                        points: live.stats.points,
-                                        rebounds: live.stats.rebounds,
-                                        assists: live.stats.assists,
-                                        steals: live.stats.steals,
-                                        turnovers: live.stats.turnovers,
-                                        isLive: true,
-                                      ),
-                                      onTap: () => _openLive(live),
-                                    );
-                                  }
-                                  i -= 1;
-                                }
-                                if (i == rows.length) {
-                                  return const SizedBox.shrink();
-                                }
-                                final g = rows[i];
-                                return GameFeedRow(
-                                  entry: GameFeedEntry(
-                                    gameId: g.gameId,
-                                    playerName: g.playerName,
-                                    playerPhotoUrl: g.playerPhotoUrl,
-                                    opponent: g.opponent,
-                                    playedAt: g.playedAt,
-                                    points: g.points,
-                                    rebounds: g.rebounds,
-                                    assists: g.assists,
-                                    steals: g.steals,
-                                    turnovers: g.turnovers,
-                                    isLive: g.isLive,
-                                  ),
-                                  onTap: () => context.pushNamed(
-                                    GameStatsWidget.routeName,
-                                    queryParameters: {
-                                      'playerID': serializeParam(
-                                          g.playerId, ParamType.String),
-                                      'gameID': serializeParam(
-                                          g.gameId, ParamType.String),
-                                    }.withoutNulls,
-                                  ),
-                                );
-                              },
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _Header(onAdd: _newGame),
+                    // The filter chrome (chips + hairline) only appears when
+                    // there ARE games to filter. With none, showing filters
+                    // over an empty list is noise - and it pushed the empty
+                    // state down so it no longer lined up with the Players
+                    // empty state. Hidden here, the no-games layout is
+                    // header + empty, exactly like Players, so the shared 0.18
+                    // spacer lands both at the same place.
+                    if (all.isNotEmpty) ...[
+                      // The chips must not touch the header. With one player the
+                      // player row is hidden, so the DATE row would otherwise
+                      // butt straight against the ink.
+                      if (players.isNotEmpty || dates.isNotEmpty)
+                        const SizedBox(height: CiSpace.s3),
+                      if (players.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: CiSpace.s3),
+                          child: CiChipBar(
+                            labels: [for (final p in players) p.label],
+                            index: players.indexWhere((p) => p.id == _playerId),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: CiSpace.screen,
                             ),
+                            onChanged: (i) => setState(() {
+                              _playerId = players[i].id;
+                              // The date may not exist for the new player.
+                              _dateId = kAllDatesKey;
+                            }),
+                          ),
+                        ),
+                      if (dates.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: CiSpace.s3),
+                          child: CiChipBar(
+                            labels: [for (final d in dates) d.label],
+                            index: dates.indexWhere((d) => d.id == dateId),
+                            scrollable: true,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: CiSpace.screen,
+                            ),
+                            onChanged: (i) =>
+                                setState(() => _dateId = dates[i].id),
+                          ),
+                        ),
+                      const CiHairline(),
+                    ],
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _refresh,
+                        child: rows.isEmpty && !showLive
+                            ? _Empty(
+                                // Naming the player turns "nothing here" into
+                                // an answer to the question they just asked.
+                                playerName: _playerId.isEmpty
+                                    ? null
+                                    : players
+                                          .firstWhere(
+                                            (p) => p.id == _playerId,
+                                            orElse: () =>
+                                                const GameFilterOption(
+                                                  id: '',
+                                                  label: '',
+                                                ),
+                                          )
+                                          .label,
+                                filtered: all.isNotEmpty,
+                              )
+                            : ListView.separated(
+                                padding: EdgeInsets.zero,
+                                // +1 so the LAST row is closed by a rule too.
+                                // Without it the list stopped mid-air against
+                                // the nav bar, which reads as content cut off
+                                // rather than a list that ended.
+                                // The live game leads. It is the newest thing
+                                // that happened and the only row still
+                                // changing, so anything above it would be
+                                // stale by comparison.
+                                itemCount: rows.length + (showLive ? 1 : 0) + 1,
+                                separatorBuilder: (_, __) => const CiHairline(),
+                                itemBuilder: (context, i) {
+                                  if (showLive) {
+                                    if (i == 0) {
+                                      return GameFeedRow(
+                                        entry: GameFeedEntry(
+                                          gameId: 'live',
+                                          playerName: live.playerName,
+                                          opponent: live.opponent,
+                                          // No date: it has not finished, so
+                                          // there is no day to name yet, and
+                                          // the LIVE pill takes that slot.
+                                          points: live.stats.points,
+                                          rebounds: live.stats.rebounds,
+                                          assists: live.stats.assists,
+                                          steals: live.stats.steals,
+                                          turnovers: live.stats.turnovers,
+                                          isLive: true,
+                                        ),
+                                        onTap: () => _openLive(live),
+                                      );
+                                    }
+                                    i -= 1;
+                                  }
+                                  if (i == rows.length) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  final g = rows[i];
+                                  return GameFeedRow(
+                                    entry: GameFeedEntry(
+                                      gameId: g.gameId,
+                                      playerName: g.playerName,
+                                      playerPhotoUrl: g.playerPhotoUrl,
+                                      opponent: g.opponent,
+                                      playedAt: g.playedAt,
+                                      points: g.points,
+                                      rebounds: g.rebounds,
+                                      assists: g.assists,
+                                      steals: g.steals,
+                                      turnovers: g.turnovers,
+                                      isLive: g.isLive,
+                                    ),
+                                    onTap: () => context.pushNamed(
+                                      GameStatsWidget.routeName,
+                                      queryParameters: {
+                                        'playerID': serializeParam(
+                                          g.playerId,
+                                          ParamType.String,
+                                        ),
+                                        'gameID': serializeParam(
+                                          g.gameId,
+                                          ParamType.String,
+                                        ),
+                                      }.withoutNulls,
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
-          bottomNavigationBar: const CiNavBar(active: CiNavTab.games),
-        );
-      }),
+                  ],
+                );
+              },
+            ),
+            bottomNavigationBar: const CiNavBar(active: CiNavTab.games),
+          );
+        },
+      ),
     );
   }
 }
@@ -308,38 +333,48 @@ class _Header extends StatelessWidget {
     // disappears the moment there is one game in the list.
     return CiSurface.ink(
       statusBar: true,
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s6),
-            // Matches the height of the Players header, whose row is set by a
-            // 40pt icon button. Text alone is ~31, so without this the two
-            // headers sat 9pt apart - visible when switching tabs, and the
-            // kind of difference that reads as a bug rather than a choice.
-            child: SizedBox(
-              height: kCiListHeaderContentHeight,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text('Games',
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                CiSpace.screen,
+                CiSpace.s5,
+                CiSpace.screen,
+                CiSpace.s6,
+              ),
+              // Matches the height of the Players header, whose row is set by a
+              // 40pt icon button. Text alone is ~31, so without this the two
+              // headers sat 9pt apart - visible when switching tabs, and the
+              // kind of difference that reads as a bug rather than a choice.
+              child: SizedBox(
+                height: kCiListHeaderContentHeight,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Games',
                         style: CiType.h2.copyWith(
-                            color: c.text, fontWeight: CiWeight.extraBold)),
-                  ),
-                  CiIconButton(
-                    icon: Icons.add,
-                    onDark: true,
-                    semanticLabel: 'New game',
-                    onPressed: onAdd,
-                  ),
-                ],
+                          color: c.text,
+                          fontWeight: CiWeight.extraBold,
+                        ),
+                      ),
+                    ),
+                    CiIconButton(
+                      icon: Icons.add,
+                      onDark: true,
+                      semanticLabel: 'New game',
+                      onPressed: onAdd,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }
@@ -379,22 +414,21 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = CiColors.of(context);
     final who = playerName;
     final forPlayer = who != null && who.isNotEmpty;
 
     final title = !filtered
         ? 'No games yet'
         : forPlayer
-            ? 'No games for $who yet'
-            : 'No games match these filters';
+        ? 'No games for $who yet'
+        : 'No games match these filters';
     final body = !filtered
         ? 'Track your first game to see how your player performed and what it '
-            'means for their growth.'
+              'means for their growth.'
         : forPlayer
-            ? 'Track a game with $who to see how they performed and what it '
-                'means for their growth.'
-            : 'Try a different player or date.';
+        ? 'Track a game with $who to see how they performed and what it '
+              'means for their growth.'
+        : 'Try a different player or date.';
 
     // A designed empty state - no games at all, or a named player - gets the
     // lime invitation. The undesigned filter fallback does not: it is a dead
@@ -402,46 +436,14 @@ class _Empty extends StatelessWidget {
     // game.
     final invites = !filtered || forPlayer;
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 45),
-      children: [
-        const SizedBox(height: CiSpace.s12),
-        Center(
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: c.surfaceSunk,
-              shape: BoxShape.circle,
-            ),
-            child: CiNavIconGlyph(
-                icon: CiNavIcon.games, size: 28, color: c.textMuted),
-          ),
-        ),
-        const SizedBox(height: CiSpace.s5),
-        Text(title,
-            textAlign: TextAlign.center,
-            style: CiType.sectionTitle.copyWith(color: c.text)),
-        const SizedBox(height: CiSpace.s2),
-        Text(
-          body,
-          textAlign: TextAlign.center,
-          style: CiType.rowTitle.copyWith(
-              color: c.textMuted, fontWeight: CiWeight.medium, height: 1.45),
-        ),
-        if (invites) ...[
-          const SizedBox(height: CiSpace.s5),
-          CiButton(
-            // "Start a game", per both frames - lime, offering to begin one
-            // now rather than the ink "Track a Game" this used to carry.
-            label: 'Start a game',
-            style: CiButtonStyle.lime,
-            expand: true,
-            onPressed: () => context.pushNamed(NewGameWidget.routeName),
-          ),
-        ],
-        const SizedBox(height: CiSpace.s8),
-      ],
+    return CiEmptyState(
+      icon: CiNavIcon.games,
+      title: title,
+      body: body,
+      // The dead-end filter fallback offers no button - see [invites]; the
+      // designed empties (no games, or a named player) get "Start a game".
+      ctaLabel: invites ? 'Start a game' : null,
+      onCta: invites ? () => context.pushNamed(NewGameWidget.routeName) : null,
     );
   }
 }

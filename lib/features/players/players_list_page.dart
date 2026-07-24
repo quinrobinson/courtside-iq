@@ -11,9 +11,9 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/ci_theme.dart';
+import '/courtside_iq/design/components/ci_empty_state.dart';
 import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
-import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -101,12 +101,12 @@ class _PlayersListPageState extends State<PlayersListPage> {
   /// the parent is already ON the list, and that is where a player is removed
   /// from. Sending them somewhere else would be a detour to where they are.
   Future<void> _addPlayer() => runAddPlayerFlow(
-        context,
-        entitlement: _entitlement,
-        playerCount: _playerCount,
-        onPlayerAdded: _refresh,
-        openPaywall: _openPaywall,
-      );
+    context,
+    entitlement: _entitlement,
+    playerCount: _playerCount,
+    onPlayerAdded: _refresh,
+    openPaywall: _openPaywall,
+  );
 
   void _openProfile(PlayerListEntry e) {
     context.pushNamed(
@@ -118,43 +118,45 @@ class _PlayersListPageState extends State<PlayersListPage> {
   @override
   Widget build(BuildContext context) {
     return CiSurface.light(
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return Scaffold(
-          backgroundColor: c.bg,
-          body: FutureBuilder<List<PlayerListEntry>>(
-            future: _future,
-            builder: (context, snap) {
-              final players = snap.data;
-              // Kept for gating. Assigned during build rather than in a
-              // callback because the future resolves outside our control.
-              if (players != null) _playerCount = players.length;
-              return Column(
-                children: [
-                  _Header(onAdd: _addPlayer),
-                  // A lapsed parent keeps their players and their list; the
-                  // banner is the only difference, offering the way back.
-                  if (_entitlement == EntitlementStatus.lapsed)
-                    TodayPromoBanner(
-                      purpose: TodayPromoPurpose.lapse,
-                      onTap: _openPaywall,
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return Scaffold(
+            backgroundColor: c.bg,
+            body: FutureBuilder<List<PlayerListEntry>>(
+              future: _future,
+              builder: (context, snap) {
+                final players = snap.data;
+                // Kept for gating. Assigned during build rather than in a
+                // callback because the future resolves outside our control.
+                if (players != null) _playerCount = players.length;
+                return Column(
+                  children: [
+                    _Header(onAdd: _addPlayer),
+                    // A lapsed parent keeps their players and their list; the
+                    // banner is the only difference, offering the way back.
+                    if (_entitlement == EntitlementStatus.lapsed)
+                      TodayPromoBanner(
+                        purpose: TodayPromoPurpose.lapse,
+                        onTap: _openPaywall,
+                      ),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _refresh,
+                        color: c.text,
+                        child: _body(context, snap, players),
+                      ),
                     ),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: _refresh,
-                      color: c.text,
-                      child: _body(context, snap, players),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-          bottomNavigationBar: kUseNavBar2
-              ? CiNavBar(active: CiNavTab.players, onPlayerAdded: _refresh)
-              : const CustomNavBarWidget(page: 'Players'),
-        );
-      }),
+                  ],
+                );
+              },
+            ),
+            bottomNavigationBar: kUseNavBar2
+                ? CiNavBar(active: CiNavTab.players, onPlayerAdded: _refresh)
+                : const CustomNavBarWidget(page: 'Players'),
+          );
+        },
+      ),
     );
   }
 
@@ -167,7 +169,7 @@ class _PlayersListPageState extends State<PlayersListPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (snap.hasError) {
-      return _Message(
+      return const _Message(
         title: 'Could not load your players',
         body: 'Pull down to try again.',
       );
@@ -180,8 +182,7 @@ class _PlayersListPageState extends State<PlayersListPage> {
     // A hairline BENEATH every row, including the last, so the list reads as
     // closed rather than trailing off. ListView.separated only puts them
     // BETWEEN items, which leaves the final row unbounded.
-    Widget hairline() =>
-        Container(height: CiSpace.hairline, color: c.hairline);
+    Widget hairline() => Container(height: CiSpace.hairline, color: c.hairline);
 
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -213,37 +214,47 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return CiSurface.ink(
       statusBar: true,
-      child: Builder(builder: (context) {
-        final c = CiColors.of(context);
-        return SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                CiSpace.screen, CiSpace.s5, CiSpace.screen, CiSpace.s6),
-            // Height shared with the Games header, which has no icon button
-            // and would otherwise sit 9pt shorter. See
-            // kCiListHeaderContentHeight.
-            child: SizedBox(
-              height: kCiListHeaderContentHeight,
-              child: Row(
-              children: [
-                Expanded(
-                  child: Text('Players',
-                      style: CiType.h2.copyWith(
-                          color: c.text, fontWeight: CiWeight.extraBold)),
+      child: Builder(
+        builder: (context) {
+          final c = CiColors.of(context);
+          return SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                CiSpace.screen,
+                CiSpace.s5,
+                CiSpace.screen,
+                CiSpace.s6,
+              ),
+              // Height shared with the Games header, which has no icon button
+              // and would otherwise sit 9pt shorter. See
+              // kCiListHeaderContentHeight.
+              child: SizedBox(
+                height: kCiListHeaderContentHeight,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Players',
+                        style: CiType.h2.copyWith(
+                          color: c.text,
+                          fontWeight: CiWeight.extraBold,
+                        ),
+                      ),
+                    ),
+                    CiIconButton(
+                      icon: Icons.add,
+                      onDark: true,
+                      semanticLabel: 'Add player',
+                      onPressed: onAdd,
+                    ),
+                  ],
                 ),
-                CiIconButton(
-                  icon: Icons.add,
-                  onDark: true,
-                  semanticLabel: 'Add player',
-                  onPressed: onAdd,
-                ),
-              ],
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }
@@ -254,49 +265,13 @@ class _EmptyState extends StatelessWidget {
   final VoidCallback onAdd;
 
   @override
-  Widget build(BuildContext context) {
-    final c = CiColors.of(context);
-    // Scrollable so pull-to-refresh still works with no content.
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        SizedBox(height: MediaQuery.sizeOf(context).height * 0.18),
-        Center(
-          child: Container(
-            width: 64,
-            height: 64,
-            decoration:
-                BoxDecoration(color: c.surfaceSunk, shape: BoxShape.circle),
-            child: CiNavIconGlyph(
-                icon: CiNavIcon.players, color: c.textMuted, size: 28),
-          ),
-        ),
-        const SizedBox(height: CiSpace.s5),
-        Text('No players yet',
-            textAlign: TextAlign.center,
-            style: CiType.h3.copyWith(color: c.text)),
-        const SizedBox(height: CiSpace.s2),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: CiSpace.s8),
-          child: Text(
-            'Add your player to start tracking how they grow game by game.',
-            textAlign: TextAlign.center,
-            style: CiType.body.copyWith(color: c.textMuted),
-          ),
-        ),
-        const SizedBox(height: CiSpace.s6),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
-          child: CiButton(
-            label: 'Add player',
-            style: CiButtonStyle.lime,
-            expand: true,
-            onPressed: onAdd,
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => CiEmptyState(
+    icon: CiNavIcon.players,
+    title: 'No players yet',
+    body: 'Add your player to start tracking how they grow game by game.',
+    ctaLabel: 'Add player',
+    onCta: onAdd,
+  );
 }
 
 class _Message extends StatelessWidget {
@@ -312,13 +287,17 @@ class _Message extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
         SizedBox(height: MediaQuery.sizeOf(context).height * 0.3),
-        Text(title,
-            textAlign: TextAlign.center,
-            style: CiType.h3.copyWith(color: c.text)),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: CiType.h3.copyWith(color: c.text),
+        ),
         const SizedBox(height: CiSpace.s2),
-        Text(body,
-            textAlign: TextAlign.center,
-            style: CiType.body.copyWith(color: c.textMuted)),
+        Text(
+          body,
+          textAlign: TextAlign.center,
+          style: CiType.body.copyWith(color: c.textMuted),
+        ),
       ],
     );
   }
