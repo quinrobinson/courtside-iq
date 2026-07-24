@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 
+import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/dot_burst.dart';
@@ -170,25 +171,31 @@ class PaywallAlreadyPremium extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: Icon(Icons.close, size: 22, color: c.text),
+              // The ghosted box, per 244:943 (radius 6, border) - the same
+              // close treatment the sheets use, not a bare glyph.
+              child: CiIconButton(
+                icon: Icons.close,
+                onDark: true,
+                semanticLabel: 'Close',
                 onPressed: onDone,
               ),
             ),
-            // Bias the block UP: 2 on top, 3 below. Two equal Spacers centred
-            // the burst in the whole height, which read as too low - the frame
-            // sits it in the upper third, between the close X and the label.
-            const Spacer(flex: 2),
-            // THE DOT BURST, which was missing entirely. 244:943 centres a
-            // 50pt mark in a 220 burst - the same pairing reset_successful
-            // and check_email already use, so this is the app's celebratory
-            // mark rather than a one-off.
-            const DotBurst(
-              size: 220,
-              markSize: 50,
-              child: CiLogoMark(size: 50),
+            // THE DOT BURST floats CENTRED in the space between the close X and
+            // the label - not glued above the label, and not shoved to the top.
+            // The 3:2 split keeps the text block low (where it read well) while
+            // the burst sits mid-way between the close button and the label. A
+            // flex-2 region was small enough that the 220 burst overflowed
+            // upward to the close's level, which read as "too high".
+            const Expanded(
+              flex: 3,
+              child: Center(
+                child: DotBurst(
+                  size: 220,
+                  markSize: 50,
+                  child: CiLogoMark(size: 50),
+                ),
+              ),
             ),
-            const SizedBox(height: CiSpace.s6),
             Text(
               'PREMIUM ACTIVE',
               style: CiType.caption.copyWith(
@@ -217,7 +224,7 @@ class PaywallAlreadyPremium extends StatelessWidget {
                 style: CiType.body.copyWith(color: c.textMuted, height: 1.4),
               ),
             ),
-            const Spacer(flex: 3),
+            const Spacer(flex: 2),
             CiButton(
               label: 'Manage subscription',
               style: CiButtonStyle.secondary,
