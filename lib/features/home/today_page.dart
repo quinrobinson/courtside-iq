@@ -156,7 +156,11 @@ class _TodayPageState extends State<TodayPage> {
       return;
     }
 
-    await Navigator.of(context).push(
+    // rootNavigator: the live tracker is an immersive task flow and must
+    // COVER the nav bar. Navigator.of(context) inside a shell branch pushes
+    // onto that BRANCH's navigator, which sits inside the shell, so the tabs
+    // stayed visible over a game being tracked.
+    await Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
       ),

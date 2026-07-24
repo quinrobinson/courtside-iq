@@ -416,6 +416,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: NewGameWidget.routeName,
         path: NewGameWidget.routePath,
+        // Covers the shell: a takeover / task flow has no business
+        // showing tabs. See FFRoute.parentNavigatorKey.
+        parentNavigatorKey: appNavigatorKey,
         requireAuth: true,
         builder: (context, params) =>
             kUseNewGame2 ? const _NewGameSetupRoute() : NewGameWidget(),
@@ -457,6 +460,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
       FFRoute(
         name: PaywallPage.routeName,
         path: PaywallPage.routePath,
+        // Covers the shell: a takeover / task flow has no business
+        // showing tabs. See FFRoute.parentNavigatorKey.
+        parentNavigatorKey: appNavigatorKey,
         requireAuth: true,
         builder: (context, params) => PaywallPage(
           onClose: () => context.pop(false),
@@ -693,6 +699,7 @@ class FFRoute {
     this.requireAuth = false,
     this.asyncParams = const {},
     this.routes = const [],
+    this.parentNavigatorKey,
   });
 
   final String name;
@@ -702,9 +709,19 @@ class FFRoute {
   final Widget Function(BuildContext, FFParameters) builder;
   final List<GoRoute> routes;
 
+  /// Which navigator this route's page belongs to.
+  ///
+  /// Set it to [appNavigatorKey] for a screen that must COVER the nav shell.
+  /// GoRouter's imperative push appends to the CURRENT match list, so a
+  /// top-level route pushed from inside a shell branch still renders in that
+  /// branch's navigator - which is how the paywall ended up with a bottom nav
+  /// over it. Naming the root navigator is what puts a page above the shell.
+  final GlobalKey<NavigatorState>? parentNavigatorKey;
+
   GoRoute toRoute(AppStateNotifier appStateNotifier) => GoRoute(
     name: name,
     path: path,
+    parentNavigatorKey: parentNavigatorKey,
     redirect: (context, state) {
       if (appStateNotifier.shouldRedirect) {
         final redirectLocation = appStateNotifier.getRedirectLocation();
@@ -868,7 +885,10 @@ class _NewGameSetupRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NewGameSetupPage(
-      onStart: (setup) => Navigator.of(context).push(
+      // rootNavigator: the tracker must cover the nav bar. Harmless when the
+      // setup screen is already outside the shell, and correct if it ever is
+      // not - which is the kind of assumption that broke three times here.
+      onStart: (setup) => Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute(
           builder: (_) => LiveGameFlow(
             setup: setup,

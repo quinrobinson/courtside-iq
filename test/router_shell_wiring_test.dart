@@ -15,6 +15,7 @@ import 'package:courtside_i_q/features/flags.dart';
 import 'package:courtside_i_q/features/nav/ci_nav_shell.dart';
 import 'package:courtside_i_q/flutter_flow/nav/nav.dart';
 import 'package:courtside_i_q/index.dart';
+import 'package:courtside_i_q/features/premium/paywall_page.dart';
 
 /// Every route name in the tree, branches included.
 Set<String> _names(List<RouteBase> routes) {
@@ -117,5 +118,38 @@ void main() {
               loggedIn: true, loading: false, path: '/playersList'),
           isNull);
     });
+  });
+
+  test('takeover screens are pinned to the ROOT navigator, above the shell',
+      () {
+    // GoRouter's imperative push appends to the CURRENT match list, so a
+    // top-level route pushed from inside a shell branch still renders in that
+    // branch's navigator - which is how the paywall ended up with a bottom nav
+    // over it. Naming the root navigator is what lifts a page above the shell.
+    final byName = <String, GoRoute>{};
+    void walk(List<RouteBase> rs) {
+      for (final r in rs) {
+        if (r is GoRoute && r.name != null) byName[r.name!] = r;
+        if (r is StatefulShellRoute) {
+          for (final b in r.branches) {
+            walk(b.routes);
+          }
+        }
+        walk(r.routes);
+      }
+    }
+
+    walk(createRouter(AppStateNotifier.instance).configuration.routes);
+
+    for (final name in [PaywallPage.routeName, NewGameWidget.routeName]) {
+      expect(byName[name]?.parentNavigatorKey, appNavigatorKey,
+          reason: '$name is a takeover and must cover the nav bar');
+    }
+
+    // And a counter-example, so this is testing the distinction rather than
+    // just asserting a field is set everywhere: Game Detail is a player-context
+    // screen and KEEPS the bar, so it must NOT be pinned to the root.
+    expect(byName[GameStatsWidget.routeName]?.parentNavigatorKey, isNull,
+        reason: 'game detail keeps the nav bar, per the standing rule');
   });
 }

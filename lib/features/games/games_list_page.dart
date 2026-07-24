@@ -107,7 +107,8 @@ class _GamesListPageState extends State<GamesListPage> {
       return;
     }
 
-    await Navigator.of(context).push(
+    // rootNavigator, so the tracker covers the nav bar. See today_page.
+    await Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (_) => LiveGameFlow.resume(snapshot: snapshot),
       ),
