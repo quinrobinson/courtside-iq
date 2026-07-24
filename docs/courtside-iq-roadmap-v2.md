@@ -2157,7 +2157,10 @@ THREE TRAPS THIS TURNED UP, all worth remembering:
   is sitting on. Resetting the branch refreshes but pops the tab to its root.
   `players_revision.dart` announces instead, and screens reload themselves.
 
-`[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
+Device-verified 2026-07-24: tab switching no longer moves or reloads the bar,
+tabs keep their state, and the slide is left to the edit screens.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
 
 ### 4.18 End-to-end passes — DO THIS LAST
 Moved after polish so it verifies what ships rather than an intermediate
