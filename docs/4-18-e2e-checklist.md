@@ -72,8 +72,8 @@ unset on the test device.
 - [ ] New Game: setup → live tracker → complete → save → Game Detail.
 - [ ] Game Detail: insight card, tier badges, share sheet, Remove Game.
 - [ ] Player Profile: all three tabs, Full Breakdown, both info sheets, the
-      age-band notice. (**View Trends is NOT built** - scoped out of 4.11, its
-      button is hidden on purpose. Pending a build/defer decision.)
+      age-band notice. (**View Trends is deferred to post-2.0.0** - roadmap 3.5.
+      Its button is hidden on purpose; do NOT log its absence as a bug.)
 - [ ] Menu: edit name, edit email, change password (including a rejected
       current password), Help Center, Send Feedback.
 - [ ] Toasts: **account** Edit Name → success, **account** Edit Email →

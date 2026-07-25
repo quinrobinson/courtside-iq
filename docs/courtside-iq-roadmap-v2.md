@@ -629,6 +629,22 @@ Stability score — standard deviation of PPSA across window, or percentage of g
 
 Feed position into prompts: "Strong rebounding for a guard."
 
+### 3.5 Stats & Trends screen — DESIGNED, NOT BUILT (post-2.0.0)
+
+**Deferred out of 2.0.0 on 2026-07-25.** The screen is fully designed - Figma
+`307:1407`: a dotted trend-over-time chart (interpolated ink dots, last point
+lime) plus "development by skill" tier rows - and `AveragesView` already takes
+an `onViewTrends` callback and renders a "View trends" button when it is
+non-null. It is passed null today, so the button is hidden, because the
+destination screen was never built in Flutter (scoped out of 4.11).
+
+To ship it: build the Stats & Trends page in `lib/features/players/`, route to
+it, and pass `onViewTrends` through `PlayerProfilePage` alongside the existing
+`onFullBreakdown`. Reached from the Averages tab, keeps the nav bar (a
+player-context screen). Full Breakdown covers the detailed-stats need until
+then, which is why this is additive rather than blocking. The 4.18 checklist
+notes it as unbuilt so it is not mistaken for a regression.
+
 ### 3.5 Foul-as-availability signal
 
 Fold fouls into a "game impact" or "availability" signal for older age bands.
