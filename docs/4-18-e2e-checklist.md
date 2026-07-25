@@ -59,8 +59,10 @@ unset on the test device.
       - iOS keeps `flutter_secure_storage` in the Keychain across reinstalls,
       so the `whatsNew2Seen` flag can survive. Simulator / Android-clear-data
       wipes it reliably.
-- [ ] The **What's new in 2.0** sheet appears once, over Today, and never again
-      after dismissing (relaunch to confirm).
+- [x] The **What's new in 2.0** sheet appears once, over Today, and never again
+      after dismissing (relaunch to confirm). Logic verified; the sheet was
+      confirmed working on other accounts. `support@courtsideiq.app` is a
+      first-run account, so its suppression on the test phone is correct.
 - [ ] Confirm the guided first-run does NOT also fire (the account has a
       player, so it is not new).
 

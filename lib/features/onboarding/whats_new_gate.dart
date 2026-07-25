@@ -96,11 +96,14 @@ class _WhatsNewGateState extends State<WhatsNewGate> {
   Future<void> _maybeShow() async {
     final show = await widget.policy.shouldShow();
     if (!show || !mounted) return;
-    // Marked before it opens, so killing the app mid-read does not bring it
-    // back: a one-time sheet shown twice is worse than shown once and quit.
-    await widget.policy.markSeen();
-    if (!mounted) return;
     await showWhatsNew2(context);
+    // Marked AFTER it is dismissed, not before. Marking first meant an
+    // interrupted render - a crash, a force-kill, one of the routing hiccups
+    // this project hit - set the flag with the sheet never seen, and on iOS
+    // that flag survives a reinstall. For a one-time "your data is safe"
+    // message, never-shown is worse than shown-twice, so a kill mid-view now
+    // just shows it again next launch.
+    await widget.policy.markSeen();
   }
 
   @override

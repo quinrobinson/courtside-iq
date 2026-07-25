@@ -38,14 +38,23 @@ Future<void> _pump(WidgetTester tester, WhatsNew2Policy policy) async {
 }
 
 void main() {
-  testWidgets('an existing user sees the sheet over Today, and it is marked '
-      'seen so it never returns', (tester) async {
+  testWidgets('an existing user sees the sheet, marked seen only AFTER it is '
+      'dismissed', (tester) async {
     final policy = _FakePolicy(true);
     await _pump(tester, policy);
     // Today is underneath; the sheet floats over it.
     expect(find.text('TODAY'), findsOneWidget);
     expect(find.text('The new Courtside IQ'), findsOneWidget);
     expect(find.text('Got it'), findsOneWidget);
+    // NOT marked while it is still open. Marking before the render finished is
+    // what let an interrupted show set the flag with the sheet never seen -
+    // and on iOS that flag survives a reinstall, so a real v1 user could miss
+    // the reassurance forever.
+    expect(policy.seenCalls, 0);
+
+    await tester.tap(find.text('Got it'));
+    await tester.pumpAndSettle();
+    // Marked now that it was actually dismissed, so it never returns.
     expect(policy.seenCalls, greaterThan(0));
   });
 
