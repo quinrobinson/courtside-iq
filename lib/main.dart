@@ -12,6 +12,7 @@ import 'auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/game_sync/supabase_game_uploader.dart';
 import '/features/auth/password_recovery_listener.dart';
+import '/features/auth/signup_confirmation_listener.dart';
 import '/features/dev/token_gallery_page.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
@@ -59,6 +60,13 @@ void main() async {
   // Supabase SDK establishes the session; this routes to the reset screen.
   // Started before runApp so a COLD start from the email link is caught.
   PasswordRecoveryListener.instance.start();
+
+  // Phase 4.18: a signup confirmation email opens courtsideiq://login-callback.
+  // The SDK would sign the parent straight in; this instead lands them on the
+  // sign-in screen (consistent with confirming on another device) with a
+  // success toast. Started before runApp so a COLD start from the link is
+  // caught.
+  SignupConfirmationListener.instance.start();
 
   await revenue_cat.initialize(
     "appl_qUqQLfzwGyGbActDYFmZwkLAcsP",
