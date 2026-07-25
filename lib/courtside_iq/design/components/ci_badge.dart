@@ -50,12 +50,17 @@ class CiBadge extends StatelessWidget {
   /// out one letter at a time.
   final String? semanticLabel;
 
-  /// Pick a tone from what a change MEANS, not from its sign.
+  /// LIME for an improvement, NEUTRAL for everything else - flat or declining.
   ///
-  /// This is the trap the design review caught: fewer turnovers is a NEGATIVE
-  /// number and a GOOD outcome. Passing `higherIsBetter: false` for turnovers
-  /// keeps the badge lime where a naive sign check would paint it orange and
-  /// tell a parent their kid got worse.
+  /// Declining was orange until 2026-07-25; on the Averages tab the red read as
+  /// overpowering next to a column of them, so a down move now carries its
+  /// meaning in the SIGN and the number, not the colour. This matches
+  /// [CiBadge.growthTrend], which already colours only the positive case.
+  ///
+  /// `higherIsBetter` still decides which direction counts as improvement, and
+  /// it still matters: fewer turnovers is a NEGATIVE number and a GOOD outcome,
+  /// so turnovers pass `higherIsBetter: false` to earn the lime rather than be
+  /// left neutral as if nothing improved.
   factory CiBadge.delta({
     Key? key,
     required double value,
@@ -64,16 +69,11 @@ class CiBadge extends StatelessWidget {
     String? suffix,
   }) {
     final improved = higherIsBetter ? value > 0 : value < 0;
-    final flat = value == 0;
     final sign = value > 0 ? '+' : '';
     return CiBadge(
       key: key,
       label: '$sign${value.toStringAsFixed(decimals)}${suffix ?? ''}',
-      tone: flat
-          ? CiBadgeTone.neutral
-          : improved
-              ? CiBadgeTone.good
-              : CiBadgeTone.energy,
+      tone: improved ? CiBadgeTone.good : CiBadgeTone.neutral,
     );
   }
 
@@ -90,11 +90,9 @@ class CiBadge extends StatelessWidget {
   /// there reads as "something is wrong with them" rather than "this number
   /// moved down".
   ///
-  /// This deliberately DIFFERS from the Averages tiles, which do paint a
-  /// declining stat orange via CiBadge.delta. That is not an oversight. "Free
-  /// throws are down 4%" is a narrow, actionable fact and orange helps a parent
-  /// find it. Growth IQ is the whole child in one number, and it does not get
-  /// the same treatment. Scope is the reason the two rules differ.
+  /// The Averages tiles follow the SAME rule now (see CiBadge.delta): only an
+  /// improvement is coloured, a decline is neutral. The two chips agree - the
+  /// word or the sign carries a down move, never a red fill.
   ///
   /// The movement is never hidden: the chip says "Dipping -13" in words. What
   /// the neutral tone withholds is the alarm, not the information.

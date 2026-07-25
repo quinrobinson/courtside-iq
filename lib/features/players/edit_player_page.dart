@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
+import '/courtside_iq/design/components/ci_toast.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/components/ci_button.dart';
@@ -264,7 +265,12 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
     }
 
     widget.onSaved?.call();
-    if (mounted) Navigator.of(context).maybePop();
+    if (!mounted) return;
+    // Confirm the save, like the account edit screens do. Shown before the pop
+    // so it attaches to the root messenger and floats over the profile the
+    // parent lands back on - editing a player was the one save with no receipt.
+    showCiToast(context, 'Player updated.', type: CiToastType.success);
+    Navigator.of(context).maybePop();
   }
 
   Future<void> _delete() async {

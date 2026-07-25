@@ -91,7 +91,7 @@ void main() {
     });
   });
 
-  group('CiBadge.delta tone follows meaning, not sign', () {
+  group('CiBadge.delta colours only an improvement', () {
     CiBadgeTone toneOf(WidgetTester t) =>
         t.widget<CiBadge>(find.byType(CiBadge)).tone;
 
@@ -100,26 +100,29 @@ void main() {
       expect(toneOf(tester), CiBadgeTone.good);
     });
 
-    testWidgets('a drop is energy when higher is better', (tester) async {
+    testWidgets('a drop is NEUTRAL, not orange (2026-07-25)', (tester) async {
+      // A down move carries its meaning in the sign and the number, not a red
+      // fill that read as overpowering on a column of Averages tiles.
       await _pump(tester, CiBadge.delta(value: -1.4));
-      expect(toneOf(tester), CiBadgeTone.energy);
+      expect(toneOf(tester), CiBadgeTone.neutral);
+      expect(find.text('-1.4'), findsOneWidget);
     });
 
     testWidgets('fewer turnovers is GOOD despite a negative number',
         (tester) async {
-      // The trap: a naive sign check paints this orange and tells a parent
-      // their kid regressed at the moment they improved.
+      // higherIsBetter still earns the lime: a smaller number is the
+      // improvement here, so it must not be left neutral as if nothing moved.
       await _pump(tester, CiBadge.delta(value: -1.4, higherIsBetter: false));
       expect(toneOf(tester), CiBadgeTone.good);
       expect(find.text('-1.4'), findsOneWidget);
     });
 
-    testWidgets('more turnovers is energy', (tester) async {
+    testWidgets('more turnovers is neutral, not orange', (tester) async {
       await _pump(tester, CiBadge.delta(value: 1.4, higherIsBetter: false));
-      expect(toneOf(tester), CiBadgeTone.energy);
+      expect(toneOf(tester), CiBadgeTone.neutral);
     });
 
-    testWidgets('no change is neutral in either direction', (tester) async {
+    testWidgets('no change is neutral', (tester) async {
       await _pump(tester, CiBadge.delta(value: 0));
       expect(toneOf(tester), CiBadgeTone.neutral);
     });
