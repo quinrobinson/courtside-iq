@@ -63,15 +63,38 @@ GoRouter _router() => GoRouter(
             whatsNewPolicy: const _QuietWhatsNew(),
           ),
           branches: [
-            for (final r in const [
-              ('/home', 'HOME'),
-              ('/players', 'PLAYERS'),
-              ('/games', 'GAMES'),
-              ('/menu', 'MENU'),
-            ])
-              StatefulShellBranch(routes: [
-                GoRoute(path: r.$1, builder: (_, __) => _Counting(r.$2)),
-              ]),
+            // Players carries a pushable detail route, so the reset-to-root
+            // behaviour can be exercised; the rest are single-screen.
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/home',
+                builder: (_, __) => const _Counting('HOME'),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/players',
+                builder: (_, __) => const _Counting('PLAYERS'),
+                routes: [
+                  GoRoute(
+                    path: 'detail',
+                    builder: (_, __) => const _Counting('PLAYER_DETAIL'),
+                  ),
+                ],
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/games',
+                builder: (_, __) => const _Counting('GAMES'),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/menu',
+                builder: (_, __) => const _Counting('MENU'),
+              ),
+            ]),
           ],
         ),
       ],
@@ -127,6 +150,33 @@ void main() {
     // Still 1: indexedStack kept it alive, so returning does not refetch.
     expect(_Counting.mounts['HOME'], 1,
         reason: 'returning to a tab must not rebuild it');
+  });
+
+  testWidgets('tapping a tab lands on its ROOT, not a stale pushed screen',
+      (tester) async {
+    // The Section-C bug: open a player profile in the Players branch, leave to
+    // another tab, come back - and land on that profile rather than the list.
+    await _pump(tester);
+
+    // Into a pushed detail within the Players branch.
+    await tester.tap(find.bySemanticsLabel('Players'));
+    await tester.pumpAndSettle();
+    tester.element(find.text('PLAYERS')); // at the root first
+    // Push detail by driving the router.
+    final ctx = tester.element(find.byType(CiNavShell));
+    GoRouter.of(ctx).go('/players/detail');
+    await tester.pumpAndSettle();
+    expect(find.text('PLAYER_DETAIL'), findsOneWidget);
+
+    // Leave and come back via the tab bar.
+    await tester.tap(find.bySemanticsLabel('Games'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Players'));
+    await tester.pumpAndSettle();
+
+    // Root, not the stale detail.
+    expect(find.text('PLAYERS'), findsOneWidget);
+    expect(find.text('PLAYER_DETAIL'), findsNothing);
   });
 
   testWidgets('the active tab follows the branch', (tester) async {

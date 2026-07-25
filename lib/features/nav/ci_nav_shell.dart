@@ -65,14 +65,14 @@ class CiNavShell extends StatelessWidget {
   void _goTab(CiNavTab tab) {
     final index = kNavShellBranches.indexOf(tab);
     if (index < 0) return;
-    // initialLocation only when the tab is ALREADY active: tapping the current
-    // tab pops back to its root, which is the standard tab-bar gesture.
-    // Passing it on every tap would throw away the branch's stack and defeat
-    // the point of keeping it.
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+    // ALWAYS to the branch root, not its remembered stack. Player Profile lives
+    // in the Players branch, so opening one left the Players tab pointing at
+    // that profile - tapping Players from another tab then landed on a specific
+    // player rather than the list, which read as the tab being stuck on a stale
+    // screen. indexedStack still keeps the root screen's scroll and state; only
+    // pushed routes on top of it are popped. "Tap a tab, land on its section"
+    // is the predictable gesture.
+    navigationShell.goBranch(index, initialLocation: true);
   }
 
   /// A player added from the create sheet has to appear on the screen under
