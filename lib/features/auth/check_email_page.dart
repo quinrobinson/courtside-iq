@@ -26,6 +26,20 @@ import '/index.dart';
 import 'forgot_password_page.dart' show kPasswordResetRedirect;
 import 'widgets/auth_scaffold.dart';
 
+/// Where the signup CONFIRMATION link sends a parent back.
+///
+/// A `courtsideiq://` deep link, mirroring [kPasswordResetRedirect]. Without it
+/// the signUp call sends nothing, so Supabase falls back to the project Site
+/// URL - which defaults to localhost, the dead end a confirm link hit on
+/// device. The confirm link then reopens the app on the implicit flow and the
+/// SDK signs the parent in.
+///
+/// MUST BE IN THE TEST PROJECT'S REDIRECT-URL ALLOWLIST. Supabase honours
+/// emailRedirectTo only when it matches an allowlisted URL, and silently falls
+/// back to the Site URL when it does not - which is exactly the failure this
+/// fixes, so a matching allowlist entry is half of the fix, not optional.
+const kEmailConfirmRedirect = 'courtsideiq://login-callback';
+
 enum CheckEmailPurpose {
   /// After creating an account. The address is NAMED, because the parent just
   /// typed it and a typo is the likeliest reason nothing ever arrives.
@@ -76,6 +90,9 @@ class _CheckEmailPageState extends State<CheckEmailPage> {
         await SupaFlow.client.auth.resend(
           type: OtpType.signup,
           email: widget.email,
+          // Same redirect as the original signup, or a resent link would land
+          // on localhost while the first one worked.
+          emailRedirectTo: kEmailConfirmRedirect,
         );
       } else {
         error = await actions.sendRecoveryEmail(

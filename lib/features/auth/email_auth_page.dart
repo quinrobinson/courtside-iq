@@ -192,6 +192,9 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
       final res = await SupaFlow.client.auth.signUp(
         email: email,
         password: password,
+        // Without this, the confirm link falls back to the project Site URL
+        // (localhost) instead of reopening the app. See kEmailConfirmRedirect.
+        emailRedirectTo: kEmailConfirmRedirect,
       );
       if (!mounted) return true;
 
