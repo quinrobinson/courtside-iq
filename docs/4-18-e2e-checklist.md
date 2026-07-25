@@ -47,10 +47,22 @@ device, and confirm with any web request before trusting an offline result.
 
 ## B. Existing-user upgrade path
 
-- [ ] Sign in as an account that already has players and has never seen 2.0 on
-      this device. The **What's new in 2.0** sheet should appear once, over
-      Today, and never again after dismissing.
-- [ ] Confirm the guided first-run does NOT also fire.
+**The account you just created in A CANNOT test this, and that is correct.**
+First-run marks `whatsNew2Seen` the moment it welcomes a new parent, so a
+new-to-2.0 account is suppressed forever - What's New is for v1 UPGRADERS, not
+new users. You need an account that already has a player AND whose flag is
+unset on the test device.
+
+- [ ] On a **fresh iOS Simulator, or Android with app data cleared**, SIGN IN
+      (not sign up) with an account that already has ≥1 player. The account
+      from section A now has one, so it works. A plain iPhone REINSTALL may not
+      - iOS keeps `flutter_secure_storage` in the Keychain across reinstalls,
+      so the `whatsNew2Seen` flag can survive. Simulator / Android-clear-data
+      wipes it reliably.
+- [ ] The **What's new in 2.0** sheet appears once, over Today, and never again
+      after dismissing (relaunch to confirm).
+- [ ] Confirm the guided first-run does NOT also fire (the account has a
+      player, so it is not new).
 
 ## C. The core journey (online, premium-by-default)
 
