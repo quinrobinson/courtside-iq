@@ -30,6 +30,7 @@ import '/features/flags.dart';
 import '/features/onboarding/first_run_gate.dart';
 import '/features/onboarding/whats_new_gate.dart';
 import '/features/players/players_revision.dart';
+import 'connectivity_banner.dart';
 import 'ci_nav_bar.dart';
 
 /// Branch order. This is the ONLY place the mapping between a tab and its
@@ -88,7 +89,10 @@ class CiNavShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget shell = Scaffold(
-      body: navigationShell,
+      // The offline bar wraps the BODY, not the whole app: it must not appear
+      // over the live tracker (pushed on the root navigator, over the shell),
+      // which is the one flow that keeps working offline.
+      body: ConnectivityBanner(child: navigationShell),
       bottomNavigationBar: CiNavBar(
         active: _active,
         onSelectTab: _goTab,
