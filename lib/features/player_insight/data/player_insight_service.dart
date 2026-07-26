@@ -74,6 +74,25 @@ class PlayerInsightService {
     });
   }
 
+  /// Generate the narrative NOW, in the background, so the Development tab is
+  /// ready when the parent looks - which is right after a game, the payoff
+  /// moment. Called after a game is saved.
+  ///
+  /// Fire-and-forget and self-contained: it drops the stale in-memory entry
+  /// (the last narrative describes the game before this one) and re-runs the
+  /// fetch, which invokes the Edge Function server-side. Even if the caller is
+  /// gone by the time it returns, the generation and the cache write have
+  /// already happened on the server. Failures are swallowed - the on-demand
+  /// fetch on tab open is still there as the fallback.
+  Future<void> warm(String playerId) async {
+    invalidate(playerId);
+    try {
+      await fetch(playerId);
+    } catch (_) {
+      // The tab-open fetch will try again; a warm that fails is not a defect.
+    }
+  }
+
   Future<PlayerInsightResponse> _invoke(String playerId) async {
     final res = await SupaFlow.client.functions.invoke(
       'generate-player-insight',

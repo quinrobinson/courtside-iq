@@ -24,6 +24,7 @@ import 'live_game_store.dart';
 import 'live_tracker_page.dart';
 import 'new_game_setup_page.dart';
 import 'save_game.dart';
+import '/features/player_insight/data/player_insight_service.dart';
 
 class LiveGameFlow extends StatefulWidget {
   /// A game starting now, from the setup screen.
@@ -129,6 +130,13 @@ class _LiveGameFlowState extends State<LiveGameFlow> {
     // offline-queued game is not on the server yet; the queue bumps this again
     // when it actually syncs.)
     notifyGamesChanged();
+    // Warm the development narrative in the background so the Development tab is
+    // instant when the parent looks, right after the game. ONLY on a synced
+    // save: an offline-queued game is not on the server yet, so generating now
+    // would produce a story that omits the game just saved.
+    if (outcome == SaveOutcome.synced) {
+      unawaited(PlayerInsightService().warm(_snapshot.playerId));
+    }
     // The game is durable either way, so the in-progress copy goes now. Left
     // behind, the next launch would offer to resume a game already saved.
     await widget.store.clear();
