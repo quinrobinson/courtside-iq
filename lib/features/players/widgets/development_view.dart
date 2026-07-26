@@ -79,15 +79,22 @@ class DevelopmentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final i = insight;
-    if (i == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    // Birth date FIRST, before the loading check. Without an age band there is
+    // no insight to compute, so a birth-date-less player waiting on the Edge
+    // Function was a spinner that could never resolve into anything but this
+    // prompt anyway. Show it straight away.
     if (needsBirthDate) {
       return _NeedsBirthDate(
         firstName: firstName,
         onAddBirthDate: onAddBirthDate,
       );
+    }
+    final i = insight;
+    if (i == null) {
+      // A named skeleton, not a bare spinner. Generating the narrative is a
+      // Sonnet call and takes a few seconds after a new game; saying whose
+      // games are being read makes the wait read as work rather than a stall.
+      return _Loading(firstName: firstName);
     }
     if (i.belowThreshold) {
       return _Locked(
@@ -104,6 +111,48 @@ class DevelopmentView extends StatelessWidget {
       trend: trend,
       onAbout: onAbout,
       onAboutGrowthIq: onAboutGrowthIq,
+    );
+  }
+}
+
+/// The wait while the development narrative generates. Named, so it reads as
+/// "we are reading your player's games", the same voice as the per-game
+/// insight card's loading state.
+class _Loading extends StatelessWidget {
+  const _Loading({required this.firstName});
+
+  final String firstName;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final who = firstName.trim().isEmpty ? 'your player' : firstName.trim();
+    return Padding(
+      padding: const EdgeInsets.all(CiSpace.screen),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Reading $who's latest games...",
+              style: CiType.rowTitle.copyWith(color: c.text)),
+          const SizedBox(height: CiSpace.s5),
+          // Widths taper so the block reads as a paragraph forming, not a bar
+          // that stalled.
+          for (final w in const [1.0, 0.94, 0.72, 0.4]) ...[
+            FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: w,
+              child: Container(
+                height: 12,
+                decoration: BoxDecoration(
+                  color: c.surfaceSunk,
+                  borderRadius: CiRadius.chipR,
+                ),
+              ),
+            ),
+            const SizedBox(height: CiSpace.s3),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -159,6 +159,22 @@ void main() {
     expect(tapped, 1);
   });
 
+  testWidgets('the birth-date prompt shows WHILE the insight is still loading',
+      (tester) async {
+    // The check used to sit after the loading guard, so a birth-date-less
+    // player waited on an Edge Function that could never produce an insight -
+    // a spinner that resolved into this same prompt. Show it straight away.
+    await tester.pumpWidget(_host(const DevelopmentView(
+      firstName: 'Jordan',
+      insight: null,
+      needsBirthDate: true,
+    )));
+
+    expect(find.text('Add a birth date first'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.textContaining("Reading Jordan's"), findsNothing);
+  });
+
   testWidgets('the birth-date lock says WHY, not just no', (tester) async {
     await tester.pumpWidget(_host(DevelopmentView(
       firstName: 'Jordan',
