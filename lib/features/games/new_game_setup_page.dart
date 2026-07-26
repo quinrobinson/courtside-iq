@@ -80,15 +80,24 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
   @override
   void initState() {
     super.initState();
-    _playersFuture = widget.repository.load();
-    _playersFuture!.then((players) {
+    _playersFuture = _loadPlayers();
+  }
+
+  /// Loads the players and preselects a lone one. Kept separate from initState
+  /// so the offline "Try again" can re-run it.
+  Future<List<PlayerListEntry>> _loadPlayers() {
+    final future = widget.repository.load();
+    future.then((players) {
       // One player means there is nothing to choose. Preselecting saves a tap
       // that has only one possible answer.
       if (mounted && players.length == 1) {
         setState(() => _playerId = players.first.playerId);
       }
     }).catchError((_) {});
+    return future;
   }
+
+  void _retry() => setState(() => _playersFuture = _loadPlayers());
 
   @override
   void dispose() {
@@ -141,11 +150,23 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
           body: FutureBuilder<List<PlayerListEntry>>(
             future: _playersFuture,
             builder: (context, snap) {
+              final loading = snap.connectionState == ConnectionState.waiting;
+              // OFFLINE IS NOT AN EMPTY SETUP. The load throws with no signal,
+              // and the old `snap.data ?? []` swallowed that into a setup with
+              // an empty player toggle and a permanently-disabled Start - a dead
+              // screen with no explanation. Every entry point (the create sheet,
+              // the games list, Today) funnels through here, so the offline
+              // state belongs here, once.
+              final failed = snap.hasError;
               final players = snap.data ?? const <PlayerListEntry>[];
               return Column(
                 children: [
                   _Hero(
-                    players: players,
+                    // Nobody to pick while the list is loading or unreachable;
+                    // the hero still carries the back button.
+                    players: loading || failed
+                        ? const <PlayerListEntry>[]
+                        : players,
                     selectedId: _playerId,
                     onSelect: (id) => setState(() {
                       _playerId = id;
@@ -156,58 +177,110 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
                     }),
                   ),
                   Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(CiSpace.screen,
-                          CiSpace.s6, CiSpace.screen, CiSpace.s6),
-                      children: [
-                        _PickerRow(
-                          label: 'Team',
-                          value: _team,
-                          placeholder: 'Select team',
-                          enabled: _playerId != null,
-                          onTap: _pickTeam,
-                          onAdd: _pickTeam,
-                        ),
-                        const SizedBox(height: CiSpace.s5),
-                        CiField(
-                          label: 'Opponent',
-                          controller: _opponent,
-                          placeholder: 'Enter opponent name',
-                          // Start depends on this, so the button has to
-                          // re-evaluate as they type.
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        const SizedBox(height: CiSpace.s5),
-                        _PickerRow(
-                          label: 'Event  ·  Optional',
-                          value: _event,
-                          placeholder: 'Select event',
-                          enabled: _playerId != null,
-                          onTap: _pickEvent,
-                          onAdd: _pickEvent,
-                        ),
-                      ],
-                    ),
+                    child: loading
+                        ? const Center(child: CircularProgressIndicator())
+                        : failed
+                            ? _OfflineNotice(onRetry: _retry)
+                            : ListView(
+                                padding: const EdgeInsets.fromLTRB(
+                                    CiSpace.screen,
+                                    CiSpace.s6,
+                                    CiSpace.screen,
+                                    CiSpace.s6),
+                                children: [
+                                  _PickerRow(
+                                    label: 'Team',
+                                    value: _team,
+                                    placeholder: 'Select team',
+                                    enabled: _playerId != null,
+                                    onTap: _pickTeam,
+                                    onAdd: _pickTeam,
+                                  ),
+                                  const SizedBox(height: CiSpace.s5),
+                                  CiField(
+                                    label: 'Opponent',
+                                    controller: _opponent,
+                                    placeholder: 'Enter opponent name',
+                                    // Start depends on this, so the button has
+                                    // to re-evaluate as they type.
+                                    onChanged: (_) => setState(() {}),
+                                  ),
+                                  const SizedBox(height: CiSpace.s5),
+                                  _PickerRow(
+                                    label: 'Event  ·  Optional',
+                                    value: _event,
+                                    placeholder: 'Select event',
+                                    enabled: _playerId != null,
+                                    onTap: _pickEvent,
+                                    onAdd: _pickEvent,
+                                  ),
+                                ],
+                              ),
                   ),
-                  SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(CiSpace.screen, 0,
-                          CiSpace.screen, CiSpace.s6),
-                      child: CiButton(
-                        label: 'Start Game',
-                        expand: true,
-                        onPressed:
-                            _canStart ? () => _start(players) : null,
+                  // No Start while loading or offline: there is no game to
+                  // start until the players are in hand.
+                  if (!loading && !failed)
+                    SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(CiSpace.screen, 0,
+                            CiSpace.screen, CiSpace.s6),
+                        child: CiButton(
+                          label: 'Start Game',
+                          expand: true,
+                          onPressed: _canStart ? () => _start(players) : null,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               );
             },
           ),
         );
       }),
+    );
+  }
+}
+
+/// Shown in place of the setup when the players cannot be loaded - almost
+/// always no connection. Persistent, not a toast: it explains why Start is not
+/// available, which a message that vanishes cannot.
+class _OfflineNotice extends StatelessWidget {
+  const _OfflineNotice({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(CiSpace.s7),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_rounded, size: 40, color: c.textMuted),
+            const SizedBox(height: CiSpace.s4),
+            Text("You're offline",
+                textAlign: TextAlign.center,
+                style: CiType.sectionTitle.copyWith(color: c.text)),
+            const SizedBox(height: CiSpace.s2),
+            Text(
+              'Starting a game needs a connection to load your players. '
+              'Reconnect and try again.',
+              textAlign: TextAlign.center,
+              style: CiType.bodySm.copyWith(color: c.textMuted),
+            ),
+            const SizedBox(height: CiSpace.s5),
+            CiButton(
+              label: 'Try again',
+              style: CiButtonStyle.secondary,
+              size: CiButtonSize.sm,
+              onPressed: onRetry,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
