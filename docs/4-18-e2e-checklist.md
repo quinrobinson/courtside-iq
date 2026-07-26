@@ -66,29 +66,38 @@ unset on the test device.
 - [ ] Confirm the guided first-run does NOT also fire (the account has a
       player, so it is not new).
 
-## C. The core journey (online, premium-by-default)
+## C. The core journey (online, premium-by-default)  — VERIFIED 2026-07-26
 
-- [ ] Add a player, with and without a birth date.
-- [ ] New Game: setup → live tracker → complete → save → Game Detail.
-- [ ] Game Detail: insight card, tier badges, share sheet, Remove Game.
-- [ ] Player Profile: all three tabs, Full Breakdown, both info sheets, the
+Fixes this pass: neutral (not orange) delta chips, a toast on Edit Player, a
+tab tap lands on its section root, the saved game appears immediately, the New
+Game setup guides player-first, and the Development tab loads fast (narrative
+pre-generated on save) with a named skeleton for the wait.
+
+- [x] Add a player, with and without a birth date.
+- [x] New Game: setup → live tracker → complete → save → Game Detail.
+- [x] Game Detail: insight card, tier badges, share sheet, Remove Game.
+- [x] Player Profile: all three tabs, Full Breakdown, both info sheets, the
       age-band notice. (**View Trends is deferred to post-2.0.0** - roadmap 3.5.
       Its button is hidden on purpose; do NOT log its absence as a bug.)
-- [ ] Menu: edit name, edit email, change password (including a rejected
+- [x] Menu: edit name, edit email, change password (including a rejected
       current password), Help Center, Send Feedback.
-- [ ] Toasts: **account** Edit Name → success, **account** Edit Email →
+- [x] Toasts: **account** Edit Name → success, **account** Edit Email →
       neutral, error → see D. Editing a PLAYER (Edit Player) now also shows a
       "Player updated." success toast.
 
-## D. Offline (wifi OFF, physical device)
+## D. Offline (wifi OFF, physical device)  — VERIFIED 2026-07-26
 
-- [ ] Track a full game with the network down. Stats must keep recording.
-- [ ] Save it offline → confirm it is queued and the copy says it will sync.
-- [ ] Restore the network → confirm it syncs and appears in Games.
+Beyond the checklist, this pass added the app-wide OFFLINE BANNER (the app
+needs a connection, like a social app; in-progress tracking is the exception)
+and an offline notice on New Game setup.
+
+- [x] Track a full game with the network down. Stats must keep recording.
+- [x] Save it offline → confirm it is queued and the copy says it will sync.
+- [x] Restore the network → confirm it syncs and appears in Games.
 - [ ] **Known gap, do not log as new:** a game queued offline never receives
       its AI insight. Generation needs a server row, so it is skipped while
       offline and the later sync does not trigger it. Logged against 4C.
-- [ ] Error toast: with the network down, Send Feedback → orange dot, ~5s.
+- [x] Error toast: with the network down, Send Feedback → orange dot, ~5s.
 
 ## E. Force-quit and resume
 
