@@ -102,6 +102,20 @@ void main() {
     expect(find.text('Select team'), findsOneWidget);
   });
 
+  testWidgets('tells the parent to pick a player first, then drops the hint',
+      (tester) async {
+    // Disabled pickers with no explanation left a parent tapping a greyed
+    // control and getting nothing. Two players, so none is preselected.
+    await _pump(tester, [_player('p1', 'Maya'), _player('p2', 'Jordan')]);
+    const hint = 'Select a player above to set the team and opponent.';
+    expect(find.text(hint), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Maya'));
+    await tester.pumpAndSettle();
+    expect(find.text(hint), findsNothing,
+        reason: 'once a player is chosen the pickers are usable');
+  });
+
   testWidgets('the hero is ink, and the chosen player wears a lime ring',
       (tester) async {
     // Read from the frame: hero #0f0f0f, selected avatar ring #9dff00 at 2pt

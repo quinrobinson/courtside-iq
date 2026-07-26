@@ -8,6 +8,7 @@ import 'package:courtside_i_q/courtside_iq/design/components/ci_field.dart';
 import 'package:courtside_i_q/courtside_iq/games_list_builder.dart';
 import 'package:courtside_i_q/features/games/games_list_page.dart';
 import 'package:courtside_i_q/features/games/games_repository.dart';
+import 'package:courtside_i_q/features/games/games_revision.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_segmented_tabs.dart';
 import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
@@ -37,6 +38,25 @@ class _SlowRepo implements GamesRepository {
   const _SlowRepo();
   @override
   Future<GamesData> load() => Completer<GamesData>().future;
+}
+
+/// Counts how many times the list refetches, for the gamesRevision guard.
+class _CountingRepo implements GamesRepository {
+  _CountingRepo(this.rows);
+  final List<GameListRow> rows;
+  int loads = 0;
+
+  @override
+  Future<GamesData> load() async {
+    loads++;
+    return GamesData(
+      roster: {for (final r in rows) r.playerId: r.playerName}
+          .entries
+          .map((e) => GameRosterEntry(playerId: e.key, firstName: e.value))
+          .toList(),
+      games: rows,
+    );
+  }
 }
 
 GameListRow _g({
@@ -261,5 +281,25 @@ void main() {
   testWidgets('no pill when nothing is live', (tester) async {
     await _pump(tester, [_g(id: 'a'), _g(id: 'b', at: DateTime(2026, 5, 2))]);
     expect(find.text('LIVE'), findsNothing);
+  });
+
+  testWidgets('refetches when a game is saved or synced (gamesRevision)',
+      (tester) async {
+    // The shell keeps this tab alive, so without this the parent saves a game,
+    // lands on Games, and it is not there - the list is the one from before it
+    // existed.
+    final repo = _CountingRepo([_g(id: 'a')]);
+    await tester.pumpWidget(MaterialApp(
+      theme: CiTheme.base(),
+      home: GamesListPage(repository: repo),
+    ));
+    await tester.pumpAndSettle();
+    final before = repo.loads;
+
+    notifyGamesChanged();
+    await tester.pumpAndSettle();
+
+    expect(repo.loads, greaterThan(before),
+        reason: 'a game change must trigger a refetch');
   });
 }

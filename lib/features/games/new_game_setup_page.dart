@@ -188,6 +188,19 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
                                     CiSpace.screen,
                                     CiSpace.s6),
                                 children: [
+                                  // Team and Opponent stay disabled until a
+                                  // player is chosen, which is not obvious - a
+                                  // parent can tap a greyed picker and get
+                                  // nothing. Say what to do first.
+                                  if (_playerId == null) ...[
+                                    Text(
+                                      'Select a player above to set the team '
+                                      'and opponent.',
+                                      style: CiType.bodySm
+                                          .copyWith(color: c.textMuted),
+                                    ),
+                                    const SizedBox(height: CiSpace.s5),
+                                  ],
                                   _PickerRow(
                                     label: 'Team',
                                     value: _team,

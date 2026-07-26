@@ -40,6 +40,7 @@ import 'resume_game_dialog.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/flags.dart';
 import '/features/nav/ci_nav_bar.dart';
+import '/features/games/games_revision.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'games_repository.dart';
@@ -78,6 +79,23 @@ class _GamesListPageState extends State<GamesListPage> {
   void initState() {
     super.initState();
     _readLive();
+    // The shell keeps this tab alive, so a game saved (or synced) elsewhere
+    // does not reach it on its own - it kept showing the list from before the
+    // game existed. Reload when the set of games changes.
+    gamesRevision.addListener(_onGamesChanged);
+  }
+
+  @override
+  void dispose() {
+    gamesRevision.removeListener(_onGamesChanged);
+    super.dispose();
+  }
+
+  void _onGamesChanged() {
+    // Also re-read the in-progress game: saving it clears the store, so the
+    // "resume" strip must drop away too.
+    _readLive();
+    _refresh();
   }
 
   Future<void> _readLive() async {

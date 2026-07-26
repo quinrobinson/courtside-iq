@@ -38,6 +38,7 @@ import '/features/players/birth_date_gate.dart';
 import '/features/players/info_copy.dart';
 import '/features/nav/ci_nav_bar.dart';
 import '/features/players/players_revision.dart';
+import '/features/games/games_revision.dart';
 import '/features/menu/account_repository.dart';
 import '/features/premium/paywall_launcher.dart';
 import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
@@ -100,6 +101,9 @@ class _TodayPageState extends State<TodayPage> {
     // The shell's shared bar announces a player change rather than calling
     // this screen's refresh directly - it cannot know what it is sitting on.
     playersRevision.addListener(_refresh);
+    // Same for a game saved or synced: the feed is kept alive by the shell and
+    // would otherwise keep showing games from before the new one existed.
+    gamesRevision.addListener(_refresh);
     // The v1 gate lives on home_widget, which this screen replaces, so
     // without this the birth-date prompt is dead on every 2.0 build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -115,6 +119,7 @@ class _TodayPageState extends State<TodayPage> {
   @override
   void dispose() {
     playersRevision.removeListener(_refresh);
+    gamesRevision.removeListener(_refresh);
     super.dispose();
   }
 

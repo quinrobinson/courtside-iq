@@ -19,6 +19,7 @@ import '/courtside_iq/design/components/ci_toast.dart';
 import 'game_complete_page.dart';
 import 'game_paused_dialog.dart';
 import '/courtside_iq/live_game.dart';
+import 'games_revision.dart';
 import 'live_game_store.dart';
 import 'live_tracker_page.dart';
 import 'new_game_setup_page.dart';
@@ -122,6 +123,12 @@ class _LiveGameFlowState extends State<LiveGameFlow> {
   Future<void> _save() async {
     setState(() => _saving = true);
     final outcome = await widget.saver.save(_snapshot);
+    // Tell the game-showing screens to reload. A synced game is on the server
+    // now, but the Games list and Today feed are kept alive by the shell and
+    // would otherwise still show the list from before this game existed. (An
+    // offline-queued game is not on the server yet; the queue bumps this again
+    // when it actually syncs.)
+    notifyGamesChanged();
     // The game is durable either way, so the in-progress copy goes now. Left
     // behind, the next launch would offer to resume a game already saved.
     await widget.store.clear();

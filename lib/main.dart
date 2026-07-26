@@ -13,6 +13,7 @@ import '/backend/supabase/supabase.dart';
 import '/courtside_iq/game_sync/supabase_game_uploader.dart';
 import '/features/auth/password_recovery_listener.dart';
 import '/features/auth/signup_confirmation_listener.dart';
+import '/features/games/games_revision.dart';
 import '/features/dev/token_gallery_page.dart';
 import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
@@ -55,6 +56,12 @@ void main() async {
   // connectivity returns. Flushes once immediately so a game saved in a gym
   // last night syncs on launch rather than waiting for a connectivity change.
   gameSyncQueue.startAutoFlush();
+
+  // Bridge the pure sync queue to the game-showing screens without the queue
+  // importing the app layer: when the queue changes - a game synced on
+  // reconnect drops the pending count - tell those screens to reload, so a
+  // game that goes up minutes later appears on its own.
+  gameSyncQueue.pendingCount.listen((_) => notifyGamesChanged());
 
   // Phase 4.9: a recovery email opens courtsideiq://reset-password. The
   // Supabase SDK establishes the session; this routes to the reset screen.
