@@ -74,6 +74,20 @@ void main() {
           matching: find.text('Use at least 8 characters.'),
         );
 
+    testWidgets('back abandons the reset, it does not maybePop into nothing',
+        (tester) async {
+      // Reached by a deep link, this screen is the only route on the stack,
+      // so the default maybePop read as a dead button - and forced a
+      // force-quit that left the recovery session signed in on next launch.
+      // Back must run the caller's teardown instead.
+      var abandoned = 0;
+      await tester.pumpWidget(MaterialApp(
+        home: ResetPasswordPage(onAbandon: () => abandoned++),
+      ));
+      await tester.tap(find.bySemanticsLabel('Back'));
+      expect(abandoned, 1);
+    });
+
     testWidgets('states the length rule under the field it governs',
         (tester) async {
       // The frame puts this under CONFIRM PASSWORD, but the rule is enforced

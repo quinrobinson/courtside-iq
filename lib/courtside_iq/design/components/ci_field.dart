@@ -103,8 +103,8 @@ class _CiFieldState extends State<CiField> {
     final borderColor = hasError
         ? c.accentEnergy
         : _focused
-            ? c.focusRing
-            : c.border;
+        ? c.focusRing
+        : c.border;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,86 +115,121 @@ class _CiFieldState extends State<CiField> {
           style: CiType.caption.copyWith(color: c.textMuted),
         ),
         const SizedBox(height: CiSpace.s2),
-        Opacity(
-          opacity: w.enabled ? 1 : 0.5,
-          child: Container(
-            // A single line is a fixed 48. Multi-line sizes to its rows, so
-            // a message box does not scroll inside a 48pt slot.
-            height: w.maxLines > 1 ? null : 48,
-            padding: EdgeInsets.symmetric(
+        // THE WHOLE BOX IS THE TAP TARGET. The TextField inside is only as
+        // tall as its text line (isDense + zero content padding), centred in
+        // the 48pt box - so more than half of the visible field was dead to
+        // taps, and focusing took a couple of tries. A tap that lands on the
+        // text line keeps native cursor placement; one that lands anywhere
+        // else in the box focuses the field with the cursor at the end,
+        // which is where typing would continue.
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: w.enabled
+              ? () {
+                  if (!_focus.hasFocus) {
+                    _focus.requestFocus();
+                    final ctrl = w.controller;
+                    if (ctrl != null) {
+                      ctrl.selection = TextSelection.collapsed(
+                        offset: ctrl.text.length,
+                      );
+                    }
+                  }
+                }
+              : null,
+          child: Opacity(
+            opacity: w.enabled ? 1 : 0.5,
+            child: Container(
+              // A single line is a fixed 48. Multi-line sizes to its rows, so
+              // a message box does not scroll inside a 48pt slot.
+              height: w.maxLines > 1 ? null : 48,
+              padding: EdgeInsets.symmetric(
                 horizontal: CiSpace.s4,
-                vertical: w.maxLines > 1 ? CiSpace.s3 : 0),
-            decoration: BoxDecoration(
-              // The ground decides the fill, and the palette already knows
-              // which ground it is on, so nothing is derived here. See
-              // CiColors.fieldFill for why this had to become a token.
-              color: c.fieldFill,
-              borderRadius: CiRadius.chipR,
-              border: Border.all(
-                color: borderColor,
-                // Focus thickens the ring as well as recolouring it, so the
-                // state survives a glance and does not rely on colour alone.
-                width: _focused && !hasError ? 2 : 1,
+                vertical: w.maxLines > 1 ? CiSpace.s3 : 0,
               ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    focusNode: _focus,
-                    controller: w.controller,
-                    obscureText: w.obscure,
-                    enabled: w.enabled,
-                    keyboardType: w.maxLines > 1
-                        ? TextInputType.multiline
-                        : w.keyboardType,
-                    maxLines: w.maxLines,
-                    minLines: w.maxLines > 1 ? w.maxLines : null,
-                    onChanged: w.onChanged,
-                    style: CiType.rowTitle
-                        .copyWith(color: c.text, fontWeight: CiWeight.regular),
-                    cursorColor: c.accentGood,
-                    decoration: InputDecoration(
-                      // The app theme sets `filled: true` with its own fill.
-                      // Left on, the TextField paints a second box INSIDE this
-                      // container - visible as a grey rectangle around the
-                      // text on the ink auth fields.
-                      filled: false,
-                      isDense: true,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      hintText: w.placeholder,
-                      hintStyle: CiType.rowTitle.copyWith(
-                          color: c.textFaint, fontWeight: CiWeight.regular),
+              decoration: BoxDecoration(
+                // The ground decides the fill, and the palette already knows
+                // which ground it is on, so nothing is derived here. See
+                // CiColors.fieldFill for why this had to become a token.
+                color: c.fieldFill,
+                borderRadius: CiRadius.chipR,
+                border: Border.all(
+                  color: borderColor,
+                  // Focus thickens the ring as well as recolouring it, so the
+                  // state survives a glance and does not rely on colour alone.
+                  width: _focused && !hasError ? 2 : 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      focusNode: _focus,
+                      controller: w.controller,
+                      obscureText: w.obscure,
+                      enabled: w.enabled,
+                      keyboardType: w.maxLines > 1
+                          ? TextInputType.multiline
+                          : w.keyboardType,
+                      maxLines: w.maxLines,
+                      minLines: w.maxLines > 1 ? w.maxLines : null,
+                      onChanged: w.onChanged,
+                      style: CiType.rowTitle.copyWith(
+                        color: c.text,
+                        fontWeight: CiWeight.regular,
+                      ),
+                      cursorColor: c.accentGood,
+                      decoration: InputDecoration(
+                        // The app theme sets `filled: true` with its own fill.
+                        // Left on, the TextField paints a second box INSIDE this
+                        // container - visible as a grey rectangle around the
+                        // text on the ink auth fields.
+                        filled: false,
+                        isDense: true,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: w.placeholder,
+                        hintStyle: CiType.rowTitle.copyWith(
+                          color: c.textFaint,
+                          fontWeight: CiWeight.regular,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                if (w.trailing != null) ...[
-                  const SizedBox(width: CiSpace.s2),
-                  GestureDetector(
-                    onTap: w.onTrailingTap,
-                    behavior: HitTestBehavior.opaque,
-                    child: Text(w.trailing!,
+                  if (w.trailing != null) ...[
+                    const SizedBox(width: CiSpace.s2),
+                    GestureDetector(
+                      onTap: w.onTrailingTap,
+                      behavior: HitTestBehavior.opaque,
+                      child: Text(
+                        w.trailing!,
                         style: CiType.rowLabel.copyWith(
-                            color: c.textFaint,
-                            fontWeight: CiWeight.medium)),
-                  ),
+                          color: c.textFaint,
+                          fontWeight: CiWeight.medium,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
         if (hasError) ...[
           const SizedBox(height: CiSpace.s1),
-          Text(w.errorText!,
-              style: CiType.bodyXs.copyWith(color: c.accentEnergy)),
+          Text(
+            w.errorText!,
+            style: CiType.bodyXs.copyWith(color: c.accentEnergy),
+          ),
         ] else if (w.helperText != null && w.helperText!.isNotEmpty) ...[
           const SizedBox(height: CiSpace.s1),
-          Text(w.helperText!,
-              style: CiType.bodyXs.copyWith(color: c.textMuted)),
+          Text(
+            w.helperText!,
+            style: CiType.bodyXs.copyWith(color: c.textMuted),
+          ),
         ],
       ],
     );
@@ -379,7 +414,8 @@ class CiPickerField extends StatelessWidget {
                   color: c.fieldFill,
                   borderRadius: CiRadius.chipR,
                   border: Border.all(
-                      color: hasError ? c.accentEnergy : c.border),
+                    color: hasError ? c.accentEnergy : c.border,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -394,8 +430,11 @@ class CiPickerField extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_rounded,
-                        size: 18, color: c.textMuted),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: c.textMuted,
+                    ),
                   ],
                 ),
               ),
@@ -403,8 +442,10 @@ class CiPickerField extends StatelessWidget {
           ),
           if (hasError) ...[
             const SizedBox(height: CiSpace.s2),
-            Text(errorText!,
-                style: CiType.bodyXs.copyWith(color: c.accentEnergy)),
+            Text(
+              errorText!,
+              style: CiType.bodyXs.copyWith(color: c.accentEnergy),
+            ),
           ],
         ],
       ),

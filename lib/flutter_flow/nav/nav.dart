@@ -268,7 +268,22 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // requireAuth stays: the recovery link establishes a session first,
         // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) => const ResetPasswordPage(),
+        builder: (context, params) => ResetPasswordPage(
+          // Back = abandon the reset. The recovery link signed the parent in
+          // as a side effect, and that session must not outlive a bailed
+          // reset: left alone it survives a force-quit, and the next launch
+          // opens the app signed in to the account being reset (observed on
+          // device 2026-07-26). Same teardown the signup-confirmation
+          // listener uses for its own side-effect session.
+          onAbandon: () async {
+            GoRouter.of(context).prepareAuthEvent();
+            await authManager.signOut();
+            GoRouter.of(context).clearRedirectLocation();
+            if (context.mounted) {
+              context.goNamed(UserAuthEmailWidget.routeName);
+            }
+          },
+        ),
       ),
       FFRoute(
         name: ForgotPasswordWidget.routeName,

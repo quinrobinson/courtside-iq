@@ -25,7 +25,18 @@ import '/index.dart';
 import 'widgets/auth_scaffold.dart';
 
 class ResetPasswordPage extends StatefulWidget {
-  const ResetPasswordPage({super.key});
+  const ResetPasswordPage({super.key, this.onAbandon});
+
+  /// Back, which here means ABANDONING THE RESET - and that is a teardown,
+  /// not a pop. This screen is reached by a recovery deep link, so it is the
+  /// only route on the stack (maybePop does nothing: the button read as
+  /// dead), and the link has already established a real session as a side
+  /// effect. Left alone, that session survives a force-quit and the next
+  /// launch opens the app SIGNED IN to the account being reset - observed on
+  /// device 2026-07-26. The caller signs out and returns to sign-in, the
+  /// same pattern the signup-confirmation listener uses for its own
+  /// side-effect session.
+  final VoidCallback? onAbandon;
 
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
@@ -94,6 +105,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       actionLabel: 'Update password',
       actionBusy: _busy,
       onAction: _busy ? null : _submit,
+      onBack: widget.onAbandon,
       children: [
         CiField(
           label: 'New password',
