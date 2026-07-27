@@ -50,3 +50,8 @@ android/app/release
 
 # Local Claude memory (written into repo by accident — should live outside)
 memory/
+
+# 4.20a backfill working files - prod user ids and generated SQL stay local
+scripts/prod_users.csv
+scripts/subscriptions_backfill.sql
+scripts/prod_players.csv
