@@ -70,6 +70,14 @@ def get(path):
             return json.loads(resp.read().decode()), None
     except urllib.error.HTTPError as e:
         if e.code == 404:
+            # Distinguish "customer unknown" from "project id wrong" - the
+            # error body names the missing resource.
+            try:
+                detail = e.read().decode()
+            except Exception:
+                detail = ""
+            if "project" in detail.lower():
+                return None, "project_not_found"
             return None, "not_found"
         if e.code in (401, 403):
             fail(
@@ -83,6 +91,26 @@ def get(path):
         return None, f"http_{e.code}"
     except Exception as e:
         return None, type(e).__name__
+
+
+def resolve_project_id(sample_uid):
+    """Dashboard URLs show the id bare; the API sometimes wants proj-prefixed.
+    Probe with a real customer and keep whichever form the API accepts."""
+    global PROJECT_ID
+    candidates = [PROJECT_ID]
+    if not PROJECT_ID.startswith("proj"):
+        candidates.append("proj" + PROJECT_ID)
+    for cand in candidates:
+        PROJECT_ID = cand
+        _, err = get(f"/customers/{sample_uid}")
+        if err != "project_not_found":
+            print(f"project id resolved: {PROJECT_ID}")
+            return
+    fail(
+        "Neither form of the project id was accepted:\n"
+        f"  tried {candidates}\n"
+        "  Copy the id from the dashboard URL segment after /projects/."
+    )
 
 
 def ts(val):
@@ -164,6 +192,7 @@ def main():
     if not os.path.exists(CSV_PATH):
         fail(f"input file missing: {CSV_PATH}")
     ids = [l.strip() for l in open(CSV_PATH) if l.strip()]
+    resolve_project_id(ids[0])
     print(f"checking {len(ids)} prod users against RevenueCat v2 (project {PROJECT_ID})...")
 
     now = datetime.now(timezone.utc)
