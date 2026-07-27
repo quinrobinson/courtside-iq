@@ -157,10 +157,23 @@ ground, Hanken Grotesk, no em dashes in headlines, every screen a REAL 2.0
 frame (they are the shipped UI, so the stores' "show the actual app" rule is
 satisfied by construction).
 
-**Sizes: confirm at upload time in App Store Connect / Play Console rather
-than trusting remembered pixel specs.** Baseline expectation: one 6.9-inch
-iPhone set (mandatory), optionally 6.5-inch; Play phone set plus the
-1024x500 feature graphic.
+**Sizes** (confirm in the consoles at upload; stores adjust specs quietly):
+
+| Store | What | Size |
+|---|---|---|
+| App Store (iPhone) | The one required set: 6.9-inch | 1320 x 2868 px portrait, exact; Apple scales it down. Up to 10 shots. |
+| Google Play (phone) | 2-8 screenshots | 1080 x 1920 px (9:16); at least 4 at >=1080px qualifies promo placement |
+| Google Play | Feature graphic (required) | 1024 x 500 px |
+
+**The CURRENT live set (reviewed 2026-07-26) cannot ship with 2.0.** All four
+frames show the v1 UI deleted in 4.24: the old tracker with FOULS / PF / +/-
+/ EFF (stats 2.0 deliberately does not track), an insight card that speaks TO
+the player ("You shot...") where 2.0 speaks to the parent (plus a typo,
+"keep your team in controls"), and the v1 Players list / profile with the old
+nav bar. The TEMPLATE (dark ball ground, big white headline, device frame)
+is keepable; the screens inside and the stat-tracker headlines are not.
+Current aspect (~2.17:1) matches the App Store size exactly; Play needs a
+9:16 variant.
 
 ---
 
