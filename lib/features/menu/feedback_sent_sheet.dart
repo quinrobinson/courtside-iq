@@ -63,12 +63,15 @@ class _FeedbackSentSheet extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Wash disc, ink check: the solid lime disc shouted next to
+                  // the lime Done button below it. The wash keeps the success
+                  // colour without competing with the one real action.
                   Container(
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                        color: c.accentGood, shape: BoxShape.circle),
-                    child: Icon(Icons.check, size: 34, color: c.bg),
+                        color: c.accentGoodWash, shape: BoxShape.circle),
+                    child: Icon(Icons.check, size: 34, color: c.text),
                   ),
                   const SizedBox(height: CiSpace.s6),
                   Text('Thanks, we\'ve got it',
