@@ -56,7 +56,7 @@ if not PROJECT_ID:
     )
 
 
-def get(path):
+def get(path, probing=False):
     """GET a v2 path. Returns (json, None) or (None, 'reason')."""
     req = urllib.request.Request(
         f"https://api.revenuecat.com/v2/projects/{PROJECT_ID}{path}",
@@ -80,6 +80,10 @@ def get(path):
                 return None, "project_not_found"
             return None, "not_found"
         if e.code in (401, 403):
+            # A scoped key answers 401 for a project it cannot see, so during
+            # the probe this means "wrong project id form", not "bad key".
+            if probing:
+                return None, "auth_rejected"
             fail(
                 f"RevenueCat rejected the request (HTTP {e.code}).\n"
                 "  Check the key is a v2 secret key with customer read access\n"
@@ -87,7 +91,7 @@ def get(path):
             )
         if e.code == 429:
             time.sleep(2.0)
-            return get(path)
+            return get(path, probing)
         return None, f"http_{e.code}"
     except Exception as e:
         return None, type(e).__name__
@@ -95,21 +99,26 @@ def get(path):
 
 def resolve_project_id(sample_uid):
     """Dashboard URLs show the id bare; the API sometimes wants proj-prefixed.
-    Probe with a real customer and keep whichever form the API accepts."""
+    Probe with a real customer and keep whichever form the API accepts. Both
+    'project not found' and an auth rejection mean 'try the other form' - a
+    scoped key 401s on any project it cannot see."""
     global PROJECT_ID
     candidates = [PROJECT_ID]
     if not PROJECT_ID.startswith("proj"):
         candidates.append("proj" + PROJECT_ID)
+    tried = []
     for cand in candidates:
         PROJECT_ID = cand
-        _, err = get(f"/customers/{sample_uid}")
-        if err != "project_not_found":
+        _, err = get(f"/customers/{sample_uid}", probing=True)
+        tried.append(f"{cand} -> {err or 'ok'}")
+        if err not in ("project_not_found", "auth_rejected"):
             print(f"project id resolved: {PROJECT_ID}")
             return
     fail(
-        "Neither form of the project id was accepted:\n"
-        f"  tried {candidates}\n"
-        "  Copy the id from the dashboard URL segment after /projects/."
+        "No project id form was accepted with this key:\n  "
+        + "\n  ".join(tried)
+        + "\nIf both were rejected for auth, the KEY is the problem: check it\n"
+        "is a v2 secret key with customer read access, from THIS project."
     )
 
 
