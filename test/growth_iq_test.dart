@@ -142,6 +142,58 @@ void main() {
     });
   });
 
+  group('zero-performance games are inert', () {
+    // A game with no qualifying data in ANY family carries no signal. It must
+    // not occupy a window slot, or logging an empty stat line moves the number.
+
+    test('appending a zero game leaves the score unchanged', () {
+      final before = run(5, ppsa: 0.9, astTov: 2.0, disrupt: 7);
+      final after = [...before, const GrowthGame()];
+      expect(growthIq(after, AgeBand.u13).score,
+          growthIq(before, AgeBand.u13).score);
+    });
+
+    test('a zero game does not lift the score by evicting a weak game', () {
+      // The reported bug: positional windowing let a no-data game push the
+      // oldest (weak) game out of the last-5 window, raising the mean. A quiet
+      // stat line must never read as progress.
+      final base = [
+        const GrowthGame(ppsa: 0.4, astTov: 0.5, disrupt: 2), // weak, oldest
+        ...run(4, ppsa: 1.2, astTov: 4.0, disrupt: 14), // strong
+      ];
+      final plusZero = [...base, const GrowthGame()];
+      expect(growthIq(plusZero, AgeBand.u13).score,
+          growthIq(base, AgeBand.u13).score,
+          reason: 'a zero game must not evict a real game from the window');
+    });
+
+    test('a zero game does not manufacture a rising trend', () {
+      final steady = run(10, ppsa: 1.0, astTov: 2.0, disrupt: 7);
+      final withZero = [...steady, const GrowthGame()];
+      final r = growthIq(withZero, AgeBand.u13);
+      expect(r.trend, GrowthTrend.steady);
+      expect(r.delta, 0);
+    });
+
+    test('a zero game interspersed matches the run without it', () {
+      final clean = run(6, ppsa: 1.1, astTov: 3.0, disrupt: 10);
+      final dirty = [
+        ...run(3, ppsa: 1.1, astTov: 3.0, disrupt: 10),
+        const GrowthGame(),
+        ...run(3, ppsa: 1.1, astTov: 3.0, disrupt: 10),
+      ];
+      expect(growthIq(dirty, AgeBand.u13).score,
+          growthIq(clean, AgeBand.u13).score);
+    });
+
+    test('only zero games resolves to the no-data lock, not a number', () {
+      final r = growthIq(run(6), AgeBand.u13);
+      expect(r.locked, isTrue);
+      expect(r.score, isNull);
+      expect(r.lockReason, GrowthIqLock.noQualifyingData);
+    });
+  });
+
   group('normalizeToTiers anchors', () {
     test('hits the documented anchor points', () {
       double n(double v) =>

@@ -209,22 +209,42 @@ GrowthIqResult growthIq(List<GrowthGame> games, AgeBand? band) {
     return GrowthIqResult.lockedResult;
   }
 
-  const w = kGrowthIqWindowGames;
-  final current = games.sublist(games.length - w);
-  final ability = abilityComposite(current, band);
+  // A zero-performance game - no qualifying data in ANY family - carries no
+  // signal about ability. It must not take a window slot: left in, it silently
+  // pushes the oldest real game out of the rolling window, and when that game
+  // was a weak one the mean of what remains RISES, so an empty stat line reads
+  // as progress. Drop these before windowing, so a zero game moves the number
+  // by exactly nothing. The game-count lock above still counts every game, so
+  // the unlock countdown is unchanged - this governs only what feeds the math.
+  final scored = [
+    for (final g in games)
+      if (g.ppsa != null || g.astTov != null || g.disrupt != null) g,
+  ];
 
-  if (ability == null) {
+  if (scored.isEmpty) {
     // Enough games logged, but no qualifying data in any family.
     return GrowthIqResult.noData;
   }
 
-  // Prior window, only when a full one exists. A partial prior window would
-  // make improvement noisy and could show a decline that is really just a
-  // smaller sample.
+  const w = kGrowthIqWindowGames;
+  final current =
+      scored.length <= w ? scored : scored.sublist(scored.length - w);
+  final ability = abilityComposite(current, band);
+
+  if (ability == null) {
+    // Every game in `scored` has at least one family, so this is unreachable;
+    // kept as a guard so a future change to abilityComposite cannot leak a null
+    // score into the UI.
+    return GrowthIqResult.noData;
+  }
+
+  // Prior window, only when a full one of SCORED games exists. A partial prior
+  // window would make improvement noisy and could show a decline that is really
+  // just a smaller sample.
   double? priorAbility;
-  if (games.length >= w * 2) {
+  if (scored.length >= w * 2) {
     priorAbility = abilityComposite(
-      games.sublist(games.length - w * 2, games.length - w),
+      scored.sublist(scored.length - w * 2, scored.length - w),
       band,
     );
   }
