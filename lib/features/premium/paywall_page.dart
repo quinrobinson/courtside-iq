@@ -91,6 +91,11 @@ class _PaywallPageState extends State<PaywallPage> {
   /// own overlay so the whole screen does not flash between them.
   _Phase _phase = _Phase.loading;
 
+  /// True when the error phase came from a purchase attempt, not a failed
+  /// offerings load, so the error copy says "not charged" rather than the
+  /// misleading "check your connection" a payment problem is not.
+  bool _purchaseFailed = false;
+
   @override
   void initState() {
     super.initState();
@@ -116,7 +121,10 @@ class _PaywallPageState extends State<PaywallPage> {
     // plans"), not a ready paywall with a dead button. Selling nothing is
     // worse than saying the store is unreachable.
     if (!offer.hasAny) {
-      setState(() => _phase = _Phase.error);
+      setState(() {
+        _purchaseFailed = false;
+        _phase = _Phase.error;
+      });
       return;
     }
     setState(() {
@@ -149,7 +157,22 @@ class _PaywallPageState extends State<PaywallPage> {
         // Back to the paywall, no error. They chose to stop.
         setState(() => _phase = _Phase.ready);
       case PurchaseOutcome.failed:
-        setState(() => _phase = _Phase.error);
+        // A "failed" purchase can still have granted the entitlement: the
+        // sandbox "you're currently subscribed" path throws an error code
+        // other than productAlreadyPurchased, yet StoreKit completes the
+        // transaction and the entitlement goes active. Re-read it before
+        // crying failure. Showing the plans-load error to someone who is now
+        // Premium, and may have just been charged, is the worst read here.
+        final nowPremium = await widget.repository.isPremium();
+        if (!mounted) return;
+        if (nowPremium) {
+          widget.onPurchased?.call();
+        } else {
+          setState(() {
+            _purchaseFailed = true;
+            _phase = _Phase.error;
+          });
+        }
     }
   }
 
@@ -188,8 +211,24 @@ class _PaywallPageState extends State<PaywallPage> {
                 onManage: widget.onManage,
                 onDone: widget.onPurchased,
               ),
-              _Phase.processing => const PaywallProcessing(),
+              // Processing is an OVERLAY over the paywall, not a full swap, so
+              // the parent still sees what they are buying and the screen does
+              // not blank to a lone spinner and back.
+              _Phase.processing => Stack(
+                children: [
+                  _buildPaywall(context, c),
+                  const ModalBarrier(
+                      dismissible: false, color: Colors.black54),
+                  const PaywallProcessing(),
+                ],
+              ),
               _Phase.error => PaywallError(
+                title: _purchaseFailed
+                    ? "That didn't go through"
+                    : "We couldn't load plans",
+                message: _purchaseFailed
+                    ? 'You have not been charged.'
+                    : 'Check your connection and try again.',
                 onRetry: () => setState(() => _phase = _Phase.ready),
                 onClose: widget.onClose,
               ),
@@ -251,6 +290,19 @@ class _PaywallPageState extends State<PaywallPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // The static premium headline travels with the centred
+                    // block, snug above the feature shot, left at the gutter.
+                    // A little larger than the carousel's own h2 headlines.
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Go Premium',
+                            style: CiType.h2
+                                .copyWith(color: c.text, fontSize: 30)),
+                      ),
+                    ),
+                    const SizedBox(height: CiSpace.s3),
                     SizedBox(
                       height: 330,
                       child: PageView.builder(

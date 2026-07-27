@@ -51,6 +51,31 @@ class _FakePaywallRepo implements PaywallRepository {
   Future<PurchaseOutcome> restore() async => restoreOutcome;
 }
 
+/// Models the sandbox "already subscribed" quirk: the purchase returns `failed`
+/// yet the entitlement is granted, so isPremium is false at load (the paywall
+/// renders) and true once a purchase has been attempted.
+class _GrantsOnFailureRepo implements PaywallRepository {
+  bool _granted = false;
+  final purchased = <String>[];
+
+  @override
+  Future<PaywallOffer> loadOffer() async => const PaywallOffer(
+        monthly: PaywallPlan(packageId: 'm', price: r'$5.99', hasTrial: true),
+        weekly: PaywallPlan(packageId: 'w', price: r'$1.99', hasTrial: false),
+      );
+  @override
+  Future<bool> isPremium() async => _granted;
+  @override
+  Future<PurchaseOutcome> purchase(String packageId) async {
+    purchased.add(packageId);
+    _granted = true;
+    return PurchaseOutcome.failed;
+  }
+
+  @override
+  Future<PurchaseOutcome> restore() async => PurchaseOutcome.failed;
+}
+
 Future<_FakePaywallRepo> _pump(
   WidgetTester tester,
   _FakePaywallRepo repo, {
@@ -97,6 +122,11 @@ void main() {
       expect(find.text(r'$5.99'), findsOneWidget);
       expect(find.text('Weekly'), findsOneWidget);
       expect(find.text(r'$1.99'), findsOneWidget);
+    });
+
+    testWidgets('shows the static "Go Premium" headline', (tester) async {
+      await _pump(tester, _FakePaywallRepo());
+      expect(find.text('Go Premium'), findsOneWidget);
     });
 
     testWidgets('the CTA promises a trial on monthly and NOT on weekly',
@@ -147,12 +177,46 @@ void main() {
       expect(find.byType(PaywallError), findsNothing);
     });
 
-    testWidgets('a failed purchase shows the error state', (tester) async {
+    testWidgets('a failed purchase shows purchase-error copy, not load-error',
+        (tester) async {
       await _pump(tester,
           _FakePaywallRepo(purchaseOutcome: PurchaseOutcome.failed));
       await tester.tap(find.text('Start free trial'));
       await tester.pumpAndSettle();
       expect(find.byType(PaywallError), findsOneWidget);
+      // A payment problem must not report itself as a connection/plans problem.
+      expect(find.text("That didn't go through"), findsOneWidget);
+      expect(find.text('You have not been charged.'), findsOneWidget);
+      expect(find.textContaining("couldn't load plans"), findsNothing);
+    });
+
+    testWidgets('a failed outcome that still granted premium hands off, no error',
+        (tester) async {
+      // The sandbox "you're currently subscribed" path returns failed while the
+      // entitlement is actually active. Re-reading isPremium must rescue it, so
+      // a now-Premium parent is not shown the plans-load error after paying.
+      var done = false;
+      final repo = _GrantsOnFailureRepo();
+      tester.view.physicalSize = const Size(1170, 6000);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: PaywallPage(
+          repository: repo,
+          onPurchased: () => done = true,
+          onManage: () async {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start free trial'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(done, isTrue);
+      expect(find.byType(PaywallError), findsNothing);
     });
 
     testWidgets('no offer at all is the error state, not a dead button',
@@ -160,6 +224,8 @@ void main() {
       // Selling nothing is worse than saying the store is unreachable.
       await _pump(tester, _FakePaywallRepo(offer: const PaywallOffer()));
       expect(find.byType(PaywallError), findsOneWidget);
+      // A load failure keeps the plans-load copy, distinct from a purchase one.
+      expect(find.textContaining("couldn't load plans"), findsOneWidget);
     });
 
     testWidgets('an existing subscriber is not sold to', (tester) async {
@@ -188,6 +254,10 @@ void main() {
       expect(find.text('See plans'), findsOneWidget);
       expect(find.text('Not now'), findsOneWidget);
       expect(find.textContaining(r'$'), findsNothing);
+      // The reason names the actual cap the parent just hit, not a generic
+      // "trends and insights" line.
+      expect(find.textContaining('free player'), findsOneWidget);
+      expect(find.textContaining('Premium tracks up to'), findsOneWidget);
     });
 
     testWidgets('See plans returns true, Not now returns false',

@@ -17,6 +17,7 @@ import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/player_gating.dart';
 
 /// Shows the gate sheet. Returns true if the parent chose "See plans", so the
 /// caller opens the paywall; false or null on "Not now" or a dismiss.
@@ -65,8 +66,8 @@ class _PremiumGateSheet extends StatelessWidget {
                       color: c.text, fontWeight: CiWeight.extraBold)),
               const SizedBox(height: CiSpace.s3),
               Text(
-                'Trends, insights, and the full development story are part '
-                'of Premium.',
+                "You're at your $kFreePlayerLimit free player. "
+                'Premium tracks up to $kPremiumPlayerLimit.',
                 textAlign: TextAlign.center,
                 style: CiType.bodySm.copyWith(color: c.textMuted, height: 1.4),
               ),
