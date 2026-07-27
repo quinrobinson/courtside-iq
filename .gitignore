@@ -55,3 +55,4 @@ memory/
 scripts/prod_users.csv
 scripts/subscriptions_backfill.sql
 scripts/prod_players.csv
+scripts/subscriptions_backfill_raw.json
