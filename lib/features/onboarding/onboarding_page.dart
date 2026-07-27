@@ -234,24 +234,27 @@ class _Slide extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: CiSpace.s5),
             // CLIP THE CAPTURE TO THE CARD'S CORNERS. The export bakes an
-            // opaque ink background (alpha 255 everywhere) with the app card
-            // rounded at radius 61 on a 960-wide image. Left unclipped, those
-            // ink corners cover the glow and read as black squares against the
-            // lit margins. Constrain to the capture's own aspect so the box
-            // matches it exactly, then clip the TOP corners at the same radius
-            // so the ink comes off and the glow shows around the card.
+            // opaque ink background (alpha 255 everywhere) around the card,
+            // which now carries its designed 6px outside border (#0F0F0F at
+            // 60%), so the 320x430 mockup exports at 332x442 (996x1326 at 3x).
+            // Left unclipped, those ink corners cover the glow and read as
+            // black squares against the lit margins. Constrain to the
+            // capture's own aspect so the box matches it exactly, then clip
+            // the TOP corners at the border's outer radius so the ink comes
+            // off and the glow shows around the card.
             child: Align(
               alignment: Alignment.topCenter,
               child: AspectRatio(
-                aspectRatio: 960 / 1290,
+                aspectRatio: 996 / 1326,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    // ~61 is where the ink meets the card, but clipping exactly
-                    // there leaves a 1-2px ink fringe (the anti-aliased clip
-                    // edge samples the ink just outside). 68 clips a hair INTO
-                    // the card corner - dark chrome, so invisible - taking the
+                    // The border's outer arc is (26 + 6) * 3 = 96 on a
+                    // 996-wide image, but clipping exactly there leaves a
+                    // 1-2px ink fringe (the anti-aliased clip edge samples the
+                    // ink just outside). 102 clips a hair INTO the border
+                    // corner - near-ink over ink, so invisible - taking the
                     // fringe with it.
-                    final radius = constraints.maxWidth * 68 / 960;
+                    final radius = constraints.maxWidth * 102 / 996;
                     return ClipRRect(
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(radius),
