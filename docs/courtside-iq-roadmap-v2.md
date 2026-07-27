@@ -2351,7 +2351,14 @@ release pipeline (JDK 17 + FF keystore for Android, Transporter for iOS).
 New screenshots, release notes and listing copy for the 2.0 UI. The release
 notes are the FIRST thing an existing parent reads about this change - they
 carry the same reassurance as 4.19c, in shorter form.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+**DONE 2026-07-26.** Copy approved (release notes, listing, rebuilt keywords)
+in `docs/store-assets-2-0.md`. Six screenshots designed on the Figma Store
+Screens page, user-signed-off, exported to `store-assets/`: App Store 6.9-inch
+set (1320x2868), Play set (1080x1920), Play feature graphic (1024x500), all
+opaque RGB. Upload happens when 4.22 creates the 2.0.0 version entries; also
+fix the iOS display-name casing (CourtSide -> Courtside) at submission.
+`[x] built` · `[x] wired` · `[x] approved` — upload rides with 4.22
 
 ### 4.25 Staged rollout and watch — NEW
 Do not ship 2.0 to everyone at once. This release changes every screen AND

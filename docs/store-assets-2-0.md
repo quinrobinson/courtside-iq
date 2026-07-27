@@ -177,11 +177,17 @@ Current aspect (~2.17:1) matches the App Store size exactly; Play needs a
 
 ---
 
-## Open items
+## Status — COMPLETE 2026-07-26, upload rides with 4.22
 
-- [x] iOS keywords field captured 2026-07-26 and rebuilt (see rationale
-      above); goes in with the 2.0.0 version entry.
-- [ ] Fix the iOS display name casing: "CourtSide IQ" -> "Courtside IQ".
-- [ ] Approve release notes + listing drafts above.
-- [ ] Figma pass for the 6 screenshot frames on a "Store Assets" page.
-- [ ] Export at store sizes, upload alongside the 4.22 build.
+- [x] iOS keywords field captured and rebuilt (rationale above).
+- [x] Release notes + listing copy APPROVED.
+- [x] Six screenshots designed on the Figma "Store Screens" page (grounds:
+      photo, lime ombre x2, ink+glow, lime wash, light gray; Hanken Grotesk
+      ExtraBold headlines at the app's display metrics; shadow on S1 only),
+      user-signed-off, exported:
+      - `store-assets/appstore-6.9/` — 1320x2868, opaque RGB
+      - `store-assets/play/` — 1080x1920 (rescaled clones of the approved
+        set), plus `feature-graphic.png` 1024x500 (ink mark + wordmark +
+        tagline on the lime ombre)
+- [ ] AT UPLOAD (4.22): create the 2.0.0 version entries, paste copy, upload
+      assets, fix the iOS display-name casing "CourtSide IQ" -> "Courtside IQ".
