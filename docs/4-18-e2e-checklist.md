@@ -1,5 +1,13 @@
 # 4.18 — End-to-end verification checklist
 
+**RE-RUN AFTER 4.24 (v1 retirement): PASSED 2026-07-26.** Every route edge
+exercised on device against the post-deletion build - no crashes, no v1
+screen appeared anywhere. The same pass device-verified the batch that rode
+along: the Go Premium paywall headline, the gate-sheet cap line, the
+processing overlay, the shortened delete dialog, the onboarding mockup
+borders, the updated logo mark + app icon, the zero-game Growth IQ fix, the
+CiField whole-box tap target, and the reset-password back teardown.
+
 The roadmap states 4.18 as a paragraph. This is that paragraph turned into an
 order you can actually work through on a device.
 

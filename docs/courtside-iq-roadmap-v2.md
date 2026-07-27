@@ -2333,8 +2333,14 @@ paywall fallback, GameStatsWidget, AllGamesWidget, the menu sub-screens.
   unchanged.
 - `flutter analyze` clean (0 errors); grep proves zero `pages/` imports. ✓
 - Full test suite green (694). ✓
-- Re-run 4.18 after deletion. A missed route surfaces here as a crash.
-`[x] built` · `[x] wired` · `[ ] device-verified` — needs the 4.18 re-run
+- Re-run 4.18 after deletion. A missed route surfaces here as a crash. ✓
+  Full device re-run passed 2026-07-26: every route edge exercised, no
+  crashes, no v1 screen appeared anywhere. The pass also surfaced and closed
+  two defects: CiField's tap target was smaller than the visible box, and the
+  reset-password back button was dead on a deep-link stack (and its recovery
+  session survived a force-quit, opening the next launch signed in - back now
+  tears the session down).
+`[x] built` · `[x] wired` · `[x] device-verified` — **DONE 2026-07-26**
 
 ### 4.22 Flip flags and cut the build
 `_kUseTestSupabase = false`. Version `2.0.0`, build number above live. Local
