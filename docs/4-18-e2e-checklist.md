@@ -94,28 +94,39 @@ and an offline notice on New Game setup.
 - [x] Track a full game with the network down. Stats must keep recording.
 - [x] Save it offline → confirm it is queued and the copy says it will sync.
 - [x] Restore the network → confirm it syncs and appears in Games.
-- [ ] **Known gap, do not log as new:** a game queued offline never receives
-      its AI insight. Generation needs a server row, so it is skipped while
-      offline and the later sync does not trigger it. Logged against 4C.
+- [x] **Offline game DOES get its insight on sync** (was logged as a gap; that
+      note was stale — closed 2026-07-22). `uploadPendingGame` upserts the rows
+      then calls `generateGameInsight`, and the queue runs that same uploader on
+      both the immediate save and the delayed flush, so a game synced days later
+      gets its per-game insight. Verified on device 2026-07-26.
 - [x] Error toast: with the network down, Send Feedback → orange dot, ~5s.
 
-## E. Force-quit and resume
+## E. Force-quit and resume  — VERIFIED 2026-07-26
 
-- [ ] Start a game, record several stats, force-quit mid-game.
-- [ ] Relaunch → the resume prompt offers the in-progress game and restores
+- [x] Start a game, record several stats, force-quit mid-game.
+- [x] Relaunch → the resume prompt offers the in-progress game and restores
       the stat line.
-- [ ] Resume, finish, save. Confirm no duplicate game is created.
+- [x] Resume, finish, save. Confirm no duplicate game is created.
 
-## F. Growth IQ edge cases
+## F. Growth IQ edge cases  — MOSTLY VERIFIED 2026-07-26
 
 Needs seeded data, so expect to add games in bulk.
 
-- [ ] Fewer than 5 games → no score, the below-threshold state shows instead.
-- [ ] Exactly 5 games → the score activates.
-- [ ] A declining run → the delta reads down, and the copy stays encouraging.
-- [ ] Age-band crossing → ratings freeze per the product rule rather than
-      silently re-rating history.
-- [ ] A zero-performance game → NO rating at all, not a "zero" rating.
+- [x] Fewer than 5 games → no score, the below-threshold state shows instead.
+- [x] Exactly 5 games → the score activates.
+- [x] A declining run → the delta reads down, and the copy stays encouraging.
+- [~] Age-band change → the Growth IQ NUMBER re-normalizes to the new band.
+      This is correct: product decision #4 is "freeze earned ratings, NORMALIZE
+      trends," and Growth IQ is a trend. Verified on device 2026-07-26 (the
+      number moved and the direction was right). OPEN: the other half of the
+      rule — earned per-game tier badges must NOT retroactively downgrade, and
+      the Age-Band Transition banner (Figma 687:2742) must mark the change. No
+      freeze/snapshot-band logic found in code; banner not confirmed built.
+      Track separately before cutover; not a blocker for the Growth IQ number.
+- [~] A zero-performance game → NO impact on the rating. FIXED 2026-07-26
+      (growth_iq.dart now drops all-null games before windowing; a zero game
+      used to lift the score by evicting a real game from the window). Unit
+      tests cover it; needs a device re-check (log a zero game, score unchanged).
 
 ## G. Entitlement states
 
@@ -125,19 +136,64 @@ paywall bypass is open. The RLS limit is built and verified but has no data to
 act on. So "free" behaviour here is not what prod will do after the 4.20a
 backfill — verify the UI, and treat enforcement as unverified until then.
 
-- [ ] Fresh / never subscribed → paywall entry points, gate sheet, upgrade
-      banner.
-- [ ] Premium → no locks, no banners, paywall shows the Already-Premium state.
-- [ ] Lapsed → the lapse banner and its "Renew" wording.
-- [ ] Billing issue → the correct state, not a generic error.
-- [ ] A real sandbox purchase (device + sandbox account only). Restore
-      purchases with nothing to restore → neutral toast.
+- [x] Fresh / never subscribed → paywall entry points, gate sheet, upgrade
+      banner. Verified 2026-07-26. NOTE two design gaps found and sent to a
+      Figma pass (not blockers): the gate sheet omits the "Free includes 1
+      player" reason, and the paywall lacks a static headline. See below.
+- [x] Premium → no locks, no banners, paywall shows the Already-Premium state.
+      Verified 2026-07-26 via `kDebugForceEntitlement = .premium`.
+- [x] Lapsed → the lapse banner and its "Renew" wording. Verified 2026-07-26
+      via `kDebugForceEntitlement = .lapsed` (all four surfaces: Today, Players
+      list, Player profile, Menu "Expired").
+- [N/A] Billing issue → NO dedicated state exists. `EntitlementStatus` is
+      three-way (premium / lapsed / never); a billing grace period keeps the
+      RevenueCat entitlement active (renders premium), and post-grace it lapses.
+      Nothing distinct to verify.
+- [x] A real sandbox purchase (device + sandbox account only). Completed
+      2026-07-26 — subscription landed and the account reads Premium. TWO issues
+      found (see below): the processing state is a full-screen swap not an
+      overlay, and a purchase that granted the entitlement still showed the
+      plans-load error screen.
 
-## H. Destructive, last
+**Design follow-ups from the G pass — BUILT + unit-tested 2026-07-26, device-verify pending:**
+- [x] Gate sheet reason line → "You're at your 1 free player. Premium tracks up
+  to 3." (uses kFreePlayerLimit/kPremiumPlayerLimit; replaces the generic line).
+- [x] Paywall static headline "Go Premium" (h2 at 30pt, a little larger than
+  the carousel headlines), left at the gutter, moved INTO the centred block so
+  it sits snug above the feature shot (was floating with too much gap).
+- [x] Delete-account confirm dialog shortened to "Delete forever?" /
+  "This can't be undone." (reverses the old restate-the-loss decision).
+- [x] Paywall Processing → scrim overlay (ModalBarrier + spinner) over the
+  still-visible paywall, not a full-screen swap.
+- [x] Paywall purchase-failure copy → "That didn't go through." /
+  "You have not been charged.", distinct from the plans-load error.
 
-- [ ] Delete account. Confirm the account and its data are gone, and that the
-      feedback row survives with its email nulled.
-- [ ] Confirm the app returns to a clean signed-out state, not a broken shell.
+DEVICE RE-CHECK for this batch: gate sheet copy when adding past the cap;
+headline on the paywall; delete dialog; the processing overlay dims the paywall
+rather than replacing it; a genuinely failed purchase reads "not charged".
+
+**Bug found in G (sandbox purchase) — FIXED 2026-07-26 (logic, not design):**
+- A purchase that GRANTS the entitlement can still return `PurchaseOutcome.failed`
+  (sandbox "already subscribed" throws a code other than
+  productAlreadyPurchasedError), sending the user to the error screen while the
+  account is actually Premium. FIXED: `_buy()` now re-checks `isPremium()` on a
+  `failed` outcome and hands off as success if premium. Covered by a new test
+  ("a failed outcome that still granted premium hands off, no error").
+  Undeployed code change; device re-check on a fresh build still worthwhile.
+
+## H. Destructive, last  — VERIFIED 2026-07-26
+
+- [x] Delete account. Confirmed via DB (throwaway qrobinson75154@gmail.com):
+      auth.users row gone, players/games/stats all cascaded to 0, and the
+      feedback row survived with its email nulled (row 26 exists, email null).
+- [x] Confirm the app returns to a clean signed-out state, not a broken shell.
+      Device-verified: landed on sign-in, no lingering nav bar, stayed signed
+      out after relaunch.
+- [ ] COPY (Figma-first, see design follow-ups): the confirm-dialog message
+      restates the loss the page already explained and reads as redundant. Make
+      it a crisp final gut-check ("Delete forever?" / "This can't be undone.")
+      rather than a second explanation. NOTE this reverses the earlier
+      deliberate choice in delete_account_page.dart:62-64 to restate the loss.
 
 ---
 

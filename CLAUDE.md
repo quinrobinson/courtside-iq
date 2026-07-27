@@ -174,8 +174,10 @@ Pause and check with me before:
   dropped it, prod did not. Needs its own reviewed migration.
 - iOS builds are now **hybrid SPM + CocoaPods** (Flutter 3.44 migrated automatically). Five plugins
   have no SPM support and Flutter warns this will eventually become an error.
-- A game queued offline never receives its AI insight: generation needs a server row, so it is
-  skipped while offline and the later sync does not trigger it. Logged against 4C.
+- NOT a bug (was logged as one, note stayed stale): a game queued offline DOES get its AI insight
+  when it syncs. `uploadPendingGame` upserts the rows then calls `generateGameInsight`, and the
+  queue runs that same uploader on both the immediate save and the delayed flush. Closed 2026-07-22,
+  device-verified 2026-07-26. Do not re-log this.
 - The paywall bypass is **open by decision**: `subscriptions` is empty, so `is_premium()` is false
   for everyone until the backfill runs. The RLS limit is built and verified on test but has no data
   to act on yet. See "Pending work" below.

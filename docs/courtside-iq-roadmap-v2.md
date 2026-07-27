@@ -2279,6 +2279,29 @@ Test had none; prod has been live for months. A failure here is the right
 outcome - it means rows exist that this would otherwise make deletable.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
+### 4.20c Freeze earned per-game ratings across an age-band crossing
+**Found 2026-07-26 during the 4.18 F pass.** Decision #4 is "freeze earned
+ratings, NORMALIZE trends." The trend half is right (Growth IQ re-normalizes to
+the current band, which is correct for a trend series) and the transition banner
+is built (`age_band_service` + `age_band_notice`). The freeze half is NOT:
+`game_detail_repository._ageBand` derives the band from the player's CURRENT
+birth date via `player_profile_view`, and `game_detail_builder.dart:194`
+(`ppsaTier(value, row.ageBand)`) grades every historical game against it. So on a
+real boundary crossing (10U → 13U) every past game's earned tier badge
+retroactively re-grades against the higher bar - a "Good" night earned at 10U
+can drop to "Solid." That fights "every rating should feel acceptable."
+
+Only the STRUCTURED badge re-grades; the cached insight-card narrative is frozen
+already, so the two can even disagree on the same screen after a crossing.
+
+FIX (schema change, test-first, explicit approval, never prod without say-so):
+store the age band (or birth date) ON the game row at save time, backfill
+existing games, and switch the per-game tier builders to read the frozen
+per-game band instead of the current one. The Growth IQ engine keeps using the
+current band (that half is correct). Only bites on an actual crossing, so it is
+deferred here, not blocking the 2.0 number.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
 ### 4.21 Deploy Edge Functions to prod
 generate-game-insight and generate-player-insight are on prod at v1 and need
 the no-birth-date change. revenuecat-webhook needs `--no-verify-jwt` and its
