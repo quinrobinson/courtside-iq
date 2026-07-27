@@ -2273,9 +2273,16 @@ scripts/subscriptions_backfill.py` (API v2, scoped customer-read key, user
 list checksum-verified against prod): 111 unknown to RC, 188 no subscription,
 9 rows written - **7 active (all is_premium true), 2 expired (false)**, all
 env=production App Store `courtside_IQ_599_1m`. Inserts were ON CONFLICT DO
-NOTHING so live webhook rows always win. Cross-check against the RevenueCat
-dashboard active count recorded below. Enforcement is still NOT live - the
-RLS limit ships in 4.20b.
+NOTHING so live webhook rows always win. **Cross-check 2026-07-27: RevenueCat
+dashboard shows 8 active; our table holds 7. The 8th is
+$RCAnonymousID:3b111541... - an ANDROID (Play Store) purchase made before the
+app identified the customer, so it has NO Supabase account and cannot be
+backfilled (user_id FKs auth.users). Notable: all 7 identified subscribers
+are App Store, so this is the only Play subscriber. Self-heals: when that device signs in, RC aliases and transfers
+the sub, and the next RENEWAL event carries the real uid and writes the row.
+Until then that one parent would hit the player cap only when ADDING a player
+past 1; existing players are untouched. Watch prod webhook logs for it.**
+Enforcement is still NOT live - the RLS limit ships in 4.20b.
 `[x] built` · `[x] wired` · `[x] verified against prod`
 
 ### 4.20b Promote schema to prod
