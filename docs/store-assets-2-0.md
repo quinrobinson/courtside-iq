@@ -81,7 +81,18 @@ leads: their data is safe. Features come second.
 |---|---|---|
 | Subtitle | 30 | `Youth basketball development` (29) |
 | Promotional text | 170 | `New in 2.0: Growth IQ, one number for how your player is developing, plus a development story that turns every game into what's working and what to work on next.` (161) |
-| Keywords | 100 | **NEEDS CURRENT LISTING** - do not replace blind, ASO history lives here |
+| Keywords | 100 | `stats,stat,tracker,player,performance,tracking,growth,coach,kids,hoops,game,insights,ratings,AAU` (96) |
+
+**Keywords rationale.** Current live field: `basketball stats, Basketball stat
+tracker, player stats, youth basketball, performance tracking` - full phrases
+with repeats, so most of the budget is spent twice. Apple combines single
+words across commas into phrases, and words in the app NAME and SUBTITLE are
+indexed for free - so with the new subtitle "Youth basketball development",
+the terms youth / basketball / development move there and every live phrase
+stays reachable: basketball stats, stat tracker, player stats, youth
+basketball, performance tracking. The freed budget adds growth, game,
+insights, ratings, coach, kids, hoops, and AAU (high intent for this exact
+parent audience). Nothing currently ranking is dropped.
 
 ### iOS + Play — full description (iOS 4,000 / Play 4,000)
 
@@ -155,9 +166,8 @@ iPhone set (mandatory), optionally 6.5-inch; Play phone set plus the
 
 ## Open items
 
-- [ ] iOS keywords field from App Store Connect (the one thing the public
-      listing cannot show). Merge, don't replace - and add "stat,tracker"
-      there when the subtitle drops it.
+- [x] iOS keywords field captured 2026-07-26 and rebuilt (see rationale
+      above); goes in with the 2.0.0 version entry.
 - [ ] Fix the iOS display name casing: "CourtSide IQ" -> "Courtside IQ".
 - [ ] Approve release notes + listing drafts above.
 - [ ] Figma pass for the 6 screenshot frames on a "Store Assets" page.
