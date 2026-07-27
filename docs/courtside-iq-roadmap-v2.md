@@ -2264,9 +2264,19 @@ RevenueCat, and VERIFY THE ROW COUNT against RevenueCat's active-subscriber
 count before anything reads it. `is_premium()` answers false for anyone
 missing, so a short backfill silently downgrades real customers.
 
-Use `scripts/entitlement_audit.py` as the read-only precedent. The RevenueCat
-key is loaded with `read -s`, never pasted - one was leaked that way already.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+**DONE 2026-07-27.** In order: `subscriptions` table + `is_premium()` applied
+to prod (verified: RLS on, callable); `revenuecat-webhook` deployed with
+`--no-verify-jwt`, secret set, fail-closed probes verified (401 bare / 401
+wrong secret / 405 GET); RevenueCat webhooks split sandbox->test and
+production->prod. Backfill swept ALL 308 prod users via `
+scripts/subscriptions_backfill.py` (API v2, scoped customer-read key, user
+list checksum-verified against prod): 111 unknown to RC, 188 no subscription,
+9 rows written - **7 active (all is_premium true), 2 expired (false)**, all
+env=production App Store `courtside_IQ_599_1m`. Inserts were ON CONFLICT DO
+NOTHING so live webhook rows always win. Cross-check against the RevenueCat
+dashboard active count recorded below. Enforcement is still NOT live - the
+RLS limit ships in 4.20b.
+`[x] built` · `[x] wired` · `[x] verified against prod`
 
 ### 4.20b Promote schema to prod
 Backup first. In order: the account-deletion cascades (20260723000000),

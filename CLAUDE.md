@@ -107,19 +107,18 @@ These apply to every change, every session:
 
 ## Pending work (picked up next session)
 
-**Backfill existing subscribers into `subscriptions`.** This is the last piece before free-tier
-enforcement does anything. The table, `is_premium()`, the RevenueCat webhook, and the RLS limit are
-all built and verified on **test**; the table is simply empty, so `is_premium()` returns false for
-everyone and the paywall bypass stays open. That is a **deliberate, accepted state** - the user chose
-not to risk production changes to close it.
+**4.20a backfill: DONE 2026-07-27.** Prod now has the `subscriptions` table, `is_premium()`, the
+live `revenuecat-webhook` (deployed `--no-verify-jwt`, secret set, fail-closed verified), and 9
+backfilled rows: **7 active subscribers (is_premium true), 2 expired**. RevenueCat webhooks are
+split: sandbox events -> test project, production events -> prod. The backfill script is
+`scripts/subscriptions_backfill.py` (RevenueCat API v2 - the scoped customer-read key cannot call
+v1). Key handling rule stands: `read -s`, never pasted into chat.
 
-To run the backfill:
-- A **fresh RevenueCat secret API key** (customer read only) is ready. Never paste it into chat;
-  load it with `read -s REVENUECAT_API_KEY && export REVENUECAT_API_KEY` so it does not land in the
-  transcript or shell history. A previous key was leaked exactly this way and had to be revoked.
-- `scripts/entitlement_audit.py` is the read-only precedent to model the backfill on.
-- The rows that matter live in **prod**, so this needs the `subscriptions` table promoted there
-  first. Do it as its own reviewed step with explicit approval, not folded into other work.
+**Next in 4E, in order:** 4.20b promote the remaining schema to prod (cascades,
+delete_current_user, age-band null, THEN the entitlement RLS limit - enforcement goes live at that
+moment), 4.21 Edge Functions to prod, 4.22 flip `_kUseTestSupabase` + cut 2.0.0 + upload the store
+assets (done, in `store-assets/`), 4.25 staged rollout. First real webhook event expected around
+Aug 4 (earliest renewal) - check the prod function logs after.
 
 **Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
 recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its
@@ -180,9 +179,10 @@ Pause and check with me before:
   when it syncs. `uploadPendingGame` upserts the rows then calls `generateGameInsight`, and the
   queue runs that same uploader on both the immediate save and the delayed flush. Closed 2026-07-22,
   device-verified 2026-07-26. Do not re-log this.
-- The paywall bypass is **open by decision**: `subscriptions` is empty, so `is_premium()` is false
-  for everyone until the backfill runs. The RLS limit is built and verified on test but has no data
-  to act on yet. See "Pending work" below.
+- The paywall bypass is **still open on prod, but the data is now real**: `subscriptions` is
+  backfilled (7 active subscribers, is_premium true) and the webhook keeps it current. The RLS
+  limit itself is NOT yet applied to prod - enforcement goes live with 4.20b, deliberately its own
+  reviewed step.
 
 ## A note on the user
 
