@@ -58,12 +58,11 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
   Future<void> _delete() async {
     final confirmed = await showCiConfirmDialog(
       context,
-      title: 'Delete your account?',
-      // Restates the loss rather than asking "are you sure" about nothing.
-      // The screen behind this one already explained; a second step that
-      // said less than the first would just be a speed bump.
-      message: 'Every player, every game you have logged and every insight '
-          'will be gone. This cannot be undone.',
+      title: 'Delete forever?',
+      // A short final gut-check. The screen behind this one already spelled out
+      // exactly what is lost, so restating it here read as redundant; this is
+      // the point-of-no-return confirmation, not a second explanation.
+      message: "This can't be undone.",
       confirmLabel: 'Delete forever',
       cancelLabel: 'Keep my account',
     );

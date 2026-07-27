@@ -77,18 +77,20 @@ void main() {
     await tester.tap(find.text('Delete my account'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Delete your account?'), findsOneWidget);
+    expect(find.text('Delete forever?'), findsOneWidget);
     expect(repo.deleteCalls, 0, reason: 'nothing until the second answer');
   });
 
-  testWidgets('the second step restates what is lost', (tester) async {
-    // A confirmation that says less than the screen behind it is a speed
-    // bump, not a safeguard.
+  testWidgets('the second step is a short final gut-check', (tester) async {
+    // The screen behind this one already spells out exactly what is lost, so
+    // the dialog is the point-of-no-return confirmation, not a second
+    // explanation. Restating the loss here read as redundant.
     await _pump(tester, _FakeAccount());
     await tester.tap(find.text('Delete my account'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Every player, every game'), findsOneWidget);
+    expect(find.text("This can't be undone."), findsOneWidget);
     expect(find.text('Keep my account'), findsOneWidget);
+    expect(find.textContaining('Every player, every game'), findsNothing);
   });
 
   testWidgets('backing out of the second step deletes nothing', (tester) async {
