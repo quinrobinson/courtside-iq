@@ -151,7 +151,9 @@ def store_product_id(rc_product_id):
         return None
     if rc_product_id in _product_cache:
         return _product_cache[rc_product_id]
-    body, err = get(f"/products/{rc_product_id}")
+    # probing=True: a key scoped to customers-only 403s here, and that must
+    # degrade to the RC product id, not abort a half-finished sweep.
+    body, err = get(f"/products/{rc_product_id}", probing=True)
     ident = (body or {}).get("store_identifier") or rc_product_id
     _product_cache[rc_product_id] = ident
     time.sleep(REQUEST_DELAY_S)
