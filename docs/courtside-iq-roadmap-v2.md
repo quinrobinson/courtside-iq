@@ -2319,12 +2319,22 @@ CRASH rather than a stale screen, and several live paths still do: the v1
 paywall fallback, GameStatsWidget, AllGamesWidget, the menu sub-screens.
 
 - Confirm every entry in `docs/2-0-screen-coverage.md` is designed + built or
-  deliberately cut.
-- Remove the per-screen 2.0 flags - 2.0 becomes the only path.
-- Delete `lib/pages/`, its routes and orphaned widgets.
-- `flutter analyze` clean; grep for lingering `pages/` imports.
+  deliberately cut. ✓ (24 approved frames, app_appearance the one deliberate cut)
+- Remove the per-screen 2.0 flags - 2.0 becomes the only path. ✓ flags.dart
+  deleted; kUseTestSupabase (env, not a screen flag) is the only flag left.
+- Delete `lib/pages/`, its routes and orphaned widgets. ✓ 117 files, 52k lines:
+  lib/pages/, DashboardPage (+widgets), PlayerProfilePageV2 (+its tabs/cards),
+  the v1 AddPlayerSheet, openPlayerProfileV2. The v1-only routes
+  (GameStatTracker, EditPlayer, EditPlayerPosition, AppAppearance) had no
+  live callers and were removed.
+- **Route names and deep-link paths survive**: lib/index.dart now defines
+  abstract holder classes with the same class names and the exact v1
+  routeName/routePath values, so every goNamed and shipped deep link works
+  unchanged.
+- `flutter analyze` clean (0 errors); grep proves zero `pages/` imports. ✓
+- Full test suite green (694). ✓
 - Re-run 4.18 after deletion. A missed route surfaces here as a crash.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+`[x] built` · `[x] wired` · `[ ] device-verified` — needs the 4.18 re-run
 
 ### 4.22 Flip flags and cut the build
 `_kUseTestSupabase = false`. Version `2.0.0`, build number above live. Local

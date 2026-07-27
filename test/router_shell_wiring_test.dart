@@ -11,7 +11,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:courtside_i_q/features/flags.dart';
 import 'package:courtside_i_q/features/nav/ci_nav_shell.dart';
 import 'package:courtside_i_q/flutter_flow/nav/nav.dart';
 import 'package:courtside_i_q/index.dart';
@@ -42,11 +41,9 @@ void main() {
     final router = createRouter(AppStateNotifier.instance);
     final shells = router.configuration.routes.whereType<StatefulShellRoute>();
 
-    expect(shells, hasLength(kUseNavShell ? 1 : 0));
-    if (kUseNavShell) {
-      expect(shells.first.branches, hasLength(kNavShellBranches.length),
-          reason: 'a branch per tab, in the order kNavShellBranches declares');
-    }
+    expect(shells, hasLength(1));
+    expect(shells.first.branches, hasLength(kNavShellBranches.length),
+        reason: 'a branch per tab, in the order kNavShellBranches declares');
   });
 
   test('no route was lost by moving the tabs into branches', () {
@@ -68,11 +65,11 @@ void main() {
     }
 
     // And a sample that must have stayed OUTSIDE the shell, so pushing them
-    // still covers the bar.
+    // still covers the bar. (EditPlayer left this list in 4.24: its v1 route
+    // was retired, and the 2.0 editor is pushed as a page, not routed.)
     for (final name in [
       GameStatsWidget.routeName,
       UserAuthWidget.routeName,
-      EditPlayerWidget.routeName,
     ]) {
       expect(names, contains(name), reason: '$name must still be routable');
     }

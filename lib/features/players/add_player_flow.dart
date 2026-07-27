@@ -12,10 +12,8 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/player_gating.dart';
-import '/features/flags.dart';
 import '/features/premium/premium_gate_sheet.dart';
 import '/features/home/entitlement_status.dart';
-import '/features/players/add_player_sheet.dart';
 import '/features/players/add_player_sheet_v2.dart';
 import '/features/players/widgets/player_gates.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -51,9 +49,7 @@ Future<void> runAddPlayerFlow(
         onPlayerAdded?.call();
       }
 
-      await (kUseAddPlayer2
-          ? showAddPlayerSheetV2(context, onPlayerAdded: onAdded)
-          : showAddPlayerSheet(context, onPlayerAdded: onAdded));
+      await showAddPlayerSheetV2(context, onPlayerAdded: onAdded);
 
       // LAND ON THE PLAYERS LIST. Wherever the parent started - Today, the
       // nav bar, the profile switcher - the new player is what they just
@@ -66,12 +62,9 @@ Future<void> runAddPlayerFlow(
         context.goNamed(PlayersListWidget.routeName);
       }
     case AddPlayerAction.upgradeGate:
-      // The 2.0 gate sheet (335:1881) behind the flag, the v1 gate otherwise.
-      // Either way, "See plans" hands to the injected openPaywall, which is
-      // what re-reads entitlement when it closes.
-      final wantsPlans = kUsePaywall2
-          ? (await showPremiumGateSheet(context) ?? false)
-          : await showAddPlayerUpgradeGate(context);
+      // The gate sheet (335:1881). "See plans" hands to the injected
+      // openPaywall, which is what re-reads entitlement when it closes.
+      final wantsPlans = await showPremiumGateSheet(context) ?? false;
       if (wantsPlans && context.mounted) {
         await openPaywall();
       }

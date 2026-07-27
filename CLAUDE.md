@@ -16,9 +16,11 @@ existed only because FlutterFlow would overwrite those files; that risk is gone.
 
 What this changes in practice:
 - `pubspec.yaml` is ours. Adding a dependency is a normal decision (still flag it first).
-- `lib/main.dart`, `lib/pages/`, `lib/backend/supabase/`, `ios/`, `android/` are editable.
-- `lib/pages/` is **legacy FlutterFlow-generated UI, scheduled for deletion** in roadmap 4.24. Treat
-  it as code with an expiry date: fix what you must to keep it compiling, do not invest in it.
+- `lib/main.dart`, `lib/backend/supabase/`, `ios/`, `android/` are editable.
+- `lib/pages/` was **deleted in roadmap 4.24 (2026-07-26)** - every v1 FlutterFlow screen is gone
+  and 2.0 is the only path. `lib/index.dart` still defines the v1 route names/paths as abstract
+  holder classes (same class names, e.g. `HomeWidget.routeName`) because the route table, every
+  `goNamed`, and shipped deep links depend on them. They are not widgets; never construct them.
 
 **Where new code goes:**
 - `lib/features/` — new screens and widgets

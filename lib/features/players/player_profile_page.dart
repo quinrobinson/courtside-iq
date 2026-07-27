@@ -30,11 +30,9 @@ import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
-import '/features/flags.dart';
 import '/features/home/entitlement_status.dart';
 import '/features/premium/paywall_launcher.dart';
 import '/features/home/widgets/today_promo_banner.dart';
-import '/features/nav/ci_nav_bar.dart';
 import '/features/players/players_revision.dart';
 import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
@@ -164,13 +162,6 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   }
 
   Future<void> _editPlayer(PlayerListEntry player) async {
-    if (!kUseEditPlayer2) {
-      context.pushNamed(
-        EditPlayerWidget.routeName,
-        queryParameters: {'playerID': player.playerId},
-      );
-      return;
-    }
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => EditPlayerPage(
         playerId: player.playerId,
@@ -307,14 +298,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
               );
             },
           ),
-          // No bar under the shell: this screen rides in the Players branch,
-          // so it inherits the shell's bar rather than drawing a second one.
-          bottomNavigationBar: kUseNavShell || !kUseNavBar2
-              ? null
-              : CiNavBar(
-                  active: CiNavTab.players,
-                  onPlayerAdded: _reloadPlayers,
-                ),
+          // No bar: this screen rides in the Players branch, so it inherits
+          // the shell's bar rather than drawing a second one.
         );
       }),
     );

@@ -1,28 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
-import '/backend/supabase/supabase.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
-import '/main.dart';
-import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
-import 'package:ff_commons/flutter_flow/lat_lng.dart';
-import 'package:ff_commons/flutter_flow/place.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
 
 import '/index.dart';
-import '/features/player_insight/player_profile_page.dart';
-import '/features/dashboard/dashboard_page.dart';
 import '/features/home/today_page.dart';
-import '/features/onboarding/first_run_gate.dart';
-import '/features/onboarding/whats_new_gate.dart';
 import '/features/nav/ci_nav_shell.dart';
 import '/features/players/players_list_page.dart';
 import '/features/players/player_profile_page.dart';
@@ -31,7 +21,6 @@ import '/features/auth/email_auth_page.dart';
 import '/features/auth/forgot_password_page.dart';
 import '/features/auth/reset_password_page.dart';
 import '/features/auth/reset_successful_page.dart';
-import '/features/flags.dart';
 import '/features/games/games_list_page.dart';
 import '/features/games/game_detail_page.dart';
 import '/auth/supabase_auth/auth_util.dart';
@@ -113,45 +102,23 @@ class AppStateNotifier extends ChangeNotifier {
   }
 }
 
-/// The screen a session starts on, flags applied.
+/// The screen a session starts on.
 ///
-/// This exists because the flags were applied in three places and one of them
-/// was missed: the signed-OUT branch here still built the v1 OnBoardWidget
-/// directly, so the 2.0 onboarding was routed correctly and never actually
-/// seen. `_initialize` and `errorBuilder` both bypass the route table, so a
-/// flag added only to the route table does nothing for a cold start.
-///
-/// Every entry point calls this. Adding a screen flag means changing one line.
+/// This exists because `_initialize` and `errorBuilder` both bypass the route
+/// table, so entry cannot be decided only in a route builder - a cold start
+/// would miss it. Every entry point calls this.
 Widget _entryScreen(AppStateNotifier appStateNotifier) {
   if (appStateNotifier.loggedIn) {
     return _homeScreen();
   }
-  return kUseEntry2 ? const OnboardingPage() : OnBoardWidget();
+  return const OnboardingPage();
 }
 
-/// Home, flags applied. 4.10a's TodayPage supersedes DashboardPage, which
-/// itself superseded HomeWidget - so the newest wins and each older one stays
-/// reachable by turning its successor off.
-Widget _homeScreen() {
-  if (kUseToday2) {
-    // The two one-time landing gates: FirstRunGate welcomes a brand-new parent
-    // BEFORE they see Today; WhatsNewGate floats the 2.0 upgrade sheet OVER
-    // Today for an existing v1 user. They are mutually exclusive (first-run
-    // marks the upgrade sheet seen), so at most one fires.
-    //
-    // UNDER THE SHELL THEY WRAP THE SHELL INSTEAD (see ci_nav_shell.dart):
-    // first-run has to cover the nav bar, and a gate applied here would sit
-    // inside the Home branch and render underneath it. Applying them in both
-    // places would also mount each gate twice and fire its query twice.
-    Widget home = const TodayPage();
-    if (!kUseNavShell) {
-      if (kUseWhatsNew2) home = WhatsNewGate(child: home);
-      if (kUseFirstRun) home = FirstRunGate(child: home);
-    }
-    return home;
-  }
-  return kUseDashboardV2 ? const DashboardPage() : HomeWidget();
-}
+/// Home. The one-time landing gates (FirstRunGate for a brand-new parent,
+/// WhatsNewGate for an existing v1 user) live in the SHELL, not here: they
+/// have to cover the nav bar, and a gate applied here would sit inside the
+/// Home branch and render underneath it. See ci_nav_shell.dart.
+Widget _homeScreen() => const TodayPage();
 
 /// Where a signed-in parent at `/` has to be sent, and WHY (4.19f).
 ///
@@ -179,7 +146,7 @@ String? shellEntryRedirect({
   required bool loading,
   required String path,
 }) {
-  if (!kUseNavShell || !loggedIn || loading) return null;
+  if (!loggedIn || loading) return null;
   return path == '/' ? HomeWidget.routePath : null;
 }
 
@@ -210,85 +177,56 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: PlayersListWidget.routeName,
         path: PlayersListWidget.routePath,
         requireAuth: true,
-        // 4.11a: keeps the v1 route name and path so existing navigation
-        // reaches it unchanged; the flag is a one-line revert.
-        builder: (context, params) =>
-            kUsePlayers2 ? const PlayersListPage() : PlayersListWidget(),
+        // Keeps the v1 route name and path so existing navigation reaches it
+        // unchanged.
+        builder: (context, params) => const PlayersListPage(),
       ),
       FFRoute(
         name: MenuWidget.routeName,
         path: MenuWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => kUseMenu2
-            ? MenuPage(
-                // MIRRORS v1's SIGN-OUT EXACTLY, including the RevenueCat
-                // logout. Dropping that would leave the next account signed
-                // in on this device carrying the previous one's entitlement -
-                // the bug that once handed everyone premium.
-                onSignOut: () async {
-                  GoRouter.of(context).prepareAuthEvent();
-                  await authManager.signOut();
-                  GoRouter.of(context).clearRedirectLocation();
-                  final router = GoRouter.of(context);
-                  await actions.logoutOfRevenueCat();
-                  router.goNamed(UserAuthWidget.routeName);
-                },
-                onOpenProfile: () =>
-                    context.pushNamed(YourProfileWidget.routeName),
-                onOpenHelp: () => context.pushNamed(HelpCenterWidget.routeName),
-                onOpenFeedback: () =>
-                    context.pushNamed(SendFeedbackWidget.routeName),
-                onOpenSubscription: () => showPaywall(context),
-              )
-            : MenuWidget(),
+        builder: (context, params) => MenuPage(
+          // MIRRORS v1's SIGN-OUT EXACTLY, including the RevenueCat
+          // logout. Dropping that would leave the next account signed
+          // in on this device carrying the previous one's entitlement -
+          // the bug that once handed everyone premium.
+          onSignOut: () async {
+            GoRouter.of(context).prepareAuthEvent();
+            await authManager.signOut();
+            GoRouter.of(context).clearRedirectLocation();
+            final router = GoRouter.of(context);
+            await actions.logoutOfRevenueCat();
+            router.goNamed(UserAuthWidget.routeName);
+          },
+          onOpenProfile: () => context.pushNamed(YourProfileWidget.routeName),
+          onOpenHelp: () => context.pushNamed(HelpCenterWidget.routeName),
+          onOpenFeedback: () => context.pushNamed(SendFeedbackWidget.routeName),
+          onOpenSubscription: () => showPaywall(context),
+        ),
       ),
       FFRoute(
         name: UserAuthWidget.routeName,
         path: UserAuthWidget.routePath,
-        // 4.9: keeps the v1 route name and path so existing navigation calls
-        // reach it unchanged and the flag is a one-line revert.
-        builder: (context, params) =>
-            kUseAuthLanding2 ? const AuthLandingPage() : UserAuthWidget(),
-      ),
-      FFRoute(
-        name: GameStatTrackerWidget.routeName,
-        path: GameStatTrackerWidget.routePath,
-        requireAuth: true,
-        builder: (context, params) => GameStatTrackerWidget(
-          playerName: params.getParam('playerName', ParamType.String),
-          oppName: params.getParam('oppName', ParamType.String),
-          playerID: params.getParam('playerID', ParamType.String),
-          eventSelected: params.getParam('eventSelected', ParamType.String),
-          playerTeam: params.getParam('playerTeam', ParamType.String),
-        ),
+        // Keeps the v1 route name and path so existing navigation calls
+        // reach it unchanged.
+        builder: (context, params) => const AuthLandingPage(),
       ),
       FFRoute(
         name: AllGamesWidget.routeName,
         path: AllGamesWidget.routePath,
         requireAuth: true,
-        builder: (context, params) =>
-            kUseGames2 ? const GamesListPage() : AllGamesWidget(),
-      ),
-      FFRoute(
-        name: EditPlayerWidget.routeName,
-        path: EditPlayerWidget.routePath,
-        requireAuth: true,
-        builder: (context, params) => EditPlayerWidget(
-          playerID: params.getParam('playerID', ParamType.String),
-        ),
+        builder: (context, params) => const GamesListPage(),
       ),
       FFRoute(
         name: OnBoardWidget.routeName,
         path: OnBoardWidget.routePath,
-        // 4.9: keeps the v1 route name and path so existing navigation calls
-        // reach it unchanged and the flag is a one-line revert.
+        // Keeps the v1 route name and path: FFRoute's requireAuth redirect
+        // sends a signed-out parent to '/onBoard', so this path must exist.
         //
         // NOT the only way onboarding is reached - _initialize and
         // errorBuilder bypass the route table entirely, which is why they go
-        // through _entryScreen. Flagging only here left the v1 screen showing
-        // on every cold start.
-        builder: (context, params) =>
-            kUseEntry2 ? const OnboardingPage() : OnBoardWidget(),
+        // through _entryScreen.
+        builder: (context, params) => const OnboardingPage(),
       ),
       FFRoute(
         name: HomeWidget.routeName,
@@ -300,57 +238,29 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: EditNameWidget.routeName,
         path: EditNameWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => kUseMenu2
-            ? const EditNamePage()
-            : EditNameWidget(
-                userFirstName: params.getParam(
-                  'userFirstName',
-                  ParamType.String,
-                ),
-                userLastName: params.getParam('userLastName', ParamType.String),
-                userEmail: params.getParam('userEmail', ParamType.String),
-                userID: params.getParam('userID', ParamType.String),
-              ),
+        builder: (context, params) => const EditNamePage(),
       ),
       FFRoute(
         name: YourProfileWidget.routeName,
         path: YourProfileWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => kUseMenu2
-            ? YourProfilePage(
-                onEditName: () => context.pushNamed(EditNameWidget.routeName, extra: slideInExtra()),
-                onEditEmail: () => context.pushNamed(EditEmailWidget.routeName, extra: slideInExtra()),
-                onChangePassword: () =>
-                    context.pushNamed(ChangePasswordPage.routeName, extra: slideInExtra()),
-                onDeleteAccount: () =>
-                    context.pushNamed(DeleteAccountPage.routeName, extra: slideInExtra()),
-                // onEditPhoto stays null: there is no column to store one.
-              )
-            : YourProfileWidget(
-                userFirstName: params.getParam(
-                  'userFirstName',
-                  ParamType.String,
-                ),
-                userLastName: params.getParam('userLastName', ParamType.String),
-                userEmail: params.getParam('userEmail', ParamType.String),
-                userID: params.getParam('userID', ParamType.String),
-              ),
+        builder: (context, params) => YourProfilePage(
+          onEditName: () =>
+              context.pushNamed(EditNameWidget.routeName, extra: slideInExtra()),
+          onEditEmail: () => context.pushNamed(EditEmailWidget.routeName,
+              extra: slideInExtra()),
+          onChangePassword: () => context.pushNamed(ChangePasswordPage.routeName,
+              extra: slideInExtra()),
+          onDeleteAccount: () => context.pushNamed(DeleteAccountPage.routeName,
+              extra: slideInExtra()),
+          // onEditPhoto stays null: there is no column to store one.
+        ),
       ),
       FFRoute(
         name: EditEmailWidget.routeName,
         path: EditEmailWidget.routePath,
         requireAuth: true,
-        builder: (context, params) => kUseMenu2
-            ? const EditEmailPage()
-            : EditEmailWidget(
-                userEmail: params.getParam('userEmail', ParamType.String),
-                userFirstName: params.getParam(
-                  'userFirstName',
-                  ParamType.String,
-                ),
-                userLastName: params.getParam('userLastName', ParamType.String),
-                userID: params.getParam('userID', ParamType.double),
-              ),
+        builder: (context, params) => const EditEmailPage(),
       ),
       FFRoute(
         name: ResetPasswordWidget.routeName,
@@ -358,41 +268,33 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // requireAuth stays: the recovery link establishes a session first,
         // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) => kUsePasswordReset2
-            ? const ResetPasswordPage()
-            : ResetPasswordWidget(),
+        builder: (context, params) => const ResetPasswordPage(),
       ),
       FFRoute(
         name: ForgotPasswordWidget.routeName,
         path: ForgotPasswordWidget.routePath,
-        // 4.9: keeps the v1 route name and path so existing navigation calls
-        // reach it unchanged and the flag is a one-line revert.
-        builder: (context, params) => kUsePasswordReset2
-            ? const ForgotPasswordPage()
-            : ForgotPasswordWidget(),
+        // Keeps the v1 route name and path so existing navigation calls
+        // reach it unchanged.
+        builder: (context, params) => const ForgotPasswordPage(),
       ),
       FFRoute(
         name: PlayersProfileWidget.routeName,
         path: PlayersProfileWidget.routePath,
         requireAuth: true,
-        // 4.11b: keeps the v1 route name and path so every existing
-        // navigation call reaches it unchanged.
+        // Keeps the v1 route name and path so every existing navigation call
+        // reaches it unchanged.
         builder: (context, params) {
           final id = params.getParam('playerID', ParamType.String) ?? '';
-          return kUseProfile2
-              ? PlayerProfilePage(playerId: id)
-              : PlayerProfilePageV2(playerId: id);
+          return PlayerProfilePage(playerId: id);
         },
       ),
       FFRoute(
         name: HelpCenterWidget.routeName,
         path: HelpCenterWidget.routePath,
-        builder: (context, params) => kUseMenu2
-            ? HelpCenterPage(
-                onSendFeedback: () =>
-                    context.pushNamed(SendFeedbackWidget.routeName),
-              )
-            : HelpCenterWidget(),
+        builder: (context, params) => HelpCenterPage(
+          onSendFeedback: () =>
+              context.pushNamed(SendFeedbackWidget.routeName),
+        ),
       ),
       FFRoute(
         name: ResetSuccesfulWidget.routeName,
@@ -400,18 +302,7 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // requireAuth stays: the recovery link establishes a session first,
         // and updateUser applies to that session.
         requireAuth: true,
-        builder: (context, params) => kUsePasswordReset2
-            ? const ResetSuccessfulPage()
-            : ResetSuccesfulWidget(),
-      ),
-      FFRoute(
-        name: EditPlayerPositionWidget.routeName,
-        path: EditPlayerPositionWidget.routePath,
-        requireAuth: true,
-        builder: (context, params) => EditPlayerPositionWidget(
-          playerID: params.getParam('playerID', ParamType.String),
-          playerPosition: params.getParam('playerPosition', ParamType.String),
-        ),
+        builder: (context, params) => const ResetSuccessfulPage(),
       ),
       FFRoute(
         name: NewGameWidget.routeName,
@@ -420,23 +311,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         // showing tabs. See FFRoute.parentNavigatorKey.
         parentNavigatorKey: appNavigatorKey,
         requireAuth: true,
-        builder: (context, params) =>
-            kUseNewGame2 ? const _NewGameSetupRoute() : NewGameWidget(),
-      ),
-      FFRoute(
-        name: AppAppearanceWidget.routeName,
-        path: AppAppearanceWidget.routePath,
-        requireAuth: true,
-        builder: (context, params) => AppAppearanceWidget(),
+        builder: (context, params) => const _NewGameSetupRoute(),
       ),
       FFRoute(
         name: UserAuthEmailWidget.routeName,
         path: UserAuthEmailWidget.routePath,
-        // 4.9: the 2.0 screen keeps the v1 route name and path, so every
-        // existing navigation call reaches it unchanged and flipping the flag
-        // back is a one-line revert rather than a routing change.
-        builder: (context, params) =>
-            kUseAuth2 ? const EmailAuthPage() : UserAuthEmailWidget(),
+        // The 2.0 screen keeps the v1 route name and path, so every existing
+        // navigation call reaches it unchanged.
+        builder: (context, params) => const EmailAuthPage(),
       ),
       FFRoute(
         name: DeleteAccountPage.routeName,
@@ -481,24 +363,17 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) {
         name: SendFeedbackWidget.routeName,
         path: SendFeedbackWidget.routePath,
         requireAuth: true,
-        builder: (context, params) =>
-            kUseMenu2 ? const SendFeedbackPage() : SendFeedbackWidget(),
+        builder: (context, params) => const SendFeedbackPage(),
       ),
       FFRoute(
         name: GameStatsWidget.routeName,
         path: GameStatsWidget.routePath,
         builder: (context, params) {
           final gameId = params.getParam('gameID', ParamType.String) ?? '';
-          // Switched HERE, not at the five call sites that push this route.
-          // One flag, every entry point - the games list, Today, the profile
-          // Games tab and the profile's own row cannot drift apart.
-          if (kUseGameDetail2) {
-            return GameDetailPage(gameId: gameId);
-          }
-          return GameStatsWidget(
-            playerID: params.getParam('playerID', ParamType.String),
-            gameID: gameId,
-          );
+          // Resolved HERE, not at the five call sites that push this route,
+          // so the games list, Today, the profile Games tab and the profile's
+          // own row cannot drift apart.
+          return GameDetailPage(gameId: gameId);
         },
       ),
       FFRoute(
@@ -526,19 +401,15 @@ final _shellBranchRouteNames = <List<String>>[
 ];
 
 /// Wraps the tab routes in a [StatefulShellRoute] so one nav bar survives a
-/// tab change. See [kUseNavShell] and `ci_nav_shell.dart`.
+/// tab change. See `ci_nav_shell.dart`.
 ///
 /// ROUTE NAMES AND PATHS ARE UNCHANGED. The branches reuse the very same
 /// [FFRoute] definitions, so every `goNamed`/`pushNamed` in the app keeps
-/// working and turning the flag off restores the previous flat table exactly.
+/// working.
 List<RouteBase> _buildRoutes(
   List<FFRoute> routes,
   AppStateNotifier appStateNotifier,
 ) {
-  if (!kUseNavShell) {
-    return routes.map((r) => r.toRoute(appStateNotifier)).toList();
-  }
-
   final inShell = _shellBranchRouteNames.expand((b) => b).toSet();
   GoRoute build(String name) =>
       routes.firstWhere((r) => r.name == name).toRoute(appStateNotifier);
@@ -744,20 +615,8 @@ class FFRoute {
               builder: (context, _) => builder(context, ffParams),
             )
           : builder(context, ffParams);
-      // 4.9: the 2.0 splash is painted, so it fits any aspect ratio. The
-      // v1 asset was a fixed bitmap stretched with BoxFit.cover, which
-      // distorted on anything it was not drawn for.
-      final child = appStateNotifier.loading
-          ? (kUseEntry2
-                ? const SplashView()
-                : Container(
-                    color: Colors.transparent,
-                    child: Image.asset(
-                      'assets/images/App_Load_d.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ))
-          : page;
+      // The 2.0 splash is painted, so it fits any aspect ratio.
+      final child = appStateNotifier.loading ? const SplashView() : page;
 
       // THE SPLASH STAND-IN GETS ITS OWN PAGE KEY (4.19f).
       //

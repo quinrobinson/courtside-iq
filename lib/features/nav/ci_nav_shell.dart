@@ -26,7 +26,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '/features/flags.dart';
 import '/features/onboarding/first_run_gate.dart';
 import '/features/onboarding/whats_new_gate.dart';
 import '/features/players/players_revision.dart';
@@ -102,20 +101,16 @@ class CiNavShell extends StatelessWidget {
 
     // Order matters: WhatsNew sits INSIDE FirstRun, so a brand-new parent
     // finishes onboarding before the upgrade sheet is even considered. The two
-    // are mutually exclusive by flag anyway, but the nesting makes it true by
-    // construction rather than by coincidence.
-    if (kUseWhatsNew2) {
-      shell = WhatsNewGate(
-        policy: whatsNewPolicy ?? const SupabaseWhatsNew2Policy(),
-        child: shell,
-      );
-    }
-    if (kUseFirstRun) {
-      shell = FirstRunGate(
-        policy: firstRunPolicy ?? const SupabaseFirstRunPolicy(),
-        child: shell,
-      );
-    }
+    // are mutually exclusive (first-run marks the upgrade sheet seen), and the
+    // nesting makes it true by construction rather than by coincidence.
+    shell = WhatsNewGate(
+      policy: whatsNewPolicy ?? const SupabaseWhatsNew2Policy(),
+      child: shell,
+    );
+    shell = FirstRunGate(
+      policy: firstRunPolicy ?? const SupabaseFirstRunPolicy(),
+      child: shell,
+    );
     return shell;
   }
 }

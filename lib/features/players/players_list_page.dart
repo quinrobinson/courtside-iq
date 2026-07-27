@@ -22,12 +22,9 @@ import '/features/home/entitlement_status.dart';
 import '/features/home/widgets/today_promo_banner.dart';
 import '/features/players/add_player_flow.dart';
 import '/features/premium/paywall_launcher.dart';
-import '/features/flags.dart';
-import '/features/nav/ci_nav_bar.dart';
 import '/features/players/players_revision.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
-import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import 'players_repository.dart';
 import 'widgets/player_list_row.dart';
 
@@ -157,15 +154,7 @@ class _PlayersListPageState extends State<PlayersListPage> {
                 );
               },
             ),
-            // Under the shell this screen renders NO bar - the shell owns the
-            // only one. The false branch here is the v1 bar, so the shell case
-            // has to be checked FIRST or it falls through to that.
-            bottomNavigationBar: kUseNavShell
-                ? null
-                : kUseNavBar2
-                    ? CiNavBar(
-                        active: CiNavTab.players, onPlayerAdded: _refresh)
-                    : const CustomNavBarWidget(page: 'Players'),
+            // No bar: the shell owns the only one.
           );
         },
       ),

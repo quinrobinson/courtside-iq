@@ -33,15 +33,12 @@ import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
-import '/features/flags.dart';
 import '/features/players/birth_date_gate.dart';
 import '/features/players/info_copy.dart';
-import '/features/nav/ci_nav_bar.dart';
 import '/features/players/players_revision.dart';
 import '/features/games/games_revision.dart';
 import '/features/menu/account_repository.dart';
 import '/features/premium/paywall_launcher.dart';
-import '/pages/global/custom_nav_bar/custom_nav_bar_widget.dart';
 import 'entitlement_status.dart';
 import 'widgets/today_promo_banner.dart';
 import 'widgets/today_skeleton.dart';
@@ -293,26 +290,7 @@ class _TodayPageState extends State<TodayPage> {
                   );
                 },
               ),
-              // CiNavBar owns its own ground and safe area, so the ColoredBox
-              // and SafeArea wrapper this screen used to need for the v1 bar
-              // are gone. The v1 bar had neither, which is why the
-              // home-indicator strip fell through to the ink scaffold.
-              // Three cases, and the middle one is easy to lose: under the
-              // shell this screen renders NO bar, because the shell owns the
-              // only one. Collapsing that into `kUseNavBar2 && !kUseNavShell`
-              // fell through to the v1 bar instead of to nothing.
-              bottomNavigationBar: kUseNavShell
-                  ? null
-                  : kUseNavBar2
-                      ? CiNavBar(
-                          active: CiNavTab.home, onPlayerAdded: _refresh)
-                      : ColoredBox(
-                          color: c.bg,
-                          child: const SafeArea(
-                            top: false,
-                            child: CustomNavBarWidget(page: 'Home'),
-                          ),
-                        ),
+              // No bar: the shell owns the only one.
             ),
           );
         },
