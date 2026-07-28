@@ -114,11 +114,16 @@ split: sandbox events -> test project, production events -> prod. The backfill s
 `scripts/subscriptions_backfill.py` (RevenueCat API v2 - the scoped customer-read key cannot call
 v1). Key handling rule stands: `read -s`, never pasted into chat.
 
-**Next in 4E, in order:** 4.20b promote the remaining schema to prod (cascades,
-delete_current_user, age-band null, THEN the entitlement RLS limit - enforcement goes live at that
-moment), 4.21 Edge Functions to prod, 4.22 flip `_kUseTestSupabase` + cut 2.0.0 + upload the store
-assets (done, in `store-assets/`), 4.25 staged rollout. First real webhook event expected around
-Aug 4 (earliest renewal) - check the prod function logs after.
+**4.20b: DONE 2026-07-27.** All remaining schema promoted to prod (incl. three discovered
+test-only dependencies: ai_usage, insight_json_nullable, insight_delete_policy) and the
+**entitlement RLS is LIVE** - proven by rolled-back probes: free-at-limit DENIED, active
+subscriber ALLOWED. Zero paying customers affected (7 premium all pass; 35 free over-limit keep
+every player, INSERT-only).
+
+**Next in 4E, in order:** 4.21 Edge Functions to prod (generate-game-insight v2 prompt,
+generate-player-insight claim-row version), 4.22 flip `_kUseTestSupabase` + version 2.0.0 + cut
+builds + upload store assets (done, in `store-assets/`), 4.25 staged rollout. First real webhook
+event expected around Aug 4 (earliest renewal) - check the prod function logs after.
 
 **Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
 recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its
@@ -179,10 +184,10 @@ Pause and check with me before:
   when it syncs. `uploadPendingGame` upserts the rows then calls `generateGameInsight`, and the
   queue runs that same uploader on both the immediate save and the delayed flush. Closed 2026-07-22,
   device-verified 2026-07-26. Do not re-log this.
-- The paywall bypass is **still open on prod, but the data is now real**: `subscriptions` is
-  backfilled (7 active subscribers, is_premium true) and the webhook keeps it current. The RLS
-  limit itself is NOT yet applied to prod - enforcement goes live with 4.20b, deliberately its own
-  reviewed step.
+- ~~The paywall bypass~~ **CLOSED 2026-07-27 (4.20b)**: the entitlement RLS limit is live on prod,
+  backed by the backfilled `subscriptions` table and the webhook. Probe-verified in both
+  directions. The one soft edge: the anonymous Android subscriber (no auth account) meets the
+  add-player gate until a renewal writes their row - documented in the roadmap.
 
 ## A note on the user
 

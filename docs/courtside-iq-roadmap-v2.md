@@ -2290,11 +2290,21 @@ Backup first. In order: the account-deletion cascades (20260723000000),
 delete_current_user (20260723000001, 20260723000002), the age-band null
 (20260721000000), then the entitlement RLS.
 
-**Check for orphaned rows before the cascades:**
-`select count(*) from public.users u where not exists (select 1 from auth.users a where a.id = u.id);`
-Test had none; prod has been live for months. A failure here is the right
-outcome - it means rows exist that this would otherwise make deletable.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+**DONE 2026-07-27.** Backup confirmed first; orphan check came back ZERO both
+directions. The promotion list grew by three discovered dependencies that were
+test-only: ai_usage (cascades + 4.21 functions need it), insight_json_nullable
+(claim rows), insight_delete_policy (claim cleanup). Skipped as verified
+no-ops: align_v_player_game_stats (view md5 identical on test and prod) and
+drop_insight_advisory_lock (functions never existed on prod). Applied in
+order: ai_usage -> insight_json_nullable -> insight_delete_policy -> cascades
+-> delete_current_user (final form incl. ai_usage pre-clear) -> age-band null
+-> entitlement RLS. All verified object-by-object, plus LIVE RLS probes in
+rolled-back transactions: a free user at the 1-player limit is DENIED
+(insufficient_privilege) and an active subscriber is ALLOWED; zero probe
+residue. Fresh blast radius at flip time: 7 premium all pass, 35 free
+over-limit keep every player (INSERT-only), zero paying customers affected.
+**Server-side entitlement enforcement is LIVE on prod as of this item.**
+`[x] built` · `[x] wired` · `[x] verified live on prod`
 
 ### 4.20c Freeze earned per-game ratings across an age-band crossing
 **Found 2026-07-26 during the 4.18 F pass.** Decision #4 is "freeze earned
