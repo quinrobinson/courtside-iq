@@ -130,6 +130,13 @@ the store version entries, paste the approved copy, upload `store-assets/`, fix 
 "CourtSide IQ" name casing. Then 4.25 staged rollout (iOS Phased Release, Play staged, watch
 Crashlytics + support inbox + prod function logs; first webhook renewal expected ~Aug 4).
 
+**Branding is FINAL (2026-07-27):** the mark is the original C with the right half at 0.5 opacity.
+One SVG feeds both `ios/Runner/courtside-iq.icon/` and `assets/images/logo-mark.svg` (keep them
+identical). Small open item: the Figma `LogoMark` COMPONENT (25:5) still holds the old geometry -
+the app renders the new SVG everywhere, but other Figma frames show the old mark in the design
+file only. Update the component deliberately (instances carry fill overrides, some on light
+grounds) - a user-driven 10-minute pass, not urgent, does not block 4.22.
+
 **Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
 recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its
 snapshot, since test holds no games predating the trigger. The point was closing the drift, not the
