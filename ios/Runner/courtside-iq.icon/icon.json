@@ -5,7 +5,7 @@
       "value" : {
         "linear-gradient" : [
           "display-p3:0.00000,0.00000,0.00000,1.00000",
-          "display-p3:0.21598,0.30604,0.09752,1.00000"
+          "extended-gray:0.00000,1.00000"
         ],
         "orientation" : {
           "start" : {
@@ -44,13 +44,28 @@
       "layers" : [
         {
           "blend-mode" : "normal",
-          "fill" : "none",
+          "fill" : {
+            "linear-gradient" : [
+              "extended-gray:0.50000,1.00000",
+              "extended-gray:1.00000,1.00000"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0.5253255108406361,
+                "y" : 0.5000000000000001
+              },
+              "stop" : {
+                "x" : 0.5,
+                "y" : 0.5000000000000001
+              }
+            }
+          },
           "glass" : true,
           "hidden" : false,
           "image-name" : "Logo Mark.svg",
           "name" : "Logo Mark",
           "position" : {
-            "scale" : 2.95,
+            "scale" : 4.67,
             "translation-in-points" : [
               -1.9997959632581797,
               0.1927013253991845
