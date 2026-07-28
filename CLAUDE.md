@@ -120,10 +120,15 @@ test-only dependencies: ai_usage, insight_json_nullable, insight_delete_policy) 
 subscriber ALLOWED. Zero paying customers affected (7 premium all pass; 35 free over-limit keep
 every player, INSERT-only).
 
-**Next in 4E, in order:** 4.21 Edge Functions to prod (generate-game-insight v2 prompt,
-generate-player-insight claim-row version), 4.22 flip `_kUseTestSupabase` + version 2.0.0 + cut
-builds + upload store assets (done, in `store-assets/`), 4.25 staged rollout. First real webhook
-event expected around Aug 4 (earliest renewal) - check the prod function logs after.
+**4.21: DONE 2026-07-27.** Both insight functions live on prod (JWT verification on, shared
+modules bundled, 401-probed). Live v1.4.0 users now receive the v2 per-game prompt and the
+claim-row narrative.
+
+**Next in 4E:** 4.22 flip `_kUseTestSupabase` to false + version 2.0.0 + build numbers above live
++ cut both builds (local pipeline: JDK 17 + FF keystore for Android, Transporter for iOS) + create
+the store version entries, paste the approved copy, upload `store-assets/`, fix the iOS
+"CourtSide IQ" name casing. Then 4.25 staged rollout (iOS Phased Release, Play staged, watch
+Crashlytics + support inbox + prod function logs; first webhook renewal expected ~Aug 4).
 
 **Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
 recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its
