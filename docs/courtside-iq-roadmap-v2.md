@@ -2381,7 +2381,33 @@ paywall fallback, GameStatsWidget, AllGamesWidget, the menu sub-screens.
 ### 4.22 Flip flags and cut the build
 `_kUseTestSupabase = false`. Version `2.0.0`, build number above live. Local
 release pipeline (JDK 17 + FF keystore for Android, Transporter for iOS).
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+**DONE 2026-07-29. BOTH STORES SUBMITTED, AWAITING REVIEW.** Cutover commit
+`ba78e6d`: flag false, version 2.0.0+300 (live was 1.4.0+234), 699 tests green
+on the flipped config.
+
+- **Android:** `flutter build appbundle --release` with JDK 17 from
+  `/opt/homebrew/opt/openjdk@17` (system Java is 25; the build needs 17).
+  68.6MB aab, `jarsigner -verify` = "jar verified". Uploaded to Play,
+  listing + screenshots + notes in, **staged rollout 24%**, submitted.
+  NOTE: Play folds "Start rollout" into "Save and submit for review" when the
+  release goes through review - the 24% begins automatically on approval.
+- **iOS:** `flutter build ipa` archived 2.0.0 (300) fine but IPA export failed
+  on two Apple-side gates: an unaccepted **PLA update** and **no iOS
+  Distribution certificate** on this Mac. Both cleared by accepting the
+  agreement, then distributing the archive through the Xcode Organizer
+  (`open build/ios/archive/Runner.xcarchive` -> Distribute App -> App Store
+  Connect -> Distribute), which mints the certificate automatically. Transporter
+  was not needed. Build attached in ASC and submitted for review.
+  CAUTION: a stale v1.4.0 `Courtside IQ.ipa` from June still sits in
+  `build/ios/ipa/` - never feed that to Transporter.
+- **Store copy/assets:** the approved 4.23 package went in as-is. Two upload
+  gotchas: Apple keywords must have **no spaces after commas** (96 chars with
+  spaces = 109 = rejected), and screenshots belong in the **6.9" slot**
+  (1320x2868); the 6.5" slot rejects them - click "Keep using 6.9" Display".
+- **Prod Supabase redirect URLs added:** `courtsideiq://reset-password` and
+  `courtsideiq://login-callback`.
+`[x] built` · `[x] wired` · `[x] submitted 2026-07-29`
 
 ### 4.23 Store assets
 New screenshots, release notes and listing copy for the 2.0 UI. The release
@@ -2412,6 +2438,32 @@ An existing FREE parent with more than one player keeps them - the policy is
 INSERT-only and removes nothing - but will meet a gate they have never seen
 when adding another. That is correct behaviour and still a support question
 worth expecting.
+
+**IN FLIGHT as of 2026-07-29.** Both stores submitted; rollout controls are
+already set (iOS Phased Release + Manual Release, Play staged at 24%), so
+approval does not ship to everyone.
+
+**On approval, in order:**
+1. iOS: click **Release** (Manual Release is on, so approval alone ships
+   nothing). Phased Release then ramps over 7 days.
+2. Watch, first 24-48h: **Crashlytics** for a 2.0-only crash signature;
+   the **support inbox** for "where did my players go" (should be
+   impossible - nothing was deleted) and "it says I am not premium" (the
+   backfill failing, and the one that costs customers - 7 rows are in and
+   verified, so treat any instance as urgent);
+   **prod Edge Function logs** for generate-game-insight / -player-insight
+   errors at real volume.
+3. **First real webhook renewal ~Aug 4** (earliest `current_period_end`).
+   Confirm `revenuecat-webhook` fires and writes: the row's `last_event_type`
+   should stop being 'BACKFILL'. That is also when the anonymous Android
+   subscriber can self-heal into a real row.
+4. **Hold the ramp** on either signal. Both stores allow pausing; neither
+   allows un-shipping.
+
+**Post-rollout cleanup (once 100% on both stores):** delete the two stale
+Supabase redirect URLs (`courtside-iq.flutterflow.app/resetPassword`,
+`webapp://courtsideiq.app`) - kept during the ramp because in-flight v1
+recovery emails still point at the first one.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ---

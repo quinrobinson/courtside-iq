@@ -124,11 +124,18 @@ every player, INSERT-only).
 modules bundled, 401-probed). Live v1.4.0 users now receive the v2 per-game prompt and the
 claim-row narrative.
 
-**Next in 4E:** 4.22 flip `_kUseTestSupabase` to false + version 2.0.0 + build numbers above live
-+ cut both builds (local pipeline: JDK 17 + FF keystore for Android, Transporter for iOS) + create
-the store version entries, paste the approved copy, upload `store-assets/`, fix the iOS
-"CourtSide IQ" name casing. Then 4.25 staged rollout (iOS Phased Release, Play staged, watch
-Crashlytics + support inbox + prod function logs; first webhook renewal expected ~Aug 4).
+**4.22: DONE 2026-07-29 — 2.0.0 IS SUBMITTED TO BOTH STORES, AWAITING REVIEW.** Cutover commit
+`ba78e6d`: `_kUseTestSupabase = false`, version 2.0.0+300, 699 tests green. Android aab signed and
+verified (build with JDK 17 from `/opt/homebrew/opt/openjdk@17` - system Java is 25), Play staged
+at 24%. iOS distributed via the Xcode Organizer, which minted the missing distribution certificate
+(Transporter not needed; ignore the stale June v1.4.0 ipa in `build/ios/ipa/`). Prod redirect URLs
+added. Full detail incl. the upload gotchas is in the roadmap's 4.22 entry.
+
+**ONLY 4.25 REMAINS: the staged rollout watch.** On iOS approval, click **Release** (Manual Release
+is on). Then watch Crashlytics, the support inbox ("it says I am not premium" = backfill trouble,
+treat as urgent), and prod Edge Function logs. **First real webhook renewal ~Aug 4** - confirm a
+row's `last_event_type` stops being 'BACKFILL'. Hold the ramp on any bad signal; both stores allow
+pausing and neither allows un-shipping.
 
 **Branding is FINAL (2026-07-27):** the mark is the original C with the right half at 0.5 opacity.
 One SVG feeds both `ios/Runner/courtside-iq.icon/` and `assets/images/logo-mark.svg` (keep them
