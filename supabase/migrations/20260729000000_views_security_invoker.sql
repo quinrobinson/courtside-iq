@@ -1,0 +1,41 @@
+-- SECURITY FIX — views bypassed RLS entirely. Applied to prod AND test
+-- 2026-07-29, then written here.
+--
+-- WHAT WAS WRONG
+--
+-- A Postgres view executes as its OWNER unless it is marked security_invoker.
+-- public.player_profile_view and public.v_player_game_stats are owned by
+-- `postgres` and granted to anon + authenticated, so every read through them
+-- ran with owner privileges and sailed past every RLS policy on players,
+-- games and player_game_stats.
+--
+-- Measured on PROD before the fix:
+--   * an UNAUTHENTICATED caller - holding only the anon key, which ships
+--     inside every installed copy of the app - could read 255 player rows
+--     across 165 families and 389 game-stat rows across 73 families
+--   * that is children's first and last names, birth dates, age bands,
+--     profile photos and complete game-by-game statistics
+--
+-- This predates 2.0; the shipped v1 app was affected the whole time. The
+-- Supabase dashboard surfaced it as the "Unrestricted" badge on both views.
+--
+-- WHY POLICIES WERE NOT THE ANSWER
+--
+-- The instinct is to add RLS policies to the views. That does nothing: without
+-- security_invoker a view never consults RLS at all. Turning it on makes the
+-- EXISTING table policies apply, which is the whole fix. player_list_view and
+-- game_list_view already had it; these two are older and were missed.
+--
+-- VERIFIED, in rolled-back transactions before applying and again live after:
+--   anon         255 / 389 rows          ->  0 / 0
+--   one parent   255 rows / 165 families ->  1 own player, 20 own games
+--
+-- Edge Functions are unaffected - they hold the service role, which bypasses
+-- RLS by design.
+--
+-- RULE GOING FORWARD: every view added to this schema must be created with
+-- `WITH (security_invoker = on)`. A view over an RLS-protected table without
+-- it is a public API over that table.
+
+alter view public.player_profile_view set (security_invoker = on);
+alter view public.v_player_game_stats set (security_invoker = on);

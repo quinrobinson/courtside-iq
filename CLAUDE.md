@@ -177,6 +177,15 @@ Current Supabase tables relevant to insight work:
 
 Never edit the database directly through the Supabase dashboard for schema changes. All schema changes go through `supabase/migrations/` files so they're version-controlled and reproducible.
 
+**EVERY VIEW MUST BE CREATED `WITH (security_invoker = on)`.** A Postgres view runs as its OWNER
+unless marked otherwise, which bypasses RLS on the underlying tables completely - policies on those
+tables are simply not consulted. On 2026-07-29 `player_profile_view` and `v_player_game_stats` were
+found without it on prod: any caller holding the anon key (which ships inside every copy of the
+app) could read 255 player rows across 165 families and 389 game-stat rows - names, birth dates,
+photos, full game histories. Fixed in `20260729000000_views_security_invoker.sql`. The Supabase
+dashboard flags this as an **"Unrestricted"** badge on the view; treat that badge as a data leak
+until proven otherwise. Adding policies to a view does NOT fix it - only `security_invoker` does.
+
 ## Things to flag before doing
 
 Pause and check with me before:
