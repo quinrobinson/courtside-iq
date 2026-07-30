@@ -2422,6 +2422,33 @@ opaque RGB. Upload happens when 4.22 creates the 2.0.0 version entries; also
 fix the iOS display-name casing (CourtSide -> Courtside) at submission.
 `[x] built` · `[x] wired` · `[x] approved` — upload rides with 4.22
 
+### 4.26 Player photos are in a PUBLIC bucket with guessable names — NEW
+
+**Found by the 2026-07-29 security sweep. Not fixed: fixing it needs an app
+change, and 2.0.0 is in review.**
+
+The `playerprofiles` storage bucket is PUBLIC (107 objects) and filenames are
+epoch-microsecond timestamps, e.g. `pics/1776050991034336.jpg` - enumerable,
+not random. So a child's profile photo is fetchable by anyone who guesses the
+URL, with no authentication. Same category as the view leak, lower reach
+(a photo, not a whole dataset).
+
+WHY IT WAS NOT FLIPPED: the app stores the PUBLIC url in
+`players.player_profile_pic`. Making the bucket private would break every
+photo in the live v1 app and in the 2.0 build now in review.
+
+THE FIX, when it is worth doing:
+- private bucket + RLS policies on storage.objects scoped by owner
+- app reads via signed urls (short TTL) rather than stored public urls
+- migrate existing objects to unguessable paths (uuid), rewrite
+  `player_profile_pic`, keep a fallback while old urls drain
+- do it AFTER the 2.0 rollout settles, as its own reviewed piece of work
+
+Also seen: the newest upload landed in a literal `null/` folder
+(`null/1785362760133418.png`) - a null in the upload path. Worth fixing in the
+same pass.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
 ### 4.25 Staged rollout and watch — NEW
 Do not ship 2.0 to everyone at once. This release changes every screen AND
 turns on entitlement enforcement that has never run in prod.

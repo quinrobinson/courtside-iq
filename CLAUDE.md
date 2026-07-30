@@ -177,6 +177,13 @@ Current Supabase tables relevant to insight work:
 
 Never edit the database directly through the Supabase dashboard for schema changes. All schema changes go through `supabase/migrations/` files so they're version-controlled and reproducible.
 
+**NEVER LEAVE A `USING (true)` POLICY ON A TABLE HOLDING USER DATA.** PostgreSQL unions PERMISSIVE
+policies with OR, so a blanket policy does not add access beside a stricter one - it becomes the
+ceiling and silently voids it. On 2026-07-29 `game_events` had exactly that next to a correct
+per-owner policy, so every signed-in parent could read every family's events (56 rows across 38
+players). Fixed in `20260729000001_game_events_policy_and_anon_grants.sql`. The only legitimate
+`true` policies here are on `event_types_list` and `player_positions_list` - pure reference data.
+
 **EVERY VIEW MUST BE CREATED `WITH (security_invoker = on)`.** A Postgres view runs as its OWNER
 unless marked otherwise, which bypasses RLS on the underlying tables completely - policies on those
 tables are simply not consulted. On 2026-07-29 `player_profile_view` and `v_player_game_stats` were
