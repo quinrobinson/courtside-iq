@@ -164,6 +164,41 @@ them with the `CiSheet` shell, ending "THE FRAMES SHOULD BE UPDATED, not the cod
 now match the shell. Note the code also says these pickers COMMIT ON TAP with no Save button,
 and the frames were already correct on that point, so no CTA was added.
 
+**Sample-data coherence fixed 2026-09-13.** The file carried two incompatible sets of team and
+event names, and the older set was semantically wrong: **all four rows of Team Selection were
+opponent names**. Northside Hawks, Eastlake Raptors, Riverside Reds and Lakeview Storm each appear
+as an opponent on the Games list or the profile Games tab, so the picker for "which team does your
+player play FOR" was offering the teams they played against. Teams Sheet `800:32` had the same
+problem on its first row.
+
+The newer Teams / Events Sheet set was taken as canonical, because it is what the counts on
+`Edit Player - Teams & Events` `799:3234` ("2 teams", "3 events") actually refer to.
+
+| Surface | Was | Now |
+|---|---|---|
+| `Team Selection` `454:1932` | Northside Hawks, Eastlake Raptors, Riverside Reds, Lakeview Storm | Verde City Vipers, Westbrook Middle |
+| `Teams Sheet` `800:32` | Northside Hawks, Riverside Select | Verde City Vipers, Westbrook Middle |
+| `Add Team Sheet` `800:64` | Northside Hawks | Westbrook Middle |
+| `Event Selection` `456:2010` | Spring League, City Tournament, Holiday Classic, Fall Showcase | Spring Classic, Metro League, Summer Shootout |
+| `New Game - Setup` `286:1328` | Verde City Vipers | unchanged, already canonical |
+
+"Verde City Vipers" was already the team on `New Game - Setup`, so it became the selected row on
+Team Selection. "Westbrook Middle" is new, chosen to read as a school team beside a club team,
+which is the real reason a youth player has two.
+
+Row counts were brought in line with the Edit Player counts: Team Selection dropped from 4 rows
+to 2, Event Selection from 4 to 3, with the add row and sheet height reflowed. Both sheets were
+also re-anchored flush to the frame bottom at 844. They had been overhanging to 851; the canonical
+`Edit Position` sheet `641:2183` sits at 424 + 420 = 844.
+
+Verified by sweep: no opponent name now appears on a team surface, and neither team name appears
+as an opponent anywhere on the page.
+
+**One thing deliberately left.** `New Event` `458:1932` keeps the placeholder "e.g. Spring League".
+It is a format hint on an empty field, and using a real existing event name there would suggest
+adding a duplicate. The old naming family surviving in a placeholder is a decision, not an
+oversight.
+
 ### Screens page - Section 6 · Menu & Account (`448:2392`)
 
 | Frame | id | Represents | Status | Code |
