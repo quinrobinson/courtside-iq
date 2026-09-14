@@ -181,11 +181,57 @@ data. Recommendation: **post-game only for Gate 1**, revisit live afterwards. No
 
 | ID | Task | Where | Depends on |
 |---|---|---|---|
-| G1.1 | Game timeline concepts. 2–3 directions: what a parent sees, live versus post-game, how runs read, how a voided tap reads, density over a long game | Chat | G0.8 |
-| G1.2 | Pick a direction | Quin | G1.1 |
-| G1.3 | Figma: timeline frames. States needed: live during game, post-game, empty, single-entry, long-game density, voided entry | Figma | G1.2 |
-| G1.4 | Figma: how the timeline sits inside the existing game detail screen without becoming a box score | Figma | G1.3, design inventory |
-| G1.5 | Approve a variant | Quin | G1.4 |
+| G1.1 | ~~Game timeline concepts~~ **done** - three directions concepted visually | Chat | done |
+| G1.2 | ~~Pick a direction~~ **done** - ribbon + moments hybrid | Quin | done |
+| G1.3 | ~~Figma: timeline frames~~ **done** - five states drawn | Figma | done |
+| G1.4 | ~~Figma: how the timeline sits inside game detail~~ **done** - built by cloning the real screen | Figma | done |
+| G1.5 | ~~Approve a variant~~ **APPROVED 2026-09-13** | Quin | done |
+
+### G1.5 APPROVED 2026-09-13 — what was signed off
+
+**Where:** Figma page **Gate 1 — Game Timeline (WIP)** in `uvHb6HXvIVFwzSSXPtEVoc`. Five frames,
+left to right: TYPICAL (19 plays, median), TWO RIBBONS (18 plays, no assists or turnovers), SPARSE
+(3 plays), DENSE (35 plays, p90), EMPTY (section absent).
+
+Built by **cloning the real Game Detail frame** and inserting the section into its existing vertical
+auto-layout, so the header, stat tiles, insight card and Development rows are the live components
+rather than redrawn approximations. G1.4 is satisfied by construction.
+
+**Final encoding**
+
+| | |
+|---|---|
+| Marks | 26px, numbered. Circle 2pt, square 3pt. |
+| Free throws | Circles **enclosed by an outline**, one enclosure per TRIP to the line. A single shot reads as a double ring, a pair as a capsule. |
+| FT circle size | **20px**, with a 14px internal gap. Forced by the grid: 26 mark + 8 gap = 34 pitch, so a 1-shot trip must be 26 wide and a 2-shot trip 60. |
+| Row | **10 marks per row** at an 8px gap. Rows containing a trip hold fewer, because wrap fills by width. |
+| Fill | Filled = made / defensive / assist. Outline = missed / offensive / turnover. |
+| **Accent** | **NONE.** No lime anywhere in the section. |
+| Values | Every number carries its unit: `22 PTS`, `5 AST  2 TO`, with a muted subline for detail. |
+| Header | The existing `SectionHeader` component, retitled "How the game went", count in its Tag property. |
+
+**No accent, deliberately.** A lime run-highlight was tried and rejected: three in a row is legible
+on its own, and colouring it is the app telling a parent what to notice rather than letting them
+see it. The accent stays unspent and available if something later genuinely earns it.
+
+**SCORING MIX IS RETIRED.** The ribbons say what it said, in sequence. Its SectionHeader instance
+was reused rather than replaced.
+
+**Moments are optional, not fixtures.** A ribbon whose sample cannot support a pattern gets no
+moment line. Four rebounds gets none; the SPARSE frame has none at all. Manufacturing a pattern
+from three events is the failure mode the whole no-causal-explanation rule exists to prevent.
+
+**Sparse still renders its ribbons.** Two shots and one rebound show as two thin ribbons rather
+than hiding the section. The parent logged those plays; hiding them would read as lost data.
+
+### Known gaps in the approved frames
+
+- **Copy is placeholder.** Written to keep numbers self-consistent, not through a copy pass.
+- **The EMPTY frame is not a truthful whole screen.** It still shows Development rows and an
+  insight card, which a genuinely zero-event game would not have. Only its TIMELINE behaviour is
+  correct; the rest of that screen is a separate question.
+- **The frames live on a WIP page, not the Screens page.** Deliberate. Decide before build whether
+  the canonical Game Detail (`145:610`) is updated to match, or these stay as the reference.
 
 ### Build
 
