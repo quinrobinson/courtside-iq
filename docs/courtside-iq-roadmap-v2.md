@@ -733,7 +733,20 @@ That's a cohesive foundation PR that doesn't ship any user-facing change yet but
 
 ---
 
-# Phase 4 — Courtside IQ 2.0 (new UI + Growth IQ)
+# 2.0 Rebuild — new UI + Growth IQ (items 4.x)
+
+**Renamed from "Phase 4" on 2026-09-13.** Three documents in this repo used
+overlapping phase numbers and it cost real confusion: this roadmap's feature
+phases 0-3, `docs/overhaul-plan.md`'s design-system phases 0-7 (its Phase 4 is
+spacing migration), and this workstream.
+
+**The item NUMBERS are unchanged and will not change.** 157 files across `lib/`
+and `test/` carry `Phase 4.x` in their headers as provenance markers - `Phase
+4.11d` alone appears 16 times - so renumbering would orphan all of them for no
+gain. Only the word "Phase" is dropped. `4.11d` still means `4.11d`; it is now
+an item of the 2.0 Rebuild rather than a phase of the feature roadmap.
+
+Shipped as **2.0.0**.
 
 **Release strategy:** built incrementally behind flags, shipped publicly as a single **version 2.0.0**. Each sub-phase merges to `main` on its own PR and is safe to sit unreleased; nothing user-visible turns on until 4E flips the flags.
 
@@ -750,7 +763,7 @@ That's a cohesive foundation PR that doesn't ship any user-facing change yet but
 
 ---
 
-## Phase 4.0 — Screen coverage audit (runs first)
+## 4.0 — Screen coverage audit (runs first)
 
 ### 4.0 Reconcile every v1 screen and state against Figma
 
@@ -771,7 +784,7 @@ That's a cohesive foundation PR that doesn't ship any user-facing change yet but
 
 ---
 
-## Phase 4A — Foundations (no user-visible change)
+## 4A — Foundations (no user-visible change)
 
 Everything in 4A is invisible to users and unblocks everything after it. This is the natural first PR set.
 
@@ -947,7 +960,7 @@ to ignore test output.
 
 ---
 
-## Phase 4B — Design system in code
+## 4B — Design system in code
 
 ### 4.7 Tokens and primitives
 Colors (ink/white, lime/orange), Hanken Grotesk type scale, radius scale (chip 6 / control 10 / sheet 14 / dialog 18 / pill 999), spacing. Ported from Figma variables.
@@ -973,7 +986,7 @@ Known gaps to settle when the first screen consumes these:
 
 ---
 
-## Phase 4C — Screens, in journey order
+## 4C — Screens, in journey order
 
 Built against approved Figma frames, in `lib/features/`. **Decision: new screens live alongside the FlutterFlow pages *during development only*.** Routing switches per-screen behind the 2.0 flag so any screen can fall back to its v1 page if it regresses mid-phase. This coexistence is a scaffold with an expiry date — see 4.24, which removes it entirely before ship. No screen may enter 4C without an approved Figma frame (see 4.0).
 
@@ -1926,7 +1939,7 @@ Each carries `[ ] built` · `[ ] wired` · `[ ] device-verified`.
 
 ---
 
-## Phase 4D — Polish and verification
+## 4D — Polish and verification
 
 **Reordered 2026-07-23.** The original order verified before polishing and had
 no plan for the parents who already use v1. Both are fixed below: the cheap
@@ -2264,7 +2277,7 @@ mid-game and resume. Delete an account.
 
 ---
 
-## Phase 4E — Cutover to 2.0.0
+## 4E — Cutover to 2.0.0
 
 **Nothing here happens without explicit approval at the time.**
 
@@ -2512,7 +2525,7 @@ recovery emails still point at the first one.
 
 ---
 
-## Phase 4 sequencing
+## 2.0 Rebuild sequencing
 
 **PR 0 (audit):** 4.0 screen coverage audit → `docs/2-0-screen-coverage.md`. Read-only, no code. Produces the Figma design backlog.
 **PR 1 (foundations):** 4.1 Growth IQ + 4.2 telemetry + 4.6 migration hygiene. No user-visible change.

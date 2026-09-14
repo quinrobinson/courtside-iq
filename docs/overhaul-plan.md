@@ -1,5 +1,9 @@
 # Courtside IQ — Design System Overhaul Plan
 
+> **Scope note.** The phases below are DESIGN SYSTEM phases and are unrelated to
+> the feature roadmap's Phase 0-3 or to the 2.0 Rebuild's 4.x items. Phase 4
+> here is the spacing migration. These numbers appear in no source file.
+
 **Goal:** Apply the v1.5 design system (colors, typography, spacing, radius, elevation) to the existing Courtside IQ FlutterFlow app **without changing any functionality, components, or layouts**.
 
 **Reference files** (must be in the repo):

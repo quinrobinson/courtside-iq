@@ -51,8 +51,17 @@ The full phased plan for current work is at `docs/courtside-iq-roadmap-v2.md`. A
 - Phase 1: Buildship → Supabase Edge Functions migration + age data + metric improvements — **done**
 - Phase 2: player-level development narrative — **done**
 - Phase 3: deferred items
-- **Phase 4: Courtside IQ 2.0** — shipped as 2.0.0. New UI + Growth IQ. Sub-phases: 4.0 screen
+- **2.0 Rebuild (items 4.x)** — shipped as 2.0.0. New UI + Growth IQ. Sub-items: 4.0 screen
   audit, 4A foundations, 4B design system, 4C screens by journey, 4D verification, 4E cutover.
+
+**NUMBERING DECODER.** Three documents use overlapping numbers. `4.11d` in a file header means an
+item of the **2.0 Rebuild**, not a phase of anything:
+| Number you see | What it means |
+|---|---|
+| Phase 0-3 | Feature roadmap, this file's roadmap doc |
+| 4.x / 4A-4E | **2.0 Rebuild** (was "Phase 4"; renamed 2026-09-13, numbers deliberately unchanged) |
+| Phase 0-7 in `docs/overhaul-plan.md` | Design system overhaul only. Its Phase 4 is spacing. |
+| G0.x-G4.x | `docs/video-and-events-plan.md` gates, the active track |
 
 **The roadmap path above is correct on this branch and WRONG ON `main`**, which still says
 `docs/roadmap.md` (a file that does not exist). `main` is 249 commits behind and carries none of

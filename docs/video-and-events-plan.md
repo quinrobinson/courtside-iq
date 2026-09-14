@@ -14,9 +14,15 @@ Three plans in this repo use overlapping phase numbers and it has already cost r
 |---|---|
 | `docs/courtside-iq-roadmap-v2.md` | Feature roadmap, Phases 0–3 |
 | `docs/overhaul-plan.md` | Design system overhaul, Phases 0–7. Its Phase 4 is spacing migration. |
-| The `phase-4-*` branches | Polish and cleanup. Items 4.26a, 4.27. Source document not on main. |
+| The `phase-4-*` branches | The **2.0 Rebuild**, items 4.x. Renamed from "Phase 4" 2026-09-13; numbers kept. |
 
-**Action:** bring the Phase 4 source document onto main and rename that workstream so it does not read as a phase of either roadmap.
+**Done 2026-09-13 (G0.5):** the workstream is renamed **2.0 Rebuild**. Item numbers are
+deliberately unchanged, because 157 files in `lib/` and `test/` carry `Phase 4.x` in their headers.
+
+**Still open:** the source document is on `main`, but STALE - 699 lines with Phases 0-3, against
+2537 on the working branch. Not a missing file, 249 commits of drift. Cherry-picking the 2.0
+Rebuild section onto `main` would put a document describing 2.0 onto a branch holding none of the
+2.0 code, which is a worse lie than the gap. Needs a decision on merging the line, not housekeeping.
 
 This plan uses **gates**, not phases, to stay out of the collision.
 
@@ -82,7 +88,20 @@ G0.8 blocks every Figma task in the plan. G0.9 and G0.10 block Gate 3 design.
 | G1.13 | Build the timeline UI from the approved Figma variant | Code | G1.5, G1.11 |
 | G1.14 | Cutover: view becomes the read path, aggregate columns deprecated | Code | G1.12 |
 
-**Risk on G1.8:** the stat tracker is FlutterFlow-generated territory. Confirm whether the write can live in `lib/custom_code/` without a FlutterFlow regeneration wiping it. Resolve before starting, not during.
+**G1.8 risk RESOLVED 2026-09-13, and the premise was void.** The tracker cannot be regenerated:
+FlutterFlow was retired 2026-07-19, there is no `.flutterflow` project link in the repo, and
+`lib/pages/` was deleted in 4.24. The 2.0 tracker is `lib/features/games/live_tracker_page.dart`,
+hand-written and measured from `138:611`. `lib/custom_code/` is also the wrong destination now: it
+is the FF bridge directory, down to five live action files.
+
+**And the shared write path G1.9 asks for already exists.** `_tap(LiveStat, int delta)` at
+`live_tracker_page.dart:105` is already the single funnel for every make, miss and undo, minus
+steppers included. G1.9 is satisfied by construction.
+
+Remaining real work is ordinary, roughly half a day, and folds into G1.10: write the event inside
+`_tap`, extend `LiveGameSnapshot` to carry the array, and handle the OFFLINE QUEUE - the one
+genuinely interesting part, since `game_sync_queue` replays built rows across app versions and
+would need to carry events too.
 
 ---
 
@@ -142,7 +161,23 @@ G0.8 blocks every Figma task in the plan. G0.9 and G0.10 block Gate 3 design.
 | G3.15 | Post-game capture summary build | Code | G3.5, G3.12 |
 | G3.16 | Clip playback inside the development story | Code | G3.6, G3.13 |
 
-**G3.8 is a real gate on the gate.** If a custom camera widget with a frame buffer cannot survive in this codebase, the whole capability needs rethinking, and that is worth knowing before any Figma work.
+**G3.8 is a real gate on the gate**, and stays one. Scoped 2026-09-13 at **2-3 days**, throwaway
+branch, nothing merged.
+
+Already present: `NSCameraUsageDescription`, `android.permission.CAMERA`, and `video_player` for
+playback. Absent: any camera CAPTURE plugin - only `image_picker` and `video_player` are in
+`pubspec.yaml`, so `camera` is a new dependency and needs flagging per CLAUDE.md.
+
+**The hard part is the rolling buffer, not the camera.** The `camera` plugin records start-to-stop
+and gives no pre-roll. A tap-captures-the-previous-seconds buffer needs either continuous segmented
+recording into a ring of short files, or a platform channel over `AVCaptureSession` and CameraX
+`ImageAnalysis`. Second risk: iOS is hybrid SPM + CocoaPods since Flutter 3.44, with five plugins
+already lacking SPM support and Flutter warning that becomes an error.
+
+Day 1 preview on real iOS and Android hardware, confirming the hybrid build survives. Day 2 a
+10-second ring buffer, measuring memory and thermals across a simulated 90-minute game. Day 3
+whether buffer plus preview can coexist with the tracker UI's tap responsiveness - **a dropped tap
+is worse than a missing clip.**
 
 ---
 
