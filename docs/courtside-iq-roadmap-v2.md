@@ -2422,31 +2422,73 @@ opaque RGB. Upload happens when 4.22 creates the 2.0.0 version entries; also
 fix the iOS display-name casing (CourtSide -> Courtside) at submission.
 `[x] built` · `[x] wired` · `[x] approved` — upload rides with 4.22
 
-### 4.26 Player photos are in a PUBLIC bucket with guessable names — NEW
+### 4.26a Player photo paths — unguessable, and not in a "null" folder
 
-**Found by the 2026-07-29 security sweep. Not fixed: fixing it needs an app
-change, and 2.0.0 is in review.**
+**Done 2026-09-13.** Splits out of 4.26 below, which stays open.
 
-The `playerprofiles` storage bucket is PUBLIC (107 objects) and filenames are
-epoch-microsecond timestamps, e.g. `pics/1776050991034336.jpg` - enumerable,
-not random. So a child's profile photo is fetchable by anyone who guesses the
-URL, with no authentication. Same category as the view leak, lower reach
-(a photo, not a whole dataset).
+Two defects in one path string, both in FlutterFlow's uploader:
 
-WHY IT WAS NOT FLIPPED: the app stores the PUBLIC url in
-`players.player_profile_pic`. Making the bucket private would break every
-photo in the live v1 app and in the 2.0 build now in review.
+1. **Enumerable names.** `_getStoragePath` names objects by
+   `DateTime.now().microsecondsSinceEpoch`, e.g. `pics/1776050991034336.jpg`.
+   The bucket is public, so a child's photo was fetchable by anyone who guessed
+   a nearby timestamp, unauthenticated.
+2. **A literal `null/` folder, live in 2.0.** `pickPlayerPhoto` never passed
+   `storageFolderPath`, and `_getStoragePath` interpolates the null straight
+   into the path. Only the v1.5 sheet passed `'pics'`, and that sheet is
+   unreachable. Every 2.0 upload lands in `null/`.
 
-THE FIX, when it is worth doing:
-- private bucket + RLS policies on storage.objects scoped by owner
-- app reads via signed urls (short TTL) rather than stored public urls
-- migrate existing objects to unguessable paths (uuid), rewrite
-  `player_profile_pic`, keep a fallback while old urls drain
-- do it AFTER the 2.0 rollout settles, as its own reviewed piece of work
+Paths are now `players/<playerId>/<uuid v4>.<ext>` via
+`lib/features/players/player_photo_storage.dart`. The player id is itself a
+uuid, so the prefix leaks nothing and gives 4.26b's RLS policy something to
+scope by. Extensions come off an allow-list, since the extension reaches the
+path.
 
-Also seen: the newest upload landed in a literal `null/` folder
-(`null/1785362760133418.png`) - a null in the upload path. Worth fixing in the
-same pass.
+**Replacing or removing a photo now deletes the old object.** Neither the old
+uploader nor "remove photo" did, which is why prod holds **107 objects for 31
+referenced photos**: 76 orphans, unreachable and still public.
+
+**Still returns a PUBLIC url, deliberately.** v1.4.0 clients read the same
+`players.player_profile_pic` column and render whatever string is in it, so
+storing a path would break every avatar on every phone still on v1 - a live
+population during a phased rollout. Unguessable names remove the enumeration
+attack now; the bucket flips in 4.26b.
+
+`[x] built` · `[x] wired` · `[ ] device-verified`
+
+**Device verification owed:** change a player's photo, confirm it uploads and
+renders, and confirm the previous object is gone from the bucket.
+
+### 4.26b Flip the photo bucket private — GATED ON v1 DRAINING
+
+**Found by the 2026-07-29 security sweep. Still open.** 4.26a removed the
+enumeration attack; this is the actual fix.
+
+Prod state as of 2026-09-13 (read-only queries):
+
+| | |
+|---|---|
+| Players | 256 |
+| With a photo | 31 |
+| Pointing at `pics/` | 30 |
+| Pointing at `null/` | 1 |
+| Objects in bucket | 107 |
+| Orphans | 76 |
+
+So the migration surface is **31 rows and 31 objects**, not 107. The original
+entry said flipping the bucket "would break every photo in the live v1 app",
+which is true but smaller than it sounds.
+
+**THE GATE IS THE ROLLOUT, NOT THE ENGINEERING.** v1.4.0 clients hold public
+urls and render them directly. The bucket cannot go private until v1 has
+drained or you accept broken avatars for whoever is left on it.
+
+When that is true:
+- copy the 31 referenced objects to `players/<playerId>/<uuid>.<ext>`
+- rewrite `players.player_profile_pic`, keeping a fallback while old urls drain
+- delete the 76 orphans
+- private bucket + RLS on `storage.objects` scoped by player owner
+- app reads via short-TTL signed urls rather than stored public urls
+
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
 ### 4.25 Staged rollout and watch — NEW
