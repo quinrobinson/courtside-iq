@@ -617,9 +617,26 @@ Items worth doing but not essential for Phase 1 + 2 ship.
 
 Add `seasons` table with user-defined date ranges. Profile gets a season filter.
 
-### 3.2 Event-level pattern analysis
+### 3.2 Event-level pattern analysis — ACTIVE TRACK
 
-`game_events` table enables richer narratives ("most assists come in transition") if data is captured.
+**This item is now expanded into its own plan: `docs/video-and-events-plan.md`
+(gates and task IDs). Detail spec: `docs/event-model-spec.md`.** Read both
+before touching stats, schema, or the tracker.
+
+`stat_events` is 3.2's actual shape, and video is what 3.2 makes possible.
+The plan tracks work in **gates**, not phases, deliberately: three documents in
+this repo already use overlapping phase numbers.
+
+**The original wording below was wrong about its own schema**, which is worth
+keeping visible rather than quietly correcting:
+
+> `game_events` table enables richer narratives ("most assists come in
+> transition") if data is captured.
+
+`game_events` is the TOURNAMENT record (`event_name`, `event_type`, `user_id`,
+`player_id`). It has no game reference and no stat column, so it can never hold
+per-play data. The new per-play table is **`stat_events`**. In this codebase
+*event* means tournament and *stat event* means a single observed play.
 
 ### 3.3 Consistency metric
 
@@ -2492,71 +2509,6 @@ Supabase redirect URLs (`courtside-iq.flutterflow.app/resetPassword`,
 `webapp://courtsideiq.app`) - kept during the ramp because in-flight v1
 recovery emails still point at the first one.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
-
----
-
-# Phase 5 — Event model (`stat_events`)
-
-**Full spec: `docs/event-model-spec.md`.** That document is the source of
-truth for this phase; this section is the tracker.
-
-**What it is.** One row per observed play in `stat_events`, replacing aggregate
--only stat capture. Parent taps and future video-derived reads write to the
-same table with a different `source`. Aggregates derive from events rather than
-being stored twice.
-
-**Why now.** Video mode is designed and not built. The moment a second source
-of observation exists, how the two reconcile and how the app talks about
-incomplete data both become permanent. Cheap to decide on paper, expensive to
-retrofit.
-
-**Locked decisions worth repeating here** (full list in the spec):
-- Parent taps are truth. Video enriches, never overwrites.
-- No game clock, ever. `sequence_no` for order, `elapsed_ms` for coarse
-  buckets only, never a displayed time.
-- A decrement VOIDS the most recent confirmed event, never writes a negative
-  row and never hard-deletes.
-- Completeness affects volume gates, never rates, and never appears as an
-  apology or a parent shortfall in copy.
-- Method, not grade: a game is `logged`, `filmed`, or `both`.
-
-### 5.1 `stat_events` table and indexes
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
-
-### 5.2 `games` completeness fields
-`logging_method` (not null, default `logged`), `completeness_score` (nullable),
-`completeness_source`. Every existing row defaults to `logged`.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
-
-### 5.3 `games.started_at` / `ended_at`, and per-event timestamps
-The tracker writes `sequence_no`, `recorded_at`, `elapsed_ms`. Confirms the
-design-inventory finding that `games` carries only `created_at` and
-`game_live`.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
-
-### 5.4 Tracker dual-write, with void-on-decrement through ONE shared path
-The Miss buttons and the minus steppers are two paths to the same counter.
-Both must route through the same event write and the same void logic or the
-array and the totals drift. This touches the one screen that must never lose
-data.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
-
-### 5.5 Rollup view and parallel run
-`player_game_stats` stays authoritative until the derived view agrees with it
-across a meaningful sample. Events must never become a second source of truth
-running alongside the first.
-`[ ] built` · `[ ] wired` · `[ ] device-verified`
-
-### 5.6+ After the parallel run closes
-Completeness rules in `metrics_config.dart` and its TypeScript mirror;
-`logging_method` / `completeness_score` into both prompts; sequence descriptors
-under the no-causal-explanation rule; FAQ entry. Then video: `video_derived`
-events, the confirmation surface, attribute drill-down.
-
-**Open questions carried from the spec** (decide before the step that needs
-them, not now): fouls control vs defer; confirmation UX; `clip_ref` storage
-ceiling; the 0.7 / 0.8 completeness thresholds, which are placeholders and
-should come from real filmed-game data.
 
 ---
 
