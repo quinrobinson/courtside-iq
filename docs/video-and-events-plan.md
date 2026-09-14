@@ -129,6 +129,26 @@ expected.
 
 Moments are computed over the same confirmed-only sequence, so a void reshapes the moment too.
 
+### Each ribbon is independently conditional
+
+**A ribbon with nothing to show does not render.** No assists and no turnovers means no
+Assists+Turnovers ribbon, not an empty one. Same for the other two. The combined ribbon only
+vanishes when BOTH sides are zero; assists with no turnovers still has something to say.
+
+This is not an edge case. Across 397 prod games:
+
+| | games | share |
+|---|---|---|
+| All three ribbons show | 305 | 77% |
+| No Assists+Turnovers ribbon | 68 | **17%** |
+| No Rebounds ribbon | 38 | 10% |
+| No Points ribbon | 17 | 4% |
+| Whole section vanishes | 8 | 2% |
+
+**Roughly one game in four drops at least one ribbon, and one in six is missing the
+Assists+Turnovers ribbon specifically.** The section has to look deliberate at one, two, or three
+ribbons - a layout that only reads well at three is wrong for a quarter of games.
+
 ### Empty is absence, not an empty state
 
 A game with nothing to show **drops the whole section**, header included. No "no plays yet" copy,
@@ -141,7 +161,8 @@ The plan listed six states. Two collapse once the above is settled:
 
 | State | Frame? |
 |---|---|
-| Post-game, typical (19 plays) | yes |
+| Post-game, typical, all three ribbons (19 plays) | yes |
+| Two ribbons, Assists+Turnovers absent | yes - 17% of games |
 | Sparse (3 plays) | yes - 9% of games |
 | Long-game density (35+, p90) | yes |
 | Empty | yes, and it is Game Detail with the section absent |
