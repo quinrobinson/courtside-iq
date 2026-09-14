@@ -53,10 +53,43 @@ This plan uses **gates**, not phases, to stay out of the collision.
 | G0.6 | Fix CLAUDE.md roadmap path; add the Current work block | Code | — |
 | G0.7 | Commit `event-model-spec.md` and this plan; link 3.2 in roadmap v2 | Code | — |
 | G0.8 | **Palette resolution.** Read `docs/design-inventory.md`, answer which palette governs and the real hex on the orange LIVE badge | Chat | — |
-| G0.9 | **Decide:** is filming occasional and purposeful, or default for every game? | Quin | — |
-| G0.10 | **Decide:** confirm capture runs continuously alongside stat tapping (current position) | Quin | — |
+| G0.9 | ~~Decide: is filming occasional and purposeful, or default for every game?~~ **ANSWERED 2026-09-13: occasional and purposeful.** | Quin | done |
+| G0.10 | ~~Decide: confirm capture runs continuously alongside stat tapping~~ **ANSWERED: NO. They are modes, not simultaneous.** See below. | Quin | done |
 
-G0.8 blocks every Figma task in the plan. G0.9 and G0.10 block Gate 3 design.
+~~G0.8 blocks every Figma task in the plan.~~ **G0.8 answered 2026-09-13:** one palette governs,
+lime `#9DFF00` / orange `#FF4F00` / ink / white. The LIVE badge is `#FF4F00`, not Spark. Jade and
+`#CDF330` are both dead artifacts. Full evidence in `docs/design-inventory.md` section 2.
+
+### G0.10, answered by an existing design POC
+
+**The question was badly posed.** It reads as ambiguous between video capture and stat capture. It
+means VIDEO: does the camera run in the background while the parent taps stats?
+
+**It was already answered**, in the E8n8 file on the **Gesture Recording** page (`1869:900`), a
+completed POC that explored three directions and selected one:
+
+> Phone down = stat tracking (full grid + Record toggle). Raise the phone = recording
+> (camera-dominant, read-only stat summary, **no logging**). Lower = clip saved, back to tracking.
+
+So tapping and filming are **mutually exclusive modes**. Also settled there: a Record toggle arms
+the gesture, a ~1s arming window means a quick glance up records nothing, each raise is one
+discrete clip with no pause/resume, and portrait is for tracking with landscape only while
+recording.
+
+**CONSEQUENCE — G3.10 NEEDS REWRITING.** "Rolling pre-roll buffer so a tap captures the seconds
+before it" assumes tapping and filming coexist. In the selected flow a parent cannot tap while
+recording, so there is no tap to pre-roll from. Either the pre-roll goes, or the interaction model
+changes. They cannot both stand.
+
+**CONSEQUENCE — G3.8 SHRINKS.** The ring buffer was the hard part of that spike. Without pre-roll
+it is ordinary start/stop recording, and the real unknowns become the raise/lower state machine
+(gravity vector, dwell thresholds) and whether a 1s arming window is reliable enough that a parent
+never loses a clip they meant to catch.
+
+**STALENESS WARNING for Gate 3 design.** The POC frames are drawn against the **v1** stat grid:
+PTS/REB/AST/BLK/STL/TOV/PF/+/- with 2PT/3PT/1PT made-missed buttons. The shipped 2.0 tracker
+(`138:611`) is different: three shot rows and six count tiles, no PF, no plus-minus. The
+interaction model survives; the screens do not. Budget a redraw, not a copy-forward.
 
 ---
 
