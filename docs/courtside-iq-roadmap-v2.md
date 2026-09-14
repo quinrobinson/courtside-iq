@@ -2449,6 +2449,48 @@ Also seen: the newest upload landed in a literal `null/` folder
 same pass.
 `[ ] built` · `[ ] wired` · `[ ] device-verified`
 
+### 4.27 List loading skeletons — NEW
+
+The Players and Games lists rendered `CircularProgressIndicator` while loading,
+even though both had approved skeleton frames sitting unbuilt
+(`515:1975`, `682:2785`). Today already had one (`670:2559`,
+`today_skeleton.dart`), so the app was showing two different kinds of waiting
+on three screens of the same kind.
+
+**Built:**
+- `lib/courtside_iq/design/components/ci_skeleton.dart` — `CiBone`, extracted
+  from today_skeleton's private `_Bone` so all three screens share one shape.
+- `lib/features/players/widgets/players_list_skeleton.dart`
+- `lib/features/games/games_list_skeleton.dart`
+
+**Two deliberate divergences from the frames, both for the same reason.** A
+skeleton exists to hold the layout still; a placeholder that is a different
+size from the thing it replaces makes the list jump on arrival, which is worse
+than a spinner.
+- The Players frame draws a 188-tall row with a 96 gauge. The built
+  `PlayerListRow` is 208 with a 112 gauge. The skeleton imports
+  `kPlayerRowHeight` / `kPlayerRowGaugeSize` (made public in this change) so the
+  two cannot drift.
+- The Games frame draws the player chip row as 14-tall bars. Both chip rows are
+  `CiChipBar`, which is h32. Reserving 14 would drop the list 18pt on arrival.
+
+**One change to a shipped screen.** `CiBone` uses `border` where today_skeleton
+used `surfaceSunk`. The frames draw bones at `#E7E7E7` on white and `#3D3D3D`
+on ink; `surfaceSunk` resolves to `#F7F7F7` / `#1A1A1A`, and `#1A1A1A` on a
+`#0F0F0F` ground is very nearly invisible. `border` (`#E9E9E9` / `#2E2E2E`) is
+the closest the palette holds. Today's loading state is therefore slightly more
+visible than before, and closer to its own frame.
+
+`test/list_skeletons_test.dart` locks the anti-jump contract. 706 tests green
+(699 + 7), `flutter analyze` 375 issues / 0 errors, down from 379.
+
+`[x] built` · `[x] wired` · `[ ] device-verified`
+
+**Device verification still owed.** Both skeletons only appear while the first
+query is in flight, so they need a real run with real latency. Note this branch
+carries `_kUseTestSupabase = false` from the 4.22 cutover, so a device run hits
+PROD.
+
 ### 4.25 Staged rollout and watch — NEW
 Do not ship 2.0 to everyone at once. This release changes every screen AND
 turns on entitlement enforcement that has never run in prod.
