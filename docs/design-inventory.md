@@ -560,10 +560,10 @@ Corroborating code:
   (`game_paused_dialog.dart:24`). Nothing in it records or displays elapsed time. Your
   characterisation of it as a safety lock is exactly what the code does.
 
-### Live mismatch: home/away on Player Profile - Games
+### Mismatch: home/away on Player Profile - Games - FIXED 2026-09-13
 
-**`Player Profile - Games` `98:583` shows a home/away designation the schema cannot supply, and
-still does.** The frame's rows read:
+**`Player Profile - Games` `98:583` showed a home/away designation the schema cannot supply.**
+The frame's rows read:
 
 ```
 vs Northside Hawks      Sat, Mar 8 · Home
@@ -577,18 +577,48 @@ Two separate things the data cannot do: the `· Home` / `· Away` suffix, and th
 prefix that alternates with it.
 
 `public.games` has `id`, `created_at`, `opponent_team`, `game_live`, `user_id`, `player_id`,
-`player_team_name`, `event_name`, `event_type`. There is no home/away column and I found no
+`player_team_name`, `event_name`, `event_type`. There is no home/away column and there is no
 occurrence of `is_home`, `isHome`, or `homeAway` anywhere in the tree.
 
-**The code already resolved this; the design was never updated.** `game_feed_row.dart:58-64`:
+**The code had already resolved this; the design had not been updated.** `game_feed_row.dart:58-64`:
 
 > "Fills the slot the frame labels 'Home', which has no column behind it: the schema has never
 > recorded home or away. The event is the real qualifier a parent has for a game."
 
-So `dateSubtitle` renders "Sat, Mar 8 · Spring Classic" using `event_name`, and `opponentTitle`
-always uses the `vs` prefix, never `at`. The shipped screen and the approved frame therefore
-disagree on two visible strings. **This is the one place where an engineer building from the
-frame today would build something the database cannot back.**
+So `dateSubtitle` renders "Sat, Mar 8 · Spring Classic" from `event_name`, and `opponentTitle`
+always uses the `vs` prefix, never `at`.
+
+**Fix applied 2026-09-13.** Seven text nodes edited on `98:583`, bringing the frame in line with
+what the code actually renders:
+
+| Node | Was | Now |
+|---|---|---|
+| `I98:671;33:9` | Sat, Mar 8 · Home | Sat, Mar 8 · Spring Classic |
+| `I98:695;33:8` | at Eastlake Raptors | vs Eastlake Raptors |
+| `I98:695;33:9` | Tue, Mar 4 · Away | Tue, Mar 4 · Spring Classic |
+| `I98:719;33:9` | Sun, Mar 2 · Home | Sun, Mar 2 · Metro League |
+| `I98:743;33:8` | at Riverside Kings | vs Riverside Kings |
+| `I98:743;33:9` | Thu, Feb 27 · Away | Thu, Feb 27 · Metro League |
+| `I98:767;33:9` | Sat, Feb 22 · Home | Sat, Feb 22 |
+
+Three notes on the replacement copy:
+
+- Event names are taken from `Events Sheet` `800:45` (Spring Classic, Metro League), which is the
+  newer of the two sample sets in the file. `game_feed_row.dart:99` independently uses
+  "Sat, Mar 8 · Spring Classic" as its worked example, so design and code now agree on the string.
+  The older `Event Selection` `456:2010` set (Spring League, City Tournament, Holiday Classic,
+  Fall Showcase) was avoided because that frame is itself stale (see section 4).
+- Two rows share an event deliberately: a player plays several games in one tournament.
+- **Row 5 carries no event on purpose.** `event_name` is optional and `dateSubtitle` drops
+  whichever half is missing, so one row without an event makes the frame document that behaviour
+  instead of hiding it.
+
+The `RecentGameRow` component `33:5` was **not** touched and needed no change: its default
+`33:9` is "vs Northside Hawks  ·  Sat, Mar 8", the Today / Games-list form, which was always
+correct. The drift lived only in the five instance overrides on this frame.
+
+A re-sweep of the Screens page for `Home`, `Away`, and a leading `at ` now returns 5 hits, all of
+them gutter `entry-label` nodes referring to the Home tab. No game-row copy remains.
 
 ### Stored-twice: `fg_made` / `fg_attempt`
 
@@ -647,8 +677,9 @@ feature leans on game date as game-played date.
 | `off_foul` / `def_foul` have no tracker control | Yes | No. Also absent from every design. |
 | `fg_made` / `fg_attempt` stored twice | Yes | No. Redundant, deliberately retained for old rows. |
 
-**One mismatch found that is not on your list:** the home/away designation on
-`Player Profile - Games` `98:583`.
+**One mismatch was found that is not on your list:** the home/away designation on
+`Player Profile - Games` `98:583`. **Fixed 2026-09-13**; see above. No design-to-data mismatch
+is currently open.
 
 ---
 
