@@ -29,9 +29,9 @@ import '/courtside_iq/players_list_builder.dart';
 ///
 /// 24 to match CiBadge, which is what Today's Growth IQ chips use - the two
 /// screens show the same kind of chip and must not differ in height.
-const double _kChipHeight = 24;
+const double kPlayerRowChipHeight = 24;
 
-const double _kGaugeSize = 112;
+const double kPlayerRowGaugeSize = 112;
 
 /// EVERY ROW IS THIS TALL, whatever the player has.
 ///
@@ -42,8 +42,8 @@ const double _kGaugeSize = 112;
 /// have - which is the point, since players join the list with none.
 ///
 /// Sized to the tallest configuration: gauge + gap + chip, plus the padding.
-const double _kRowHeight =
-    _kGaugeSize + CiSpace.s2 + _kChipHeight + (_kRowPadding * 2);
+const double kPlayerRowHeight =
+    kPlayerRowGaugeSize + CiSpace.s2 + kPlayerRowChipHeight + (kPlayerRowPadding * 2);
 
 /// Vertical breathing room around each row's content.
 ///
@@ -52,7 +52,7 @@ const double _kRowHeight =
 /// review asked to match. Centring made them differ: the gauge column is
 /// taller than the identity column, so centring pushed the name down by half
 /// the difference on top of this padding.
-const double _kRowPadding = 32;
+const double kPlayerRowPadding = 32;
 
 class PlayerListRow extends StatelessWidget {
   const PlayerListRow({super.key, required this.entry, this.onTap});
@@ -69,10 +69,10 @@ class PlayerListRow extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          height: _kRowHeight,
+          height: kPlayerRowHeight,
           alignment: Alignment.topCenter,
           padding: const EdgeInsets.fromLTRB(
-              CiSpace.screen, _kRowPadding, CiSpace.screen, _kRowPadding),
+              CiSpace.screen, kPlayerRowPadding, CiSpace.screen, kPlayerRowPadding),
           // The GAUGE stays top-aligned; the IDENTITY column is centred in the
           // row. On device 2026-07-23 the name and stats read as sitting too
           // high against the taller gauge, so the identity block now centres
@@ -176,7 +176,7 @@ class _GrowthGauge extends StatelessWidget {
         DotGauge(
           // There are never more than three players, so the row can afford a
           // gauge that fills its space rather than floating in it.
-          size: _kGaugeSize,
+          size: kPlayerRowGaugeSize,
           value: growthIqGaugeValue(entry.growthIq!),
           child: Text('${entry.growthIq}',
               style: CiType.h1.copyWith(
@@ -188,7 +188,7 @@ class _GrowthGauge extends StatelessWidget {
         // collapse made her row ~28pt taller than his - the uneven heights
         // in the device review. Reserving it keeps every row identical.
         SizedBox(
-          height: _kChipHeight,
+          height: kPlayerRowChipHeight,
           child: entry.trend == null
               ? null
               // The colour rule lives in CiBadge.growthTrend so Today, this
