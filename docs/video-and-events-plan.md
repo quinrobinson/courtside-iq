@@ -31,7 +31,7 @@ This plan uses **gates**, not phases, to stay out of the collision.
 | Tag | Meaning |
 |---|---|
 | **Chat** | Concepts, decisions, copy. Claude in chat. |
-| **Figma** | Frames on the **Claude Code page** of *CourtsideIQ — Performance Analytics*, per the CLAUDE.md convention. Always land an approved variant before code. |
+| **Figma** | Frames in **Courtside IQ 2.0** (`uvHb6HXvIVFwzSSXPtEVoc`), **Screens page** `65:6`, in the relevant flow section. NOT the E8n8 "Claude Code page" - that is the v1 legacy file, it has no 2.0 screens, and drafting there wasted a rebuild on 2026-07-23. Always land an approved variant before code. |
 | **Code** | Claude Code, in the repo. |
 | **Quin** | Only you can do it: review, device verification, product decisions. |
 
@@ -92,6 +92,65 @@ PTS/REB/AST/BLK/STL/TOV/PF/+/- with 2PT/3PT/1PT made-missed buttons. The shipped
 interaction model survives; the screens do not. Budget a redraw, not a copy-forward.
 
 ---
+
+## Gate 1 design decisions — LOCKED 2026-09-13 (G1.1, G1.2)
+
+Direction chosen: **per-stat ribbon plus a plain-language moment**, concepted in chat against
+real data (397 prod games: median 19 events, p90 35, and 9% of games at 5 events or fewer).
+
+| Decision | Value |
+|---|---|
+| Ribbons | **Three only:** Points (free throws included), Rebounds, Assists+Turnovers |
+| Not ribboned | Steals, blocks. At 2-3 events a ribbon is noise. |
+| Marks | Numbered, 26px. Circle 2pt, square 3pt, narrow pill ft. |
+| Encoding | **Fill and shape, never green/red.** Filled = made / defensive / assist. |
+| Ground | **Light.** Sits in Game Detail under a banded SectionHeader. |
+| Accent | Lime, and ONLY on the marks a moment names. |
+| Moments | Describe, never explain. No confidence, rhythm, or momentum. |
+
+**Why assists and turnovers share a ribbon:** AST/TOV is already one rated metric with its own
+thresholds, so the ribbon shows what the rating is made of.
+
+**No green/red, deliberately.** Red on a child's missed shot is the thing this system avoids
+everywhere else - CiBadge stopped colouring declines, Room to Grow sits on lime-wash rather than an
+alarm colour. Fill and shape say the same thing without a verdict, and survive colour-blindness.
+
+### Corrections are NOT shown — and this splits display from storage
+
+A voided event **disappears from the ribbon and the remaining marks renumber**. The parent sees the
+final state, never the correction.
+
+**CONSEQUENCE, and it is a trap for later work:** the number on a mark is a DISPLAY INDEX over
+confirmed events (1..n, contiguous), **not `stat_events.sequence_no`**. The spec is explicit that
+voided rows keep their `sequence_no` and that gaps are normal, so the two numberings diverge the
+moment a parent corrects anything. Anything that cites "attempt 8" to a parent means the display
+index. Anything that queries the table means `sequence_no`. Never pass one where the other is
+expected.
+
+Moments are computed over the same confirmed-only sequence, so a void reshapes the moment too.
+
+### Empty is absence, not an empty state
+
+A game with nothing to show **drops the whole section**, header included. No "no plays yet" copy,
+no zero. This follows the standing rule that a zero-performance game returns no rating and displays
+nothing. 8 of 397 prod games are affected.
+
+### Frames actually needed
+
+The plan listed six states. Two collapse once the above is settled:
+
+| State | Frame? |
+|---|---|
+| Post-game, typical (19 plays) | yes |
+| Sparse (3 plays) | yes - 9% of games |
+| Long-game density (35+, p90) | yes |
+| Empty | yes, and it is Game Detail with the section absent |
+| Voided entry | **no frame.** Renumbering means there is nothing to draw. |
+| Live, during the game | **OPEN.** See below. |
+
+**Live is still undecided.** The ground chosen is light; the tracker is ink throughout. Putting a
+light block in the tracker is a departure, and the tracker is the one screen that must never lose
+data. Recommendation: **post-game only for Gate 1**, revisit live afterwards. Not yet confirmed.
 
 ## Gate 1 — `stat_events` foundation
 
