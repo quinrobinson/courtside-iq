@@ -224,6 +224,51 @@ from three events is the failure mode the whole no-causal-explanation rule exist
 **Sparse still renders its ribbons.** Two shots and one rebound show as two thin ribbons rather
 than hiding the section. The parent logged those plays; hiding them would read as lost data.
 
+### SUPERSEDED 2026-09-15 — the ribbon direction was replaced by LANES
+
+Everything in the G1.5 section above describes the **ribbon** direction. It was approved on
+2026-09-13 and replaced two days later after exploring alternatives. Kept rather than deleted
+because the reasoning matters.
+
+**Why it changed.** Three independent per-stat ribbons cannot show a relationship BETWEEN stat
+types. "The turnover came just before the run, not during it" is unsayable with three separate
+sequences and obvious with one shared axis. That is a capability difference, not a restyle.
+
+### APPROVED 2026-09-15 — LANES
+
+Figma page **Gate 1 — Game Timeline (WIP)**, five frames at the left of the page. The five ribbon
+frames sit to their right at 45% opacity, prefixed SUPERSEDED.
+
+| | |
+|---|---|
+| Structure | One row per stat, all on ONE shared sequence axis |
+| Lanes | **Points, Rebounds, Playmaking, Defense** - four, not five |
+| Row | Label and value on the LEFT (82pt column), track on the right, full-bleed hairline between rows |
+| Track rule | **Dotted**, gray300 `#C9C9C9`, 1.8pt, `dashPattern [0.01, 3.6]` with ROUND cap |
+| Marks | Circles. Filled = made / defensive / assist / steal. Hollow = missed / offensive / turnover. |
+| Free throws | **Enclosed by a white-filled capsule**, one per TRIP to the line. The white fill INTERRUPTS the dotted rule rather than overlapping it. |
+| Axis | **Start and End**, never play numbers |
+| Accent | **None** |
+
+**Playmaking is combined, and the prod data is why.** Assists and turnovers were briefly split into
+separate lanes. Across 397 games a Turnovers lane would be absent in **39%** of them and Assists in
+33%, where a combined lane is absent in only 17%. All five lanes appeared in just **144 of 397
+games (36%)**, so a five-lane layout was the minority case. Four lanes with a combined Playmaking
+lane is the stable shape. Filled assist, hollow turnover, the same convention every other lane uses.
+
+**Marks scale with the play count:** `clamp(trackWidth / plays - 1, 7, 13)`. At 35 plays the
+spacing is 6.97pt, so a fixed 13pt dot would overlap its neighbour by half. Resolved sizes: 13 at
+3 plays, 12.6 at 18, 11.8 at 19, 7 at 35. **The approved TYPICAL frame is still drawn at a fixed
+13**, which is why its two adjacent Playmaking marks touch; the production component should use the
+formula.
+
+**No play numbers on the marks.** They were in the ribbon and do not fit at 13pt or below. A play
+index is meaningless to a parent anyway, so moments describe position in words instead.
+
+**Lane absence rates, from prod:** Points 4%, Rebounds 10%, Defense 25%, combined Playmaking 17%.
+Average 3.89 lanes per game. A lane with no events does not render; a game with no events drops the
+whole section.
+
 ### Known gaps in the approved frames
 
 - **Copy is placeholder.** Written to keep numbers self-consistent, not through a copy pass.
