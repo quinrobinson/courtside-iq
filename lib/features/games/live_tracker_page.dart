@@ -103,7 +103,9 @@ class _LiveTrackerPageState extends State<LiveTrackerPage> {
   LiveGameStats get _stats => _snapshot.stats;
 
   void _tap(LiveStat stat, int delta) {
-    final next = _snapshot.withStats(applyStat(_stats, stat, delta));
+    // withTap moves the totals AND the event list together. Going through
+    // applyStat directly would leave the two representations to drift.
+    final next = _snapshot.withTap(stat, delta);
     setState(() => _snapshot = next);
     // Fire and forget deliberately: the UI must not wait on a disk write
     // between taps, and the write cannot fail in a way the parent could act

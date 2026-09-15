@@ -16,6 +16,7 @@
 import '/auth/supabase_auth/auth_util.dart';
 import '/courtside_iq/game_sync/game_sync_queue.dart';
 import '/courtside_iq/game_sync/supabase_game_uploader.dart';
+import '/courtside_iq/stat_event.dart';
 import 'live_game_store.dart';
 
 /// What happened, so the screen can say so.
@@ -54,6 +55,11 @@ class GameSaver {
         // would leave a LIVE pill on the games list forever.
         'game_live': false,
         'created_at': snapshot.startedAt.toUtc().toIso8601String(),
+        // Distinct from created_at on purpose. created_at is when the ROW was
+        // written, which for a game queued in a gym is whenever the queue
+        // later flushed. These two are when the parent actually tracked.
+        'started_at': snapshot.startedAt.toUtc().toIso8601String(),
+        'ended_at': DateTime.now().toUtc().toIso8601String(),
       },
       // NO user_id HERE. player_game_stats does not have that column - it
       // reaches the owner through game_id - and sending it made PostgREST
@@ -78,6 +84,22 @@ class GameSaver {
         'block': s.blocks,
         'turnover': s.turnovers,
       },
+      // One row per tap, voided ones included. They are sent so the void is
+      // recorded, and excluded from every rollup by status - the parent sees
+      // the corrected game, and the correction rate stays measurable.
+      eventRows: [
+        for (final e in snapshot.events)
+          {
+            'player_id': snapshot.playerId,
+            'event_type': kStatEventType[e.stat],
+            'sequence_no': e.sequenceNo,
+            'recorded_at': e.recordedAt.toUtc().toIso8601String(),
+            'elapsed_ms':
+                e.recordedAt.difference(snapshot.startedAt).inMilliseconds,
+            'source': 'parent_tap',
+            'status': e.isConfirmed ? 'confirmed' : 'voided',
+          },
+      ],
     );
 
     return await _q.enqueueAndTry(pending)

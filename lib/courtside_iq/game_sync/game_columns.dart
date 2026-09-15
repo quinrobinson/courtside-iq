@@ -22,6 +22,10 @@ const Set<String> kGameColumns = {
   'player_team_name',
   'event_name',
   'event_type',
+  // Added 20260915000001. Distinct from created_at, which is when the ROW was
+  // written - for a game queued offline that can be days after it was played.
+  'started_at',
+  'ended_at',
 };
 
 const Set<String> kStatsColumns = {
@@ -46,6 +50,28 @@ const Set<String> kStatsColumns = {
   'off_foul',
   'def_foul',
   'game_insights',
+};
+
+/// The columns public.stat_events actually has.
+///
+/// Transcribed from 20260915000000_stat_events.sql. Same rule as the two sets
+/// above: when a migration changes this table, change it HERE in the same
+/// commit. The uploader conforms against this list before sending, so a game
+/// queued by an older build cannot fail forever on a key this schema lost.
+const Set<String> kStatEventColumns = {
+  'id',
+  'game_id',
+  'player_id',
+  'event_type',
+  'sequence_no',
+  'recorded_at',
+  'elapsed_ms',
+  'source',
+  'status',
+  'confidence',
+  'attributes',
+  'clip_ref',
+  'merged_into',
 };
 
 /// Drops any key the table does not have, returning what was dropped.

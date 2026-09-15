@@ -30,6 +30,14 @@ class PendingGame {
   /// Column/value map for public.player_game_stats (game_id already set)
   final Map<String, dynamic> statsRow;
 
+  /// Rows for public.stat_events, one per tap, game_id already set.
+  ///
+  /// EMPTY IS VALID AND COMMON. Games queued by a build from before events
+  /// existed carry none, and so does any game whose timeline was never
+  /// captured. A game with no events is still a complete game; it simply has
+  /// no timeline. Nothing downstream may treat empty as a failure.
+  final List<Map<String, dynamic>> eventRows;
+
   /// When the parent tapped save, not when we managed to upload.
   final DateTime queuedAt;
 
@@ -46,15 +54,20 @@ class PendingGame {
     required this.gameRow,
     required this.statsRow,
     required this.queuedAt,
+    this.eventRows = const [],
     this.attempts = 0,
     this.lastError,
   });
 
+  /// EVERY FIELD HAS TO BE CARRIED. This runs on each retry to bump attempts,
+  /// so anything omitted here is silently dropped the first time an upload
+  /// fails - which is exactly when the data matters most.
   PendingGame copyWith({int? attempts, String? lastError}) => PendingGame(
         gameId: gameId,
         statsId: statsId,
         gameRow: gameRow,
         statsRow: statsRow,
+        eventRows: eventRows,
         queuedAt: queuedAt,
         attempts: attempts ?? this.attempts,
         lastError: lastError ?? this.lastError,
@@ -65,6 +78,7 @@ class PendingGame {
         'statsId': statsId,
         'gameRow': gameRow,
         'statsRow': statsRow,
+        'eventRows': eventRows,
         'queuedAt': queuedAt.toIso8601String(),
         'attempts': attempts,
         'lastError': lastError,
@@ -75,6 +89,16 @@ class PendingGame {
         statsId: j['statsId'] as String,
         gameRow: Map<String, dynamic>.from(j['gameRow'] as Map),
         statsRow: Map<String, dynamic>.from(j['statsRow'] as Map),
+        // Absent on every game queued before events shipped. The outbox is a
+        // cross-version format, so this has to read an older payload without
+        // throwing - a PendingGame that cannot be decoded is a lost game.
+        eventRows: switch (j['eventRows']) {
+          final List raw => [
+              for (final e in raw)
+                if (e is Map) Map<String, dynamic>.from(e),
+            ],
+          _ => const <Map<String, dynamic>>[],
+        },
         queuedAt:
             DateTime.tryParse(j['queuedAt'] as String? ?? '') ?? DateTime.now(),
         attempts: (j['attempts'] as num?)?.toInt() ?? 0,

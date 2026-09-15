@@ -26,6 +26,7 @@ const _uuid = Uuid();
 PendingGame buildPendingGame({
   required Map<String, dynamic> gameRow,
   required Map<String, dynamic> statsRow,
+  List<Map<String, dynamic>> eventRows = const [],
 }) {
   final gameId = _uuid.v4();
   final statsId = _uuid.v4();
@@ -35,6 +36,12 @@ PendingGame buildPendingGame({
     statsId: statsId,
     gameRow: {...gameRow, 'id': gameId},
     statsRow: {...statsRow, 'id': statsId, 'game_id': gameId},
+    // Client-generated ids here too, for the same reason the other two rows
+    // have them: the upsert is by primary key, so the same PendingGame can be
+    // sent five times and still produce exactly one row per event.
+    eventRows: [
+      for (final e in eventRows) {...e, 'id': _uuid.v4(), 'game_id': gameId},
+    ],
     queuedAt: DateTime.now(),
   );
 }
@@ -79,6 +86,23 @@ Future<void> uploadPendingGame(PendingGame game) async {
   await client
       .from('player_game_stats')
       .upsert(statsRow.row, onConflict: 'id');
+
+  // Events LAST, and in their own try. The aggregates are what the app reads
+  // today; the timeline is additive. A game whose events fail to land is a
+  // complete game missing its timeline, which is recoverable. Letting that
+  // failure throw would send the whole game back to the queue and re-upsert
+  // rows that already succeeded, on every retry, forever.
+  if (game.eventRows.isNotEmpty) {
+    try {
+      final rows = [
+        for (final e in game.eventRows) conformToColumns(e, kStatEventColumns).row,
+      ];
+      await client.from('stat_events').upsert(rows, onConflict: 'id');
+    } catch (e) {
+      dev.log('stat_events upload failed for ${game.gameId}: $e',
+          name: 'GameSync');
+    }
+  }
 
   try {
     await generateGameInsight(game.gameId);

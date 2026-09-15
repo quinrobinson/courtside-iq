@@ -15,6 +15,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/courtside_iq/live_game.dart';
+import '/courtside_iq/stat_event.dart';
 
 /// A game in progress, as stored.
 class LiveGameSnapshot {
@@ -26,15 +27,43 @@ class LiveGameSnapshot {
   final LiveGameStats stats;
   final DateTime startedAt;
 
+  /// Every tap, in order, including voided ones.
+  ///
+  /// Persisted with the totals on EVERY tap for the same reason they are: a
+  /// phone gets dropped, killed by iOS, or run flat mid-game, and a game
+  /// cannot be tracked twice. Losing the sequence while keeping the totals
+  /// would leave a game the timeline cannot render.
+  final List<StatEvent> events;
+
   const LiveGameSnapshot({
     required this.playerId,
     required this.playerName,
     required this.stats,
     required this.startedAt,
+    this.events = const [],
     this.team,
     this.opponent,
     this.event,
   });
+
+  /// Applies one tap to the totals AND the event list together.
+  ///
+  /// The only way the tracker should record a tap. Moving the totals without
+  /// the events, or the other way round, is the drift the G1.12 parallel run
+  /// exists to catch.
+  LiveGameSnapshot withTap(LiveStat stat, int delta) {
+    final r = applyTap(stats, events, stat, delta);
+    return LiveGameSnapshot(
+      playerId: playerId,
+      playerName: playerName,
+      team: team,
+      opponent: opponent,
+      event: event,
+      stats: r.stats,
+      events: r.events,
+      startedAt: startedAt,
+    );
+  }
 
   LiveGameSnapshot withStats(LiveGameStats next) => LiveGameSnapshot(
         playerId: playerId,
@@ -43,6 +72,7 @@ class LiveGameSnapshot {
         opponent: opponent,
         event: event,
         stats: next,
+        events: events,
         startedAt: startedAt,
       );
 
@@ -54,6 +84,7 @@ class LiveGameSnapshot {
         'event': event,
         'started_at': startedAt.toIso8601String(),
         'stats': stats.toJson(),
+        'events': [for (final e in events) e.toJson()],
       };
 
   static LiveGameSnapshot? fromJson(Map<String, dynamic> json) {
@@ -72,6 +103,17 @@ class LiveGameSnapshot {
       stats: rawStats is Map
           ? LiveGameStats.fromJson(Map<String, dynamic>.from(rawStats))
           : const LiveGameStats(),
+      // Absent on any game started before this shipped, and on a payload
+      // written by an older build. An empty list is correct there: the totals
+      // still save, the game is still complete, it simply has no timeline.
+      events: switch (json['events']) {
+        final List raw => [
+            for (final e in raw)
+              if (e is Map)
+                ?StatEvent.fromJson(Map<String, dynamic>.from(e)),
+          ],
+        _ => const <StatEvent>[],
+      },
     );
   }
 }
