@@ -278,12 +278,49 @@ whole section.
 - **The frames live on a WIP page, not the Screens page.** Deliberate. Decide before build whether
   the canonical Game Detail (`145:610`) is updated to match, or these stay as the reference.
 
+### G1.6 / G1.7 applied to TEST 2026-09-15
+
+Files: `supabase/migrations/20260915000000_stat_events.sql` and
+`20260915000001_games_started_ended_at.sql`. **Test only**
+(`yihmccmyijtyrffpzstb`). Prod untouched.
+
+Verified after applying: 14 columns, RLS on, **4 policies and zero
+`USING (true)`**, 7 indexes, **zero grants to `anon`**, both `games` columns
+present, and 0 games carrying a `started_at` (nothing was backfilled).
+
+**Ownership mirrors `player_game_stats`** - through `games.user_id`, not
+`players.user_id`. Note `games.user_id` is TEXT while `players.user_id` is
+UUID; this table is game-scoped so it follows the games side and casts.
+
+**No `USING (true)`, four separate policies.** Permissive policies union with
+OR, so a blanket policy is not additive - it becomes the ceiling and silently
+voids the strict rule beside it. That is what leaked `game_events` on
+2026-07-29.
+
+**`started_at` is NOT backfilled.** All 397 existing games get null, because
+`created_at` is when the row was WRITTEN - for a game queued offline that can
+be days after it was played. Inventing a start time would make `elapsed_ms`
+lie. Null means unknown and has to keep meaning unknown.
+
+**Video-only event types are NOT in the CHECK constraint.** The spec permits
+`drive` / `catch` / `closeout` eventually, but they are speculative names and
+Gate 4 is gated on a spike that may fail outright. Adding them is a one-line
+migration when they are real. `off_foul` and `def_foul` ARE included: those
+columns already exist in `player_game_stats`, they are logged separately and
+aggregated into one foul total, and including them avoids a migration if a
+foul control ever ships.
+
+**Promotion to prod happens after the G1.12 parallel run**, following the same
+path 4.20b used. The schema is additive and safe to promote early; what must
+not happen early is DEVELOPING against prod, because the G1.10 dual-write
+turns every test tap into a real play inside a real family's game.
+
 ### Build
 
 | ID | Task | Where | Depends on |
 |---|---|---|---|
-| G1.6 | Migration: `stat_events` table and indexes | Code | G0.7 |
-| G1.7 | Migration: `started_at` / `ended_at` on `games` | Code | G0.7 |
+| G1.6 | ~~Migration: `stat_events` table and indexes~~ **APPLIED TO TEST 2026-09-15** | Code | done |
+| G1.7 | ~~Migration: `started_at` / `ended_at` on `games`~~ **APPLIED TO TEST 2026-09-15** | Code | done |
 | G1.8 | Tracker writes `sequence_no`, `recorded_at`, `elapsed_ms` per tap | Code | G1.6 |
 | G1.9 | Void-on-decrement, routed through one shared write path shared by the Miss buttons and the minus steppers | Code | G1.8 |
 | G1.10 | Dual-write alongside the existing aggregate columns | Code | G1.9 |
