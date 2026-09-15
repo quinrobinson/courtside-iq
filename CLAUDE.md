@@ -51,11 +51,39 @@ The full phased plan for current work is at `docs/courtside-iq-roadmap-v2.md`. A
 - Phase 1: Buildship → Supabase Edge Functions migration + age data + metric improvements — **done**
 - Phase 2: player-level development narrative — **done**
 - Phase 3: deferred items
-- **Phase 4: Courtside IQ 2.0** — the current work. New UI + Growth IQ, built incrementally behind
-  flags and shipped as a single **2.0.0**. Sub-phases: 4.0 screen audit, 4A foundations, 4B design
-  system, 4C screens by journey, 4D verification, 4E cutover. Phase 4A is complete.
+- **2.0 Rebuild (items 4.x)** — shipped as 2.0.0. New UI + Growth IQ. Sub-items: 4.0 screen
+  audit, 4A foundations, 4B design system, 4C screens by journey, 4D verification, 4E cutover.
+
+**NUMBERING DECODER.** Three documents use overlapping numbers. `4.11d` in a file header means an
+item of the **2.0 Rebuild**, not a phase of anything:
+| Number you see | What it means |
+|---|---|
+| Phase 0-3 | Feature roadmap, this file's roadmap doc |
+| 4.x / 4A-4E | **2.0 Rebuild** (was "Phase 4"; renamed 2026-09-13, numbers deliberately unchanged) |
+| Phase 0-7 in `docs/overhaul-plan.md` | Design system overhaul only. Its Phase 4 is spacing. |
+| G0.x-G4.x | `docs/video-and-events-plan.md` gates, the active track |
+
+**The roadmap path above is correct on this branch and WRONG ON `main`**, which still says
+`docs/roadmap.md` (a file that does not exist). `main` is 249 commits behind and carries none of
+the 2.0 work, so a session started from `main` reads a broken path. Fixed on `phase-4-sdk-upgrade`
+in `b263ebe`; the real fix is getting `main` current.
+
+## Current work
+
+Next track is roadmap item 3.2, event-level pattern analysis.
+Plan: `docs/video-and-events-plan.md`  (gates and task IDs)
+Spec: `docs/event-model-spec.md`
+Read both before touching stats, schema, or the tracker.
+
+**NAMING:** `game_events` already exists and means TOURNAMENTS.
+The new per-play table is `stat_events`. Never conflate them.
+
+**SEQUENCING:** Chat before Figma, Figma before Code. No migration
+for `stat_events` until the game timeline design is approved.
 
 **Companion docs:**
+- `docs/design-inventory.md` — every Figma page and frame mapped to code, palette resolution,
+  component coverage, gaps, design-to-data mismatches
 - `docs/2-0-screen-coverage.md` — every v1 screen mapped to its approved 2.0 Figma frame
 - `docs/entitlement-audit-findings.md` — why free-tier enforcement is safe (audited against prod)
 
