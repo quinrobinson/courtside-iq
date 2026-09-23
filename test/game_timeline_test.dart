@@ -48,15 +48,14 @@ void main() {
       // least one lane, so this is the normal case rather than an edge.
       final lanes = buildTimelineLanes(
           _confirmed([LiveStat.twoMade, LiveStat.defReb, LiveStat.twoMissed]));
-      expect(lanes.map((l) => l.label), ['Points', 'Rebounds']);
+      expect(lanes.map((l) => l.label), ['PTS', 'REB']);
     });
 
     test('all four appear when all four have plays', () {
       final lanes = buildTimelineLanes(_confirmed([
         LiveStat.twoMade, LiveStat.defReb, LiveStat.assists, LiveStat.steals,
       ]));
-      expect(lanes.map((l) => l.label),
-          ['Points', 'Rebounds', 'Playmaking', 'Defense']);
+      expect(lanes.map((l) => l.label), ['PTS', 'REB', 'AST·TO', 'STL·BLK']);
     });
   });
 
@@ -67,8 +66,8 @@ void main() {
         (LiveStat.twoMade, StatEventStatus.voided),
         (LiveStat.twoMade, StatEventStatus.confirmed),
       ]));
-      expect(_lane(lanes, 'Points').plays.length, 2);
-      expect(_lane(lanes, 'Points').value, '4', reason: 'two makes, not three');
+      expect(_lane(lanes, 'PTS').plays.length, 2);
+      expect(_lane(lanes, 'PTS').value, '4', reason: 'two makes, not three');
     });
 
     test('positions renumber over confirmed plays, leaving no gap', () {
@@ -79,8 +78,8 @@ void main() {
         (LiveStat.defReb, StatEventStatus.voided), // seq 2 -> absent
         (LiveStat.assists, StatEventStatus.confirmed), // seq 3 -> pos 2
       ]));
-      expect(_lane(lanes, 'Points').plays.single.position, 1);
-      expect(_lane(lanes, 'Playmaking').plays.single.position, 2,
+      expect(_lane(lanes, 'PTS').plays.single.position, 1);
+      expect(_lane(lanes, 'AST·TO').plays.single.position, 2,
           reason: 'not 3 - the voided play left no slot behind');
     });
 
@@ -91,9 +90,9 @@ void main() {
         StatEvent(sequenceNo: 2, stat: LiveStat.defReb, recordedAt: DateTime.utc(2026)),
       ];
       final lanes = buildTimelineLanes(shuffled);
-      expect(_lane(lanes, 'Points').plays.single.position, 1);
-      expect(_lane(lanes, 'Rebounds').plays.single.position, 2);
-      expect(_lane(lanes, 'Defense').plays.single.position, 3);
+      expect(_lane(lanes, 'PTS').plays.single.position, 1);
+      expect(_lane(lanes, 'REB').plays.single.position, 2);
+      expect(_lane(lanes, 'STL·BLK').plays.single.position, 3);
     });
   });
 
@@ -101,24 +100,24 @@ void main() {
     test('made shots are filled, missed are hollow', () {
       final lanes = buildTimelineLanes(
           _confirmed([LiveStat.twoMade, LiveStat.threeMissed, LiveStat.ftMade]));
-      expect(_lane(lanes, 'Points').plays.map((p) => p.filled), [true, false, true]);
+      expect(_lane(lanes, 'PTS').plays.map((p) => p.filled), [true, false, true]);
     });
 
     test('defensive rebounds are filled, offensive are hollow', () {
       final lanes = buildTimelineLanes(_confirmed([LiveStat.defReb, LiveStat.offReb]));
-      expect(_lane(lanes, 'Rebounds').plays.map((p) => p.filled), [true, false]);
+      expect(_lane(lanes, 'REB').plays.map((p) => p.filled), [true, false]);
     });
 
     test('assists are filled, turnovers are hollow', () {
       final lanes = buildTimelineLanes(_confirmed([LiveStat.assists, LiveStat.turnovers]));
-      expect(_lane(lanes, 'Playmaking').plays.map((p) => p.filled), [true, false]);
-      expect(_lane(lanes, 'Playmaking').value, '1·1');
+      expect(_lane(lanes, 'AST·TO').plays.map((p) => p.filled), [true, false]);
+      expect(_lane(lanes, 'AST·TO').value, '1·1');
     });
 
     test('only free throws are marked as such', () {
       final lanes = buildTimelineLanes(
           _confirmed([LiveStat.twoMade, LiveStat.ftMade, LiveStat.ftMissed]));
-      expect(_lane(lanes, 'Points').plays.map((p) => p.freeThrow),
+      expect(_lane(lanes, 'PTS').plays.map((p) => p.freeThrow),
           [false, true, true]);
     });
   });
@@ -128,52 +127,87 @@ void main() {
       final lanes = buildTimelineLanes(_confirmed([
         LiveStat.twoMade, LiveStat.twoMade, LiveStat.threeMade, LiveStat.ftMade,
       ]));
-      expect(_lane(lanes, 'Points').value, '8');
+      expect(_lane(lanes, 'PTS').value, '8');
     });
 
     test('defense combines steals and blocks', () {
       final lanes = buildTimelineLanes(
           _confirmed([LiveStat.steals, LiveStat.steals, LiveStat.blocks]));
-      expect(_lane(lanes, 'Defense').value, '3');
+      expect(_lane(lanes, 'STL·BLK').value, '3');
     });
   });
 
-  group('marks scale with the play count', () {
-    test('a dense game shrinks its marks rather than overlapping them', () {
-      // 244 / 35 is 6.97, so a fixed 13 would overlap its neighbour by half.
-      final size = timelineMarkSize(35);
-      expect(size, lessThan(13));
-      expect(size, greaterThanOrEqualTo(7));
+  group('fit or scroll', () {
+    // The track at the 390pt design width: 390 - 74 - 55 - 2 x 8.
+    const design = 245.0;
+
+    test('24 plays fit the column and 25 scroll: the approved threshold', () {
+      expect(timelineScale(24, design).scrolls, isFalse);
+      expect(timelineScale(25, design).scrolls, isTrue);
     });
 
-    test('a sparse game does not balloon', () {
-      expect(timelineMarkSize(3), 13);
-      expect(timelineMarkSize(1), 13);
-    });
-
-    test('a typical game lands between the bounds', () {
-      final size = timelineMarkSize(19);
-      expect(size, closeTo(11.84, 0.01));
-    });
-
-    test('never returns a size that would collapse or overflow', () {
-      for (var plays = 1; plays <= 200; plays++) {
-        final s = timelineMarkSize(plays);
-        expect(s, inInclusiveRange(7, 13), reason: 'at $plays plays');
+    test('a fitted game never draws a mark below 9pt or above 13', () {
+      // 6pt marks in the dense frame are what failed on review: hollow and
+      // filled stop reading apart. Scrolling exists so this floor holds.
+      for (var plays = 1; plays <= 24; plays++) {
+        final s = timelineScale(plays, design);
+        expect(s.markSize, inInclusiveRange(9, 13), reason: 'at $plays plays');
+        expect(s.contentWidth, design);
       }
+    });
+
+    test('a scrolling game keeps the typical sizing and grows instead', () {
+      final s = timelineScale(35, design);
+      expect(s.spacing, 12);
+      expect(s.markSize, 11);
+      expect(s.contentWidth, 35 * 12);
+    });
+
+    test('a narrower phone scrolls sooner rather than shrinking', () {
+      // 360pt wide: a 215pt track. 21 plays fit at 10.2 apart, 22 would not.
+      expect(timelineScale(21, 215).scrolls, isFalse);
+      expect(timelineScale(22, 215).scrolls, isTrue);
+    });
+
+    test('the record game scrolls at the same sizing as any other', () {
+      final s = timelineScale(181, design);
+      expect(s.scrolls, isTrue);
+      expect(s.markSize, 11);
     });
   });
 
   group('the widget', () {
-    Future<void> pump(WidgetTester tester, List<StatEvent> events, {String? moment}) =>
-        tester.pumpWidget(MaterialApp(
-          theme: CiTheme.base(),
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: GameTimeline(events: events, moment: moment),
-            ),
+    // The 390pt design width, so the scroll threshold lands where it does on
+    // the phone the frames were drawn for.
+    Future<void> pump(WidgetTester tester, List<StatEvent> events, {String? moment}) {
+      tester.view.physicalSize = const Size(1170, 2400);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      return tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: GameTimeline(events: events, moment: moment),
           ),
-        ));
+        ),
+      ));
+    }
+
+    // The page itself scrolls vertically; only the timeline scrolls sideways.
+    final sideways = find.byWidgetPredicate(
+        (w) => w is SingleChildScrollView && w.scrollDirection == Axis.horizontal);
+
+    List<LiveStat> mixed(int plays) => [
+          for (var i = 0; i < plays; i++)
+            [LiveStat.twoMade, LiveStat.defReb, LiveStat.assists, LiveStat.steals][i % 4],
+        ];
+
+    double fade(WidgetTester tester) => tester
+        .widget<AnimatedOpacity>(find.byKey(const ValueKey('timeline-scroll-fade')))
+        .opacity;
 
     testWidgets('renders nothing at all for a game with no events',
         (tester) async {
@@ -193,10 +227,62 @@ void main() {
       expect(find.text('3 plays'), findsNothing);
     });
 
-    testWidgets('labels the axis Start and End', (tester) async {
+    testWidgets('heads the timeline Tip-off to Final, with no footer', (tester) async {
       await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.defReb]));
-      expect(find.text('Start'), findsOneWidget);
-      expect(find.text('End'), findsOneWidget);
+      expect(find.text('TIP-OFF'), findsOneWidget);
+      expect(find.text('FINAL'), findsOneWidget);
+      expect(find.text('Start'), findsNothing);
+      expect(find.text('End'), findsNothing);
+    });
+
+    testWidgets('each number is said once', (tester) async {
+      // The lanes said POINTS above and PTS beside. Now the abbreviation
+      // names the row and the figure sits alone on the right.
+      await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.twoMade]));
+      expect(find.text('PTS'), findsOneWidget);
+      expect(find.text('4'), findsOneWidget);
+      expect(find.text('POINTS'), findsNothing);
+    });
+
+    testWidgets('24 plays fit the column: nothing scrolls sideways', (tester) async {
+      await pump(tester, _confirmed(mixed(24)));
+      expect(sideways, findsNothing);
+    });
+
+    testWidgets('25 plays scroll, and every lane scrolls as one', (tester) async {
+      await pump(tester, _confirmed(mixed(25)));
+      // ONE sideways scroll view for four lanes and the header. Separate
+      // scrolls would let lanes drift apart and break the shared axis.
+      expect(sideways, findsOneWidget);
+      expect(find.descendant(of: sideways, matching: find.text('TIP-OFF')), findsOneWidget);
+      expect(find.descendant(of: sideways, matching: find.text('FINAL')), findsOneWidget);
+    });
+
+    testWidgets('labels and totals stay pinned outside the scroll', (tester) async {
+      await pump(tester, _confirmed(mixed(30)));
+      for (final label in ['PTS', 'REB', 'AST·TO', 'STL·BLK']) {
+        expect(find.text(label), findsOneWidget);
+        expect(find.descendant(of: sideways, matching: find.text(label)), findsNothing);
+      }
+    });
+
+    testWidgets('the fade shows until the final play, then goes', (tester) async {
+      await pump(tester, _confirmed(mixed(35)));
+      expect(fade(tester), 1, reason: 'opens at tip-off with more to the right');
+
+      await tester.drag(sideways, const Offset(-2000, 0));
+      await tester.pumpAndSettle();
+      expect(fade(tester), 0, reason: 'nothing left to scroll to');
+
+      await tester.drag(sideways, const Offset(600, 0));
+      await tester.pumpAndSettle();
+      expect(fade(tester), 1, reason: 'back from the end, more again');
+    });
+
+    testWidgets('the record 181-play game renders without overflowing', (tester) async {
+      await pump(tester, _confirmed(mixed(181)));
+      expect(tester.takeException(), isNull);
+      expect(sideways, findsOneWidget);
     });
 
     testWidgets('marks carry no numbers', (tester) async {
@@ -232,10 +318,9 @@ void main() {
     });
 
     testWidgets('the widest lane fits its fixed label column', (tester) async {
-      // Playmaking carries the widest label, value and unit of the four
-      // ("PLAYMAKING", "12·4", "AST·TO") against a label column fixed at 82.
-      // It overflowed by 48pt before the column was allowed to scale down,
-      // and an overflow is a caught exception here rather than a stripe.
+      // AST·TO carries the widest label and value of the four against fixed
+      // columns. An earlier build overflowed here by 48pt; an overflow is a
+      // caught exception in a test rather than a stripe.
       await pump(tester, _confirmed([
         ...List.filled(12, LiveStat.assists),
         ...List.filled(4, LiveStat.turnovers),
@@ -246,10 +331,10 @@ void main() {
 
     testWidgets('renders only the lanes that have plays', (tester) async {
       await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.defReb]));
-      expect(find.text('POINTS'), findsOneWidget);
-      expect(find.text('REBOUNDS'), findsOneWidget);
-      expect(find.text('PLAYMAKING'), findsNothing);
-      expect(find.text('DEFENSE'), findsNothing);
+      expect(find.text('PTS'), findsOneWidget);
+      expect(find.text('REB'), findsOneWidget);
+      expect(find.text('AST·TO'), findsNothing);
+      expect(find.text('STL·BLK'), findsNothing);
     });
   });
 }
