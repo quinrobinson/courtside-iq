@@ -182,6 +182,71 @@ void main() {
     });
   });
 
+  group('a free-throw trip keeps its neighbours clear', () {
+    // Found on device 2026-09-23: a miss, then two made free throws, and the
+    // trip's enclosure ran underneath the miss so the three read as one joined
+    // shape. The capsule reaches kTripClearance past its marks; the neighbours
+    // did not know that.
+    final lanes = buildTimelineLanes(_confirmed([
+      LiveStat.twoMissed, LiveStat.ftMade, LiveStat.ftMade, LiveStat.twoMade,
+    ]));
+    final trips = timelineTrips(lanes);
+    final scale = timelineScale(4, 226, trips: trips);
+    final mark = scale.markSize;
+    final plainGap = scale.spacing - mark;
+
+    test('consecutive free throws are one trip', () {
+      expect(trips, [(2, 3)]);
+    });
+
+    test('the gap before a trip equals the gap between any two plain marks', () {
+      final neighbourRight = scale.centreOf(1) + mark / 2;
+      final capsuleLeft = scale.centreOf(2) - mark / 2 - kTripClearance;
+      expect(capsuleLeft - neighbourRight, closeTo(plainGap, 1e-9));
+    });
+
+    test('and so does the gap after it', () {
+      final capsuleRight = scale.centreOf(3) + mark / 2 + kTripClearance;
+      final neighbourLeft = scale.centreOf(4) - mark / 2;
+      expect(neighbourLeft - capsuleRight, closeTo(plainGap, 1e-9));
+    });
+
+    test('the pair inside the trip stays at plain spacing', () {
+      expect(scale.centreOf(3) - scale.centreOf(2), closeTo(scale.spacing, 1e-9));
+    });
+
+    test('the clearance moves every lane, because they share one order', () {
+      // A rebound at position 4 sits exactly where a shot at 4 would. The
+      // offset is a property of the axis, not of the points lane.
+      final withRebound = buildTimelineLanes(_confirmed([
+        LiveStat.twoMissed, LiveStat.ftMade, LiveStat.ftMade, LiveStat.defReb,
+      ]));
+      final s = timelineScale(4, 226, trips: timelineTrips(withRebound));
+      expect(s.centreOf(4) - s.centreOf(1),
+          closeTo(3 * s.spacing + 2 * kTripClearance, 1e-9));
+    });
+
+    test('a trip at the very end still fits inside the track', () {
+      final end = timelineScale(3, 226, trips: const [(2, 3)]);
+      final capsuleRight = end.centreOf(3) + end.markSize / 2 + kTripClearance;
+      expect(capsuleRight, lessThanOrEqualTo(226));
+    });
+
+    test('the clearance counts toward the scroll threshold', () {
+      // 22 plays fit on their own; a trip to the line takes 7pt out of the
+      // width and tips the same game over into scrolling rather than letting
+      // the spacing fall under 10.
+      expect(timelineScale(22, 226).scrolls, isFalse);
+      expect(timelineScale(22, 226, trips: const [(5, 6)]).scrolls, isTrue);
+    });
+
+    test('a scrolling track is widened by the clearance, not squeezed', () {
+      final s = timelineScale(30, 226, trips: const [(5, 6), (20, 21)]);
+      expect(s.contentWidth, 30 * 12 + 4 * kTripClearance);
+      expect(s.centreOf(30) + s.markSize / 2, lessThanOrEqualTo(s.contentWidth));
+    });
+  });
+
   group('the widget', () {
     // The 390pt design width, so the scroll threshold lands where it does on
     // the phone the frames were drawn for.

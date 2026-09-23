@@ -168,6 +168,28 @@ List<TimelineLane> buildTimelineLanes(List<StatEvent> events) {
   return [for (final l in lanes) if (!l.isEmpty) l];
 }
 
+/// Every free-throw trip in the game, as (first, last) display positions.
+///
+/// Consecutive free throws are one TRIP to the line, drawn as one enclosure.
+/// Only the points lane holds free throws, but the result is used for the
+/// WHOLE axis: see [TimelineScale.centreOf].
+List<(int, int)> timelineTrips(List<TimelineLane> lanes) {
+  final positions = [
+    for (final l in lanes)
+      for (final p in l.plays)
+        if (p.freeThrow) p.position,
+  ]..sort();
+  final trips = <(int, int)>[];
+  for (final pos in positions) {
+    if (trips.isNotEmpty && trips.last.$2 == pos - 1) {
+      trips[trips.length - 1] = (trips.last.$1, pos);
+    } else {
+      trips.add((pos, pos));
+    }
+  }
+  return trips;
+}
+
 /// How the plays sit on the track at a given width.
 @immutable
 class TimelineScale {
@@ -176,12 +198,14 @@ class TimelineScale {
     required this.spacing,
     required this.markSize,
     required this.contentWidth,
+    this.trips = const [],
   });
 
   /// True when the plays are laid out wider than the column and it scrolls.
   final bool scrolls;
 
-  /// Distance between one play's centre and the next.
+  /// Distance between one play's centre and the next, where no free-throw
+  /// trip sits between them.
   final double spacing;
 
   final double markSize;
@@ -189,6 +213,30 @@ class TimelineScale {
   /// Width of the drawn track. Equal to the column's track width when the
   /// timeline fits; wider, and scrolled, when it does not.
   final double contentWidth;
+
+  /// Free-throw trips as (first, last) positions, from [timelineTrips].
+  final List<(int, int)> trips;
+
+  /// Where play [position] is centred on the track.
+  ///
+  /// A TRIP GETS ROOM FOR ITS ENCLOSURE. The capsule reaches [kTripClearance]
+  /// past its marks on each side, so with plain spacing it ran underneath the
+  /// play beside it: a miss followed by two made free throws read as one
+  /// joined shape. Each trip adds that clearance before its first play and
+  /// after its last, which leaves the gap from the capsule's edge to its
+  /// neighbour exactly the gap between any two plain marks.
+  ///
+  /// The clearance shifts EVERY LANE, not just points. All lanes share one
+  /// order, so a rebound that came after the trip has to move with the shot
+  /// that came after it or the axis stops meaning anything.
+  double centreOf(int position) {
+    var gaps = 0;
+    for (final (first, last) in trips) {
+      if (first <= position) gaps++;
+      if (last < position) gaps++;
+    }
+    return (position - 0.5) * spacing + gaps * kTripClearance;
+  }
 }
 
 /// Lays [plays] out across a track [trackWidth] wide.
@@ -196,27 +244,35 @@ class TimelineScale {
 /// Fits them to the width while that keeps plays at least [kTimelineMinSpacing]
 /// apart, which keeps marks at 9pt or larger. Past that, spacing and marks fix
 /// at the typical game's sizing and the track grows wider than the column.
-TimelineScale timelineScale(int plays, double trackWidth) {
+/// Each of [trips] takes its clearance out of the width first.
+TimelineScale timelineScale(int plays, double trackWidth,
+    {List<(int, int)> trips = const []}) {
   if (plays <= 0) {
     return TimelineScale(
         scrolls: false, spacing: trackWidth, markSize: _kMarkMax, contentWidth: trackWidth);
   }
-  final fitted = trackWidth / plays;
+  final clearance = trips.length * 2 * kTripClearance;
+  final fitted = (trackWidth - clearance) / plays;
   if (fitted >= kTimelineMinSpacing) {
     return TimelineScale(
       scrolls: false,
       spacing: fitted,
       markSize: (fitted - 1).clamp(_kMarkFitMin, _kMarkMax),
       contentWidth: trackWidth,
+      trips: trips,
     );
   }
   return TimelineScale(
     scrolls: true,
     spacing: _kScrollSpacing,
     markSize: _kScrollMark,
-    contentWidth: plays * _kScrollSpacing,
+    contentWidth: plays * _kScrollSpacing + clearance,
+    trips: trips,
   );
 }
+
+/// How far a free-throw enclosure reaches past its marks, on each side.
+const double kTripClearance = 3.5;
 
 /// The closest two plays may sit before the timeline scrolls instead.
 ///
@@ -270,7 +326,7 @@ class GameTimeline extends StatelessWidget {
         LayoutBuilder(
           builder: (context, box) {
             final track = box.maxWidth - kTimelineLabelCol - kTimelineStatCol - _kTrackPad * 2;
-            final scale = timelineScale(plays, track);
+            final scale = timelineScale(plays, track, trips: timelineTrips(lanes));
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -569,21 +625,8 @@ class _Track extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     final mark = scale.markSize;
-    double centreOf(int position) => (position - 0.5) * scale.spacing;
-
-    // Consecutive free throws are one TRIP to the line, and a trip is drawn as
-    // one enclosure rather than two marks. Grouping by adjacent position is
-    // what makes a pair read as a pair.
-    final trips = <List<TimelinePlay>>[];
-    for (final p in plays.where((p) => p.freeThrow)) {
-      if (trips.isNotEmpty && trips.last.last.position == p.position - 1) {
-        trips.last.add(p);
-      } else {
-        trips.add([p]);
-      }
-    }
-
-    const pad = 3.5;
+    final centreOf = scale.centreOf;
+    const pad = kTripClearance;
     return SizedBox(
       width: width,
       height: _kTrackHeight,
@@ -603,20 +646,24 @@ class _Track extends StatelessWidget {
           // Enclosures first, filled with the column's own colour, so they
           // interrupt the dotted rule rather than sitting on top of it. A trip
           // reads as a segment carved out of the timeline.
-          for (final t in trips)
-            Positioned(
-              left: centreOf(t.first.position) - mark / 2 - pad,
-              top: _kTrackHeight / 2 - (mark + pad * 2) / 2,
-              child: Container(
-                width: centreOf(t.last.position) - centreOf(t.first.position) + mark + pad * 2,
-                height: mark + pad * 2,
-                decoration: BoxDecoration(
-                  color: c.surfaceSunk,
-                  borderRadius: BorderRadius.circular((mark + pad * 2) / 2),
-                  border: Border.all(color: c.text, width: 1.4),
+          //
+          // Only this lane's trips: the scale holds every trip in the game,
+          // which is right for spacing and wrong for drawing.
+          for (final (first, last) in scale.trips)
+            if (plays.any((p) => p.position == first && p.freeThrow))
+              Positioned(
+                left: centreOf(first) - mark / 2 - pad,
+                top: _kTrackHeight / 2 - (mark + pad * 2) / 2,
+                child: Container(
+                  width: centreOf(last) - centreOf(first) + mark + pad * 2,
+                  height: mark + pad * 2,
+                  decoration: BoxDecoration(
+                    color: c.surfaceSunk,
+                    borderRadius: BorderRadius.circular((mark + pad * 2) / 2),
+                    border: Border.all(color: c.text, width: 1.4),
+                  ),
                 ),
               ),
-            ),
           for (final p in plays)
             Positioned(
               left: centreOf(p.position) - mark / 2,

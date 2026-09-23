@@ -367,6 +367,11 @@ What changes in `game_timeline.dart`:
   `surface-sunk` shows until the end is reached. From 391 prod games: p50 19, p75 27.5, p90 35,
   max 181. 148 of 391 games (38%) scroll; the rest stay static.
 - Hollow marks and free-throw enclosures fill with `surface-sunk`, not white.
+- **A free-throw trip gets room for its enclosure** (found on device 2026-09-23: a miss then two
+  made free throws, and the capsule ran underneath the miss). Each trip adds 3.5pt before its
+  first play and after its last, on the WHOLE axis since every lane shares one order, so the gap
+  from the capsule to its neighbour equals the gap between any two plain marks. The clearance
+  counts toward the scroll threshold: a 22-play game with a trip to the line scrolls.
 - The summary line ("moment") takes the insight wash: `accent/lime-wash` fill, the `Icon/spark`
   used by the insight card, `color/text` copy, bottom hairline. Lime-wash plus spark already means
   "Courtside IQ noticed this" on this screen. NOTE: nothing generates a moment yet; the widget
