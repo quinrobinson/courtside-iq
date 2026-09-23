@@ -138,18 +138,18 @@ void main() {
   });
 
   group('fit or scroll', () {
-    // The track at the 390pt design width: 390 - 74 - 55 - 2 x 8.
-    const design = 245.0;
+    // The track at the 390pt design width: 390 - 74 - 74 - 2 x 8.
+    const design = 226.0;
 
-    test('24 plays fit the column and 25 scroll: the approved threshold', () {
-      expect(timelineScale(24, design).scrolls, isFalse);
-      expect(timelineScale(25, design).scrolls, isTrue);
+    test('22 plays fit the column and 23 scroll', () {
+      expect(timelineScale(22, design).scrolls, isFalse);
+      expect(timelineScale(23, design).scrolls, isTrue);
     });
 
     test('a fitted game never draws a mark below 9pt or above 13', () {
       // 6pt marks in the dense frame are what failed on review: hollow and
       // filled stop reading apart. Scrolling exists so this floor holds.
-      for (var plays = 1; plays <= 24; plays++) {
+      for (var plays = 1; plays <= 22; plays++) {
         final s = timelineScale(plays, design);
         expect(s.markSize, inInclusiveRange(9, 13), reason: 'at $plays plays');
         expect(s.contentWidth, design);
@@ -167,6 +167,12 @@ void main() {
       // 360pt wide: a 215pt track. 21 plays fit at 10.2 apart, 22 would not.
       expect(timelineScale(21, 215).scrolls, isFalse);
       expect(timelineScale(22, 215).scrolls, isTrue);
+    });
+
+    test('the side columns are equal', () {
+      // Balanced 2026-09-23: a narrow stat column crowded "5·2" against the
+      // timeline's edge while the labels had room to spare.
+      expect(kTimelineStatCol, kTimelineLabelCol);
     });
 
     test('the record game scrolls at the same sizing as any other', () {
@@ -244,13 +250,13 @@ void main() {
       expect(find.text('POINTS'), findsNothing);
     });
 
-    testWidgets('24 plays fit the column: nothing scrolls sideways', (tester) async {
-      await pump(tester, _confirmed(mixed(24)));
+    testWidgets('22 plays fit the column: nothing scrolls sideways', (tester) async {
+      await pump(tester, _confirmed(mixed(22)));
       expect(sideways, findsNothing);
     });
 
-    testWidgets('25 plays scroll, and every lane scrolls as one', (tester) async {
-      await pump(tester, _confirmed(mixed(25)));
+    testWidgets('23 plays scroll, and every lane scrolls as one', (tester) async {
+      await pump(tester, _confirmed(mixed(23)));
       // ONE sideways scroll view for four lanes and the header. Separate
       // scrolls would let lanes drift apart and break the shared axis.
       expect(sideways, findsOneWidget);

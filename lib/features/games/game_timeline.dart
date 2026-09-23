@@ -26,11 +26,13 @@
 // run, and one shared sequence can. Position is ORDER, never time - there is
 // no game clock.
 //
-// PAST 24 PLAYS THE TIMELINE SCROLLS rather than shrinking its marks. Fitting
+// PAST 22 PLAYS THE TIMELINE SCROLLS rather than shrinking its marks. Fitting
 // a 35-play game into the column took the marks to 6pt, and at 6pt hollow and
-// filled stop reading apart. The rule is a minimum spacing, which at the 390pt
-// design width lands exactly on the approved 24 plays and on a narrower phone
+// filled stop reading apart. The rule is a minimum spacing, not a play count:
+// at the 390pt design width it lands on 22, and on a narrower phone it
 // switches to scrolling a little sooner instead of shrinking below legible.
+// (It was 24 until the side columns were balanced at 74pt each; the rule held
+// and the count moved.)
 // Labels and totals stay pinned; the header and all four lanes scroll as one.
 //
 // A LANE WITH NOTHING TO SHOW DOES NOT RENDER, and a game with no events
@@ -218,13 +220,17 @@ TimelineScale timelineScale(int plays, double trackWidth) {
 
 /// The closest two plays may sit before the timeline scrolls instead.
 ///
-/// At the design width the track is 245pt: 24 plays fit at 10.2 apart, 25
-/// would need 9.8, so this is what puts the approved threshold at 24.
+/// At the design width the track is 226pt: 22 plays fit at 10.3 apart, 23
+/// would need 9.8, so this is what puts the threshold at 22.
 const double kTimelineMinSpacing = 10;
 
 /// Column widths and row heights, measured from the TABLE frames.
+///
+/// THE SIDE COLUMNS ARE EQUAL ON PURPOSE. The stat column was 55, which left
+/// "5·2" 8pt from the timeline's edge hairline while the labels had 12. Both
+/// are 74 now, so the table balances and the totals have room.
 const double kTimelineLabelCol = 74;
-const double kTimelineStatCol = 55;
+const double kTimelineStatCol = 74;
 const double _kTrackPad = 8;
 const double _kAxisRow = 34;
 const double _kLaneRow = 50;

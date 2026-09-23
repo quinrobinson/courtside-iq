@@ -356,12 +356,16 @@ What changes in `game_timeline.dart`:
   Each number is said once.
 - A header row above the lanes, in the timeline column only: TIP-OFF, an arrow, FINAL, in
   `color/text`. The old Start/End footer goes.
-- **Scroll threshold: 24 plays.** Up to 24, the track fits the column and marks scale 13 down to
-  about 9pt. Above 24, spacing is fixed at 12pt with 11pt marks and the timeline column scrolls
+- **Label and stat columns are both 74pt** (balanced 2026-09-23; the stat column was 55 and
+  crowded "5·2" against the timeline's edge).
+- **Scroll threshold: a 10pt minimum spacing, which is 22 plays at the design width** (it was 24
+  before the columns were balanced; the rule held, the count moved). Up to 22, the track fits the
+  column and marks scale 13 down to about 9pt. Above 22, spacing is fixed at 12pt with 11pt marks
+  and the timeline column scrolls
   horizontally. Labels and totals stay pinned; the header and all four lanes scroll as ONE unit
   (the shared axis is the point of the design); it opens at tip-off; a right-edge fade in
   `surface-sunk` shows until the end is reached. From 391 prod games: p50 19, p75 27.5, p90 35,
-  max 181. Two thirds of games stay static; 129 of 391 scroll.
+  max 181. 148 of 391 games (38%) scroll; the rest stay static.
 - Hollow marks and free-throw enclosures fill with `surface-sunk`, not white.
 - The summary line ("moment") takes the insight wash: `accent/lime-wash` fill, the `Icon/spark`
   used by the insight card, `color/text` copy, bottom hairline. Lime-wash plus spark already means
