@@ -359,10 +359,9 @@ tokens. What changes in `game_timeline.dart`:
   so a 7pt minimum makes neighbouring marks touch.
 - Defense counts steals AND blocks; the old `STL` unit was wrong and STL·BLK fixes it.
 
-**G1.12 needs more real games before G1.14.** (Superseded heading, kept for history:) **G1.12 IS THE ONLY THING BLOCKING G1.14, AND IT HAS NEVER RUN.** Everything above is proven by
-synthetic data only. Nothing has yet taken a real tap in a real gym through the queue to a real
-row. It needs one game tracked end to end on a device against TEST, then
-`select * from v_stat_event_reconciliation` with an empty `mismatched` on every row.
+**G1.12 IS STILL THE ONLY THING BLOCKING G1.14.** It needs more real games tracked on a device
+against TEST, then `select * from v_stat_event_reconciliation` with an empty `mismatched` on
+every row.
 
 **G1.8 risk RESOLVED 2026-09-13, and the premise was void.** The tracker cannot be regenerated:
 FlutterFlow was retired 2026-07-19, there is no `.flutterflow` project link in the repo, and
