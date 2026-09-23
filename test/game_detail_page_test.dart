@@ -8,12 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
-import 'package:courtside_i_q/courtside_iq/design/components/ci_scoring_mix.dart';
 import 'package:courtside_i_q/courtside_iq/game_detail_builder.dart';
+import 'package:courtside_i_q/courtside_iq/live_game.dart';
 import 'package:courtside_i_q/courtside_iq/metrics_config.dart';
+import 'package:courtside_i_q/courtside_iq/stat_event.dart';
 import 'package:courtside_i_q/features/games/game_detail_page.dart';
 import 'package:courtside_i_q/features/games/game_detail_repository.dart';
 import 'package:courtside_i_q/features/games/game_insight_card.dart';
+import 'package:courtside_i_q/features/games/game_timeline.dart';
 
 class _FakeRepo implements GameDetailRepository {
   _FakeRepo(this.row);
@@ -39,6 +41,7 @@ GameDetailRow _row({
   int ftMade = 4,
   AgeBand? ageBand = AgeBand.u13,
   GameInsight? insight,
+  List<StatEvent> events = const [],
 }) =>
     GameDetailRow(
       gameId: 'g1',
@@ -62,6 +65,7 @@ GameDetailRow _row({
       blocks: 0,
       turnovers: turnovers,
       insight: insight,
+      events: events,
     );
 
 Future<_FakeRepo> _pump(WidgetTester tester, GameDetailRow? row) async {
@@ -174,18 +178,53 @@ void main() {
     });
   });
 
-  group('scoring mix', () {
-    testWidgets('renders when anything was scored', (tester) async {
+  group('the game timeline replaced scoring mix', () {
+    // Approved 2026-09-15 with the lanes direction. The timeline says what
+    // the stacked bar said - how the points broke down - and says it in
+    // sequence, which the bar could not.
+    List<StatEvent> plays(List<LiveStat> stats) => [
+          for (var i = 0; i < stats.length; i++)
+            StatEvent(
+              sequenceNo: i + 1,
+              stat: stats[i],
+              recordedAt: DateTime(2026, 3, 8, 19, i),
+            ),
+        ];
+
+    testWidgets('scoring mix is gone even from a game full of points',
+        (tester) async {
       await _pump(tester, _row());
-      expect(find.text('Scoring Mix'), findsOneWidget);
-      expect(find.byType(CiScoringMix), findsOneWidget);
+      expect(find.text('Scoring Mix'), findsNothing);
     });
 
-    testWidgets('is absent from a scoreless game', (tester) async {
-      await _pump(tester, _row(points: 0, threeMade: 0, ftMade: 0));
-      // twoMade is still 5 in the fixture, so force the true zero case via
-      // the builder's own rule rather than asserting a half-empty bar.
-      expect(find.byType(CiScoringMix), findsOneWidget);
+    testWidgets('renders the timeline when the game has plays', (tester) async {
+      await _pump(tester, _row(events: plays([
+        LiveStat.twoMade, LiveStat.defReb, LiveStat.assists, LiveStat.steals,
+      ])));
+      expect(find.byType(GameTimeline), findsOneWidget);
+      expect(find.text('How the game went'), findsOneWidget);
+      expect(find.text('4 plays'), findsOneWidget);
+    });
+
+    testWidgets('shows nothing at all when the game has no plays',
+        (tester) async {
+      // Every game logged before stat_events shipped, which is most of them.
+      // The section is ABSENT rather than empty - there is no "no plays yet".
+      await _pump(tester, _row());
+      expect(find.text('How the game went'), findsNothing);
+      expect(find.text('Start'), findsNothing);
+    });
+
+    testWidgets('a fully corrected game shows no timeline', (tester) async {
+      await _pump(tester, _row(events: [
+        StatEvent(
+          sequenceNo: 1,
+          stat: LiveStat.twoMade,
+          recordedAt: DateTime(2026, 3, 8),
+          status: StatEventStatus.voided,
+        ),
+      ]));
+      expect(find.text('How the game went'), findsNothing);
     });
   });
 

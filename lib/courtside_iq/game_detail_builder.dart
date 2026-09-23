@@ -24,6 +24,7 @@
 
 import 'game_metrics.dart';
 import 'metrics_config.dart';
+import 'stat_event.dart';
 
 /// One game as stored, before any judgement is applied.
 class GameDetailRow {
@@ -51,7 +52,13 @@ class GameDetailRow {
     required this.blocks,
     required this.turnovers,
     this.insight,
+    this.events = const [],
   });
+
+  /// Every confirmed play, in order. Empty for any game logged before
+  /// stat_events shipped, which is most of them - and empty is not a failure,
+  /// it simply means the timeline does not render.
+  final List<StatEvent> events;
 
   final String gameId;
   final String playerId;

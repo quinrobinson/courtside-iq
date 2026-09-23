@@ -25,7 +25,6 @@ import '/courtside_iq/design/components/ci_badge.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_confirm_dialog.dart';
 import '/courtside_iq/design/components/ci_info_sheet.dart';
-import '/courtside_iq/design/components/ci_scoring_mix.dart';
 import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -35,6 +34,7 @@ import '/courtside_iq/game_detail_builder.dart';
 import '/courtside_iq/game_metrics.dart';
 import 'game_detail_repository.dart';
 import 'game_insight_card.dart';
+import 'game_timeline.dart';
 
 class GameDetailPage extends StatefulWidget {
   const GameDetailPage({
@@ -186,18 +186,14 @@ class _GameDetailPageState extends State<GameDetailPage> {
                       ],
                       const CiHairline(),
                     ],
-                    if (v.scoringMix.isNotEmpty) ...[
-                      const CiSectionHeader(title: 'Scoring Mix'),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          CiSpace.screen,
-                          CiSpace.s5,
-                          CiSpace.screen,
-                          CiSpace.s5,
-                        ),
-                        child: CiScoringMix(segments: v.scoringMix),
-                      ),
-                    ],
+                    // SCORING MIX IS RETIRED HERE. The timeline says what it
+                    // said - how the points broke down - and says it in
+                    // sequence, which the stacked bar could not. Approved
+                    // 2026-09-15 with the lanes direction.
+                    //
+                    // Renders nothing when the game has no plays, which is
+                    // every game logged before stat_events shipped.
+                    GameTimeline(events: row.events),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(
                         CiSpace.screen,

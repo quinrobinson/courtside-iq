@@ -231,6 +231,19 @@ void main() {
       expect(find.text('Both turnovers came early.'), findsNothing);
     });
 
+    testWidgets('the widest lane fits its fixed label column', (tester) async {
+      // Playmaking carries the widest label, value and unit of the four
+      // ("PLAYMAKING", "12·4", "AST·TO") against a label column fixed at 82.
+      // It overflowed by 48pt before the column was allowed to scale down,
+      // and an overflow is a caught exception here rather than a stripe.
+      await pump(tester, _confirmed([
+        ...List.filled(12, LiveStat.assists),
+        ...List.filled(4, LiveStat.turnovers),
+      ]));
+      expect(tester.takeException(), isNull);
+      expect(find.text('12·4'), findsOneWidget);
+    });
+
     testWidgets('renders only the lanes that have plays', (tester) async {
       await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.defReb]));
       expect(find.text('POINTS'), findsOneWidget);

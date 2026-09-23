@@ -239,23 +239,37 @@ class _Lane extends StatelessWidget {
               children: [
                 // 9 Medium at +7% tracking, measured from the frame. micro
                 // is the nearest token (10 Medium); there is no 9pt eyebrow.
-                Text(lane.label.toUpperCase(),
-                    style: CiType.micro.copyWith(
-                        color: c.textMuted, fontSize: 9, letterSpacing: 0.63)),
+                //
+                // BOTH ROWS SHRINK RATHER THAN OVERFLOW. The column is a fixed
+                // 82 because the frame is, but its contents are not fixed:
+                // Playmaking carries the widest of each ("12·4" beside
+                // "AST·TO"), and a parent running large text sizes widens
+                // every one of them. scaleDown leaves the Figma sizing alone
+                // whenever it fits and gives up points only when it cannot.
+                _Shrink(
+                  child: Text(lane.label.toUpperCase(),
+                      maxLines: 1,
+                      style: CiType.micro.copyWith(
+                          color: c.textMuted, fontSize: 9, letterSpacing: 0.63)),
+                ),
                 const SizedBox(height: 3),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(lane.value,
-                        style: CiType.statSm
-                            .copyWith(color: c.text, fontSize: 21, letterSpacing: 0)),
-                    const SizedBox(width: 4),
-                    Text(lane.unit,
-                        style: CiType.micro.copyWith(
-                            color: c.textMuted, letterSpacing: 0.5)),
-                  ],
+                _Shrink(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(lane.value,
+                          maxLines: 1,
+                          style: CiType.statSm
+                              .copyWith(color: c.text, fontSize: 21, letterSpacing: 0)),
+                      const SizedBox(width: 4),
+                      Text(lane.unit,
+                          maxLines: 1,
+                          style: CiType.micro.copyWith(
+                              color: c.textMuted, letterSpacing: 0.5)),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -268,6 +282,24 @@ class _Lane extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Keeps a line on one line inside the fixed label column.
+///
+/// Left-aligned on purpose: the lane labels form a column and a centred
+/// shrink would break its left edge the moment one lane scaled and another
+/// did not.
+class _Shrink extends StatelessWidget {
+  const _Shrink({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: child,
+      );
 }
 
 class _Track extends StatelessWidget {

@@ -120,6 +120,16 @@ const Map<LiveStat, String> kStatEventType = {
   LiveStat.turnovers: 'turnover',
 };
 
+/// `stat_events.event_type` back to a [LiveStat], for reading a game back.
+///
+/// Built from [kStatEventType] rather than written out again, so the two
+/// directions cannot disagree. An unknown type returns null: video may
+/// eventually emit types with no stat equivalent, and those carry no stat
+/// weight and must not be counted as one.
+final Map<String, LiveStat> kStatFromEventType = {
+  for (final e in kStatEventType.entries) e.value: e.key,
+};
+
 /// The result of one tap: the new totals and the new event list, together.
 typedef TapResult = ({LiveGameStats stats, List<StatEvent> events});
 

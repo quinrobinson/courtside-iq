@@ -13,6 +13,7 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/courtside_iq/game_detail_builder.dart';
 import '/courtside_iq/metrics_config.dart';
+import '/courtside_iq/stat_event.dart';
 
 class GameDetailRepository {
   const GameDetailRepository();
@@ -42,6 +43,7 @@ class GameDetailRepository {
 
     final playerId = r['player_id'] as String? ?? '';
     final band = await _ageBand(playerId, uid);
+    final events = await _events(gameId);
 
     return GameDetailRow(
       gameId: r['game_id'] as String? ?? gameId,
@@ -67,6 +69,7 @@ class GameDetailRepository {
       blocks: _int(r['block']),
       turnovers: _int(r['turnover']),
       insight: _insight(r['game_insights_json']),
+      events: events,
     );
   }
 
@@ -79,6 +82,34 @@ class GameDetailRepository {
         .delete()
         .eq('id', gameId)
         .eq('user_id', uid);
+  }
+
+  /// The game's plays, in order. Empty for any game logged before stat_events
+  /// shipped, which is most of them.
+  ///
+  /// NEVER THROWS. The timeline is additive - the aggregates above are what
+  /// this screen is actually for - so a failure here costs the timeline and
+  /// nothing else. Letting it propagate would turn a missing extra into a
+  /// screen that will not open.
+  ///
+  /// Voided rows are fetched rather than filtered in SQL, because the widget
+  /// needs them to renumber correctly: the display index counts confirmed
+  /// plays, and it can only do that if it knows which were voided.
+  Future<List<StatEvent>> _events(String gameId) async {
+    try {
+      final rows = await SupaFlow.client
+          .from('stat_events')
+          .select('event_type, sequence_no, recorded_at, status')
+          .eq('game_id', gameId)
+          .order('sequence_no') as List;
+
+      return [
+        for (final raw in rows)
+          if (raw is Map<String, dynamic>) ?_event(raw),
+      ];
+    } catch (_) {
+      return const [];
+    }
   }
 
   Future<AgeBand?> _ageBand(String playerId, String uid) async {
@@ -98,6 +129,28 @@ class GameDetailRepository {
 }
 
 int _int(Object? v) => (v as num?)?.toInt() ?? 0;
+
+/// Null for a row this build cannot read.
+///
+/// Video may eventually write event types with no stat equivalent. Those carry
+/// no stat weight, so skipping them is correct rather than defensive.
+StatEvent? _event(Map<String, dynamic> r) {
+  final stat = kStatFromEventType[r['event_type'] as String? ?? ''];
+  final seq = (r['sequence_no'] as num?)?.toInt();
+  final at = DateTime.tryParse(r['recorded_at'] as String? ?? '');
+  if (stat == null || seq == null || at == null) return null;
+  return StatEvent(
+    sequenceNo: seq,
+    stat: stat,
+    recordedAt: at.toLocal(),
+    // Anything that is not explicitly confirmed is treated as not counting.
+    // 'suggested' and 'dismissed' are video states no tracker tap produces,
+    // and neither should reach a rollup or the screen.
+    status: r['status'] == 'confirmed'
+        ? StatEventStatus.confirmed
+        : StatEventStatus.voided,
+  );
+}
 
 GameInsight? _insight(Object? raw) {
   if (raw is! Map) return null;
