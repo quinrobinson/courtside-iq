@@ -321,13 +321,24 @@ turns every test tap into a real play inside a real family's game.
 |---|---|---|---|
 | G1.6 | ~~Migration: `stat_events` table and indexes~~ **APPLIED TO TEST 2026-09-15** | Code | done |
 | G1.7 | ~~Migration: `started_at` / `ended_at` on `games`~~ **APPLIED TO TEST 2026-09-15** | Code | done |
-| G1.8 | Tracker writes `sequence_no`, `recorded_at`, `elapsed_ms` per tap | Code | G1.6 |
-| G1.9 | Void-on-decrement, routed through one shared write path shared by the Miss buttons and the minus steppers | Code | G1.8 |
-| G1.10 | Dual-write alongside the existing aggregate columns | Code | G1.9 |
-| G1.11 | Rollup view deriving all 17 fields from events | Code | G1.10 |
-| G1.12 | Parallel run: compare view against stored columns across a real sample | Code + Quin | G1.11 |
-| G1.13 | Build the timeline UI from the approved Figma variant | Code | G1.5, G1.11 |
+| G1.8 | ~~Tracker writes `sequence_no`, `recorded_at`, `elapsed_ms` per tap~~ **DONE 2026-09-15** | Code | done |
+| G1.9 | ~~Void-on-decrement, routed through one shared write path shared by the Miss buttons and the minus steppers~~ **DONE 2026-09-15** | Code | done |
+| G1.10 | ~~Dual-write alongside the existing aggregate columns~~ **DONE 2026-09-15** | Code | done |
+| G1.11 | ~~Rollup view deriving all 17 fields from events~~ **APPLIED TO TEST 2026-09-22** | Code | done |
+| G1.12 | Parallel run: compare view against stored columns across a real sample | **Quin — needs a real game tracked on a device** | G1.11 |
+| G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-22** | Code | done |
 | G1.14 | Cutover: view becomes the read path, aggregate columns deprecated | Code | G1.12 |
+
+**G1.13 shipped the read path as well as the widget (2026-09-22).** Game Detail now reads a
+game's `stat_events` and renders the lanes where Scoring Mix used to sit; Scoring Mix is retired
+rather than moved, since the timeline says the same thing about how the points broke down and says
+it in sequence. A game with no events shows no section at all, which is every game logged before
+G1.10, so nothing regressed for the existing 397.
+
+**G1.12 IS THE ONLY THING BLOCKING G1.14, AND IT HAS NEVER RUN.** Everything above is proven by
+synthetic data only. Nothing has yet taken a real tap in a real gym through the queue to a real
+row. It needs one game tracked end to end on a device against TEST, then
+`select * from v_stat_event_reconciliation` with an empty `mismatched` on every row.
 
 **G1.8 risk RESOLVED 2026-09-13, and the premise was void.** The tracker cannot be regenerated:
 FlutterFlow was retired 2026-07-19, there is no `.flutterflow` project link in the repo, and
