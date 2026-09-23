@@ -340,23 +340,34 @@ rows, 1 voided (a deliberate take-back), 11 confirmed, `mismatched` empty on all
 chain from a real tap through the offline queue to a real row now works. One game is not the
 "meaningful sample" G1.14 needs, so G1.12 stays open.
 
-**G1.13 REDESIGN APPROVED 2026-09-22: the table direction. Implementation starts next session.**
+**G1.13 REDESIGN APPROVED 2026-09-23, READY FOR DEVELOPMENT: the table direction.**
 Seeing the lanes on a phone showed two problems: every lane said its stat twice (POINTS above,
-PTS beside), and Start/End sat under the tracks where nobody read them. Frames:
-`TABLE · TYPICAL` (1013:567) and `TABLE · DENSE` (1013:5477) on the Gate 1 page, all on system
-tokens. What changes in `game_timeline.dart`:
-- Three edge-to-edge columns: label | timeline | stat. Rows use the Development rows' bottom
-  hairline (`color/hairline`). The timeline column is `color/surface-sunk`.
+PTS beside), and Start/End sat under the tracks where nobody read them. A second pass on
+2026-09-23 found the dense game illegible at 6pt marks, and the summary line floating.
+Frames on the Gate 1 page, all on system tokens:
+`TABLE · TYPICAL (19 plays)` 1013:567, `TABLE · DENSE (35 plays) · scrolls, at tip-off` 1018:569,
+`TABLE · DENSE (35 plays) · scrolled to final` 1018:5523.
+What changes in `game_timeline.dart`:
+- Three edge-to-edge columns: label | timeline | stat. Every row has the Development rows' bottom
+  hairline (`color/hairline`); the timeline column also has that hairline on its left and right
+  edges. The timeline column is `color/surface-sunk`.
 - Labels are the hero's abbreviations in the hero's caps style, `text-muted`: PTS, REB, AST·TO,
   STL·BLK. The stat column is Light 16 (the hero's secondary stats are Light 20), right-aligned.
   Each number is said once.
 - A header row above the lanes, in the timeline column only: TIP-OFF, an arrow, FINAL, in
   `color/text`. The old Start/End footer goes.
+- **Scroll threshold: 24 plays.** Up to 24, the track fits the column and marks scale 13 down to
+  about 9pt. Above 24, spacing is fixed at 12pt with 11pt marks and the timeline column scrolls
+  horizontally. Labels and totals stay pinned; the header and all four lanes scroll as ONE unit
+  (the shared axis is the point of the design); it opens at tip-off; a right-edge fade in
+  `surface-sunk` shows until the end is reached. From 391 prod games: p50 19, p75 27.5, p90 35,
+  max 181. Two thirds of games stay static; 129 of 391 scroll.
 - Hollow marks and free-throw enclosures fill with `surface-sunk`, not white.
-- The moment line gets a bottom hairline so it does not float.
+- The summary line ("moment") takes the insight wash: `accent/lime-wash` fill, the `Icon/spark`
+  used by the insight card, `color/text` copy, bottom hairline. Lime-wash plus spark already means
+  "Courtside IQ noticed this" on this screen. NOTE: nothing generates a moment yet; the widget
+  renders one only when given one.
 - The section header stays the standard `CiSectionHeader` with the play count.
-- **Mark minimum drops from 7 to 6.** The track is now 245 wide; at 35 plays the spacing is 7.0,
-  so a 7pt minimum makes neighbouring marks touch.
 - Defense counts steals AND blocks; the old `STL` unit was wrong and STL·BLK fixes it.
 
 **G1.12 IS STILL THE ONLY THING BLOCKING G1.14.** It needs more real games tracked on a device
