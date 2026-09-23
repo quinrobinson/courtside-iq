@@ -335,7 +335,31 @@ rather than moved, since the timeline says the same thing about how the points b
 it in sequence. A game with no events shows no section at all, which is every game logged before
 G1.10, so nothing regressed for the existing 397.
 
-**G1.12 IS THE ONLY THING BLOCKING G1.14, AND IT HAS NEVER RUN.** Everything above is proven by
+**G1.12 FIRST REAL GAME PASSED (2026-09-22).** One game tracked on a device against TEST: 12
+rows, 1 voided (a deliberate take-back), 11 confirmed, `mismatched` empty on all 17 fields. The
+chain from a real tap through the offline queue to a real row now works. One game is not the
+"meaningful sample" G1.14 needs, so G1.12 stays open.
+
+**G1.13 REDESIGN APPROVED 2026-09-22: the table direction. Implementation starts next session.**
+Seeing the lanes on a phone showed two problems: every lane said its stat twice (POINTS above,
+PTS beside), and Start/End sat under the tracks where nobody read them. Frames:
+`TABLE · TYPICAL` (1013:567) and `TABLE · DENSE` (1013:5477) on the Gate 1 page, all on system
+tokens. What changes in `game_timeline.dart`:
+- Three edge-to-edge columns: label | timeline | stat. Rows use the Development rows' bottom
+  hairline (`color/hairline`). The timeline column is `color/surface-sunk`.
+- Labels are the hero's abbreviations in the hero's caps style, `text-muted`: PTS, REB, AST·TO,
+  STL·BLK. The stat column is Light 16 (the hero's secondary stats are Light 20), right-aligned.
+  Each number is said once.
+- A header row above the lanes, in the timeline column only: TIP-OFF, an arrow, FINAL, in
+  `color/text`. The old Start/End footer goes.
+- Hollow marks and free-throw enclosures fill with `surface-sunk`, not white.
+- The moment line gets a bottom hairline so it does not float.
+- The section header stays the standard `CiSectionHeader` with the play count.
+- **Mark minimum drops from 7 to 6.** The track is now 245 wide; at 35 plays the spacing is 7.0,
+  so a 7pt minimum makes neighbouring marks touch.
+- Defense counts steals AND blocks; the old `STL` unit was wrong and STL·BLK fixes it.
+
+**G1.12 needs more real games before G1.14.** (Superseded heading, kept for history:) **G1.12 IS THE ONLY THING BLOCKING G1.14, AND IT HAS NEVER RUN.** Everything above is proven by
 synthetic data only. Nothing has yet taken a real tap in a real gym through the queue to a real
 row. It needs one game tracked end to end on a device against TEST, then
 `select * from v_stat_event_reconciliation` with an empty `mismatched` on every row.
