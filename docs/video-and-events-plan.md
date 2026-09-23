@@ -326,7 +326,7 @@ turns every test tap into a real play inside a real family's game.
 | G1.10 | ~~Dual-write alongside the existing aggregate columns~~ **DONE 2026-09-15** | Code | done |
 | G1.11 | ~~Rollup view deriving all 17 fields from events~~ **APPLIED TO TEST 2026-09-22** | Code | done |
 | G1.12 | Parallel run: compare view against stored columns across a real sample | **Quin — needs a real game tracked on a device** | G1.11 |
-| G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-22** | Code | done |
+| G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-23: [x] built [x] wired [x] device-verified** (table redesign, see below) | Code | done |
 | G1.14 | Cutover: view becomes the read path, aggregate columns deprecated | Code | G1.12 |
 
 **G1.13 shipped the read path as well as the widget (2026-09-22).** Game Detail now reads a
@@ -340,7 +340,8 @@ rows, 1 voided (a deliberate take-back), 11 confirmed, `mismatched` empty on all
 chain from a real tap through the offline queue to a real row now works. One game is not the
 "meaningful sample" G1.14 needs, so G1.12 stays open.
 
-**G1.13 REDESIGN APPROVED 2026-09-23, READY FOR DEVELOPMENT: the table direction.**
+**G1.13 TABLE REDESIGN: BUILT, WIRED AND DEVICE-VERIFIED 2026-09-23.** Signed off on the phone,
+including the scroll past 22 plays and the free-throw clearance.
 Seeing the lanes on a phone showed two problems: every lane said its stat twice (POINTS above,
 PTS beside), and Start/End sat under the tracks where nobody read them. A second pass on
 2026-09-23 found the dense game illegible at 6pt marks, and the summary line floating.
