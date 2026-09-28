@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_page_dots.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_logo_mark.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/dot_burst.dart';
 import 'package:courtside_i_q/features/premium/paywall_content.dart';
 import 'package:courtside_i_q/features/premium/paywall_page.dart';
@@ -332,16 +333,15 @@ void main() {
         reason: 'must hug its dots, not fill the row');
   });
 
-  testWidgets('the already-premium screen wears the dot burst',
+  testWidgets('the already-premium screen wears the mark alone at 96',
       (tester) async {
-    // It was a bare 40pt mark. 244:943 centres a 50 in a 220 burst - the
-    // same pairing reset_successful and check_email use, so a subscriber
-    // gets the app's celebratory mark rather than a plain logo.
+    // 244:943 (Dot-burst C, 2026-09-28): the mark at 96, the same hero
+    // reset_successful and check_email use. The burst that used to surround
+    // it went, because the mark is itself a burst.
     await _pump(tester, _FakePaywallRepo(premium: true));
 
-    expect(find.byType(DotBurst), findsOneWidget);
-    final burst = tester.widget<DotBurst>(find.byType(DotBurst));
-    expect(burst.size, 220);
+    expect(find.byType(DotBurst), findsNothing);
+    expect(tester.getSize(find.byType(CiLogoMark)).width, 96);
     expect(find.text("You're on Premium"), findsOneWidget);
   });
 

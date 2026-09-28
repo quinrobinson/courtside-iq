@@ -269,7 +269,7 @@ class _PaywallPageState extends State<PaywallPage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      const CiLogoMark(size: 26, tone: CiLogoTone.classic),
+                      const CiLogoMark(size: 26),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: _IconTap(

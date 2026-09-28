@@ -1,105 +1,86 @@
-// CiLogoMark — the Courtside IQ mark.
+// CiLogoMark — the Courtside IQ mark, Dot-burst C (Release 2.1, 2026-09-28).
 //
-// A disc cut by a vertical channel and a horizontal channel across the right
-// side, leaving three fields: a tall left form and two stacked right quadrants.
+// Two rings of dots forming a C that opens right; along each ring the dots
+// grow and fade in from the bottom tip to the top tip. The shape lives in
+// `lib/courtside_iq/brand/dot_c_mark_geometry.dart` - this widget only paints
+// it, so the in-app mark and the app icon cannot drift apart.
 //
-// AN SVG, NOT A PAINTER (changed 4.19e). It was drawn as a CustomPainter for
-// two good reasons - it had to take a colour and scale to any size, because
-// `assets/images/logo-mark.png` is solid black and vanishes on ink ground. Both
-// still hold, and both are satisfied here: the path is vector, so it scales,
-// and srcIn replaces its fill with the caller's colour. Same guarantees, no
-// geometry of ours to drift.
+// PAINTED AGAIN, NOT AN SVG. The previous mark was two tinted SVG halves
+// because its rounded cuts were a shape to take from Figma verbatim. This mark
+// is 26 circles with an opacity each: exact as constants, and a painter keeps
+// the per-dot fade that a single srcIn tint cannot express per colour. It also
+// cannot fail to load, which was the tinted SVG's silent failure mode.
 //
-// What changed is the mark itself. The refreshed mark (Figma Branding page,
-// `923:3515`) moved the vertical channel to centre and widened it, and its cut
-// terminations are ROUNDED. That rounding is deliberate, including the fact
-// that it stops reading as rounded at small sizes - so the shape is taken from
-// the design as-is rather than re-derived from constants here, where an
-// approximation of the brand mark would quietly drift from the file.
+// Which colour goes where (Quin, 2026-09-28):
+// - [CiLogoTone.primary], the default, uses the ground's `mark` token: LIME on
+//   ink, where the brand always aims to sit, and INK on light (mono on white).
+// - [CiLogoTone.mono] uses the ground's text colour: white on ink, ink on
+//   light. For one-colour / greyscale moments on a dark ground.
+// The fade stays at EVERY size, top bars included (Quin chose it over a solid
+// small-size cut that would avoid the spinner read).
 //
-// The old painter expressed the geometry as fractions (channel 0.055 wide at
-// x 0.47). Those numbers do not describe this mark and are gone, not adjusted.
+// Screens that render above any CiSurface (Splash) must wrap themselves in
+// one; there is deliberately no colour override here.
 //
-// TWO HALVES, TWO COLOURS (Release 2.1, 2026-09-28). The app icon went lime +
-// white, and the in-app mark followed it. One tinted SVG can only be one
-// colour, so the mark is split into `logo-mark-left.svg` and
-// `logo-mark-right.svg` - the shipped paths, verbatim, on the same 173x173
-// canvas, identical to the app icon's layers - and each half is tinted on its
-// own. Figma: LogoMark component set 1066:364, Tone = Classic | Ink | Light.
-//
-// Which tone goes where (Quin, 2026-09-28):
-// - [CiLogoTone.accent], the default: right half lime on EVERY ground. That is
-//   Figma's Ink (white + lime) and Light (ink + lime) - the left half follows
-//   the ground's text colour, so one tone covers both.
-// - [CiLogoTone.classic]: right half at 50% of the left. Kept ONLY for the
-//   small brand mark in a top bar - the home screen's "Courtside IQ" callout
-//   and marks playing the same role (paywall and onboarding top bars).
-//
-// Lime on white is low contrast. Quin accepted that for now and chose it over
-// a deeper lime; revisit it as its own piece of work, not here.
+// Figma: LogoMark 1066:364, Tone = Primary | Mono on black | Mono on white.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../brand/dot_c_mark_geometry.dart';
 import '../tokens/ci_colors.dart';
 
-/// The two halves. Both must exist, or that half vanishes silently -
-/// ci_logo_mark_test.dart reads and parses each one.
-const kLogoMarkLeftAsset = 'assets/images/logo-mark-left.svg';
-const kLogoMarkRightAsset = 'assets/images/logo-mark-right.svg';
-
 enum CiLogoTone {
-  /// Right half in lime. Everywhere except top-bar brand marks.
-  accent,
+  /// Lime on ink, ink on light. Everywhere by default.
+  primary,
 
-  /// Right half at 50% of the left. Top-bar brand marks only.
-  classic,
+  /// The ground's text colour. One-colour moments only.
+  mono,
 }
 
 class CiLogoMark extends StatelessWidget {
-  const CiLogoMark({
-    super.key,
-    this.size = 44,
-    this.color,
-    this.tone = CiLogoTone.accent,
-  });
+  const CiLogoMark({super.key, this.size = 44, this.tone = CiLogoTone.primary});
 
+  /// The mark's box. The dots fill it edge to edge (Figma LogoMark bounds).
   final double size;
-
-  /// The LEFT half. Defaults to the current ground's text colour: white on
-  /// ink, ink on light.
-  final Color? color;
 
   final CiLogoTone tone;
 
   @override
   Widget build(BuildContext context) {
     final colors = CiColors.of(context);
-    final left = color ?? colors.text;
-    final right = switch (tone) {
-      CiLogoTone.accent => colors.accentGood,
-      CiLogoTone.classic => left.withValues(alpha: 0.5),
+    final color = switch (tone) {
+      CiLogoTone.primary => colors.mark,
+      CiLogoTone.mono => colors.text,
     };
-    // A SizedBox at the ROOT, exactly as the painted version had, so the
-    // widget keeps its intrinsic size - DotBurst spaces its first ring off
-    // markSize, and call sites measure this box. Both halves share the full
-    // canvas, so stacking them re-assembles the mark with nothing to align.
     return SizedBox(
       width: size,
       height: size,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          SvgPicture.asset(
-            kLogoMarkLeftAsset,
-            colorFilter: ColorFilter.mode(left, BlendMode.srcIn),
-          ),
-          SvgPicture.asset(
-            kLogoMarkRightAsset,
-            colorFilter: ColorFilter.mode(right, BlendMode.srcIn),
-          ),
-        ],
-      ),
+      child: CustomPaint(painter: DotCMarkPainter(color)),
     );
   }
+}
+
+/// Paints [kMarkDots] fitted to the canvas by their tight bounds.
+class DotCMarkPainter extends CustomPainter {
+  const DotCMarkPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final b = markBounds();
+    final scale = size.shortestSide / b.side;
+    final paint = Paint()..isAntiAlias = true;
+    for (final d in kMarkDots) {
+      paint.color = color.withValues(alpha: color.a * d.opacity);
+      canvas.drawCircle(
+        Offset((d.x - b.left) * scale, (d.y - b.top) * scale),
+        d.r * scale,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(DotCMarkPainter old) => old.color != color;
 }

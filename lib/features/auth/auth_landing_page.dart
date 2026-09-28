@@ -35,7 +35,6 @@ import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -118,16 +117,12 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
                         ),
                       ),
                     ),
-                    const Center(
-                      // 220 to match the frame's burst. The mark is 50 rather
-                      // than the frame's 44: at 44 it read as lost inside the
-                      // burst on device, at 54 it was heavy. Tuned on device
-                      // 2026-07-19, deliberate deviation from the frame.
-                      child: DotBurst(
-                        size: 220,
-                        markSize: 50,
-                        child: CiLogoMark(size: 50),
-                      ),
+                    const SizedBox(
+                      // The burst's old 220 slot, kept so the layout below
+                      // does not move. The Dot-burst C is itself a burst, so
+                      // it stands alone at 96 (Figma 251:965, 2026-09-28).
+                      height: 220,
+                      child: Center(child: CiLogoMark(size: 96)),
                     ),
                     const SizedBox(height: CiSpace.s6),
                     Text('Get started',

@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -180,21 +179,15 @@ class PaywallAlreadyPremium extends StatelessWidget {
                 onPressed: onDone,
               ),
             ),
-            // THE DOT BURST floats CENTRED in the space between the close X and
-            // the label - not glued above the label, and not shoved to the top.
-            // The 3:2 split keeps the text block low (where it read well) while
-            // the burst sits mid-way between the close button and the label. A
-            // flex-2 region was small enough that the 220 burst overflowed
-            // upward to the close's level, which read as "too high".
+            // THE MARK floats CENTRED in the space between the close X and the
+            // label - not glued above the label, and not shoved to the top.
+            // The 3:2 split keeps the text block low (where it read well). It
+            // is the mark alone at 96 since the Dot-burst C (Figma 244:943,
+            // 2026-09-28); the burst that used to surround it went, because
+            // the mark is itself a burst.
             const Expanded(
               flex: 3,
-              child: Center(
-                child: DotBurst(
-                  size: 220,
-                  markSize: 50,
-                  child: CiLogoMark(size: 50),
-                ),
-              ),
+              child: Center(child: CiLogoMark(size: 96)),
             ),
             Text(
               'PREMIUM ACTIVE',

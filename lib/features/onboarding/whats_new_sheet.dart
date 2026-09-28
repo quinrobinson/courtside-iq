@@ -24,7 +24,6 @@ import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_sheet.dart';
 import '/courtside_iq/design/components/ci_spark.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -64,17 +63,12 @@ class CiWhatsNewSheet extends StatelessWidget {
                       children: [
                         const CiSheetHandle(),
                         const SizedBox(height: CiSpace.s2),
-                        // The brand hero: real burst geometry, logo mark centred,
-                        // its own soft haze behind the dots.
+                        // The brand hero: the mark alone at 96 in the old 184
+                        // slot (Figma 892:3184, 2026-09-28). No burst and no
+                        // haze: the Dot-burst C is itself a burst.
                         const SizedBox(
                           height: 184,
-                          child: Center(
-                            child: DotBurst(
-                              size: 184,
-                              markSize: 46,
-                              child: CiLogoMark(size: 46),
-                            ),
-                          ),
+                          child: Center(child: CiLogoMark(size: 96)),
                         ),
                         const SizedBox(height: CiSpace.s6),
                         Text(

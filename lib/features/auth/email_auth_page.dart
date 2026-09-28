@@ -37,7 +37,6 @@ import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
 import '/courtside_iq/design/components/ci_toast.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -254,17 +253,15 @@ class _EmailAuthPageState extends State<EmailAuthPage> {
                     onPressed: () => Navigator.of(context).maybePop(),
                   ),
                   // The mark, carried over from the auth landing so the two
-                  // screens read as one flow. Same 50-in-220 pairing and the
-                  // same gap above it; the form moves down to make room, which
-                  // is the intended trade. Centre-aligned inside a column that
-                  // otherwise starts at the left, like the landing's buttons.
+                  // screens read as one flow: the same 96 mark in the same
+                  // 220 slot, and the same gap above it. Centre-aligned inside
+                  // a column that otherwise starts at the left, like the
+                  // landing's buttons. No burst since the Dot-burst C
+                  // (2026-09-28): the mark is itself a burst.
                   const SizedBox(height: CiSpace.s4),
-                  const Center(
-                    child: DotBurst(
-                      size: 220,
-                      markSize: 50,
-                      child: CiLogoMark(size: 50),
-                    ),
+                  const SizedBox(
+                    height: 220,
+                    child: Center(child: CiLogoMark(size: 96)),
                   ),
                   const SizedBox(height: CiSpace.s6),
                   _ModeChips(mode: _mode, onChanged: _setMode),

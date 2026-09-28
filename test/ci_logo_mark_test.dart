@@ -1,32 +1,20 @@
-// CiLogoMark — Phase 4.19e
+// CiLogoMark — the Dot-burst C (Release 2.1, 2026-09-28).
 //
-// The mark moved from a CustomPainter to a tinted SVG when the refreshed brand
-// mark landed (Figma Branding page, 923:3515) - its channel moved to centre,
-// widened, and its cut terminations became rounded, which is a shape to take
-// from the design rather than re-derive from constants.
-//
-// That swap trades one risk for another: a painter cannot fail to load, an
-// asset can - and it would fail SILENTLY on every brand surface at once.
-//
-// PUMPING THE WIDGET DOES NOT CATCH THAT. flutter_svg does not surface a
-// missing asset through `tester.takeException()`; a deliberately bogus path
-// was verified to render an empty box and pass. So the load is tested by
-// reading the file and running it through the real parser instead.
+// The mark is one geometry (dot_c_mark_geometry.dart) painted in-app and
+// generated into the app icon. These tests hold the shape to what was approved
+// in Figma, hold the icon to the geometry, and pin which colour each ground
+// gets.
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:courtside_i_q/courtside_iq/design/components/ci_logo_mark.dart';
+import 'package:courtside_i_q/courtside_iq/brand/dot_c_mark_geometry.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_logo_mark.dart';
 import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
-
-/// The paths CiLogoMark asks for. If any drift, that half of the mark
-/// silently disappears - which is exactly the failure this file exists to
-/// prevent. Two files since Release 2.1, when the mark became two colours.
-const _assetPaths = [kLogoMarkLeftAsset, kLogoMarkRightAsset];
 
 const _lime = Color(0xFF9DFF00);
 
@@ -36,117 +24,109 @@ Future<void> _pump(WidgetTester tester, Widget child) async {
       home: Scaffold(body: Center(child: child)),
     ),
   );
-  await tester.pumpAndSettle();
 }
 
-/// The left and right halves' tints, in paint order.
-List<ColorFilter?> _filters(WidgetTester tester) => tester
-    .widgetList<SvgPicture>(find.byType(SvgPicture))
-    .map((p) => p.colorFilter)
-    .toList();
+Color _painted(WidgetTester tester) {
+  final paint = tester.widget<CustomPaint>(
+    find.descendant(
+      of: find.byType(CiLogoMark),
+      matching: find.byType(CustomPaint),
+    ),
+  );
+  return (paint.painter! as DotCMarkPainter).color;
+}
 
 void main() {
-  for (final path in _assetPaths) {
-    test('$path exists at the path CiLogoMark asks for', () {
-      expect(
-        File(path).existsSync(),
-        isTrue,
-        reason:
-            'CiLogoMark loads $path; without it half the mark renders as '
-            'an empty box on Splash, auth, the paywall and every other hero',
-      );
+  group('geometry', () {
+    const inner = 11, outer = 15;
+
+    test('two rings: 11 inner dots, then 15 outer', () {
+      expect(kMarkDots, hasLength(inner + outer));
     });
 
-    test('$path is valid SVG that the real parser can draw', () async {
-      final raw = File(path).readAsStringSync();
-      final picture = await vg.loadPicture(SvgStringLoader(raw), null);
-      addTearDown(picture.picture.dispose);
+    for (final (name, ring) in [
+      ('inner', kMarkDots.sublist(0, inner)),
+      ('outer', kMarkDots.sublist(inner)),
+    ]) {
+      test('$name ring grows and fades in from bottom tip to top tip', () {
+        for (var i = 1; i < ring.length; i++) {
+          expect(ring[i].r, greaterThan(ring[i - 1].r), reason: 'dot $i');
+          expect(
+            ring[i].opacity,
+            greaterThan(ring[i - 1].opacity),
+            reason: 'dot $i',
+          );
+        }
+        expect(ring.first.opacity, closeTo(0.30, 1e-9));
+        expect(ring.last.opacity, closeTo(1.00, 1e-9));
+        // 45% to 100% of the ring's base size (D6 wide).
+        expect(ring.first.r / ring.last.r, closeTo(0.45, 0.01));
+      });
+    }
 
-      // Both halves are drawn on the FULL mark canvas, so stacking them
-      // re-assembles the disc. A non-square box means a broken export or a
-      // half cropped to its own bounds, which would misalign when stacked.
-      expect(picture.size.width, greaterThan(0));
-      expect(picture.size.aspectRatio, closeTo(1.0, 0.02));
+    test('no two dots crowd each other (the breathing-room ask)', () {
+      for (var i = 0; i < kMarkDots.length; i++) {
+        for (var j = i + 1; j < kMarkDots.length; j++) {
+          final a = kMarkDots[i], b = kMarkDots[j];
+          final dx = a.x - b.x, dy = a.y - b.y;
+          final gap = sqrt(dx * dx + dy * dy) - a.r - b.r;
+          // Refined D6 wide: every neighbour sits 7 units apart (256 box).
+          expect(gap, greaterThan(6.9), reason: 'dots $i and $j');
+        }
+      }
     });
-  }
-
-  test('the halves match the app icon layers exactly', () {
-    // The in-app mark and the app icon are one mark. Same paths, or the two
-    // drift apart with nobody noticing until they sit side by side.
-    String d(String path) => RegExp(
-      r' d="([^"]+)"',
-    ).firstMatch(File(path).readAsStringSync())!.group(1)!;
-    const icon = 'ios/Runner/courtside-iq.icon/Assets';
-    expect(d(kLogoMarkLeftAsset), d('$icon/Left.svg'));
-    expect(d(kLogoMarkRightAsset), d('$icon/Right.svg'));
   });
 
-  testWidgets('renders both halves at every size it is used at', (
-    tester,
-  ) async {
-    for (final size in const [20.0, 26.0, 32.0, 44.0, 50.0, 60.0]) {
-      await _pump(tester, CiLogoMark(size: size));
-      expect(find.byType(SvgPicture), findsNWidgets(2));
+  test('the iOS icon layer is generated from the geometry', () {
+    // Re-run scripts/build_dot_c_icon.dart after any geometry change.
+    final svg = File(
+      'ios/Runner/courtside-iq.icon/Assets/Mark.svg',
+    ).readAsStringSync();
+    final circles = RegExp(
+      r'cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="#9DFF00" '
+      r'fill-opacity="([\d.]+)"',
+    ).allMatches(svg).toList();
+    expect(circles, hasLength(kMarkDots.length));
+    const k = 1024 / kMarkIconBox;
+    for (var i = 0; i < kMarkDots.length; i++) {
+      final d = kMarkDots[i], m = circles[i];
+      expect(double.parse(m.group(1)!), closeTo(d.x * k, 0.01));
+      expect(double.parse(m.group(2)!), closeTo(d.y * k, 0.01));
+      expect(double.parse(m.group(3)!), closeTo(d.r * k, 0.01));
+      expect(double.parse(m.group(4)!), closeTo(d.opacity, 0.001));
     }
   });
 
-  testWidgets('keeps its intrinsic box, which DotBurst spaces its rings off', (
-    tester,
-  ) async {
-    await _pump(tester, const CiLogoMark(size: 50));
-    expect(tester.getSize(find.byType(CiLogoMark)), const Size(50, 50));
+  testWidgets('keeps its box at every size it is used at', (tester) async {
+    for (final size in const [20.0, 26.0, 64.0, 96.0, 128.0]) {
+      await _pump(tester, CiLogoMark(size: size));
+      expect(tester.getSize(find.byType(CiLogoMark)), Size(size, size));
+    }
   });
 
-  testWidgets('on ink: white left, lime right', (tester) async {
+  testWidgets('primary on ink is lime', (tester) async {
     await _pump(
       tester,
-      const CiSurface.ink(child: Center(child: CiLogoMark(size: 44))),
+      const CiSurface.ink(child: Center(child: CiLogoMark())),
     );
-    expect(_filters(tester), [
-      ColorFilter.mode(CiColors.onInk.text, BlendMode.srcIn),
-      const ColorFilter.mode(_lime, BlendMode.srcIn),
-    ]);
+    expect(_painted(tester), _lime);
   });
 
-  testWidgets('on light: ink left, lime right (L1, Quin 2026-09-28)', (
-    tester,
-  ) async {
+  testWidgets('primary on light is ink (mono on white)', (tester) async {
     await _pump(
       tester,
-      const CiSurface.light(child: Center(child: CiLogoMark(size: 44))),
+      const CiSurface.light(child: Center(child: CiLogoMark())),
     );
-    final filters = _filters(tester);
-    expect(
-      filters.last,
-      const ColorFilter.mode(_lime, BlendMode.srcIn),
-      reason: 'lime on light too - the deeper lime was rejected',
-    );
-    expect(
-      filters.first,
-      isNot(ColorFilter.mode(CiColors.onInk.text, BlendMode.srcIn)),
-      reason: 'the left half follows the ground; white on white vanishes',
-    );
+    expect(_painted(tester), CiColors.onLight.text);
   });
 
-  testWidgets('classic: right half is the left at 50%, no lime', (
-    tester,
-  ) async {
-    const white = Color(0xFFFFFFFF);
+  testWidgets('mono on ink is white', (tester) async {
     await _pump(
       tester,
-      const CiLogoMark(size: 20, color: white, tone: CiLogoTone.classic),
+      const CiSurface.ink(
+        child: Center(child: CiLogoMark(tone: CiLogoTone.mono)),
+      ),
     );
-    expect(_filters(tester), [
-      const ColorFilter.mode(white, BlendMode.srcIn),
-      ColorFilter.mode(white.withValues(alpha: 0.5), BlendMode.srcIn),
-    ]);
-  });
-
-  testWidgets('an explicit colour sets the left half only', (tester) async {
-    const c = Color(0xFF123456);
-    await _pump(tester, const CiLogoMark(size: 44, color: c));
-    final filters = _filters(tester);
-    expect(filters.first, const ColorFilter.mode(c, BlendMode.srcIn));
-    expect(filters.last, const ColorFilter.mode(_lime, BlendMode.srcIn));
+    expect(_painted(tester), CiColors.onInk.text);
   });
 }

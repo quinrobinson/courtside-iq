@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
@@ -131,39 +130,25 @@ void main() {
   });
 
   group('logo mark', () {
-    testWidgets('takes the ground colour instead of being a black asset',
+    testWidgets('is the primary mark: lime on the ink auth ground',
         (tester) async {
-      // logo-mark.png is solid black, so on ink ground it vanished into the
-      // background. The mark reads the ground instead.
-      //
-      // Asserts the CONTRACT (colour is inherited, and the mark is tintable),
-      // not the drawing mechanism - it moved from a CustomPainter to a tinted
-      // SVG in 4.19e and the guarantee is what matters, not how it is painted.
+      // logo-mark.png was solid black and vanished on ink. The mark reads the
+      // ground instead; on ink that is lime (Dot-burst C, 2026-09-28).
       await _pump(tester, isAndroid: false);
       final mark = tester.widget<CiLogoMark>(find.byType(CiLogoMark));
-      expect(mark.color, isNull, reason: 'should inherit, not hardcode');
-
-      // Two halves since Release 2.1 (left follows the ground, right is lime).
-      // Every half must be tinted.
-      final halves = tester.widgetList<SvgPicture>(
-        find.descendant(
-            of: find.byType(CiLogoMark), matching: find.byType(SvgPicture)),
-      );
-      expect(halves, hasLength(2));
-      for (final svg in halves) {
-        expect(svg.colorFilter, isNotNull,
-            reason: 'must be tinted, or it renders as the flat asset colour');
-      }
+      expect(mark.tone, CiLogoTone.primary);
+      final paint = tester.widget<CustomPaint>(find.descendant(
+          of: find.byType(CiLogoMark), matching: find.byType(CustomPaint)));
+      expect((paint.painter! as DotCMarkPainter).color, CiColors.onInk.mark);
     });
 
-    testWidgets('burst matches the frame and the mark is the tuned size',
+    testWidgets('stands alone at 96, no burst (Figma 251:965)',
         (tester) async {
-      // The burst shipped at 300 first and read as oversized; the frame is
-      // 220. The mark is 54, up from the frame's 44, because at 44 it looked
-      // lost inside the burst on device.
+      // The Dot-burst C is itself a burst; inside the old DotBurst the two
+      // competed, so the burst went and the mark grew into its slot.
       await _pump(tester, isAndroid: false);
-      expect(tester.getSize(find.byType(CiLogoMark)).width, 50);
-      expect(tester.getSize(find.byType(DotBurst)).width, 220);
+      expect(tester.getSize(find.byType(CiLogoMark)).width, 96);
+      expect(find.byType(DotBurst), findsNothing);
     });
   });
 }
