@@ -325,7 +325,7 @@ turns every test tap into a real play inside a real family's game.
 | G1.9 | ~~Void-on-decrement, routed through one shared write path shared by the Miss buttons and the minus steppers~~ **DONE 2026-09-15** | Code | done |
 | G1.10 | ~~Dual-write alongside the existing aggregate columns~~ **DONE 2026-09-15** | Code | done |
 | G1.11 | ~~Rollup view deriving all 17 fields from events~~ **APPLIED TO TEST 2026-09-22** | Code | done |
-| G1.12 | Parallel run: compare view against stored columns until the coverage bar below is met | **Quin — two covering games tracked on a device** | G1.11 |
+| G1.12 | ~~Parallel run: compare view against stored columns until the coverage bar below is met~~ **DONE 2026-09-27: coverage bar met, 5 games, zero mismatches** | Quin | done |
 | G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-23: [x] built [x] wired [x] device-verified** (table redesign, see below) | Code | done |
 | G1.14 | Cutover: view becomes the read path, aggregate columns deprecated | Code | G1.12 |
 
@@ -380,9 +380,7 @@ What changes in `game_timeline.dart`:
 - The section header stays the standard `CiSectionHeader` with the play count.
 - Defense counts steals AND blocks; the old `STL` unit was wrong and STL·BLK fixes it.
 
-**G1.12 IS STILL THE ONLY THING BLOCKING G1.14.** It needs more real games tracked on a device
-against TEST, then `select * from v_stat_event_reconciliation` with an empty `mismatched` on
-every row.
+**G1.12 DONE 2026-09-27. G1.14 IS UNBLOCKED.** (Was: the only thing blocking G1.14.)
 
 **G1.12 EXIT BAR — DECIDED 2026-09-27: coverage, not count.** "Meaningful sample" had no finish
 line. More ordinary games repeat paths that already pass; coverage is what finds bugs. G1.12 is
@@ -396,14 +394,22 @@ Covered by the two games on TEST as of 2026-09-27 (11 and 32 plays, both clean):
 - [x] a voided (taken-back) non-scoring play (an assist)
 - [x] a dense game past the 22-play scroll threshold (32 plays)
 
-Still to cover (fits in two games):
-- [ ] **a block** - never tapped yet
-- [ ] **a take-back of a made 2 or 3** - the riskiest void, since it moves `points`, `fg_*` and
-  `two_*`/`three_*` at once
-- [ ] **a full game tracked in airplane mode, then synced** - every play so far reached the server
-  within ~90s (`created_at - recorded_at`), so the offline queue has never replayed events
-- [ ] **the app force-quit mid-game, then resumed** - the in-progress snapshot must carry the
-  event array across a restart without dropping or duplicating plays
+Covered by three more games on TEST, 2026-09-27 (all clean):
+- [x] **a block** - in all three
+- [x] **a take-back of a made 2 or 3** - `ae4f21ce`: a made 3 voided; stored and derived points both 0
+- [x] **a game tracked offline, then synced** - `066c4b66`: ended 00:51:52, rows written 00:52:10.
+  Online games write in the same second as End Game, so these came from the queue on reconnect
+- [x] **the app force-quit mid-game, then resumed** - `066c4b66`: quit between play 4 (FT made)
+  and play 5 (assist), confirmed by Quin; sequence 1-7 contiguous, no duplicates, a voided block
+  after the restart
+
+**Result: 5 games, 64 rows, `mismatched` empty on every row. Bar met.**
+
+**Found along the way (not a G1.12 defect):** a game cannot be STARTED offline. New Game shows
+"You're offline" when the players list cannot load, by 4.5's design (offline covers tracking and
+saving, not setup). Test procedure: start online, go offline before the first tap. Whether a
+parent with no signal at the gym should be able to start a game (cached players list) is a product
+question, and a user-visible change that needs Figma first.
 
 Check after each game: `select game_id, plays, mismatched from v_stat_event_reconciliation;` plus,
 for the offline game, `max(created_at - recorded_at)` on its `stat_events` to confirm it really
