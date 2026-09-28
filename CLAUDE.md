@@ -165,17 +165,25 @@ treat as urgent), and prod Edge Function logs. **First real webhook renewal ~Aug
 row's `last_event_type` stops being 'BACKFILL'. Hold the ramp on any bad signal; both stores allow
 pausing and neither allows un-shipping.
 
-**Branding: geometry FINAL 2026-07-27, color V2 2026-09-28 (Release 2.1).** The mark is the C:
-left half-disc + two right quarters. Color changed, shape did not:
-- **App icon:** white left + lime right on ink (`ios/Runner/courtside-iq.icon/`, layers `Left.svg` /
-  `Right.svg`; Android/web regenerated via `scripts/build_app_icon.dart`).
-- **In-app mark:** `assets/images/logo-mark-left.svg` + `logo-mark-right.svg`, IDENTICAL paths to
-  the icon layers (a test enforces it). `CiLogoMark` tints each half: default tone = right half
-  lime `#9DFF00` on every ground; `CiLogoTone.classic` (right half at 50%) ONLY for small top-bar
-  brand marks (Today header, paywall top bar, onboarding top bar). Lime on white is low contrast,
-  accepted for now.
-- **Figma:** `LogoMark` is a component set (`1066:364`, Tone = Classic `25:5` | Ink | Light) with
-  all instances remapped; the old cross-gap geometry is gone from the file.
+**Branding: Dot-burst C, 2026-09-28 (Release 2.1, PR #29).** REPLACES the half-disc + quarters mark.
+Two rings of dots forming a C; along each ring the dots grow (45%->100%) and fade in (30%->100%)
+from the bottom tip to the top tip. Chosen through icon round 4 (brand-mark skill).
+- **One geometry:** `lib/courtside_iq/brand/dot_c_mark_geometry.dart` is the only copy. Change Figma
+  first, then this file, then re-run `scripts/build_dot_c_icon.dart` (a test holds the icon to it).
+- **In-app:** `CiLogoMark` paints it. Tone `primary` (default) uses the `CiColors.mark` token: LIME
+  on ink, INK on light. `mono` = the ground's text colour. No colour override; screens above any
+  CiSurface (Splash) wrap themselves in one. The fade stays at EVERY size (Quin, over a solid
+  small-size cut), even though it can read like a spinner at 20-26 px.
+- **No DotBurst behind the mark:** the mark is itself a burst and the two competed. Hero screens show
+  the mark alone at 96 in the burst's old slot. `DotBurst` survives only in the dev token gallery.
+- **App icon:** three versions - Primary lime fade on black (default), Mono white on black
+  (greyscale, iOS dark/tinted source), Mono ink on white. iOS `.icon` = one `Mark.svg` layer, no
+  layer fill (it would flatten the fade), glass off. Android/web via build_dot_c_icon ->
+  rsvg-convert -> build_app_icon.dart -> flutter_launcher_icons.
+- **Figma:** `LogoMark` `1066:364` rebuilt in place (Tone = Primary `1066:356` | Mono on black `25:5` |
+  Mono on white `1066:360`); the fade lives on each ellipse's LAYER opacity (paint opacity on a
+  variable-bound fill does not reach instances). AppIcon (Dot C) `1084:7034`. Onboarding/paywall
+  slide art is exported PNG: re-export it when the mark changes.
 
 **Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
 recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its
