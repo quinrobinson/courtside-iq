@@ -30,6 +30,13 @@ const _lightModeStatusBar = SystemUiOverlayStyle(
   statusBarBrightness: Brightness.light,    // iOS
 );
 
+/// The LEAST time the splash (the Dot-burst C on ink) stays up: 3 s, Quin
+/// 2026-09-28 (was 2.5 s). It is a floor, not a fixed time - the splash also
+/// waits for the auth state to resolve, so a slow start holds it longer. The
+/// clock starts when MyApp mounts, i.e. when the splash first paints; the
+/// native launch screen before it (plain ink) does not count.
+const Duration kSplashMinDuration = Duration(seconds: 3);
+
 /// Dev-only: boot into the design-token gallery instead of the app.
 /// Never commit this as true.
 const bool kShowTokenGallery = false;
@@ -149,7 +156,7 @@ class _MyAppState extends State<MyApp> {
       });
     jwtTokenStream.listen((_) {});
     Future.delayed(
-      Duration(milliseconds: 2500),
+      kSplashMinDuration,
       () => _appStateNotifier.stopShowingSplashImage(),
     );
   }
