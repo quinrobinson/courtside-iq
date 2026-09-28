@@ -221,6 +221,15 @@ photos, full game histories. Fixed in `20260729000000_views_security_invoker.sql
 dashboard flags this as an **"Unrestricted"** badge on the view; treat that badge as a data leak
 until proven otherwise. Adding policies to a view does NOT fix it - only `security_invoker` does.
 
+**NO DATABASE WEBHOOK MAY POINT AT A SERVICE WE DO NOT OWN AND RUN.** A Supabase database webhook
+(`supabase_functions.http_request` trigger) POSTs the whole inserted row. On 2026-09-27
+`player_game_stats` was found with two dashboard-made AFTER INSERT webhooks still posting every
+child's stat row to the retired Buildship (`nni3ua.buildship.run`), on test AND prod, since at least
+2026-01-09 (349 firings each on prod). Recent attempts failed at TLS, but earlier delivery cannot be
+ruled out. Dropped in `20260927000100_drop_buildship_webhooks.sql` (test 2026-09-27; prod pending
+approval). Audit with `select tgrelid::regclass, tgname from pg_trigger where tgfoid =
+'supabase_functions.http_request'::regproc;` - the correct answer is zero rows.
+
 ## Things to flag before doing
 
 Pause and check with me before:
