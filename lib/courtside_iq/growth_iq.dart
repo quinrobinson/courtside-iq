@@ -26,6 +26,14 @@ import 'metrics_config.dart';
 /// it. A euphemism that disagrees with the data is not kind, it is confusing.
 enum GrowthTrend { dipping, steady, rising }
 
+/// The word a parent reads for a trend. One place, so the Today gauge and
+/// the trend chip on the Players list can never say different things.
+String growthTrendWord(GrowthTrend trend) => switch (trend) {
+      GrowthTrend.rising => 'Rising',
+      GrowthTrend.steady => 'Steady',
+      GrowthTrend.dipping => 'Dipping',
+    };
+
 /// A display score as a 0..1 gauge fill.
 ///
 /// Lives here rather than beside each gauge because the 40-99 floor and

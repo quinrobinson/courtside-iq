@@ -143,15 +143,18 @@ class _TodayHeroState extends State<TodayHero> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: CiSpace.s5),
+                  // Figma: the 20 gap plus the dots row's own 4 top padding.
+                  const SizedBox(height: CiSpace.s6),
                   CiPageDots(
                     count: widget.snapshots.length,
                     index: _index,
                     activeColor: c.text,
-                    // Not textFaint: on the glow the faint grey disappears.
-                    inactiveColor: c.textMuted,
+                    // White at 30%, as the frame has it. Not textFaint: on
+                    // the glow the faint grey disappears.
+                    inactiveColor: c.text.withValues(alpha: 0.3),
                   ),
-                  const SizedBox(height: CiSpace.s7),
+                  // The hero's 28 bottom padding in the frame.
+                  const SizedBox(height: 28),
                 ],
               ],
             ),
@@ -234,28 +237,41 @@ class _GlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Positions as fractions of the frame, so the wash sits the same way on
-    // any device rather than drifting on a wider screen.
-    void glow(Offset centre, double radius, double alpha) {
+    // any device rather than drifting on a wider screen. Values are Figma's
+    // glow-a (88:209) and glow-b (88:210) on the 390x296 Today hero, exactly:
+    // centre, radius and every stop, rebuilt 2026-09-28 from Quin's edit.
+    void glow(
+      Offset centre,
+      double radius,
+      List<double> alphas,
+      List<double> stops,
+    ) {
       final rect = Rect.fromCircle(center: centre, radius: radius);
       canvas.drawCircle(
         centre,
         radius,
         Paint()
           ..shader = RadialGradient(
-            colors: [
-              color.withValues(alpha: alpha),
-              color.withValues(alpha: alpha * 0.3),
-              color.withValues(alpha: 0),
-            ],
-            stops: const [0, 0.5, 1],
+            colors: [for (final a in alphas) color.withValues(alpha: a)],
+            stops: stops,
           ).createShader(rect),
       );
     }
 
-    // glow-a: up and left, behind the brand row.
-    glow(Offset(size.width * 0.0, size.height * 0.2), size.width * 0.80, 0.16);
-    // glow-b: down and right, behind the gauge.
-    glow(Offset(size.width * 0.87, size.height * 1.1), size.width * 0.67, 0.10);
+    // glow-a: up and left, behind the brand row. Centre (60, 60), r 310.
+    glow(
+      Offset(size.width * 60 / 390, size.height * 60 / 296),
+      size.width * 310 / 390,
+      const [0.15, 0.09, 0.04, 0.01, 0, 0],
+      const [0, 0.30, 0.55, 0.74, 0.88, 1],
+    );
+    // glow-b: down and right, behind the gauge. Centre (400, 330), r 260.
+    glow(
+      Offset(size.width * 400 / 390, size.height * 330 / 296),
+      size.width * 260 / 390,
+      const [0.08, 0.04, 0.01, 0, 0],
+      const [0, 0.40, 0.66, 0.86, 1],
+    );
   }
 
   @override
@@ -331,20 +347,30 @@ class _GrowthBlock extends StatelessWidget {
                 // would leave the ring looking barely started at a genuinely
                 // good score. Map the real range onto the full sweep.
                 value: growthIqGaugeValue(snapshot.growthIq!),
-                // THE SCORE ONLY. The trend word used to sit under it here and
-                // the delta rode the chip to the right, which split one fact
-                // across two places - the number lost the word explaining it.
-                // Both now travel together on the chip.
-                child: Text(
-                  '${snapshot.growthIq}',
-                  style: CiType.h2.copyWith(
-                    color: c.text,
-                    fontWeight: CiWeight.light,
-                  ),
+                // The score with its trend word under it, as the frame has it
+                // (Quin, 2026-09-28: build Today as designed). The delta sits
+                // to the right as plain text.
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${snapshot.growthIq}',
+                      style: CiType.statSm.copyWith(color: c.text),
+                    ),
+                    if (snapshot.trend != null) ...[
+                      const SizedBox(height: 1.5),
+                      Text(
+                        growthTrendWord(snapshot.trend!),
+                        style: CiType.micro.copyWith(color: c.textMuted),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),
-            const SizedBox(width: CiSpace.s4),
+            // 18, the frame's gap. Off the scale on purpose; the Development
+            // view's gauge uses the same 18.
+            const SizedBox(width: 18),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,19 +409,14 @@ class _GrowthBlock extends StatelessWidget {
                         CiBadge(label: ppg, tone: CiBadgeTone.ghost),
                         const SizedBox(width: CiSpace.s3),
                       ],
-                      // A CHIP, not the frame's plain lime text. Chosen for
-                      // consistency with every other delta in the app, which
-                      // is worth more than matching this one frame. The frame
-                      // should be updated to follow.
-                      //
-                      // growthTrend, NOT delta. CiBadge.delta colours by sign,
-                      // so this chip was orange here and neutral on the
-                      // Players list for the same player's same drop.
-                      if (snapshot.trend != null)
-                        CiBadge.growthTrend(
-                          trend: snapshot.trend!,
-                          delta: delta,
-                        ),
+                      // PLAIN TEXT, as the frame has it (Quin, 2026-09-28). It
+                      // was a chip for consistency with other deltas; the
+                      // frame wins now, and the trend word moved into the
+                      // gauge. The COLOUR RULE is unchanged from the chip:
+                      // only Rising earns lime, a dip stays neutral (see
+                      // CiBadge.growthTrend for why).
+                      if (snapshot.trend != null && delta != null)
+                        _GrowthDelta(trend: snapshot.trend!, delta: delta),
                     ],
                   ),
                 ],
@@ -403,6 +424,32 @@ class _GrowthBlock extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// "▲ +4" beside the PPG tag. Lime only when Rising; neutral otherwise.
+class _GrowthDelta extends StatelessWidget {
+  const _GrowthDelta({required this.trend, required this.delta});
+
+  final GrowthTrend trend;
+  final int delta;
+
+  @override
+  Widget build(BuildContext context) {
+    const c = CiColors.onInk;
+    final arrow = delta > 0
+        ? '▲ '
+        : delta < 0
+        ? '▼ '
+        : '';
+    final number = delta > 0 ? '+$delta' : '$delta';
+    return Text(
+      '$arrow$number',
+      style: CiType.rowLabel.copyWith(
+        color: trend == GrowthTrend.rising ? c.accentGood : c.textMuted,
+        fontWeight: CiWeight.bold,
       ),
     );
   }

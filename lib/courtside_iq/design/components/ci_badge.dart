@@ -107,11 +107,7 @@ class CiBadge extends StatelessWidget {
     required GrowthTrend trend,
     int? delta,
   }) {
-    final word = switch (trend) {
-      GrowthTrend.rising => 'Rising',
-      GrowthTrend.steady => 'Steady',
-      GrowthTrend.dipping => 'Dipping',
-    };
+    final word = growthTrendWord(trend);
     final number = delta == null ? '' : '${delta >= 0 ? '+' : ''}$delta';
     return CiBadge(
       key: key,

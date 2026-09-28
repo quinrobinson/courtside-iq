@@ -87,11 +87,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
   /// a parent who already knows what the app does should not have to page
   /// through three slides to reach sign-in.
   void _continue() {
-    context.pushNamed(UserAuthWidget.routeName);
+    context.pushNamed(
+      UserAuthWidget.routeName,
+    );
   }
 
   void _signIn() {
-    context.pushNamed(UserAuthEmailWidget.routeName);
+    context.pushNamed(
+      UserAuthEmailWidget.routeName,
+    );
   }
 
   @override
