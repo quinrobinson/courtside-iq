@@ -415,6 +415,16 @@ insight functions, seven app repositories) is untouched. What changed is who dec
 
 **GATE 1 COMPLETE ON TEST (2026-09-27).**
 
+**GATE 1 SCHEMA PROMOTED TO PROD 2026-09-27** (Quin approved in-session). Applied in order:
+`stat_events`, `games.started_at/ended_at`, `v_stat_event_rollup` + `v_stat_event_reconciliation`,
+the G1.14 triggers. Verified: stats hash, games hash (excluding the two new null columns) and
+snapshot count identical before and after (401 stats rows, 406 games, 227 snapshots); RLS on with
+4 policies; both views `security_invoker=on`; anon has no read on `stat_events` or the rollup.
+Rolled-back probes on prod, all pass: no-events keeps client totals, events override wrong client
+totals, retry re-derives, void a made 3, and privacy (owner sees 3 rows, another parent sees 0 in
+the table and 0 in the rollup). Nothing parent-visible changes until an app version that writes
+events ships (2.1.0). Live 2.0.0 never writes events, so no trigger fires for its games.
+
 **G1.12 EXIT BAR — DECIDED 2026-09-27: coverage, not count.** "Meaningful sample" had no finish
 line. More ordinary games repeat paths that already pass; coverage is what finds bugs. G1.12 is
 done when every row of `v_stat_event_reconciliation` has an empty `mismatched` AND the tracked
