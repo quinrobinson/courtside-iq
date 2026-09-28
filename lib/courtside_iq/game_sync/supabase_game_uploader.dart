@@ -4,14 +4,12 @@
 // testable without a network. This file is the only place that knows the
 // database exists.
 
-import 'dart:developer' as dev;
-
 import 'package:uuid/uuid.dart';
 
 import '/backend/supabase/supabase.dart';
 import '/custom_code/actions/generate_game_insight.dart';
-import 'game_columns.dart';
 import 'game_sync_queue.dart';
+import 'game_upload_steps.dart';
 import 'pending_game.dart';
 
 const _uuid = Uuid();
@@ -46,69 +44,19 @@ PendingGame buildPendingGame({
   );
 }
 
-/// Upserts the game and its stats, then asks for the insight.
+/// Uploads a queued game through Supabase.
 ///
-/// Order matters: the game must exist before the stats row, which references
-/// it by foreign key.
-///
-/// THE INSIGHT IS REQUESTED HERE, and that is the fix for a defect carried
-/// since 4.5. Generation needs a server row, so it was skipped while offline -
-/// and the later flush uploaded the rows without ever asking, leaving a game
-/// permanently without the insight the save screen PROMISED ("Save to unlock
-/// Maya's game insight"). Asking from the uploader covers both paths, because
-/// both an immediate save and a flush days later come through here.
-///
-/// Failure to generate NEVER fails the upload. The game is saved either way,
-/// and generateGameInsight already swallows its own errors; the try/catch is
-/// belt and braces so a future change there cannot start losing games.
-Future<void> uploadPendingGame(PendingGame game) async {
+/// The order and the failure rules live in [runGameUpload]
+/// (game_upload_steps.dart), where they are tested without a network. This
+/// only supplies the two things that need the database.
+Future<void> uploadPendingGame(PendingGame game) {
   final client = SupaFlow.client;
-
-  // Conform BEFORE sending. A queued game holds the rows as they were built,
-  // so one written by an older build can carry a key this schema does not
-  // have - and a payload that cannot be fixed fails on every retry until the
-  // queue gives up. Logged, never silent: a dropped key is either a stale
-  // payload healing itself or a column list that has drifted from the
-  // database, and the second one needs a person.
-  final gameRow = conformToColumns(game.gameRow, kGameColumns);
-  final statsRow = conformToColumns(game.statsRow, kStatsColumns);
-  for (final (table, dropped) in [
-    ('games', gameRow.dropped),
-    ('player_game_stats', statsRow.dropped),
-  ]) {
-    if (dropped.isNotEmpty) {
-      dev.log('dropped unknown $table columns: ${dropped.join(', ')}',
-          name: 'GameSync');
-    }
-  }
-
-  await client.from('games').upsert(gameRow.row, onConflict: 'id');
-  await client
-      .from('player_game_stats')
-      .upsert(statsRow.row, onConflict: 'id');
-
-  // Events LAST, and in their own try. The aggregates are what the app reads
-  // today; the timeline is additive. A game whose events fail to land is a
-  // complete game missing its timeline, which is recoverable. Letting that
-  // failure throw would send the whole game back to the queue and re-upsert
-  // rows that already succeeded, on every retry, forever.
-  if (game.eventRows.isNotEmpty) {
-    try {
-      final rows = [
-        for (final e in game.eventRows) conformToColumns(e, kStatEventColumns).row,
-      ];
-      await client.from('stat_events').upsert(rows, onConflict: 'id');
-    } catch (e) {
-      dev.log('stat_events upload failed for ${game.gameId}: $e',
-          name: 'GameSync');
-    }
-  }
-
-  try {
-    await generateGameInsight(game.gameId);
-  } catch (_) {
-    // The rows are up. An insight can be regenerated; a lost game cannot.
-  }
+  return runGameUpload(
+    game,
+    upsert: (table, rows) =>
+        client.from(table).upsert(rows, onConflict: 'id'),
+    requestInsight: generateGameInsight,
+  );
 }
 
 /// App-wide queue. Single instance so the connectivity listener and any UI

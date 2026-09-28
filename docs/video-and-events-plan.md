@@ -327,7 +327,7 @@ turns every test tap into a real play inside a real family's game.
 | G1.11 | ~~Rollup view deriving all 17 fields from events~~ **APPLIED TO TEST 2026-09-22** | Code | done |
 | G1.12 | ~~Parallel run: compare view against stored columns until the coverage bar below is met~~ **DONE 2026-09-27: coverage bar met, 5 games, zero mismatches** | Quin | done |
 | G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-23: [x] built [x] wired [x] device-verified** (table redesign, see below) | Code | done |
-| G1.14 | Cutover: view becomes the read path, aggregate columns deprecated | Code | G1.12 |
+| G1.14 | Cutover: events become the source of truth, `player_game_stats` a derived cache (**reworded 2026-09-27**, see below) | Code | G1.12 |
 
 **G1.13 shipped the read path as well as the widget (2026-09-22).** Game Detail now reads a
 game's `stat_events` and renders the lanes where Scoring Mix used to sit; Scoring Mix is retired
@@ -381,6 +381,34 @@ What changes in `game_timeline.dart`:
 - Defense counts steals AND blocks; the old `STL` unit was wrong and STL·BLK fixes it.
 
 **G1.12 DONE 2026-09-27. G1.14 IS UNBLOCKED.** (Was: the only thing blocking G1.14.)
+
+**G1.14 REWORDED 2026-09-27: events are the source of truth; the stored columns are a cache the
+database maintains.** "The view becomes the read path, aggregate columns deprecated" cannot be done
+as written: almost every game has no events (every game before G1.10, every game from an app
+version that does not write them), so reading stats from the rollup would blank them. The 17
+columns stay and keep their meaning, and every reader (both views, the snapshot trigger, both
+insight functions, seven app repositories) is untouched. What changed is who decides the values.
+
+- Migration `20260927000000_stat_events_source_of_truth.sql`, **applied to TEST 2026-09-27**:
+  - BEFORE INSERT/UPDATE on `player_game_stats`: for a (game, player) with ANY `stat_events` row,
+    the 17 fields are overwritten from `v_stat_event_rollup`. No events, no change: older app
+    versions and every existing game keep their client totals.
+  - AFTER INSERT/UPDATE/DELETE on `stat_events` (statement-level): re-derives the affected rows.
+  - AFTER UPDATE on `player_game_stats`: refreshes that game's trend snapshot, only when a total
+    really changed (the snapshot trigger is insert-only and never recomputed).
+  - Probed on TEST in a rolled-back transaction, 8 cases, all pass: no-events keeps client totals;
+    wrong client totals overridden; a retry overwrite re-derived; void a made 3; late events;
+    all voided gives zeros; events deleted hands control back; no-op update leaves snapshots alone.
+  - Existing data unchanged (stats hash and snapshot count identical before and after).
+- App: `lib/courtside_iq/game_sync/game_upload_steps.dart` owns the upload order, now games, then
+  stat_events, then player_game_stats, then the insight. **A failed events upload now fails the
+  upload** and the game stays queued; before, it was logged and swallowed. 5 tests.
+- `v_stat_event_reconciliation` stays as a tripwire: empty-mismatched by construction now, so a
+  non-empty row means a trigger was dropped or bypassed.
+- **Not yet:** device verification (one game tracked on a phone against TEST), and promotion to
+  prod, which is its own reviewed step with `stat_events` itself.
+
+`[x] built` · `[x] wired` · `[ ] device-verified`
 
 **G1.12 EXIT BAR — DECIDED 2026-09-27: coverage, not count.** "Meaningful sample" had no finish
 line. More ordinary games repeat paths that already pass; coverage is what finds bugs. G1.12 is
