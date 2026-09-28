@@ -32,6 +32,7 @@ import '/courtside_iq/design/tokens/ci_type.dart';
 import 'birth_date_sheet.dart';
 import 'delete_player_dialog.dart';
 import 'present_picker.dart';
+import 'player_photo_storage.dart';
 import 'profile_photo_sheet.dart';
 import 'teams_events_repository.dart';
 import 'teams_events_sheets.dart';
@@ -169,7 +170,11 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
     if (action == null || !mounted) return;
 
     if (action == PhotoAction.remove) {
+      // Capture before the row is nulled, or there is nothing left to point
+      // the delete at.
+      final previous = _photoUrl;
       await _writePhotoUrl(null);
+      await deletePlayerPhotoAt(previous);
       return;
     }
 
@@ -183,13 +188,16 @@ class _EditPlayerPageState extends State<EditPlayerPage> {
       _error = null;
     });
 
+    final previous = _photoUrl;
     try {
-      final urls = await uploadSupabaseStorageFiles(
-        bucketName: 'playerprofiles',
-        selectedFiles: files,
+      final url = await uploadPlayerPhoto(
+        playerId: widget.playerId,
+        file: files.first,
       );
-      if (urls.isEmpty) throw StateError('upload returned no url');
-      await _writePhotoUrl(urls.first);
+      await _writePhotoUrl(url);
+      // Only after the row points at the new object. Deleting first would
+      // leave the player with a broken photo if the upload then failed.
+      await deletePlayerPhotoAt(previous);
     } catch (_) {
       if (!mounted) return;
       setState(() {
