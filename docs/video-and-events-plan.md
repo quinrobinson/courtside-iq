@@ -325,7 +325,7 @@ turns every test tap into a real play inside a real family's game.
 | G1.9 | ~~Void-on-decrement, routed through one shared write path shared by the Miss buttons and the minus steppers~~ **DONE 2026-09-15** | Code | done |
 | G1.10 | ~~Dual-write alongside the existing aggregate columns~~ **DONE 2026-09-15** | Code | done |
 | G1.11 | ~~Rollup view deriving all 17 fields from events~~ **APPLIED TO TEST 2026-09-22** | Code | done |
-| G1.12 | Parallel run: compare view against stored columns across a real sample | **Quin — needs a real game tracked on a device** | G1.11 |
+| G1.12 | Parallel run: compare view against stored columns until the coverage bar below is met | **Quin — two covering games tracked on a device** | G1.11 |
 | G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-23: [x] built [x] wired [x] device-verified** (table redesign, see below) | Code | done |
 | G1.14 | Cutover: view becomes the read path, aggregate columns deprecated | Code | G1.12 |
 
@@ -383,6 +383,31 @@ What changes in `game_timeline.dart`:
 **G1.12 IS STILL THE ONLY THING BLOCKING G1.14.** It needs more real games tracked on a device
 against TEST, then `select * from v_stat_event_reconciliation` with an empty `mismatched` on
 every row.
+
+**G1.12 EXIT BAR — DECIDED 2026-09-27: coverage, not count.** "Meaningful sample" had no finish
+line. More ordinary games repeat paths that already pass; coverage is what finds bugs. G1.12 is
+done when every row of `v_stat_event_reconciliation` has an empty `mismatched` AND the tracked
+games, together, have exercised every path below. Games do not need to be real matches: tapping
+through on a device against TEST at home counts.
+
+Covered by the two games on TEST as of 2026-09-27 (11 and 32 plays, both clean):
+- [x] 2s, 3s, free throws, makes and misses
+- [x] offensive and defensive rebounds, assists, steals, turnovers
+- [x] a voided (taken-back) non-scoring play (an assist)
+- [x] a dense game past the 22-play scroll threshold (32 plays)
+
+Still to cover (fits in two games):
+- [ ] **a block** - never tapped yet
+- [ ] **a take-back of a made 2 or 3** - the riskiest void, since it moves `points`, `fg_*` and
+  `two_*`/`three_*` at once
+- [ ] **a full game tracked in airplane mode, then synced** - every play so far reached the server
+  within ~90s (`created_at - recorded_at`), so the offline queue has never replayed events
+- [ ] **the app force-quit mid-game, then resumed** - the in-progress snapshot must carry the
+  event array across a restart without dropping or duplicating plays
+
+Check after each game: `select game_id, plays, mismatched from v_stat_event_reconciliation;` plus,
+for the offline game, `max(created_at - recorded_at)` on its `stat_events` to confirm it really
+replayed from the queue.
 
 **G1.8 risk RESOLVED 2026-09-13, and the premise was void.** The tracker cannot be regenerated:
 FlutterFlow was retired 2026-07-19, there is no `.flutterflow` project link in the repo, and
