@@ -327,7 +327,7 @@ turns every test tap into a real play inside a real family's game.
 | G1.11 | ~~Rollup view deriving all 17 fields from events~~ **APPLIED TO TEST 2026-09-22** | Code | done |
 | G1.12 | ~~Parallel run: compare view against stored columns until the coverage bar below is met~~ **DONE 2026-09-27: coverage bar met, 5 games, zero mismatches** | Quin | done |
 | G1.13 | ~~Build the timeline UI from the approved Figma variant, and read it on Game Detail~~ **DONE 2026-09-23: [x] built [x] wired [x] device-verified** (table redesign, see below) | Code | done |
-| G1.14 | Cutover: events become the source of truth, `player_game_stats` a derived cache (**reworded 2026-09-27**, see below) | Code | G1.12 |
+| G1.14 | ~~Cutover: events become the source of truth, `player_game_stats` a derived cache~~ **DONE 2026-09-27: [x] built [x] wired [x] device-verified** (reworded, see below; TEST only) | Code | done |
 
 **G1.13 shipped the read path as well as the widget (2026-09-22).** Game Detail now reads a
 game's `stat_events` and renders the lanes where Scoring Mix used to sit; Scoring Mix is retired
@@ -405,10 +405,15 @@ insight functions, seven app repositories) is untouched. What changed is who dec
   upload** and the game stays queued; before, it was logged and swallowed. 5 tests.
 - `v_stat_event_reconciliation` stays as a tripwire: empty-mismatched by construction now, so a
   non-empty row means a trigger was dropped or bypassed.
-- **Not yet:** device verification (one game tracked on a phone against TEST), and promotion to
-  prod, which is its own reviewed step with `stat_events` itself.
+- **Device-verified 2026-09-27:** game `fecd7df8` tracked on a phone against TEST, 16 rows
+  (2 voided: a block and a steal), 14 confirmed, stored 8 = derived 8, `mismatched` empty; events
+  written ~1s after End Game, insight generated after the stats row.
+- **Not yet:** promotion to prod, a reviewed step together with `stat_events` itself and an app
+  release that writes events.
 
-`[x] built` · `[x] wired` · `[ ] device-verified`
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+**GATE 1 COMPLETE ON TEST (2026-09-27).**
 
 **G1.12 EXIT BAR — DECIDED 2026-09-27: coverage, not count.** "Meaningful sample" had no finish
 line. More ordinary games repeat paths that already pass; coverage is what finds bugs. G1.12 is
