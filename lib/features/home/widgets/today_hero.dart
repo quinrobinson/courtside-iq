@@ -278,7 +278,7 @@ class _BrandRow extends StatelessWidget {
         height: 40,
         child: Row(
           children: [
-            CiLogoMark(size: 20, color: c.text),
+            CiLogoMark(size: 20, color: c.text, tone: CiLogoTone.classic),
             const SizedBox(width: CiSpace.s2),
             Text(
               'Courtside IQ',

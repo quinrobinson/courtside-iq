@@ -165,12 +165,17 @@ treat as urgent), and prod Edge Function logs. **First real webhook renewal ~Aug
 row's `last_event_type` stops being 'BACKFILL'. Hold the ramp on any bad signal; both stores allow
 pausing and neither allows un-shipping.
 
-**Branding is FINAL (2026-07-27):** the mark is the original C with the right half at 0.5 opacity.
-One SVG feeds both `ios/Runner/courtside-iq.icon/` and `assets/images/logo-mark.svg` (keep them
-identical). Small open item: the Figma `LogoMark` COMPONENT (25:5) still holds the old geometry -
-the app renders the new SVG everywhere, but other Figma frames show the old mark in the design
-file only. Update the component deliberately (instances carry fill overrides, some on light
-grounds) - a user-driven 10-minute pass, not urgent, does not block 4.22.
+**Branding: geometry FINAL 2026-07-27, color V2 2026-09-28 (Release 2.1).** The mark is the C:
+left half-disc + two right quarters. Color changed, shape did not:
+- **App icon:** white left + lime right on ink (`ios/Runner/courtside-iq.icon/`, layers `Left.svg` /
+  `Right.svg`; Android/web regenerated via `scripts/build_app_icon.dart`).
+- **In-app mark:** `assets/images/logo-mark-left.svg` + `logo-mark-right.svg`, IDENTICAL paths to
+  the icon layers (a test enforces it). `CiLogoMark` tints each half: default tone = right half
+  lime `#9DFF00` on every ground; `CiLogoTone.classic` (right half at 50%) ONLY for small top-bar
+  brand marks (Today header, paywall top bar, onboarding top bar). Lime on white is low contrast,
+  accepted for now.
+- **Figma:** `LogoMark` is a component set (`1066:364`, Tone = Classic `25:5` | Ink | Light) with
+  all instances remapped; the old cross-gap geometry is gone from the file.
 
 **Resolved 2026-07-19:** `20260615000001_backfill_trend_snapshots.sql` is applied to test and
 recorded in `schema_migrations`. It was a **no-op on current data** - every game already had its

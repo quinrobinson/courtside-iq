@@ -87,15 +87,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
   /// a parent who already knows what the app does should not have to page
   /// through three slides to reach sign-in.
   void _continue() {
-    context.pushNamed(
-      UserAuthWidget.routeName,
-    );
+    context.pushNamed(UserAuthWidget.routeName);
   }
 
   void _signIn() {
-    context.pushNamed(
-      UserAuthEmailWidget.routeName,
-    );
+    context.pushNamed(UserAuthEmailWidget.routeName);
   }
 
   @override
@@ -192,7 +188,9 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 56),
           // CiSpace.s7, not a hand-picked 34: sizes come off the scale too.
           const Expanded(
-            child: Center(child: CiLogoMark(size: CiSpace.s7)),
+            child: Center(
+              child: CiLogoMark(size: CiSpace.s7, tone: CiLogoTone.classic),
+            ),
           ),
           GestureDetector(
             onTap: onSkip,

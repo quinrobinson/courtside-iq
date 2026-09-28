@@ -217,8 +217,7 @@ class _PaywallPageState extends State<PaywallPage> {
               _Phase.processing => Stack(
                 children: [
                   _buildPaywall(context, c),
-                  const ModalBarrier(
-                      dismissible: false, color: Colors.black54),
+                  const ModalBarrier(dismissible: false, color: Colors.black54),
                   const PaywallProcessing(),
                 ],
               ),
@@ -269,7 +268,7 @@ class _PaywallPageState extends State<PaywallPage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      const CiLogoMark(size: 26),
+                      const CiLogoMark(size: 26, tone: CiLogoTone.classic),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: _IconTap(
@@ -297,9 +296,13 @@ class _PaywallPageState extends State<PaywallPage> {
                       padding: const EdgeInsets.symmetric(horizontal: _gutter),
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text('Go Premium',
-                            style: CiType.h2
-                                .copyWith(color: c.text, fontSize: 30)),
+                        child: Text(
+                          'Go Premium',
+                          style: CiType.h2.copyWith(
+                            color: c.text,
+                            fontSize: 30,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: CiSpace.s3),

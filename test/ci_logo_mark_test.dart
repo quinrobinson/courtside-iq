@@ -21,70 +21,132 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/components/ci_logo_mark.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 
-/// The path CiLogoMark asks for. If these two drift, the mark silently
-/// disappears - which is exactly the failure this file exists to prevent.
-const _assetPath = 'assets/images/logo-mark.svg';
+/// The paths CiLogoMark asks for. If any drift, that half of the mark
+/// silently disappears - which is exactly the failure this file exists to
+/// prevent. Two files since Release 2.1, when the mark became two colours.
+const _assetPaths = [kLogoMarkLeftAsset, kLogoMarkRightAsset];
+
+const _lime = Color(0xFF9DFF00);
 
 Future<void> _pump(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(
-    MaterialApp(home: Scaffold(body: Center(child: child))),
+    MaterialApp(
+      home: Scaffold(body: Center(child: child)),
+    ),
   );
   await tester.pumpAndSettle();
 }
 
+/// The left and right halves' tints, in paint order.
+List<ColorFilter?> _filters(WidgetTester tester) => tester
+    .widgetList<SvgPicture>(find.byType(SvgPicture))
+    .map((p) => p.colorFilter)
+    .toList();
+
 void main() {
-  test('the asset exists at the path CiLogoMark asks for', () {
-    expect(File(_assetPath).existsSync(), isTrue,
-        reason: 'CiLogoMark loads $_assetPath; without it the mark renders as '
-            'an empty box on Splash, auth, the paywall and every other hero');
+  for (final path in _assetPaths) {
+    test('$path exists at the path CiLogoMark asks for', () {
+      expect(
+        File(path).existsSync(),
+        isTrue,
+        reason:
+            'CiLogoMark loads $path; without it half the mark renders as '
+            'an empty box on Splash, auth, the paywall and every other hero',
+      );
+    });
+
+    test('$path is valid SVG that the real parser can draw', () async {
+      final raw = File(path).readAsStringSync();
+      final picture = await vg.loadPicture(SvgStringLoader(raw), null);
+      addTearDown(picture.picture.dispose);
+
+      // Both halves are drawn on the FULL mark canvas, so stacking them
+      // re-assembles the disc. A non-square box means a broken export or a
+      // half cropped to its own bounds, which would misalign when stacked.
+      expect(picture.size.width, greaterThan(0));
+      expect(picture.size.aspectRatio, closeTo(1.0, 0.02));
+    });
+  }
+
+  test('the halves match the app icon layers exactly', () {
+    // The in-app mark and the app icon are one mark. Same paths, or the two
+    // drift apart with nobody noticing until they sit side by side.
+    String d(String path) => RegExp(
+      r' d="([^"]+)"',
+    ).firstMatch(File(path).readAsStringSync())!.group(1)!;
+    const icon = 'ios/Runner/courtside-iq.icon/Assets';
+    expect(d(kLogoMarkLeftAsset), d('$icon/Left.svg'));
+    expect(d(kLogoMarkRightAsset), d('$icon/Right.svg'));
   });
 
-  test('the asset is valid SVG that the real parser can draw', () async {
-    final raw = File(_assetPath).readAsStringSync();
-    final picture = await vg.loadPicture(SvgStringLoader(raw), null);
-    addTearDown(picture.picture.dispose);
-
-    // Non-zero, and the square-ish viewBox the mark was exported at. A garbled
-    // path would parse to an empty or wrongly-sized drawing.
-    expect(picture.size.width, greaterThan(0));
-    expect(picture.size.height, greaterThan(0));
-    expect(picture.size.aspectRatio, closeTo(1.0, 0.02),
-        reason: 'the mark is a disc; a non-square box means a broken export');
-  });
-
-  testWidgets('renders at every size it is used at', (tester) async {
-    // 24 through 60 (splash/auth hero) covers the real call sites.
-    for (final size in const [24.0, 44.0, 46.0, 50.0, 60.0]) {
+  testWidgets('renders both halves at every size it is used at', (
+    tester,
+  ) async {
+    for (final size in const [20.0, 26.0, 32.0, 44.0, 50.0, 60.0]) {
       await _pump(tester, CiLogoMark(size: size));
-      expect(find.byType(SvgPicture), findsOneWidget);
+      expect(find.byType(SvgPicture), findsNWidgets(2));
     }
   });
 
-  testWidgets('keeps its intrinsic box, which DotBurst spaces its rings off',
-      (tester) async {
+  testWidgets('keeps its intrinsic box, which DotBurst spaces its rings off', (
+    tester,
+  ) async {
     await _pump(tester, const CiLogoMark(size: 50));
     expect(tester.getSize(find.byType(CiLogoMark)), const Size(50, 50));
   });
 
-  testWidgets('is tinted, so it reads on ink and on light', (tester) async {
-    // Explicit colour wins.
-    await _pump(tester, const CiLogoMark(size: 44, color: Color(0xFF9DFF00)));
-    final tinted = tester.widget<SvgPicture>(find.byType(SvgPicture));
-    expect(
-      tinted.colorFilter,
-      const ColorFilter.mode(Color(0xFF9DFF00), BlendMode.srcIn),
-    );
-
-    // And with no colour it inherits the ground rather than shipping a flat
-    // asset colour - which is the whole reason this is not the black PNG.
+  testWidgets('on ink: white left, lime right', (tester) async {
     await _pump(
       tester,
       const CiSurface.ink(child: Center(child: CiLogoMark(size: 44))),
     );
-    final inherited = tester.widget<SvgPicture>(find.byType(SvgPicture));
-    expect(inherited.colorFilter, isNotNull);
-    expect(inherited.colorFilter,
-        isNot(const ColorFilter.mode(Color(0xFF9DFF00), BlendMode.srcIn)));
+    expect(_filters(tester), [
+      ColorFilter.mode(CiColors.onInk.text, BlendMode.srcIn),
+      const ColorFilter.mode(_lime, BlendMode.srcIn),
+    ]);
+  });
+
+  testWidgets('on light: ink left, lime right (L1, Quin 2026-09-28)', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      const CiSurface.light(child: Center(child: CiLogoMark(size: 44))),
+    );
+    final filters = _filters(tester);
+    expect(
+      filters.last,
+      const ColorFilter.mode(_lime, BlendMode.srcIn),
+      reason: 'lime on light too - the deeper lime was rejected',
+    );
+    expect(
+      filters.first,
+      isNot(ColorFilter.mode(CiColors.onInk.text, BlendMode.srcIn)),
+      reason: 'the left half follows the ground; white on white vanishes',
+    );
+  });
+
+  testWidgets('classic: right half is the left at 50%, no lime', (
+    tester,
+  ) async {
+    const white = Color(0xFFFFFFFF);
+    await _pump(
+      tester,
+      const CiLogoMark(size: 20, color: white, tone: CiLogoTone.classic),
+    );
+    expect(_filters(tester), [
+      const ColorFilter.mode(white, BlendMode.srcIn),
+      ColorFilter.mode(white.withValues(alpha: 0.5), BlendMode.srcIn),
+    ]);
+  });
+
+  testWidgets('an explicit colour sets the left half only', (tester) async {
+    const c = Color(0xFF123456);
+    await _pump(tester, const CiLogoMark(size: 44, color: c));
+    final filters = _filters(tester);
+    expect(filters.first, const ColorFilter.mode(c, BlendMode.srcIn));
+    expect(filters.last, const ColorFilter.mode(_lime, BlendMode.srcIn));
   });
 }

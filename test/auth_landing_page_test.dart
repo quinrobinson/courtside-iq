@@ -143,12 +143,17 @@ void main() {
       final mark = tester.widget<CiLogoMark>(find.byType(CiLogoMark));
       expect(mark.color, isNull, reason: 'should inherit, not hardcode');
 
-      final svg = tester.widget<SvgPicture>(
+      // Two halves since Release 2.1 (left follows the ground, right is lime).
+      // Every half must be tinted.
+      final halves = tester.widgetList<SvgPicture>(
         find.descendant(
             of: find.byType(CiLogoMark), matching: find.byType(SvgPicture)),
       );
-      expect(svg.colorFilter, isNotNull,
-          reason: 'must be tinted, or it renders as the flat asset colour');
+      expect(halves, hasLength(2));
+      for (final svg in halves) {
+        expect(svg.colorFilter, isNotNull,
+            reason: 'must be tinted, or it renders as the flat asset colour');
+      }
     });
 
     testWidgets('burst matches the frame and the mark is the tuned size',
