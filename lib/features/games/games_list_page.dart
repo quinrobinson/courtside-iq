@@ -28,6 +28,7 @@ import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_empty_state.dart';
 import '/courtside_iq/design/components/ci_nav_icon.dart';
 import '/courtside_iq/design/components/ci_avatar.dart';
+import 'games_list_skeleton.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
@@ -396,12 +397,15 @@ class _Header extends StatelessWidget {
   }
 }
 
+/// Measured from Games - Loading (Skeleton) 682:2785. A skeleton rather than a
+/// spinner for the reason today_skeleton.dart gives: this screen has a fixed,
+/// known shape, so its outline reads as "your games, arriving" instead of "the
+/// app is busy", and it holds the layout still so nothing jumps on arrival.
 class _Loading extends StatelessWidget {
   const _Loading();
 
   @override
-  Widget build(BuildContext context) =>
-      const Center(child: CircularProgressIndicator());
+  Widget build(BuildContext context) => const GamesListSkeleton();
 }
 
 /// Measured from BOTH empty frames: No Games (206:1025) and No Games (Player

@@ -27,6 +27,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'players_repository.dart';
 import 'widgets/player_list_row.dart';
+import 'widgets/players_list_skeleton.dart';
 
 class PlayersListPage extends StatefulWidget {
   const PlayersListPage({
@@ -167,7 +168,10 @@ class _PlayersListPageState extends State<PlayersListPage> {
     List<PlayerListEntry>? players,
   ) {
     if (snap.connectionState == ConnectionState.waiting && players == null) {
-      return const Center(child: CircularProgressIndicator());
+      // Measured from Players - Loading (Skeleton) 515:1975. A skeleton, not a
+      // spinner: the list has a fixed, known shape, and showing its outline
+      // holds the layout still so nothing jumps when the rows land.
+      return const PlayersListSkeleton();
     }
     if (snap.hasError) {
       return const _Message(

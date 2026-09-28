@@ -7,6 +7,7 @@ import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_field.dart';
 import 'package:courtside_i_q/courtside_iq/games_list_builder.dart';
 import 'package:courtside_i_q/features/games/games_list_page.dart';
+import 'package:courtside_i_q/features/games/games_list_skeleton.dart';
 import 'package:courtside_i_q/features/games/games_repository.dart';
 import 'package:courtside_i_q/features/games/games_revision.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_segmented_tabs.dart';
@@ -206,7 +207,9 @@ void main() {
     ));
     await tester.pump();
     expect(find.text('Games'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    // A skeleton, not a spinner (4.27). 682:2785.
+    expect(find.byType(GamesListSkeleton), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
   testWidgets('a player with NO games still gets a chip', (tester) async {
