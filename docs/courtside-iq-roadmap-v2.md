@@ -376,6 +376,12 @@ Return JSON with this exact shape:
 - Keep Buildship code for one release as rollback safety.
 - Remove Buildship code and cancel subscription after two clean weeks on Edge Functions.
 
+**Missed in the cutover (found 2026-09-27):** the client code was removed, but two Supabase
+database webhooks on `player_game_stats` kept POSTing every inserted stat row to
+`nni3ua.buildship.run` on test and prod. Dropped in `20260927000100_drop_buildship_webhooks.sql`:
+- [x] Built (migration) - [x] Applied + probe-verified on TEST - [x] Applied + probe-verified on PROD 2026-09-27
+- [ ] Buildship workspace checked for retained payloads, then deleted (user, in Buildship)
+
 **Design implication:** None during parallel run. If quality regresses, iterate the prompt before flipping the flag.
 
 ---
