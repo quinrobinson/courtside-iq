@@ -403,7 +403,7 @@ Covered by three more games on TEST, 2026-09-27 (all clean):
   and play 5 (assist), confirmed by Quin; sequence 1-7 contiguous, no duplicates, a voided block
   after the restart
 
-**Result: 5 games, 64 rows, `mismatched` empty on every row. Bar met.**
+**Result: 5 games, 65 rows (12+32+2+12+7), `mismatched` empty on every row. Bar met.**
 
 **Found along the way (not a G1.12 defect):** a game cannot be STARTED offline. New Game shows
 "You're offline" when the players list cannot load, by 4.5's design (offline covers tracking and
