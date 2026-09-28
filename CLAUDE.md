@@ -226,8 +226,8 @@ until proven otherwise. Adding policies to a view does NOT fix it - only `securi
 `player_game_stats` was found with two dashboard-made AFTER INSERT webhooks still posting every
 child's stat row to the retired Buildship (`nni3ua.buildship.run`), on test AND prod, since at least
 2026-01-09 (349 firings each on prod). Recent attempts failed at TLS, but earlier delivery cannot be
-ruled out. Dropped in `20260927000100_drop_buildship_webhooks.sql` (test 2026-09-27; prod pending
-approval). Audit with `select tgrelid::regclass, tgname from pg_trigger where tgfoid =
+ruled out. Dropped in `20260927000100_drop_buildship_webhooks.sql` (test and prod 2026-09-27,
+probe-verified on both). Audit with `select tgrelid::regclass, tgname from pg_trigger where tgfoid =
 'supabase_functions.http_request'::regproc;` - the correct answer is zero rows.
 
 ## Things to flag before doing

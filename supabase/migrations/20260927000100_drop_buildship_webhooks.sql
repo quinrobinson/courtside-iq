@@ -1,5 +1,5 @@
 -- PRIVACY FIX - drop two legacy Buildship database webhooks.
--- Found 2026-09-27. Applied to TEST first; PROD only on explicit approval.
+-- Found 2026-09-27. Applied to TEST, then PROD (approved), same day.
 --
 -- public.player_game_stats carried two AFTER INSERT FOR EACH ROW triggers,
 -- created in the dashboard (never in a migration), that called
