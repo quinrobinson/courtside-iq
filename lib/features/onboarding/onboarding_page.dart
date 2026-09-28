@@ -193,7 +193,7 @@ class _TopBar extends StatelessWidget {
           // CiSpace.s7, not a hand-picked 34: sizes come off the scale too.
           const Expanded(
             child: Center(
-              child: CiLogoMark(size: CiSpace.s7, tone: CiLogoTone.classic),
+              child: CiLogoMark(size: CiSpace.s7),
             ),
           ),
           GestureDetector(

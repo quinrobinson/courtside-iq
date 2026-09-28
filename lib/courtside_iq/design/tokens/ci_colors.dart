@@ -94,6 +94,7 @@ class CiColors extends ThemeExtension<CiColors> {
     required this.onAccent,
     required this.focusRing,
     required this.navGlass,
+    required this.mark,
   });
 
   /// Screen background.
@@ -184,6 +185,12 @@ class CiColors extends ThemeExtension<CiColors> {
   /// Nav bar backdrop, blurred over content.
   final Color navGlass;
 
+  /// The brand mark on this ground (Quin, 2026-09-28): lime on ink - the
+  /// primary, where the brand always aims to sit - and ink on light, the mono
+  /// version for the rare mark that must sit on white. A token, not a
+  /// brightness check in CiLogoMark, for the reason [fieldFill] gives.
+  final Color mark;
+
   // --- On light ground -------------------------------------------------------
 
   static const onLight = CiColors(
@@ -209,6 +216,7 @@ class CiColors extends ThemeExtension<CiColors> {
     onAccent: CiPalette.inkDefault,
     focusRing: CiPalette.inkDefault,
     navGlass: CiPalette.white,
+    mark: CiPalette.inkDefault,
   );
 
   // --- On ink ground ---------------------------------------------------------
@@ -236,6 +244,7 @@ class CiColors extends ThemeExtension<CiColors> {
     onAccent: CiPalette.inkDefault,
     focusRing: CiPalette.white,
     navGlass: CiPalette.inkDefault,
+    mark: CiPalette.lime,
   );
 
   /// Convenience accessor: `CiColors.of(context).text`
@@ -266,6 +275,7 @@ class CiColors extends ThemeExtension<CiColors> {
     Color? onAccent,
     Color? focusRing,
     Color? navGlass,
+    Color? mark,
   }) =>
       CiColors(
         bg: bg ?? this.bg,
@@ -290,6 +300,7 @@ class CiColors extends ThemeExtension<CiColors> {
         onAccent: onAccent ?? this.onAccent,
         focusRing: focusRing ?? this.focusRing,
         navGlass: navGlass ?? this.navGlass,
+        mark: mark ?? this.mark,
       );
 
   @override
@@ -319,6 +330,7 @@ class CiColors extends ThemeExtension<CiColors> {
       onAccent: c(onAccent, other.onAccent),
       focusRing: c(focusRing, other.focusRing),
       navGlass: c(navGlass, other.navGlass),
+      mark: c(mark, other.mark),
     );
   }
 }

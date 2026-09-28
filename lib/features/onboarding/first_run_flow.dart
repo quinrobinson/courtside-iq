@@ -26,7 +26,6 @@ import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -147,10 +146,11 @@ class _WelcomeStep extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(flex: 2),
-          DotBurst(
-            size: 200,
-            markSize: 50,
-            child: CiLogoMark(size: 50, color: c.text),
+          // The burst's old 200 slot with the mark alone at 96 (Figma
+          // 321:1451, 2026-09-28): the Dot-burst C is itself a burst.
+          const SizedBox(
+            height: 200,
+            child: Center(child: CiLogoMark(size: 96)),
           ),
           const SizedBox(height: CiSpace.s7),
           Text(

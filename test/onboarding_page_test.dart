@@ -177,14 +177,18 @@ void main() {
       // any aspect ratio it was not drawn for.
       await tester.pumpWidget(const MaterialApp(home: SplashView()));
       expect(find.byType(Image), findsNothing);
-      expect(find.byType(DotBurst), findsOneWidget);
       expect(find.byType(CiLogoMark), findsOneWidget);
+      // No burst since the Dot-burst C (2026-09-28): the mark is itself a
+      // burst, and the two competed.
+      expect(find.byType(DotBurst), findsNothing);
     });
 
-    testWidgets('sizes the burst to the screen width', (tester) async {
+    testWidgets('sizes the mark to the frame proportion, 128 of 390',
+        (tester) async {
       await tester.pumpWidget(const MaterialApp(home: SplashView()));
       final width = tester.getSize(find.byType(SplashView)).width;
-      expect(tester.getSize(find.byType(DotBurst)).width, width);
+      expect(tester.getSize(find.byType(CiLogoMark)).width,
+          closeTo(width * 128 / 390, 0.01));
     });
 
     testWidgets('names its ground rather than inheriting one', (tester) async {

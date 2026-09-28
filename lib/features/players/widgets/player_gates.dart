@@ -23,7 +23,6 @@ import '/courtside_iq/design/ci_theme.dart';
 import '/courtside_iq/design/components/ci_button.dart';
 import '/courtside_iq/design/components/ci_sheet.dart';
 import '/courtside_iq/design/components/ci_logo_mark.dart';
-import '/courtside_iq/design/components/dot_burst.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -72,11 +71,9 @@ class _UpgradeGateSheet extends StatelessWidget {
                 // dismissed by dragging, which the handle is what says.
                 const CiSheetHandle(),
                 const SizedBox(height: CiSpace.s7),
-                DotBurst(
-                  size: 120,
-                  markSize: 32,
-                  child: CiLogoMark(size: 32, color: c.text),
-                ),
+                // The mark alone at 64 (Figma 652:2192, 2026-09-28): the
+                // Dot-burst C is itself a burst, so the old burst went.
+                const CiLogoMark(size: 64),
                 const SizedBox(height: CiSpace.s5),
                 Text('Track more players',
                     textAlign: TextAlign.center,
