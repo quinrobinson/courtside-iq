@@ -44,61 +44,15 @@
       "layers" : [
         {
           "blend-mode" : "normal",
-          "fill" : {
-            "linear-gradient" : [
-              "display-p3:0.81072,0.94394,0.45633,1.00000",
-              "display-p3:0.58675,0.79279,0.25596,1.00000"
-            ],
-            "orientation" : {
-              "start" : {
-                "x" : 0.5,
-                "y" : 0
-              },
-              "stop" : {
-                "x" : 0.5,
-                "y" : 1
-              }
-            }
-          },
-          "glass" : true,
+          "glass" : false,
           "hidden" : false,
-          "image-name" : "Right.svg",
-          "name" : "Mark Right (lime)",
+          "image-name" : "Mark.svg",
+          "name" : "Mark (Dot-burst C, lime fade)",
           "position" : {
-            "scale" : 3.85,
+            "scale" : 1,
             "translation-in-points" : [
-              -1.9997959632581797,
-              0.1927013253991845
-            ]
-          }
-        },
-        {
-          "blend-mode" : "normal",
-          "fill" : {
-            "linear-gradient" : [
-              "extended-gray:1.00000,1.00000",
-              "extended-gray:0.87843,1.00000"
-            ],
-            "orientation" : {
-              "start" : {
-                "x" : 0.5,
-                "y" : 0
-              },
-              "stop" : {
-                "x" : 0.5,
-                "y" : 1
-              }
-            }
-          },
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "Left.svg",
-          "name" : "Mark Left (white)",
-          "position" : {
-            "scale" : 3.85,
-            "translation-in-points" : [
-              -1.9997959632581797,
-              0.1927013253991845
+              0,
+              0
             ]
           }
         }
@@ -108,7 +62,7 @@
         "opacity" : 0.5
       },
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
       }
     }
