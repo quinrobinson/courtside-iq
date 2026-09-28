@@ -26,7 +26,9 @@ Future<bool> showPaywall(BuildContext context) async {
   return purchased ?? false;
 }
 
-/// The add-player gate: the sheet, then the paywall only if they want plans.
+/// A premium-FEATURE gate: the sheet, then the paywall only if they want
+/// plans. Not the add-player gate since 2026-09-28 (that is the dark
+/// "Track more players" sheet in player_gates.dart). No caller yet.
 Future<bool> showPremiumGate(BuildContext context) async {
   final wantsPlans = await showPremiumGateSheet(context);
   if (wantsPlans != true || !context.mounted) return false;

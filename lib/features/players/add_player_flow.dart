@@ -12,7 +12,6 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/player_gating.dart';
-import '/features/premium/premium_gate_sheet.dart';
 import '/features/home/entitlement_status.dart';
 import '/features/players/add_player_sheet_v2.dart';
 import '/features/players/widgets/player_gates.dart';
@@ -62,9 +61,14 @@ Future<void> runAddPlayerFlow(
         context.goNamed(PlayersListWidget.routeName);
       }
     case AddPlayerAction.upgradeGate:
-      // The gate sheet (335:1881). "See plans" hands to the injected
-      // openPaywall, which is what re-reads entitlement when it closes.
-      final wantsPlans = await showPremiumGateSheet(context) ?? false;
+      // The DARK "Track more players" sheet (Figma 652:2192), Quin's choice
+      // 2026-09-28. 4.16 had put the white "A Premium feature" sheet
+      // (335:1881) here; that sheet's copy is about premium FEATURES, and it
+      // stays in premium_gate_sheet.dart for when a feature is gated. This one
+      // says why the parent is seeing it: the free tier is one player.
+      // "See plans" hands to the injected openPaywall, which is what re-reads
+      // entitlement when it closes.
+      final wantsPlans = await showAddPlayerUpgradeGate(context);
       if (wantsPlans && context.mounted) {
         await openPaywall();
       }

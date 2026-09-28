@@ -8,6 +8,11 @@
 // is for and hands off to the carousel, which is where money is discussed. A
 // parent who hit the player cap wants to know why first, not be sold to
 // before they understand what they would get.
+//
+// NOT THE ADD-PLAYER GATE since 2026-09-28. Quin chose the dark "Track more
+// players" sheet (player_gates.dart, Figma 652:2192) for that moment. This
+// sheet is kept for gating a premium FEATURE, which is what its Figma copy
+// (335:1881) is written for; build it to that frame when it gets a caller.
 
 import 'package:flutter/material.dart';
 

@@ -159,54 +159,50 @@ void main() {
       expect(CiColors.of(ctx).text, isNot(CiColors.onLight.text));
     });
 
-    testWidgets('the delta is a chip, coloured by classification',
+    // Built as the Today frame (65:7) shows it, Quin 2026-09-28: the trend
+    // WORD sits in the gauge under the score, and the movement is plain text
+    // beside the PPG tag. It was a chip ("Rising +4") before. NOTE: this split
+    // was tried once before and reverted because on device it read as two
+    // separate facts; it is back by explicit choice, not by accident.
+    //
+    // THE COLOUR RULE DID NOT MOVE: only Rising earns lime. A dip stays
+    // neutral - Growth IQ is a composite about a CHILD at the top of the app,
+    // and an accent there reads as "something is wrong with them".
+    Color? deltaColor(WidgetTester tester, String text) =>
+        tester.widget<Text>(find.text(text)).style?.color;
+
+    testWidgets('rising: lime arrow and number beside the PPG tag',
         (tester) async {
-      // Chosen over the frame's plain lime text, for consistency with every
-      // other delta in the app.
       await _pump(tester, [_snap(delta: 4, trend: GrowthTrend.rising)]);
-      final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
-      final delta = badges.firstWhere((b) => b.label.contains('4'));
-      expect(delta.tone, CiBadgeTone.good);
-      expect(delta.label, 'Rising +4');
+      expect(find.text('▲ +4'), findsOneWidget);
+      expect(deltaColor(tester, '▲ +4'), CiColors.onInk.accentGood);
     });
 
     testWidgets('a drop is neutral - the word carries it, not the colour',
         (tester) async {
-      // Orange was tried here and reverted: Growth IQ is a composite about a
-      // CHILD at the top of the app, and an accent there reads as "something
-      // is wrong with them". The chip still SAYS "Dipping -3".
       await _pump(tester, [_snap(delta: -3, trend: GrowthTrend.dipping)]);
-      final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
-      final delta = badges.firstWhere((b) => b.label.contains('3'));
-      expect(delta.tone, CiBadgeTone.neutral);
-      expect(delta.label, 'Dipping -3');
+      expect(find.text('▼ -3'), findsOneWidget);
+      expect(deltaColor(tester, '▼ -3'), CiColors.onInk.textMuted);
+      expect(find.text('Dipping'), findsOneWidget);
     });
 
-    testWidgets('steady stays neutral - only a real dip is coloured',
+    testWidgets('steady stays neutral - only Rising is coloured',
         (tester) async {
       await _pump(tester, [_snap(delta: 1, trend: GrowthTrend.steady)]);
-      final badges = tester.widgetList<CiBadge>(find.byType(CiBadge)).toList();
-      final chip = badges.firstWhere((b) => b.label.contains('Steady'));
-      expect(chip.tone, CiBadgeTone.neutral);
+      expect(deltaColor(tester, '▲ +1'), CiColors.onInk.textMuted);
     });
 
-    testWidgets('the word and the number travel together on the chip',
+    testWidgets('the gauge holds the score and the trend word',
         (tester) async {
-      // They were briefly split - word inside the gauge, number on the chip -
-      // and on device that read as two separate facts about the player. The
-      // gauge holds the score; the chip holds the movement.
-      await _pump(tester, [_snap(delta: -13, trend: GrowthTrend.dipping)]);
-      expect(find.text('Dipping -13'), findsOneWidget);
-      expect(find.text('Dipping'), findsNothing);
-    });
-
-    testWidgets('the gauge holds the score and nothing else', (tester) async {
       await _pump(tester, [_snap(growthIq: 82, delta: 4)]);
-      expect(find.byType(DotGauge), findsOneWidget);
-      expect(find.text('82'), findsOneWidget);
-      // The word rides the chip, so it never appears bare.
-      expect(find.text('Rising'), findsNothing);
-      expect(find.text('Rising +4'), findsOneWidget);
+      final gauge = find.byType(DotGauge);
+      expect(gauge, findsOneWidget);
+      expect(find.descendant(of: gauge, matching: find.text('82')),
+          findsOneWidget);
+      expect(find.descendant(of: gauge, matching: find.text('Rising')),
+          findsOneWidget);
+      // No chip any more: the word is not repeated beside the number.
+      expect(find.text('Rising +4'), findsNothing);
     });
 
     testWidgets('falls back to the name when there is no headline',
