@@ -14,10 +14,20 @@
 //   stat    Light 16, one step below the hero's secondary stats
 //   header  one row above the lanes, in the timeline column only: TIP-OFF,
 //           an arrow, FINAL
-//   track   a dotted rule, marks centred on it. Filled = made / defensive /
-//           assist; hollow = the other. Free throws ENCLOSED, one capsule per
-//           trip to the line. Hollow marks and capsules take the column's own
-//           fill, so they read as hollow rather than as white pills
+//   track   a dotted rule, marks centred on it. Filled = the first kind in
+//           the row's name (made / defensive / assist / steal); hollow = the
+//           second kind in the row (missed / offensive / turnover / block).
+//           Hollow means "the other kind", NOT "worse": a block is not a
+//           lesser steal. Free throws ENCLOSED, one capsule per trip to the
+//           line. Hollow marks and capsules take the column's own fill, so
+//           they read as hollow rather than as white pills
+//   key     "How to read this", collapsed under the table (Quin, 2026-09-29).
+//           Same link pattern as "About insights" under the insight card
+//           (CiInfoLink). Opens in place to one row per lane SHOWN, with the
+//           marks drawn exactly as the track draws them, then one sentence
+//           reading this game's own AST·TO / STL·BLK figures back in words.
+//           14 above and 14 below the link in both states, so opening it
+//           never moves the link; the block closes on the row hairline
 //   moment  the insight wash (lime-wash + the insight sparkle), because on
 //           this screen that already means "Courtside IQ noticed this"
 //
@@ -41,6 +51,7 @@
 
 import 'package:flutter/material.dart';
 
+import '/courtside_iq/design/components/ci_info_link.dart';
 import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
@@ -63,7 +74,8 @@ class TimelinePlay {
   final int position;
 
   /// Made shot, defensive rebound, assist, steal. The hollow alternative is
-  /// missed, offensive, turnover.
+  /// missed, offensive, turnover, block. Hollow is the row's second kind of
+  /// play, not a worse one.
   final bool filled;
 
   final bool freeThrow;
@@ -76,6 +88,7 @@ class TimelineLane {
     required this.label,
     required this.value,
     required this.plays,
+    this.pair,
   });
 
   /// The hero's abbreviation for the stat. It names the row AND serves as the
@@ -83,6 +96,11 @@ class TimelineLane {
   final String label;
   final String value;
   final List<TimelinePlay> plays;
+
+  /// The two counts behind a "3·1" [value] (filled kind, hollow kind), for the
+  /// paired lanes AST·TO and STL·BLK. Null on PTS and REB, whose value is one
+  /// number. The key reads these back in words.
+  final (int, int)? pair;
 
   bool get isEmpty => plays.isEmpty;
 }
@@ -130,7 +148,8 @@ List<TimelineLane> buildTimelineLanes(List<StatEvent> events) {
   final points = n(LiveStat.twoMade) * 2 + n(LiveStat.threeMade) * 3 + n(LiveStat.ftMade);
   final assists = n(LiveStat.assists);
   final turnovers = n(LiveStat.turnovers);
-  final defence = n(LiveStat.steals) + n(LiveStat.blocks);
+  final steals = n(LiveStat.steals);
+  final blocks = n(LiveStat.blocks);
 
   final lanes = <TimelineLane>[
     TimelineLane(
@@ -148,7 +167,7 @@ List<TimelineLane> buildTimelineLanes(List<StatEvent> events) {
     // metric - and because separately, a turnovers lane would be absent in 39%
     // of games against 17% for the pair.
     TimelineLane(
-      label: 'AST·TO', value: '$assists·$turnovers',
+      label: 'AST·TO', value: '$assists·$turnovers', pair: (assists, turnovers),
       plays: pick(
         (s) => s == LiveStat.assists || s == LiveStat.turnovers,
         (s) => s == LiveStat.assists,
@@ -156,11 +175,14 @@ List<TimelineLane> buildTimelineLanes(List<StatEvent> events) {
     ),
     TimelineLane(
       // STL·BLK, not STL: this lane has always counted blocks too, and the
-      // old unit said otherwise.
-      label: 'STL·BLK', value: '$defence',
+      // old unit said otherwise. Split like AST·TO since 2026-09-29 (Quin):
+      // filled = steal, hollow = block, and the figure reads steals·blocks.
+      // It was one filled mark and one summed number, so a parent could not
+      // tell which plays were which.
+      label: 'STL·BLK', value: '$steals·$blocks', pair: (steals, blocks),
       plays: pick(
         (s) => s == LiveStat.steals || s == LiveStat.blocks,
-        (_) => true,
+        (s) => s == LiveStat.steals,
       ),
     ),
   ];
@@ -353,7 +375,168 @@ class GameTimeline extends StatelessWidget {
             );
           },
         ),
+        TimelineKey(lanes: lanes),
         if (moment != null) _Moment(text: moment!),
+      ],
+    );
+  }
+}
+
+/// The sentence under the key that reads this game's paired figures back in
+/// words: "4·2 means 4 assists and 2 turnovers. 2·1 means 2 steals and 1
+/// block." One sentence per paired lane that is SHOWN; null when neither is,
+/// because PTS and REB carry a single number that needs no decoding.
+String? timelineKeyNote(List<TimelineLane> lanes) {
+  String plural(int n, String one, String many) => '$n ${n == 1 ? one : many}';
+  final sentences = [
+    for (final l in lanes)
+      if (l.pair case (final a, final b))
+        switch (l.label) {
+          'AST·TO' => '$a·$b means ${plural(a, 'assist', 'assists')} and '
+              '${plural(b, 'turnover', 'turnovers')}.',
+          'STL·BLK' => '$a·$b means ${plural(a, 'steal', 'steals')} and '
+              '${plural(b, 'block', 'blocks')}.',
+          _ => null,
+        },
+  ].whereType<String>().toList();
+  return sentences.isEmpty ? null : sentences.join(' ');
+}
+
+/// What a mark in the key stands for.
+enum _KeyMark { filled, hollow, trip }
+
+/// Each lane's legend, by label: filled first, then hollow, as the track draws
+/// them. PTS always shows the free-throw capsule, whether or not this game had
+/// a trip; a legend that changes shape per game is harder to learn.
+const Map<String, List<(_KeyMark, String)>> _kKeyItems = {
+  'PTS': [
+    (_KeyMark.filled, 'made'),
+    (_KeyMark.hollow, 'missed'),
+    (_KeyMark.trip, 'free-throw trip'),
+  ],
+  'REB': [(_KeyMark.filled, 'defensive'), (_KeyMark.hollow, 'offensive')],
+  'AST·TO': [(_KeyMark.filled, 'assist'), (_KeyMark.hollow, 'turnover')],
+  'STL·BLK': [(_KeyMark.filled, 'steal'), (_KeyMark.hollow, 'block')],
+};
+
+/// The "How to read this" key under the table. Collapsed by default; opens in
+/// place. See the file header for the spacing rule.
+class TimelineKey extends StatefulWidget {
+  const TimelineKey({super.key, required this.lanes});
+
+  final List<TimelineLane> lanes;
+
+  @override
+  State<TimelineKey> createState() => _TimelineKeyState();
+}
+
+class _TimelineKeyState extends State<TimelineKey> {
+  bool _open = false;
+
+  static const double _gap = 14;
+  static const double _labelCol = 50;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final note = timelineKeyNote(widget.lanes);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: CiSpace.screen),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: c.hairline, width: CiSpace.hairline)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: _gap),
+          CiInfoLink(
+            key: const ValueKey('timeline-key-toggle'),
+            label: 'How to read this',
+            onTap: () => setState(() => _open = !_open),
+          ),
+          const SizedBox(height: _gap),
+          if (_open)
+            Column(
+              key: const ValueKey('timeline-key-body'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final (i, lane) in widget.lanes.indexed)
+                  if (_kKeyItems[lane.label] case final items?)
+                    Padding(
+                      padding: EdgeInsets.only(top: i == 0 ? 0 : CiSpace.s2),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(width: _labelCol, child: _LabelText(lane.label)),
+                          Expanded(
+                            child: Wrap(
+                              spacing: _gap,
+                              runSpacing: 6,
+                              children: [
+                                for (final (mark, text) in items)
+                                  _KeyItem(mark: mark, text: text),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                if (note != null) ...[
+                  const SizedBox(height: _gap),
+                  Text(note,
+                      style: CiType.chipLabel.copyWith(color: c.textMuted, height: 1.4)),
+                ],
+                const SizedBox(height: _gap),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One legend entry: the mark, drawn as the track draws it, then its word.
+class _KeyItem extends StatelessWidget {
+  const _KeyItem({required this.mark, required this.text});
+
+  final _KeyMark mark;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    const size = 7.0;
+    const stroke = 1.2;
+    final drawn = switch (mark) {
+      _KeyMark.filled => Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: c.text),
+        ),
+      _KeyMark.hollow => Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: c.text, width: stroke),
+          ),
+        ),
+      _KeyMark.trip => Container(
+          width: 15,
+          height: size,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(size / 2),
+            border: Border.all(color: c.text, width: stroke),
+          ),
+        ),
+    };
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        drawn,
+        const SizedBox(width: 5),
+        Text(text, style: CiType.chipLabel.copyWith(color: c.textMuted)),
       ],
     );
   }

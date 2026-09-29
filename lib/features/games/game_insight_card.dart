@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 
 import '/courtside_iq/design/components/ci_button.dart';
+import '/courtside_iq/design/components/ci_info_link.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
@@ -130,20 +131,8 @@ class _Ready extends StatelessWidget {
         Text(text, style: CiType.body.copyWith(color: c.text, height: 1.5)),
         if (onAbout != null) ...[
           const SizedBox(height: CiSpace.s4),
-          InkWell(
-            onTap: onAbout,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.info_outline, size: 15, color: c.textMuted),
-                const SizedBox(width: 6),
-                Text(
-                  'About insights',
-                  style: CiType.caption.copyWith(color: c.textMuted),
-                ),
-              ],
-            ),
-          ),
+          // Shared with the game timeline's "How to read this".
+          CiInfoLink(label: 'About insights', onTap: onAbout),
         ],
       ],
     );
