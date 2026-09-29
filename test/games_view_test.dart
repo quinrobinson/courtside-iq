@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/metrics_config.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
 import 'package:courtside_i_q/features/players/widgets/games_view.dart';
 
@@ -30,6 +31,32 @@ GameFeedEntry _game({
     );
 
 void main() {
+  testWidgets("the profile's known age band rates each row's scoring",
+      (tester) async {
+    // 14 points on 10 shots at 11U-13U is Elite. The repository reads no band
+    // per game; the profile knows it once and GamesView applies it.
+    const game = GameFeedEntry(
+      gameId: 'g1',
+      playerName: '',
+      opponent: 'Northside Hawks',
+      points: 14,
+      rebounds: 0,
+      assists: 0,
+      steals: 0,
+      turnovers: 0,
+      fgAttempt: 10,
+    );
+
+    await tester.pumpWidget(_host(const GamesView(games: [game])));
+    expect(find.text('Scoring Efficiency'), findsNothing,
+        reason: 'no band, no scoring tier');
+
+    await tester.pumpWidget(
+        _host(const GamesView(games: [game], ageBand: AgeBand.u13)));
+    expect(find.text('Scoring Efficiency'), findsOneWidget);
+    expect(find.text('Elite'), findsOneWidget);
+  });
+
   testWidgets('the opponent carries the title, not the player name',
       (tester) async {
     // Inside one player's own profile, repeating their name on every row

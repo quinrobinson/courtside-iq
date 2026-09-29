@@ -115,6 +115,25 @@ class GameInsight {
   bool get hasText => (text ?? '').trim().isNotEmpty;
 }
 
+/// Reads `game_insights_json` ({text, highlight_metric, tier_context}).
+///
+/// Null for a row this build cannot read, or one with neither text nor a
+/// metric. Hoisted out of GameDetailRepository on 2026-09-29 so the game rows
+/// on Today, Games and the profile read the insight the same way Game Detail
+/// does, rather than each list growing its own parser.
+GameInsight? parseGameInsight(Object? raw) {
+  if (raw is! Map) return null;
+  final text = raw['text'] as String?;
+  final metric = raw['highlight_metric'] as String?;
+  final tier = raw['tier_context'] as String?;
+  if (text == null && metric == null) return null;
+  return GameInsight(
+    text: text,
+    highlightMetric: metric,
+    storedTier: tier,
+  );
+}
+
 /// One rated row in the Development section.
 class DevelopmentRow {
   const DevelopmentRow({

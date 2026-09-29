@@ -68,7 +68,7 @@ class GameDetailRepository {
       steals: _int(r['steal']),
       blocks: _int(r['block']),
       turnovers: _int(r['turnover']),
-      insight: _insight(r['game_insights_json']),
+      insight: parseGameInsight(r['game_insights_json']),
       events: events,
     );
   }
@@ -149,18 +149,5 @@ StatEvent? _event(Map<String, dynamic> r) {
     status: r['status'] == 'confirmed'
         ? StatEventStatus.confirmed
         : StatEventStatus.voided,
-  );
-}
-
-GameInsight? _insight(Object? raw) {
-  if (raw is! Map) return null;
-  final text = raw['text'] as String?;
-  final metric = raw['highlight_metric'] as String?;
-  final tier = raw['tier_context'] as String?;
-  if (text == null && metric == null) return null;
-  return GameInsight(
-    text: text,
-    highlightMetric: metric,
-    storedTier: tier,
   );
 }

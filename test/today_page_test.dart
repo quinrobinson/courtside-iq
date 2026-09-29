@@ -6,6 +6,9 @@ import 'package:courtside_i_q/courtside_iq/live_game.dart';
 import 'package:courtside_i_q/features/games/live_game_store.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
+import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
+import 'package:courtside_i_q/courtside_iq/game_detail_builder.dart';
+import 'package:courtside_i_q/courtside_iq/metrics_config.dart';
 import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
 import 'package:courtside_i_q/features/home/today_repository.dart';
 import 'package:courtside_i_q/features/home/entitlement_status.dart';
@@ -78,7 +81,54 @@ void main() {
           home: Scaffold(body: GameFeedRow(entry: e)),
         ));
 
-    testWidgets('shows all five stat columns', (tester) async {
+    // LIVE rows keep the five-stat grid: the game is still moving and nothing
+    // is rated yet.
+    testWidgets('a live row shows all five stat columns', (tester) async {
+      await pump(
+        tester,
+        const GameFeedEntry(
+          gameId: 'live',
+          playerName: 'Maya Chen',
+          points: 22,
+          rebounds: 7,
+          assists: 5,
+          steals: 3,
+          turnovers: 2,
+          isLive: true,
+        ),
+      );
+      for (final label in ['PTS', 'REB', 'AST', 'STL', 'TO']) {
+        expect(find.text(label), findsOneWidget);
+      }
+      expect(find.text('22'), findsOneWidget);
+      expect(find.text('7'), findsOneWidget);
+      expect(find.text('LIVE'), findsOneWidget);
+    });
+
+    testWidgets('a live row renders a zero stat rather than hiding it',
+        (tester) async {
+      // Mid-game, a zero is a real running count.
+      await pump(
+        tester,
+        const GameFeedEntry(
+          gameId: 'live',
+          playerName: 'Maya Chen',
+          points: 0,
+          rebounds: 0,
+          assists: 0,
+          steals: 0,
+          turnovers: 0,
+          isLive: true,
+        ),
+      );
+      expect(find.text('0'), findsNWidgets(5));
+    });
+
+    // SAVED rows say what the game meant (2026-09-29).
+    const lead = ValueKey('game-row-lead');
+
+    testWidgets('saved game with an insight: its first sentence and the spark',
+        (tester) async {
       await pump(
         tester,
         const GameFeedEntry(
@@ -89,31 +139,92 @@ void main() {
           assists: 5,
           steals: 3,
           turnovers: 2,
+          fgAttempt: 15,
+          insight: GameInsight(
+              text: 'Maya attacked the rim all night. Her free throws lagged.'),
         ),
       );
-      for (final label in ['PTS', 'REB', 'AST', 'STL', 'TO']) {
-        expect(find.text(label), findsOneWidget);
+      expect(find.text('Maya attacked the rim all night.'), findsOneWidget);
+      expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
+      expect(find.descendant(of: find.byKey(lead), matching: find.text('22')),
+          findsOneWidget);
+      expect(find.text('PTS'), findsOneWidget);
+      // The box score is gone.
+      for (final label in ['REB', 'AST', 'STL', 'TO']) {
+        expect(find.text(label), findsNothing);
       }
-      expect(find.text('22'), findsOneWidget);
-      expect(find.text('7'), findsOneWidget);
     });
 
-    testWidgets('renders a zero stat rather than hiding it', (tester) async {
-      // A zero here is a real result from a real game, unlike a missing
-      // average with no games behind it.
+    testWidgets('saved game with a rating: the Game Detail chip and skill',
+        (tester) async {
       await pump(
         tester,
         const GameFeedEntry(
           gameId: 'g1',
           playerName: 'Maya Chen',
+          points: 14,
+          rebounds: 0,
+          assists: 0,
+          steals: 0,
+          turnovers: 0,
+          fgAttempt: 10,
+          ageBand: AgeBand.u13,
+        ),
+      );
+      final chip = tester.widget<CiBadge>(find.byType(CiBadge));
+      expect(chip.label, 'Elite');
+      expect(chip.tone, CiBadgeTone.good);
+      expect(find.text('Scoring Efficiency'), findsOneWidget);
+      expect(find.byIcon(Icons.auto_awesome), findsNothing);
+    });
+
+    testWidgets('saved game with neither: the standout counts in words',
+        (tester) async {
+      await pump(
+        tester,
+        const GameFeedEntry(
+          gameId: 'g1',
+          playerName: 'Maya Chen',
+          points: 2,
+          // Two defensive rebounds are a disruption of 1, under the gate, and
+          // 3 attempts are under the efficiency minimum: nothing rates.
+          rebounds: 2,
+          assists: 1,
+          steals: 0,
+          turnovers: 1,
+          fgAttempt: 3,
+        ),
+      );
+      expect(find.text('2 rebounds, 1 assist'), findsOneWidget);
+      expect(find.byType(CiBadge), findsNothing);
+      expect(find.byIcon(Icons.auto_awesome), findsNothing);
+      expect(find.descendant(of: find.byKey(lead), matching: find.text('2')),
+          findsOneWidget);
+    });
+
+    testWidgets('a zero-performance game draws nothing, not a zero',
+        (tester) async {
+      await pump(
+        tester,
+        const GameFeedEntry(
+          gameId: 'g1',
+          playerName: 'Maya Chen',
+          opponent: 'Hawks',
           points: 0,
           rebounds: 0,
           assists: 0,
           steals: 0,
           turnovers: 0,
+          insight: GameInsight(text: 'Tough night.'),
         ),
       );
-      expect(find.text('0'), findsNWidgets(5));
+      expect(find.byKey(lead), findsNothing);
+      expect(find.text('0'), findsNothing);
+      expect(find.text('Tough night.'), findsNothing);
+      expect(find.byType(CiBadge), findsNothing);
+      // The row itself still renders: name and opponent.
+      expect(find.text('Maya Chen'), findsOneWidget);
+      expect(find.text('vs Hawks'), findsOneWidget);
     });
   });
 

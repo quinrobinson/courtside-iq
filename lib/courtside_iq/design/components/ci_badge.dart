@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../game_metrics.dart';
 import '../../growth_iq.dart';
 import '../tokens/ci_colors.dart';
 import '../tokens/ci_metrics.dart';
@@ -117,6 +118,21 @@ class CiBadge extends StatelessWidget {
           : CiBadgeTone.neutral,
     );
   }
+
+  /// A game tier tag: "Elite", "Good", "Solid".
+  ///
+  /// Elite is the only tier that takes the accent. Good and Solid are both
+  /// fine outcomes, and painting all three lime would make the colour mean
+  /// "rated" rather than "excellent".
+  ///
+  /// Lifted out of Game Detail's development rows on 2026-09-29 so the game
+  /// rows on Today, Games and the profile draw the SAME chip as the screen
+  /// they open, rather than a lookalike.
+  factory CiBadge.tier({Key? key, required GameTier tier}) => CiBadge(
+        key: key,
+        label: tier.label,
+        tone: tier == GameTier.elite ? CiBadgeTone.good : CiBadgeTone.neutral,
+      );
 
   /// "LIVE" — a game being tracked right now.
   ///

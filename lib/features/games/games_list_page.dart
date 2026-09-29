@@ -307,6 +307,12 @@ class _GamesListPageState extends State<GamesListPage> {
                                       steals: g.steals,
                                       turnovers: g.turnovers,
                                       isLive: g.isLive,
+                                      blocks: g.blocks,
+                                      offRebounds: g.offRebounds,
+                                      fgAttempt: g.fgAttempt,
+                                      ftAttempt: g.ftAttempt,
+                                      insight: g.insight,
+                                      ageBand: g.ageBand,
                                     ),
                                     onTap: () => context.pushNamed(
                                       GameStatsWidget.routeName,
