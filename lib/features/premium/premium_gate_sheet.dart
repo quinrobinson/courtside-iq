@@ -64,7 +64,7 @@ class _PremiumGateSheet extends StatelessWidget {
             children: [
               const CiSheetHandle(),
               const SizedBox(height: CiSpace.s5),
-              const CiLogoMark(size: 30),
+              const CiLogoMark(size: 64),
               const SizedBox(height: CiSpace.s5),
               Text('A Premium feature',
                   style: CiType.h3.copyWith(
