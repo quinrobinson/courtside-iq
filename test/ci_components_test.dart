@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:courtside_i_q/courtside_iq/game_metrics.dart';
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
@@ -89,6 +90,20 @@ void main() {
       );
       expect(tester.getSize(find.byType(CiBadge)).width, lessThan(120));
     });
+  });
+
+  group('CiBadge.tier matches the Figma tier chips (2026-09-29)', () {
+    for (final (tier, tone) in [
+      (GameTier.elite, CiBadgeTone.good),
+      (GameTier.good, CiBadgeTone.goodWash),
+      (GameTier.solid, CiBadgeTone.neutral),
+    ]) {
+      testWidgets('\${tier.label} is \${tone.name}', (tester) async {
+        await _pump(tester, CiBadge.tier(tier: tier));
+        expect(tester.widget<CiBadge>(find.byType(CiBadge)).tone, tone);
+        expect(find.text(tier.label), findsOneWidget);
+      });
+    }
   });
 
   group('CiBadge.delta colours only an improvement', () {
