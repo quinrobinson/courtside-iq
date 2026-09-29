@@ -86,15 +86,29 @@ void main() {
       r'cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="#9DFF00" '
       r'fill-opacity="([\d.]+)"',
     ).allMatches(svg).toList();
-    expect(circles, hasLength(kMarkDots.length));
-    const k = 1024 / kMarkIconBox;
-    for (var i = 0; i < kMarkDots.length; i++) {
-      final d = kMarkDots[i], m = circles[i];
-      expect(double.parse(m.group(1)!), closeTo(d.x * k, 0.01));
-      expect(double.parse(m.group(2)!), closeTo(d.y * k, 0.01));
-      expect(double.parse(m.group(3)!), closeTo(d.r * k, 0.01));
+    final dots = iconDots(kIconPlacementSquare, canvas: 1024);
+    expect(circles, hasLength(dots.length));
+    for (var i = 0; i < dots.length; i++) {
+      final d = dots[i], m = circles[i];
+      expect(double.parse(m.group(1)!), closeTo(d.x, 0.01));
+      expect(double.parse(m.group(2)!), closeTo(d.y, 0.01));
+      expect(double.parse(m.group(3)!), closeTo(d.r, 0.01));
       expect(double.parse(m.group(4)!), closeTo(d.opacity, 0.001));
     }
+  });
+
+  test('icons place the mark at 70%, circle further left than square', () {
+    // Quin placed these by hand (Figma 1101:974): the C's opening leaves a
+    // box-centred mark visibly right of centre, most in a circle mask.
+    for (final p in [kIconPlacementSquare, kIconPlacementCircle]) {
+      final dots = iconDots(p, canvas: 1000);
+      final l = dots.map((d) => d.x - d.r).reduce(min);
+      final r = dots.map((d) => d.x + d.r).reduce(max);
+      final t = dots.map((d) => d.y - d.r).reduce(min);
+      final b = dots.map((d) => d.y + d.r).reduce(max);
+      expect(max(r - l, b - t), closeTo(700, 0.5));
+    }
+    expect(kIconPlacementCircle.dx, lessThan(kIconPlacementSquare.dx));
   });
 
   testWidgets('keeps its box at every size it is used at', (tester) async {

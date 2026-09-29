@@ -78,3 +78,47 @@ const List<MarkDot> kMarkDots = [
     side: side,
   );
 }
+
+/// How the mark sits inside an app icon (Quin, 2026-09-28, placed by hand in
+/// Figma section 1101:974, row 70%, dead-centre column).
+///
+/// The mark's box fills [fill] of the visible icon shape, and its centre sits
+/// [dx] / [dy] away from the shape's centre, as fractions of that shape's
+/// width (negative = left / up). The square and the circle differ because the
+/// C is two concentric rings with an opening on the right: centring its BOX
+/// leaves the rings visibly right of centre, most of all inside a circle mask,
+/// where the rings should read concentric with the mask.
+class IconPlacement {
+  const IconPlacement({required this.fill, required this.dx, required this.dy});
+  final double fill;
+  final double dx;
+  final double dy;
+}
+
+/// iOS, the Play Store listing icon, legacy Android and web: a square.
+const kIconPlacementSquare = IconPlacement(fill: 0.70, dx: -0.0111, dy: -0.0040);
+
+/// Android adaptive launcher icon: the launcher shows a circle (or squircle)
+/// cut from the middle 72dp of a 108dp layer.
+const kIconPlacementCircle = IconPlacement(fill: 0.70, dx: -0.0278, dy: -0.0040);
+
+/// The dots placed in an icon: [canvas] is the layer's size and [shape] the
+/// size of the visible shape centred in it (equal for iOS; 72/108 of the
+/// canvas for an Android adaptive layer). Radii and opacities carry over.
+List<MarkDot> iconDots(IconPlacement p, {required double canvas, double? shape}) {
+  final visible = shape ?? canvas;
+  final b = markBounds();
+  final side = visible * p.fill;
+  final k = side / b.side;
+  final left = canvas / 2 + p.dx * visible - side / 2;
+  final top = canvas / 2 + p.dy * visible - side / 2;
+  return [
+    for (final d in kMarkDots)
+      MarkDot(
+        left + (d.x - b.left) * k,
+        top + (d.y - b.top) * k,
+        d.r * k,
+        d.opacity,
+      ),
+  ];
+}
