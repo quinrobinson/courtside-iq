@@ -7,6 +7,12 @@
 // Rebounding, Playmaking, Defense - each a grid of centred tiles carrying a
 // value, a label, and a supporting count.
 //
+// Scoring is six tiles, two full rows of three: Points, Pts / shot, then the
+// shooting split Field goal, 2-point, 3-point, Free throw. It was five, which
+// left an empty sixth cell that read as a missing stat (Quin, 2026-09-29).
+// Efficiency sits beside Points because together they answer "how much, and
+// how well"; the percentages follow as one run.
+//
 // Pure Dart. The rate metrics (PPSA, AST/TOV, disruption) come from
 // game_metrics.dart rather than being recomputed here, because that file is
 // the mirror of the TypeScript the AI insights use. A breakdown that computed
@@ -85,6 +91,9 @@ List<BreakdownSection> buildBreakdown(
   final fgAtt = sum((r) => r.fgAttempt);
   final tpMade = sum((r) => r.threeMade);
   final tpAtt = sum((r) => r.threeAttempt);
+  // Twos are not stored; they are field goals that were not threes.
+  final twoMade = fgMade - tpMade;
+  final twoAtt = fgAtt - tpAtt;
   final ftMade = sum((r) => r.ftMade);
   final ftAtt = sum((r) => r.ftAttempt);
   final oreb = sum((r) => r.offReb);
@@ -131,9 +140,21 @@ List<BreakdownSection> buildBreakdown(
         sub: '$points total',
       ),
       BreakdownTile(
+        // Below the attempt minimum a single lucky basket reads as elite
+        // efficiency, so the tile shows nothing rather than a flattering lie.
+        value: ppsaQualified ? ppsaValue.toStringAsFixed(2) : null,
+        label: 'Pts / shot',
+        sub: 'efficiency',
+      ),
+      BreakdownTile(
         value: pct(fgMade, fgAtt),
         label: 'Field goal',
         sub: '$fgMade of $fgAtt',
+      ),
+      BreakdownTile(
+        value: pct(twoMade, twoAtt),
+        label: '2-point',
+        sub: '$twoMade of $twoAtt',
       ),
       BreakdownTile(
         value: pct(tpMade, tpAtt),
@@ -144,13 +165,6 @@ List<BreakdownSection> buildBreakdown(
         value: pct(ftMade, ftAtt),
         label: 'Free throw',
         sub: '$ftMade of $ftAtt',
-      ),
-      BreakdownTile(
-        // Below the attempt minimum a single lucky basket reads as elite
-        // efficiency, so the tile shows nothing rather than a flattering lie.
-        value: ppsaQualified ? ppsaValue.toStringAsFixed(2) : null,
-        label: 'Pts / shot',
-        sub: 'efficiency',
       ),
     ]),
     BreakdownSection(title: 'Rebounding', tiles: [

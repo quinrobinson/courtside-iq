@@ -73,6 +73,37 @@ void main() {
     expect(_tile(s, '3-point').sub, '0 of 0');
   });
 
+  test('Scoring is six tiles in the approved order, filling two rows', () {
+    final s = buildBreakdown([_g(points: 10)], BreakdownWindow.season);
+    expect([for (final t in s.first.tiles) t.label], [
+      'Points',
+      'Pts / shot',
+      'Field goal',
+      '2-point',
+      '3-point',
+      'Free throw',
+    ]);
+  });
+
+  test('2-point is field goals that were not threes', () {
+    // 7 of 15 from the field, 2 of 6 from three -> 5 of 9 inside the arc.
+    final s = buildBreakdown([
+      _g(fgMade: 4, fgAttempt: 8, threeMade: 1, threeAttempt: 3),
+      _g(fgMade: 3, fgAttempt: 7, threeMade: 1, threeAttempt: 3),
+    ], BreakdownWindow.season);
+    expect(_tile(s, '2-point').value, '56%');
+    expect(_tile(s, '2-point').sub, '5 of 9');
+  });
+
+  test('no 2-point attempts shows nothing, not 0%', () {
+    // Every field goal attempt was a three.
+    final s = buildBreakdown(
+        [_g(fgMade: 1, fgAttempt: 4, threeMade: 1, threeAttempt: 4)],
+        BreakdownWindow.season);
+    expect(_tile(s, '2-point').value, isNull);
+    expect(_tile(s, '2-point').sub, '0 of 0');
+  });
+
   test('efficiency is withheld below the attempt minimum', () {
     // One attempt, one make. Without the gate this reads as elite.
     final thin = buildBreakdown([_g(points: 2, fgMade: 1, fgAttempt: 1)],

@@ -199,8 +199,9 @@ class _Grid extends StatelessWidget {
                   if (i > 0)
                     Container(width: CiSpace.hairline, color: c.hairline),
                   // A partial row still occupies every column, so its seams
-                  // land on the same boundaries as the rows above. Scoring has
-                  // five tiles, so the last row is always partial.
+                  // land on the same boundaries as the rows above. Every
+                  // section now fills its rows (Scoring became six tiles on
+                  // 2026-09-29), but the guard stays for any future section.
                   Expanded(
                     child: i < rows[r].length
                         ? _Tile(tile: rows[r][i])
