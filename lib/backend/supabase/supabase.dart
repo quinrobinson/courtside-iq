@@ -4,12 +4,23 @@ import '/flutter_flow/flutter_flow_util.dart';
 export 'database/database.dart';
 export 'storage/storage.dart';
 
-// TEMPORARY dev flag: while Phase 1.x schema work is in progress, dev builds
-// target a separate test Supabase project so in-progress changes don't touch
-// the live App Store / Play Store app. Flip to `false` before submitting to
-// the app stores. Using an explicit const (not kDebugMode) so `--release`
-// local builds also hit test.
-const bool _kUseTestSupabase = false;
+// TEMPORARY dev flag: dev builds target a separate test Supabase project so
+// in-progress changes don't touch the live App Store / Play Store app. Using an
+// explicit const (not kDebugMode) so `--release` local builds also hit test.
+//
+// ============================================================================
+//  TRUE ON THIS BRANCH ONLY (gate-1-tracker-events). MUST BE FALSE TO SHIP.
+// ============================================================================
+//
+// Flipped 2026-09-15 for the G1.10 tracker dual-write. That work makes EVERY
+// TAP A SAVED PLAY, so pointed at prod a development session writes fake
+// events into real families' games - 256 players, 397 games, 7 paying
+// subscribers - interleaved with their real ones and with no clean way back
+// out. The schema risk is nil; the data-pollution risk is not.
+//
+// 4.22 set this to `false` to cut 2.0.0. It goes back to `false` before this
+// branch merges anywhere that ships.
+const bool _kUseTestSupabase = true;
 
 const _kProdSupabaseUrl = 'https://ejwgxsszmfabujdqxxdz.supabase.co';
 const _kProdSupabaseAnonKey =

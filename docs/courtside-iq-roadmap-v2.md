@@ -376,6 +376,12 @@ Return JSON with this exact shape:
 - Keep Buildship code for one release as rollback safety.
 - Remove Buildship code and cancel subscription after two clean weeks on Edge Functions.
 
+**Missed in the cutover (found 2026-09-27):** the client code was removed, but two Supabase
+database webhooks on `player_game_stats` kept POSTing every inserted stat row to
+`nni3ua.buildship.run` on test and prod. Dropped in `20260927000100_drop_buildship_webhooks.sql`:
+- [x] Built (migration) - [x] Applied + probe-verified on TEST - [x] Applied + probe-verified on PROD 2026-09-27
+- [ ] Buildship workspace checked for retained payloads, then deleted (user, in Buildship)
+
 **Design implication:** None during parallel run. If quality regresses, iterate the prompt before flipping the flag.
 
 ---
@@ -617,9 +623,26 @@ Items worth doing but not essential for Phase 1 + 2 ship.
 
 Add `seasons` table with user-defined date ranges. Profile gets a season filter.
 
-### 3.2 Event-level pattern analysis
+### 3.2 Event-level pattern analysis — ACTIVE TRACK
 
-`game_events` table enables richer narratives ("most assists come in transition") if data is captured.
+**This item is now expanded into its own plan: `docs/video-and-events-plan.md`
+(gates and task IDs). Detail spec: `docs/event-model-spec.md`.** Read both
+before touching stats, schema, or the tracker.
+
+`stat_events` is 3.2's actual shape, and video is what 3.2 makes possible.
+The plan tracks work in **gates**, not phases, deliberately: three documents in
+this repo already use overlapping phase numbers.
+
+**The original wording below was wrong about its own schema**, which is worth
+keeping visible rather than quietly correcting:
+
+> `game_events` table enables richer narratives ("most assists come in
+> transition") if data is captured.
+
+`game_events` is the TOURNAMENT record (`event_name`, `event_type`, `user_id`,
+`player_id`). It has no game reference and no stat column, so it can never hold
+per-play data. The new per-play table is **`stat_events`**. In this codebase
+*event* means tournament and *stat event* means a single observed play.
 
 ### 3.3 Consistency metric
 
@@ -628,6 +651,22 @@ Stability score — standard deviation of PPSA across window, or percentage of g
 ### 3.4 Positional context in prompts
 
 Feed position into prompts: "Strong rebounding for a guard."
+
+### 3.5 Stats & Trends screen — DESIGNED, NOT BUILT (post-2.0.0)
+
+**Deferred out of 2.0.0 on 2026-07-25.** The screen is fully designed - Figma
+`307:1407`: a dotted trend-over-time chart (interpolated ink dots, last point
+lime) plus "development by skill" tier rows - and `AveragesView` already takes
+an `onViewTrends` callback and renders a "View trends" button when it is
+non-null. It is passed null today, so the button is hidden, because the
+destination screen was never built in Flutter (scoped out of 4.11).
+
+To ship it: build the Stats & Trends page in `lib/features/players/`, route to
+it, and pass `onViewTrends` through `PlayerProfilePage` alongside the existing
+`onFullBreakdown`. Reached from the Averages tab, keeps the nav bar (a
+player-context screen). Full Breakdown covers the detailed-stats need until
+then, which is why this is additive rather than blocking. The 4.18 checklist
+notes it as unbuilt so it is not mistaken for a regression.
 
 ### 3.5 Foul-as-availability signal
 
@@ -697,3 +736,1905 @@ Natural first pull request:
 - PPSA edge case fix
 
 That's a cohesive foundation PR that doesn't ship any user-facing change yet but unblocks everything else.
+
+---
+
+# 2.0 Rebuild — new UI + Growth IQ (items 4.x)
+
+**Renamed from "Phase 4" on 2026-09-13.** Three documents in this repo used
+overlapping phase numbers and it cost real confusion: this roadmap's feature
+phases 0-3, `docs/overhaul-plan.md`'s design-system phases 0-7 (its Phase 4 is
+spacing migration), and this workstream.
+
+**The item NUMBERS are unchanged and will not change.** 157 files across `lib/`
+and `test/` carry `Phase 4.x` in their headers as provenance markers - `Phase
+4.11d` alone appears 16 times - so renumbering would orphan all of them for no
+gain. Only the word "Phase" is dropped. `4.11d` still means `4.11d`; it is now
+an item of the 2.0 Rebuild rather than a phase of the feature roadmap.
+
+Shipped as **2.0.0**.
+
+**Release strategy:** built incrementally behind flags, shipped publicly as a single **version 2.0.0**. Each sub-phase merges to `main` on its own PR and is safe to sit unreleased; nothing user-visible turns on until 4E flips the flags.
+
+**Design source of truth:** Figma `uvHb6HXvIVFwzSSXPtEVoc` (Screens page, organized as flow sections). Product decisions are locked in memory `product-decisions-2-0`. No screen gets built before its frame is approved.
+
+**Definition of Done — every item carries all three:**
+`[ ] built` · `[ ] wired` (reachable from a real call site) · `[ ] device-verified` (`fvm flutter run --release`)
+
+**Environment rule for the whole phase:** all work targets **test** (`yihmccmyijtyrffpzstb`). `_kUseTestSupabase = true` on every 2.0 branch. Prod is read-only until 4E.
+
+**Standing design rule for the whole phase:** if we reach a screen, state, or dialog that has no approved 2.0 Figma frame, **stop coding**. Design it in Figma on the Screens page (placed in its flow section, wired with a connector from its entry point), review it, get approval, and only then implement. No UI gets improvised at the keyboard, and no v1 screen gets carried forward "temporarily" because a 2.0 frame is missing.
+
+**End state:** by 4E there are **no v1 screens left**. `lib/pages/` is deleted, not deprecated. A 2.0 release that still routes to a FlutterFlow dialog is not done.
+
+---
+
+## 4.0 — Screen coverage audit (runs first)
+
+### 4.0 Reconcile every v1 screen and state against Figma
+
+**Problem:** v1 has 35 screen/component directories under `lib/pages/`. The 2.0 Figma file covers the main journeys well, but edge cases (password reset, rate prompt, feedback, snackbars, informational dialogs, permission-denied, offline, expired states) may have no frame. Discovering a missing frame mid-build stalls that PR and invites improvised UI.
+
+**Action:**
+- Enumerate every v1 route in `lib/pages/` **and every reachable state within it** — empty, loading, error, offline, permission-denied, expired, first-run, below-threshold.
+- Map each to a Figma frame on the 2.0 Screens page.
+- Classify each: **designed** (frame exists + approved) / **needs design** (gap) / **deliberately cut** (e.g. App Appearance, per prior decision).
+- Commit the result as `docs/2-0-screen-coverage.md` — a living checklist, updated as gaps close.
+- Everything marked *needs design* becomes a Figma backlog worked **before** its 4C screen PR starts.
+
+**Known candidates for *needs design*** (to confirm, not assume): `forgot_password`, `reset_password`, `reset_succesful`, `alert_rate`, `send_feedback`, `custom_snack_bar`, `informational_dialog`, `empty_states`, `menu_list_empty_state`, `support`, `your_profile`, `user_account`, `edit_player_position`, `edit_live_game`.
+
+**Design implication:** Turns edge-case risk into a known, sized backlog at the start of the phase instead of a series of mid-PR surprises. This is the item that protects the 4C schedule.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## 4A — Foundations (no user-visible change)
+
+Everything in 4A is invisible to users and unblocks everything after it. This is the natural first PR set.
+
+### 4.1 Growth IQ into config
+
+**Decision:** 70% age-normalized ability + 30% improvement, on a 40–99 display scale. Ability = equal thirds of PPSA, AST/TOV, Disruption. Improvement = last-5 vs prior window; supplies the Building/Steady/Rising qualifier and the delta. Locked until 5 games. Never a rank or percentile.
+
+**Action:**
+- Extend `lib/courtside_iq/metrics_config.dart` with Growth IQ weights, band normalization, scale floor/ceiling, and the 5-game lock.
+- Mirror in `supabase/functions/_shared/metrics_config.ts`. Client and server must not drift.
+- Pure Dart function `growthIq(...)` in `lib/courtside_iq/` with unit tests covering: below-threshold, floor clamp, decline lowers score, age-band change freeze.
+- Age-band transition: freeze earned ratings for display, normalize trend series underneath.
+
+**Design implication:** DotGauge renders this directly. Every 2.0 screen showing a number depends on it.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.2 AI usage telemetry
+
+**Problem:** AI cost is currently estimated, not measured. Model and throttle decisions need evidence.
+
+**Action:**
+- `ai_usage` table, service-role only (RLS on, no policies). FKs `on delete set null` so cost history survives record deletion.
+- `_shared/ai_usage.ts` writer; failures swallowed so telemetry can never break insight generation.
+- Log from both Edge Functions, success and failure paths.
+- Rollup queries: spend per user per month, per game, per model.
+- Set a spend cap in the Anthropic console.
+
+**Design implication:** None user-facing. Enables the model-tier decisions in 4.3.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.3 Per-user AI throttle
+
+**Action:** Cap generations per user per day in both Edge Functions. Set the limit from one week of real 4.2 data, not a guess. Costs don't explode from growth, they explode from retry loops.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.4 Server-side entitlement
+
+**Problem:** premium currently trusts client state. A bug once gave everyone free premium.
+
+**Action:**
+- RevenueCat webhook → Edge Function → `subscriptions` table. Server becomes source of truth.
+- Enforce free-tier limits (1 player / 3 games) in **RLS**, not UI.
+- Distinguish billing-issue from expired (the lapsed states are already designed).
+- Pull prices from RevenueCat Offerings instead of the hardcoded $5.99/$1.99.
+
+**Design implication:** Makes the Lapsed and Locked screens truthful rather than cosmetic.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.5 Offline-first live tracking
+
+**Problem:** gyms have poor or no wifi; live tracking must not lose a game.
+
+**Action:**
+- Client-generated UUIDs + upsert so retries can't duplicate.
+- Hive outbox queue; flush on reconnect.
+- Add `connectivity_plus` (**new dependency — flag before adding**).
+- Visible sync state in the tracker UI (designed: "offline scoring + deferred sync").
+
+**Design implication:** Removes the single biggest failure mode in the core loop.
+
+`[x] built` · `[x] wired` · `[x] device-verified` — **DONE 2026-07-19** (commit `9342dc1`)
+
+**Scope was narrower than this item assumed.** Live tracking was ALREADY safe: every stat setter
+writes through to `FlutterSecureStorage`, so a crash or dead battery mid-game loses nothing. The
+real gap was only the final save, which fired two inserts with no retry.
+
+Verified on device: tracked a game, airplane mode on, saved (reported success), airplane mode off,
+game synced unattended. Database confirmed exactly one game row and one stats row.
+
+**CARRY-OVER GAP for 4.13 / 4.14 - CLOSED 2026-07-22.** A game queued offline never received its AI
+insight: generation needs a server row so it was skipped while offline, and the later sync uploaded
+the rows without triggering it. `uploadPendingGame` now requests the insight, which covers both an
+immediate save and a flush days later because both come through there. Failure to generate never
+fails the upload.
+
+**Still unbuilt: the UI surface.** The "Offline Scoring + Deferred Sync" frame exists in Figma but
+was drawn for the 2.0 tracker, so it was deliberately not retrofitted onto the FlutterFlow screen.
+`gameSyncQueue.pendingCount` streams the queue depth for whatever renders it in 4C.
+
+### 4.6 Migration hygiene
+
+**Problem:** `players`, `games`, `player_game_stats` were created outside migrations, so there is no from-scratch reproducible schema. Test also carries two migrations absent from the repo (`revert_player_profile_view_age_band`, a duplicate `add_birth_date_to_player_profile_view`).
+
+**Action:**
+- Dump prod schema (structure only) → commit as `20260101000000_baseline_schema.sql`.
+- Reconcile the two test-only migrations into the repo.
+- Verify a blank project can be stood up from `supabase/migrations/` alone.
+
+**Design implication:** None. Prerequisite for trusting the 4E prod promotion.
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.6b Flutter / Dart SDK upgrade
+
+**Problem:** the project is pinned to Flutter 3.35.0 / Dart 3.9.0 (Aug 2025). Current stable is
+**Flutter 3.44.6 / Dart 3.12.2** (2026-07-09) — nine minor versions and ~11 months behind. The
+original reason for the pin was FlutterFlow regenerating `pubspec.yaml`; **FlutterFlow is retired,
+so that constraint is gone.**
+
+**Why before 4B/4C, not after:** those phases write thousands of lines of new UI. Building them on
+3.9 and upgrading later means verifying every 2.0 screen twice. Upgrade once, then build on the SDK
+we actually ship. Shipping a 2.0.0 major release on an 11-month-old SDK is also a poor combination
+as app store minimum requirements move.
+
+**Action** (validated by the spike below — follow in order):
+- Confirm the target stable at upgrade time (it moves; 3.44.6 as of 2026-07-18).
+- `.fvmrc` → target version; `pubspec.yaml` sdk constraint `>=3.0.0 <4.0.0` → `>=3.9.0 <4.0.0`.
+- Bump `font_awesome_flutter` to `^11.0.0` and `page_transition` to `^2.2.1` **in both**
+  `pubspec.yaml` and `dependencies/lock_orientation_library_opafp4/pubspec.yaml`.
+- Fix the three `FaIconData` call sites listed below.
+- `flutter analyze` clean, `flutter test` green, full device pass on iOS + Android in `--release`.
+
+### Spike results (2026-07-18, throwaway worktree on 3.44.6 / Dart 3.12.2)
+
+Measured, not estimated. **The upgrade is small — roughly half a day including a device pass.**
+
+| Check | Result |
+|---|---|
+| `flutter pub get` | ✅ resolved, zero version conflicts |
+| `flutter analyze` | ✅ **0 errors** — 993 warnings, 2311 infos, none blocking |
+| Compile | ❌ 3 call-site errors, all downstream of two package bumps |
+
+**Two packages block it:**
+
+1. `font_awesome_flutter` **10.7.0 → ^11.0.0**. It extends `IconData`, now a `final class`.
+   10.12 is NOT enough; the 11.x major is required.
+2. `page_transition` **2.1.0 → ^2.2.1**. References the removed `CupertinoPageTransitionsBuilder`
+   constructor.
+
+**The font_awesome 11 bump changes `FaIcon` to take `FaIconData` instead of `IconData`**, which
+cascades into exactly three call sites:
+
+- `lib/flutter_flow/flutter_flow_widgets.dart:215`
+- `lib/flutter_flow/flutter_flow_icon_button.dart:67`
+- `dependencies/lock_orientation_library_opafp4/lib/flutter_flow/flutter_flow_widgets.dart:215`
+
+**GOTCHA — the vendored package must be bumped in lockstep.** `dependencies/lock_orientation_library_opafp4/pubspec.yaml`
+mirrors the app's dependency pins. Bumping only the root `pubspec.yaml` fails resolution with a
+misleading `"... from path is forbidden"` error. Every version bump goes in **both** files.
+
+**Not verified by the spike:** no full iOS/Android release build, and the app was never launched on
+a device. Compile-clean is not runs-correctly, especially for the FlutterFlow UI layer.
+
+**ORDERING DECISION — RESOLVED: keep the plan order, do NOT pull 4.24 forward.** The concern was
+that the cascade would land in `lib/pages/` (doomed code). It largely does for *warnings* — 865 of
+993, and 731 of those are just unused imports — but warnings do not block a build. The only three
+hard errors are in `lib/flutter_flow/`, and patching three call sites in soon-to-be-deleted files
+is a trivial cost, not grounds for reshuffling the phase.
+
+`[x] built` · `[x] wired` · `[x] device-verified` — **DONE 2026-07-19** (commit `695f52a`)
+
+**Outcome matched the spike.** Two package bumps, three call sites, ~half a day. `flutter analyze`
+clean, 16 Growth IQ tests pass, `--release` device run on iPhone with no visible regressions.
+
+**Unplanned side effect worth carrying forward: the iOS build migrated to Swift Package Manager.**
+Flutter 3.44 did this automatically on the first device run - `Podfile.lock` lost 177 lines and two
+`Package.resolved` files appeared (now committed; they pin SPM versions). The build is now hybrid:
+`app_links`, `flutter_native_splash`, `share_plus`, `sign_in_with_apple` and `sqflite` have no SPM
+support and stay on CocoaPods, which Flutter warns will eventually become an error. **Relevant to
+4.22** - the local release pipeline assembles the iOS app differently now than it did for 1.4.0.
+
+**Known-failing test, NOT caused by this:** `test/widget_test.dart` fails on both 3.35.0 and 3.44.6
+(verified in a worktree at the pre-upgrade commit). It is the default scaffold test pumping
+`MyApp()` without initializing Supabase. Delete or fix it - a permanently-red test trains everyone
+to ignore test output.
+
+> Numbered `4.6b` rather than renumbering 4.7-4.24. The cascade of edits that would cause across an
+> already-reviewed document is a worse trade than one irregular label.
+
+---
+
+## 4B — Design system in code
+
+### 4.7 Tokens and primitives
+Colors (ink/white, lime/orange), Hanken Grotesk type scale, radius scale (chip 6 / control 10 / sheet 14 / dialog 18 / pill 999), spacing. Ported from Figma variables.
+`[x] built` · `[ ] wired` · `[x] device-verified`
+
+### 4.8 Shared components
+DotGauge, DotBurst, Chip (filter), underline TabBar (navigation), Avatar, stat grid with vertical seams, edge-to-edge hairline, delta chip (direction-aware by meaning), Field, pill button.
+**Rules:** chips are filters, tabs are navigation; hairlines always full-bleed; content on lime or orange is always ink.
+`[x] built` · `[ ] wired` · `[x] device-verified`
+
+**`wired` stays unchecked deliberately.** Every component here is device-verified
+in the token gallery, but the gallery is not a call site. Nothing in the shipping
+app imports these yet, so by our own Definition of Done 4B is not complete - it is
+*built and proven*, waiting on 4C to consume it. This is the AddPlayerSheet failure
+mode, and the box is what keeps it visible. **4B closes when 4C's screens land, not
+before.**
+
+Known gaps to settle when the first screen consumes these:
+- Light-mode field fill is `surfaceSunk`, inferred from the token system rather
+  than verified against a Figma light-mode auth frame. Dark mode is measured.
+- `CiAvatar` renders `Image.network` with no cache or placeholder. Fine for the
+  gallery, likely not for a scrolling players list.
+
+---
+
+## 4C — Screens, in journey order
+
+Built against approved Figma frames, in `lib/features/`. **Decision: new screens live alongside the FlutterFlow pages *during development only*.** Routing switches per-screen behind the 2.0 flag so any screen can fall back to its v1 page if it regresses mid-phase. This coexistence is a scaffold with an expiry date — see 4.24, which removes it entirely before ship. No screen may enter 4C without an approved Figma frame (see 4.0).
+
+| # | Flow | Screens |
+|---|---|---|
+| 4.9 | Entry/Auth | Splash (Dot Burst), Onboarding ×3, Auth Landing, Email auth (sign-in/sign-up chips + validation error), Forgot Password, Reset Password, Reset Successful |
+| 4.10 | Home/Today | Today feed, empty + first-run states |
+
+**4.10b (loading skeleton + premium banners) built 2026-07-20.**
+`[x] built` · `[x] wired` · `[~] device-verified`
+
+- **Skeleton** replaces the loading spinner: the hero's gauge and the feed rows
+  become grey placeholders. The screen has a fixed shape, so its outline reads
+  as "arriving" and holds the layout still. Shapes only, no shimmer - Today is
+  opened many times a day and a sweep would distract.
+- **Two premium banners**, one `TodayPromoBanner` with an upgrade/lapse purpose
+  enum (same shape as CheckEmailPage). Upgrade is lime "See plans", lapse is
+  orange "Renew". Both open the EXISTING paywall - display and routing only.
+- **Which banner shows is a CLIENT-SIDE RevenueCat read** via
+  `entitlement_status.dart`: `premium_users` in `entitlements.active` = premium
+  (no banner); present in `.all` but not `.active` = lapsed (Renew); absent =
+  never (Unlock). **This does not touch Supabase, prod, or the deferred
+  `subscriptions` backfill** - it reads only what RevenueCat tells the client,
+  the same source the dashboard already used. Fails safe to `never`: a network
+  blip must never tell a paying parent their premium ended.
+- **The lapsed RENDER is unverifiable on test.** It needs a genuinely expired
+  RevenueCat account, which test users do not have. The LOGIC is unit-tested;
+  the render is confirmed only by forcing the enum or against a real lapsed
+  account. Same shape as the signup-confirmation gap. `[~]` reflects this.
+
+**4.10 decisions, 2026-07-20:**
+
+- **Growth IQ is computed CLIENT-SIDE** via `lib/courtside_iq/growth_iq.dart`.
+  It is not stored anywhere. The repository feeds per-game metrics into the
+  existing formula.
+- **The Today header shows ONLY players with a computable Growth IQ.** A player
+  with too few games is absent from the header while remaining everywhere else
+  in the app. The header is about growth, and growth needs games; a zero would
+  be a claim about the child. Encoded in `headerSnapshots()`.
+- **Paging dots follow the FILTERED count.** Two players where only one
+  qualifies is a single-item header with no dots.
+- **Recent games cap raised from 3 to 5.** A deliberate change from production
+  behaviour, not an accident of the redesign.
+- **The bottom nav is its own item, not part of 4.10.** It is shared chrome
+  across Today, Players, Games and Menu, and folding it in would make 4.10
+  unreviewable. Currently still the v1 `CustomNavBarWidget`.
+
+**4.10a is BUILT, WIRED and DEVICE-VERIFIED (2026-07-20).** `kUseToday2` is on.
+`DashboardPage` is untouched and still reachable by turning it off.
+
+Corrections that came out of two device reviews, each measured from the frame
+rather than nudged by eye: the second carousel player was unattributed (now
+"Maya's Growth IQ"); the PPG tag is a ghost, not a filled chip; the stat
+columns are `spaceBetween`, since equal `Expanded` slots pooled their slack on
+the right; both feed bands share `kFeedBandHeight`; and the hero now DECLARES
+its ground with `CiSurface.ink` rather than only painting ink - without that,
+every component resolving its palette from context read LIGHT and rendered
+ink-on-ink.
+
+**One deliberate departure from the frame:** the Growth IQ delta is a chip, not
+the frame's plain lime text. Consistency with every other delta in the app beat
+matching one frame. **The frame should be updated to follow.**
+
+**KNOWN ISSUE: the bottom overscroll shows ink.** Scrolling past the end of the
+feed reveals the ink scaffold beneath it. Deferred 2026-07-20 pending the nav
+rebuild, but **the nav is unlikely to fix it on its own**: the cause is that the
+scaffold is ink so the TOP overscroll can reveal ink under the dark hero, and
+the trailing light filler only extends to the viewport edge. The real fix is a
+bottom-anchored light layer behind the scroll view, independent of the nav.
+Revisit when the nav lands, and do not assume it went away.
+
+**KNOWN ISSUE: the nav bar shifts position between pages.** On Today the bar is
+a `Scaffold.bottomNavigationBar` slot; on the v1 Players/Games/Menu pages it
+sits in a `Stack`/`Align`, so it lands a few pixels differently and appears to
+jump when switching tabs. There is also no shared page transition. The real fix
+is a PERSISTENT SHELL: the nav bar lives outside the routed content (a
+`StatefulShellRoute` or an app shell) so it never rebuilds or moves between
+tabs, and tab switches animate. This is an architectural change, not a tweak,
+and belongs with the 4C navigation work or its own item - deferred 2026-07-20.
+
+**STATUS-BAR ICONS: FIXED 2026-07-20.** The global default is dark (light-mode
+era); every ink screen now goes light. Centralised as `CiSystemUi.onInk`, and
+opt-in through `CiSurface.ink(statusBar: true)` so a full-screen ink surface
+takes it while a partial ink region (the promo banner) does not flip the whole
+screen. Applied to Auth Landing, Email Auth, the AuthScaffold screens
+(Forgot/Reset/Reset Successful/Check Email), Onboarding, Splash and Today.
+
+**DESIGN GAP: the empty header.** A user whose players all lack enough games
+gets an EMPTY header carousel, and no frame covers it. This is NOT the same as
+`Today - Empty (No Players)` (`204:763`), which is for a user with no players
+at all. The new state is "players exist, none have enough games yet" - which is
+every user's first days in the app, so it is not an edge case.
+
+`headerSnapshots()` can return empty and its callers must handle it. **Needs a
+Figma pass before 4.10a can be considered done.**
+| 4.11 | Players | Players list, Player Profile, Averages, Games, Full Breakdown, About Growth IQ |
+
+**4.11 is a REBUILD, not a fresh build.** A 2291-line `PlayerProfilePageV2`
+(Phase 2) already implements the profile tabs, data layer and the insight dedup
+fix, on the OLD tokens. 4.11b re-skins it on 2.0; the behaviour is proven.
+
+**4.11 sub-phasing (2026-07-20):**
+- **4.11a Players List** - list, empty, list-level gating. **DONE and
+  device-verified 2026-07-20** (lapsed banner excepted, needs a real expired
+  subscription).
+- **4.11b Player Profile + tabs** - **DONE 2026-07-21.** Rebuild
+  `PlayerProfilePageV2` (2291
+  lines, Phase 2, on the OLD tokens) onto 2.0. The behaviour is proven; this is
+  a re-skin plus three defects.
+
+  **Starting checklist for 4.11b:**
+  1. Read the v1 profile's action code BEFORE writing the replacement. That
+     habit caught four invisible behaviours in 4.9 and the RevenueCat identity
+     bug in 4.11a.
+  2. **Keep the insight dedup fix.** The v1 page swapped tab widgets by type,
+     remounting the Development tab and firing another paid Sonnet call on
+     every return. Whatever replaces the tab control must keep the tabs alive
+     or hoist the fetch above them.
+  3. **Fix `readCached` ignoring game_id.** It returns the player's most recent
+     insight regardless of which game produced it, so a stale narrative renders
+     instantly before the current one loads. Never fixed in v1.
+  4. **Exercise the server claim row.** The guard in `generate-player-insight`
+     has never actually raced - client dedup absorbed every duplicate before it
+     reached the server. Treat as unverified defence-in-depth.
+  5. Frames: Player Profile `93:211`, Averages `97:340`, Games `98:583`,
+     Development (Locked) `156:704`, Locked `663:2426`, Age-Band Transition
+     `687:2742`.
+**4.11b built, wired and DEVICE-VERIFIED 2026-07-21.**
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+Two states could not be exercised and remain unverified: the **lapse strip**
+(needs a genuinely expired subscription, the same gap as Today and the
+Players list) and the **age-band notice** (needs a player who actually crosses
+a band between opens).
+
+Shipped in five commits: the shell (`2fe8674`), Development (`1ad3b35`),
+Averages (`3c06590`), Games (`a2b384e`), and the age-band notice (`e579bce`).
+`kUseProfile2` is ON; `PlayerProfilePageV2` stays reachable by turning it off.
+
+Checklist outcomes:
+1. Read the v1 action code first - done. It is what surfaced the two Games-tab
+   features below and the missing home/away column.
+2. **Insight dedup fix - done.** All three tab futures are hoisted onto the
+   page and the body is an `IndexedStack`, so no tab switch can refetch,
+   whatever the tab control does.
+3. **`readCached` game_id fix - done.** It now matches the cached story to the
+   player's latest game and returns nothing when it describes an older one.
+4. **Server claim row - STILL UNVERIFIED.** Carried to 4.11c. Nothing in this
+   build races it, so it remains untested defence-in-depth.
+
+Behaviour changes worth knowing before the device run:
+- **Averages deltas changed meaning.** v1 compared the last 5 games against a
+  lifetime average that CONTAINS those 5 games, damping every trend toward
+  zero and shrinking as a player logs more. Deltas now compare the recent
+  window against the games before it, and need 3 games on each side. Numbers
+  will read differently, and some that showed a near-zero now show nothing.
+- Shooting percentages weight by attempts, not by game. A shot never attempted
+  is absent rather than "0.0%".
+- Games rows use `event_name` where the frame says "Home". **There is no
+  home/away column** and adding one is a migration plus a New Game change.
+
+**Deliberately NOT built, needs a designed placement first:**
+- The Games tab's **event filter chips** (2+ distinct events) and the
+  **"✦ marks games with an AI insight"** indicator. Both are real v1 features
+  absent from frame `98:583`. They still exist on `GamesTab` behind the flag.
+- **Development-tab gating for lapsed users.** Frame `663:2426` adds a lapse
+  strip but leaves every average visible, and there is no frame showing what a
+  lapsed parent sees on Development. Not invented.
+
+**Unverified render (same gap as Today and the Players list):** the lapse
+strip needs a genuinely expired subscription.
+
+**Device review 2026-07-21 — three fixes, all landed:**
+
+1. **Two trend classifiers, found via "Building -13".** The same player read
+   "Dipping" on Today and "Building -13" on both the list and the profile.
+   `growthIq()` computes a trend and `today_builder` was throwing it away;
+   `TodaySnapshot` then re-derived one from the SIGN of the delta. Different
+   vocabulary AND different classification, since a sign has no dead band.
+   `GrowthTrend.building` is now `dipping`, `TodayTrend` is deleted, and
+   `CiBadge.growthTrend` is the only thing that colours a trend.
+   `PlayerListEntry.trendLabel` went too - it was a second copy of the word.
+2. **The word rides the chip, never the gauge.** The gauge holds the score,
+   the chip holds the movement, word and number together. Splitting them left
+   the number without the word that explains it.
+3. **Development tab spacing re-measured, not nudged.** The code had 20pt
+   vertical throughout where the frames say 24 (summary, focus) and 22/32
+   (wash blocks), a 96 gauge that should be 104, and a 22pt headline that
+   should be 15. A hairline was added above the Development Story header,
+   which is NOT in the frame - noted in code as deliberate.
+
+**LOCKED PRODUCT RULE, decided on device after trying both:** a dipping Growth
+IQ chip is **neutral**, not orange and never red. Growth IQ is a composite
+judgement about a child at the top of the app, and an accent there reads as
+"something is wrong with them". This deliberately DIFFERS from the Averages
+tiles, which do paint a declining stat orange: "free throws are down 4%" is
+narrow and actionable, the whole child in one number is not. Scope is the
+reason the two rules differ. See `CiBadge.growthTrend`.
+
+- **4.11c Full Breakdown, About Growth IQ, info sheets** - **DONE 2026-07-21.**
+  Full Breakdown `435:1922`, About Story
+  Sheet `648:2195`, About Growth IQ `691:2845`. The two sheets are one
+  component (`CiInfoSheet`): the frames differ only by the length of their
+  paragraph.
+
+  Entry points came from `entry-label` text in the Figma gutters, not from
+  guesswork - "Today or Player Profile, tap the Growth IQ gauge" and "from
+  Averages -> Full Breakdown". **Read those labels before assuming a surface
+  is undesigned.**
+
+  - **`Game Insights Info` (668:2555) deferred to 4.12.** It reads as Game
+    Detail, not the profile.
+  - **"View trends" is still absent from the Averages action row.** Its
+    destination is Stats & Trends (307:1407), scoped out of 4.11, and a button
+    that goes nowhere is worse than no button. The row shows ONE button until
+    that item lands, which does not match the frame.
+  - Adds a `textSoft` colour token (gray700 on light). The sheets' body is
+    #4d4d4d, and `text`/`textMuted` are not interchangeable for a paragraph:
+    full ink is heavier than drawn, textMuted at 15px on white is ~3.5:1.
+
+  **Device-verified 2026-07-21**, after three fixes from the review: the Full
+  Breakdown hero was built LIGHT when 435:1923 is ink, the info sheets were
+  given the system's top-sheet radius when the frames carry none, and the
+  Scoring grid was missing the seam between its two rows.
+
+  **Two of those three were the same failure: writing what the design system
+  would do instead of fetching what the frame says.** The hero was never
+  measured at all, and the code carried a comment JUSTIFYING the light ground -
+  which made an unchecked assumption read as a decision. Fetch design context
+  for every region being rendered, hero included, not only the novel-looking
+  parts.
+
+  `[x] built` · `[x] wired` · `[x] device-verified`
+
+- **4.11d Player management** - **BUILT AND WIRED 2026-07-21.** Position
+  `641:2183`, Birth Date `643:2188`, Add Player `302:1402`, Create sheet
+  `281:1303`, Edit Player `387:1901`, Photo `646:2192`, Birth Date Prompt
+  `647:2189`, caveat `649:2201`, plus teams and events (designed here, no v1
+  frame existed).
+
+  `[x] built` · `[x] wired` · `[~] device-verified` - everything through
+  teams and events is verified; the birth-date prompt and caveat are not.
+
+  **THREE FEATURES WERE FOUND DEAD OR DYING IN 2.0, none of them by looking:**
+  - the **birth-date prompt** is mounted only on v1's `home_widget`, so no
+    build with `kUseDashboardV2` on has asked for a birth date since Today
+    shipped. Now runs from `TodayPage`.
+  - **teams and events** had no 2.0 design at all and would have been lost at
+    cutover with `kUseEditPlayer2` on. Designed and built.
+  - a player added from the **nav bar** never refreshed the screen behind it,
+    which reads as a failed save.
+
+  The lesson is the same each time: a re-skin that only follows the frames
+  loses whatever the frames do not show. **Read the v1 screen's action code
+  AND check where its entry points are mounted.**
+
+  Product changes, all from the frames rather than invented:
+  - Add Player collects a **last name**, and **birth date became optional**
+  - the position picker commits on **Save** rather than on tap
+  - `event_type` shows as **Season / Tournament**; the stored Long-Term /
+    Short-Term is unchanged, and `event_types.dart` is the only place that
+    knows they differ
+  - **no rename** for teams or events: those `games` columns are denormalised
+    text, so a rename would not touch a single past game
+
+  Also fixed a latent `setState(() => _future = ...)` bug in four screens -
+  the arrow returns the assigned Future, which Flutter asserts against.
+
+- **4.11e Games tab event filter and insight spark** - FOLDED INTO 4.12,
+  which is already "Games list, filters". Both were deferred in 4.11b because
+  events had no 2.0 home; they do now. Neither is in frame `98:583`, so both
+  still need a design pass.
+
+**A PRODUCT RULE CHANGED IN 4.11d: no birth date, no rating.** Approved
+2026-07-21 after the device review asked how the app could know a bandless
+player was 11U-13U. It could not.
+
+`get_age_band()` returned `'11U-13U'` for a null birth date - deliberately,
+and mirrored in `metrics_config.dart` and `metrics.ts`. Two consequences:
+
+- an ASSUMPTION rendered identically to a FACT, on the list subtitle, the
+  profile identity line and the Averages calibration note
+- ratings were computed against middle-school cutoffs for a player of unknown
+  age, while presenting themselves as age-normalised. Age fairness is the
+  entire premise of Growth IQ.
+
+Now: migration `20260721000000` returns NULL (**applied to TEST only**),
+`ageBandFromString` returns null, and `growthIq()` locks with
+`GrowthIqLock.noBirthDate`. **The TypeScript mirror is written but NOT
+DEPLOYED** - `getAgeBand` returns `AgeBand | null`, tiers are withheld without
+a band, and both prompts say the age is unknown. Both deno check clean.
+
+A lock now carries its REASON, because the two resolve differently: telling a
+parent their story "unlocks in 2 games" when it needs a birth date sends them
+to do the wrong thing.
+
+**Consequences worth carrying forward:**
+- a player with no birth date is absent from the Today header, exactly as one
+  with too few games is
+- **frame `649:2201` (the caveat banner) is now obsolete and was deleted.** It
+  existed to caveat an uncalibrated rating; there are none left to caveat. The
+  decision retired one of its own frames.
+- `3.7 Fallback band indicator in UI` in Phase 3 is likewise moot - there is no
+  fallback band any more.
+- v1 FlutterFlow callers keep the old u18 fallback. They cannot render a
+  locked state and are deleted in 4.24.
+
+**Edge Functions DEPLOYED TO TEST 2026-07-22** with approval.
+`generate-game-insight` v7 -> v8, `generate-player-insight` v9 -> v10, both
+ACTIVE with `verify_jwt` true. This carried the `d7c194d` no-birth-date
+change, which had been sitting undeployed for three days: the SQL migration
+was applied to test, so `get_age_band()` already returned null, while the
+deployed TypeScript still assumed `11U-13U`. For a player with no birth date
+the client withheld the rating while the server generated an insight scored
+against middle-school cutoffs and named a band it did not know. Client and
+server now agree.
+
+Note for anyone reading the old wording: the functions themselves were never
+unbuilt. Both have been live on TEST since July and on PROD since 8 June -
+what was undeployed was one change to them.
+
+**Still open:** prod runs v1 of both, self-consistent with the live v1.3.2
+app. Promote them and migration `20260721000000` together at cutover, not
+before - the migration is what makes a null band possible, and the functions
+are what handle it.
+- **Scoped OUT of 4.11:** Game Detail (145:610 -> 4.12), Stats & Trends
+  (307:1407) and Premium Trends Teaser (331:1661) -> premium/trends item.
+
+**4.11a.1 built and device-verified 2026-07-20** (list + empty). `kUsePlayers2`
+is ON.
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+Row height is FIXED, not content-driven. Three configurations appeared at
+different heights on device before this: a scored row with a trend chip, a
+scored row without one, and a brand-new player with no gauge at all. Every
+player joins the list with no data, so the rhythm cannot depend on how much
+they have.
+- Hybrid ground like Today: ink header, light rows. Row carries avatar, name,
+  "position, band · N games", PPG/RPG/APG, and a DotGauge with Growth IQ + a
+  Building/Steady/Rising chip.
+- Averages from lifetime totals; Growth IQ from per-game rows, reusing the
+  Today builder. Two queries, no per-player fan-out.
+**4.11a.2 (gating) built and device-verified 2026-07-20.** Client-side
+entitlement only - no Supabase, no prod, nothing touching the deferred
+subscriptions backfill.
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+Verified on device: the free-tier upgrade sheet, the 3-player cap dialog, and
+adding a player end to end. **The lapsed banner is NOT verified** - it needs a
+genuinely expired subscription, the same gap as Today's lapse banner.
+
+- Free tier at 1 player -> upgrade gate SHEET ("Track more players").
+- Premium at 3 -> cap DIALOG ("You've reached 3 players"). **It does not
+  sell**: the parent already pays, so it offers management, not a purchase.
+- Lapsed -> the list is unchanged plus a lapse banner (reuses
+  `TodayPromoBanner`). Their players are never taken away.
+
+**CUTOVER BLOCKER: client and server disagree about who is premium.** Seen on
+device 2026-07-20 - the client allowed the add-player form while the server's
+INSERT policy refused it, for the same signed-in user, and both were right
+about the source they trusted.
+
+- The CLIENT reads RevenueCat, which **transfers purchases on `logIn`**, so a
+  subscription can follow a user onto a different account.
+- The SERVER reads `subscriptions`, populated only by the RevenueCat webhook
+  since it went live. **It was never backfilled**, so it does not know about
+  any subscription bought before that.
+
+**Do NOT "fix" this by gating on the server.** `is_premium()`, `player_count()`
+and `free_player_limit()` are all callable by `authenticated`, so it is
+technically easy - and on prod, where `subscriptions` is EMPTY, it would gate
+every existing paying subscriber at one player. The backfill is what actually
+resolves this; gating on server truth before it lands trades a confusing
+message for locking out real customers.
+
+Current stance: client gates optimistically, the server refuses authoritatively,
+and the refusal is now explained inline in the sheet. **Settle the trust model
+at 4E, after the backfill.** Likely landing point: server for writes, client for
+display.
+
+**TEST DATA NOTE:** a `subscriptions` row was seeded by hand on TEST for
+`testuser@mail.com` on 2026-07-20 (`last_event_type = 'MANUAL_TEST_SEED'`) so
+the add-player flow could be exercised. It mirrors what the webhook writes.
+Test only; delete it if you want to re-test the free-tier gate.
+
+**REVENUECAT IDENTITY MUST BE SYNCED, and 4.10a shipped without it.** The v1
+`DashboardPage` called `loginToRevenueCat(uid)` on load; `TodayPage` did not.
+RevenueCat keeps whatever app-user id it was last given, so a real purchase on
+device was attributed to a DIFFERENT account than the one signed in - the buyer
+stayed non-premium and the `players` INSERT policy correctly refused their next
+player. `fetchEntitlementStatus()` now calls `Purchases.logIn(currentUserUid)`
+before reading. **Any future screen reading entitlement must go through it.**
+
+**THE TWO LIMITS COME FROM DIFFERENT PLACES.** Free = 1 mirrors
+`free_player_limit()` server-side. Premium = 3 is a **client-only product
+rule**: the migration states "Premium is unlimited via is_premium()", so the
+database will NOT refuse a fourth player for a premium user. Do not assume the
+server enforces the cap.
+
+**NOTE a header/list trend-word discrepancy.** The Today header (4.10a) labels
+trend Rising/Steady/**Dipping** from the delta SIGN. Growth IQ's own
+classification is Building/Steady/Rising by movement THRESHOLD, which is what
+the frames show and what the players list uses. The header should be
+reconciled to the real GrowthTrend - logged, not yet done.
+
+**4.9 scope was widened on 2026-07-19.** Auth Landing and the Forgot / Reset /
+Reset Successful trio had approved Figma frames and live v1 equivalents, but no
+phase item owned them. An unowned screen means either a v1 page survives into
+2.0 or password reset breaks at cutover, so they now belong to 4.9 explicitly.
+
+**4.9 progress:**
+
+- Screen flags moved to `lib/features/flags.dart` (one registry, deleted whole
+  in 4.24). `kUseDashboardV2` moved there too.
+- Email Auth built and routed behind `kUseAuth2`, keeping the v1 route name and
+  path so every existing navigation call reaches it unchanged. Flag is ON.
+  `[x] built` · `[x] wired` · `[x] device-verified` (sign in AND sign up)
+
+**Test now diverges from prod on email confirmation. Remember this at 4E.**
+
+`Confirm email` was turned OFF on the test project (`yihmccmyijtyrffpzstb`) on
+2026-07-19, because Supabase's built-in email service is throttled to a few
+messages an hour and it was blocking every signup attempt. **Prod still has
+confirmation ON.**
+
+Consequences:
+- The signup flow verified on test is NOT the one a real parent gets. On prod
+  they receive a confirmation email and are not signed in until they click it.
+  The post-signup navigation to Home was verified against the confirmation-off
+  path only.
+- Before cutover, either verify signup on a project with confirmation ON, or
+  design the "check your email" state that prod signup requires. **There is no
+  Figma frame for that state today** - it is a genuine gap in 4.9's coverage,
+  not just an unverified path.
+
+Test accounts on test: `testuser@mail.com` (2 players) and `testuser2@gmail.com`
+(created 2026-07-19, zero players). Keep the second one: a user with no players
+is what the free-tier RLS limit needs in order to be exercised at all.
+- **Two regressions caught on device, both worth remembering:**
+  - *Dead sign-in button.* The screen called authManager but never navigated.
+    Sign-in succeeded and left the parent sitting on the auth screen. The v1
+    screen calls `prepareAuthEvent()` then `pushNamedAuth` explicitly; nothing
+    redirects an authenticated user off the auth route on its own.
+  - *Account lockout.* An 8-character minimum was applied to SIGN IN, barring
+    every account created before that rule existed, in their own app, with no
+    recourse since password reset is not built yet. Length is a rule about
+    creating a password. `validatePassword` (sign in) now checks only that
+    something was typed; `validateNewPassword` (sign up) holds the minimum.
+- **Design note:** the Validation Error frame draws the sign-in/sign-up control
+  as underline tabs while the other two frames use chips. Decided in favour of
+  chips, since a second tab idiom would undercut the real navigation tabs.
+  **The Figma frame is stale and should be updated.**
+- Auth Landing built and routed behind `kUseAuthLanding2`. Google and Apple
+  sign-in both device-verified 2026-07-19.
+  `[x] built` · `[x] wired` · `[x] device-verified` (glow and mark sizing still
+  being tuned on device)
+- **Reading the v1 widget before writing the replacement caught four behaviours
+  the frame does not show**, and this is now the standing approach for 4C:
+  Apple is hidden on Android; OAuth uses `goNamedAuth` (replaces the stack)
+  while email uses `pushNamed` (keeps it); `prepareAuthEvent()` precedes every
+  OAuth call; the legal links are real and point at Apple's standard EULA and
+  `courtsideiq.app/policy`.
+- **Figma's code export is lossy. Read the node tree, not just the generated
+  code.** Two things were silently missing from the export and only found in
+  the metadata: the `TapGestureRecognizer` on the legal links, and the 220x220
+  ellipse behind the burst that produces its glow (`251:977`). Both would have
+  shipped as quiet regressions against the design.
+- Component fixes that came out of this screen:
+  - `DotBurst` geometry was absolute, calibrated for the 390 Splash frame, so
+    it was only correct at that one size. Now scales from a 390 reference;
+    identical output at 390, correct at every other size.
+  - `DotBurst` gained `glowOpacity` for the haze the frame carries.
+  - `CiButton` gained `leading` for brand marks. `FaIconData` is not
+    assignable to `IconData`, and a brand mark must not be recoloured to the
+    label colour.
+  - `CiLogoMark` is painted rather than an asset: `logo-mark.png` is solid
+    black and vanished on ink ground, and no white version exists in the repo.
+- Forgot Password, Reset Password and Reset Successful built and routed behind
+  `kUsePasswordReset2`. **Flag is OFF** and must stay off until the deep link
+  lands: Reset Password is reached by a recovery link, and today that link
+  opens a web page, not the app.
+  `[x] built` · `[x] wired` · `[x] device-verified`
+
+**Part A is DONE and device-verified 2026-07-19.** Full loop confirmed on a
+real device against test: Forgot Password sends, the email arrives, the link
+opens the app, Reset Password applies, and the new password signs in.
+
+**The FlutterFlow page still cannot be switched off.** Every recovery email
+already sent points at it, and older installs keep sending it. It can only be
+retired once those links have expired and those installs have updated.
+
+**Two device-only bugs, both from the same root cause: two clocks that do not
+agree.** Supabase emits `passwordRecovery` the instant it parses the link,
+while `AppStateNotifier` is driven by a separate user stream that lags. Acting
+on the Supabase event alone navigated to a `requireAuth` route while the app
+still believed nobody was signed in:
+
+  1. FFRoute honoured a stale "come back here once you log in" stash and sent
+     the parent to Home before they could type a password.
+  2. With that cleared, `requireAuth && !loggedIn` bounced them to /onBoard.
+
+Chasing each destination in turn was treating symptoms. The listener now waits
+for the app's own `loggedIn` before navigating, with a 15s give-up so a
+recovery session that never materialises leaves the app usable.
+
+**ORIGINAL RISK, NOW RESOLVED - kept for the record.**
+
+The recovery email redirects to `https://courtside-iq.flutterflow.app/resetPassword`,
+a FlutterFlow-hosted web page. FlutterFlow was retired 2026-07-19. The page is
+up today (verified HTTP 200), but if that hosting ever lapses, **every reset
+link in every inbox stops working and affected users cannot get back in.**
+
+Decision 2026-07-19: replace it with a `courtsideiq://` deep link so reset
+happens natively on the 2.0 screen. Split into two parts, screens first:
+
+- **Part A, still to do:** register `courtsideiq://` on iOS and Android, handle
+  the incoming recovery link, add the redirect to Supabase's allowlist.
+  Current state: iOS has **no** deep-link configuration at all (no associated
+  domains, no custom scheme beyond Google Sign-In's). Android has a custom
+  scheme `webapp://courtsideiq.app` with `flutter_deeplinking_enabled`.
+  `app_links` is in pubspec but **imported nowhere** - a dead dependency.
+- **Not a clean cutover.** Emails already sent keep pointing at the FlutterFlow
+  page, so it has to stay alive through the transition whatever we do.
+
+**Design gaps found building these:**
+
+- **No frame for what Forgot Password shows after sending.** v1 popped a
+  dialog. Using the design system's Snackbar (`521:2009`) rather than inventing
+  a dialog or a fourth screen. Same family as the missing signup confirmation
+  state. Both want a design pass.
+- **The length rule sat under the wrong field.** The frame places "Use at least
+  8 characters." under CONFIRM PASSWORD, but the rule is enforced on NEW
+  PASSWORD, so a parent would read the rule under one field and see it violated
+  under another. Moved to the field it governs. **The frame should be updated.**
+
+### 4.9b Undesigned states (BLOCKS 4E cutover)
+
+Two states the app genuinely needs, that no Figma frame covers. Both were
+found while building 4.9. Neither is a nice-to-have: the first is what every
+new user on prod sees, and shipping without it means signup appears to hang.
+
+**Per the standing rule, these get designed and approved in Figma before any
+code.** Place them in the Entry/Auth flow section with connectors from their
+entry points.
+
+| # | State | Why it is needed | b | w | v |
+|---|---|---|---|---|---|
+| 4.9b.1 | **Signup - check your email** (`765:3144`) | Prod has email confirmation ON. After signup a parent is NOT signed in until they click the link, so the app must say so. | ☑ | ☑ | ☑ |
+| 4.9b.2 | **Forgot Password - link sent** (`765:3370`) | Replaces the Snackbar. Copy does not confirm whether an account exists. | ☑ | ☑ | ☑ |
+
+**Both verified on device 2026-07-19 with email confirmation temporarily ON.**
+Signup showed Check Your Email naming the address, the confirmation link
+confirmed the account, and the full recovery loop ran end to end: request,
+email, deep link into the app, new password set, Password Updated.
+
+**A LATENT BUG WAS FOUND ONLY BECAUSE CONFIRMATION WAS TURNED ON.** With it
+OFF, signup returned a session and everything looked right. With it ON, signup
+did nothing at all - silently. `emailCreateAccountFunc` returns null for an
+unconfirmed account, which is indistinguishable from a failure, so the screen
+bailed before it could ever render. **The screen was built, wired, tested and
+still could not have worked on prod.** Fixed by calling `signUp` directly,
+where the SESSION rather than the user says whether they are signed in.
+
+**Two open items from this verification:**
+
+1. **Signup confirmation links open a browser, not the app.** The project's
+   Site URL is still `http://localhost:3000`, a FlutterFlow web-preview
+   leftover, so tapping the link lands on a Safari error page. **The account
+   IS confirmed** - verified in `auth.users` - but a parent has no way to know
+   that, and it looks like signup failed at the last step. Same shape as the
+   password-reset problem, same fix: pass `emailRedirectTo` on signup and
+   handle the resulting event. The deep-link plumbing already exists.
+2. **One recovery failure was never explained.** It landed on onboarding
+   instead of Reset Password, then stopped reproducing once the parent signed
+   out first. The strongest hypothesis is a stale session: "Back to sign in"
+   navigates without clearing one, so recovery cannot assume a signed-out
+   start. **Not fixed, because a third speculative fix is not a fix.**
+   Diagnostic logging is left in `password_recovery_listener.dart` behind
+   `_kLogRecovery`; flip it to true if this recurs.
+
+**Frames approved and built 2026-07-19.** One screen, `CheckEmailPage`, with a
+`CheckEmailPurpose` enum - the two frames are clones differing only in body copy
+and which resend they offer, so two files would have been duplication.
+
+**4.9b.1 CANNOT be device-verified on test, by choice.** It only appears when
+signup does NOT sign the parent in, which is what email confirmation produces.
+Test has confirmation OFF and the user has chosen to keep it that way, so on
+test signup falls through to Home and this screen never renders. Nine tests
+cover the copy rules; the render itself is unverified until either confirmation
+is turned on temporarily or cutover reaches prod. **Do not tick `v` for 4.9b.1
+without one of those.**
+
+4.9b.2 is reachable on test and should be verified on the next device run:
+Forgot password, submit, and the screen replaces the old snackbar.
+
+**Frames drafted 2026-07-19, AWAITING APPROVAL.** Both sit in the `1 · Entry &
+Auth` section on the Screens page, inserted in journey order rather than
+appended: Check Your Email directly after Email Auth (Sign Up), Link Sent
+directly after Forgot Password. Ten existing frames shifted right to open the
+slots, and the section widened to 7980.
+
+Both are clones of Reset Successful, so the status bar, back button, dot burst,
+button instance and type scale are the existing ones rather than reproductions.
+Shared shape: burst, "Check your email" h1, one line of body, a lime CTA, and a
+text link beneath it for the secondary action.
+
+Copy decisions to preserve when these are built:
+
+- **The signup screen names the address** ("We sent a link to
+  alex.rivera@email.com"), so a parent catches a typo instead of hunting in an
+  inbox that will never receive anything. **The reset screen must NOT** - it
+  says "If that email has an account", and reads identically whether or not the
+  address is registered. Confirming existence would let anyone probe which
+  parents have accounts.
+- Both offer a resend, because the commonest failure here is an email that
+  never arrives or lands in spam, and a dead end is the worst outcome.
+- The reset screen states the expiry (one hour), since a link that silently
+  stops working is indistinguishable from a broken app.
+
+**Connectors deliberately not drawn.** CLAUDE.md asks new screens to be wired
+with connectors from their entry points, but the whole file contains exactly
+ONE such node (`flow-arrow`, in `4 · Games`). Two orphan arrows in a section
+with none would be noise. Wiring Entry & Auth properly is worth doing as its
+own pass.
+
+**Also for the Figma file, found while building 4.9:**
+
+- **Email Auth - Validation Error (`524:2009`)** draws the sign-in/sign-up
+  control as underline tabs while the other two frames use chips. Chips won.
+  The frame is stale.
+- **Reset Password (`608:2172`)** places "Use at least 8 characters." under
+  CONFIRM PASSWORD, but the rule is enforced on NEW PASSWORD. Moved in code to
+  the field it governs; the frame should follow.
+
+### 4.9 Splash + Onboarding
+
+- Splash and Onboarding x3 built and routed behind `kUseEntry2`.
+  `[x] built` · `[x] wired` · `[x] device-verified`
+- **Guided First-Run built and gated (2026-07-23).** After a new parent
+  confirms email (or signs up on an auto-confirm env), a two-step Welcome →
+  Add first player, shown ONCE and skippable. The gate lives at `_homeScreen()`
+  in nav — the one seam every landing passes through, including the
+  email-confirmation deep link — and triggers on `playerCount == 0 && !seen`
+  with a per-user local flag in `FFAppState`, behind `kUseFirstRun`. Files:
+  `first_run_flow.dart`, `first_run_gate.dart`.
+  `[x] built` · `[x] wired` · `[x] device-verified`
+- **Onboarding VISUAL PASS is now done (4.19b), superseding the "good-for-now"
+  note below:** the ambient lime glow, the ink-overlay fade (replacing the
+  baked-gradient concern below), the capture's corner clip, and the spacing all
+  landed and are device-verified.
+- **Native splash checked on device: no white or coloured flash before the dot
+  burst.** The earlier concern about LaunchScreen.storyboard did not
+  materialise, so nothing to fix there.
+- **The onboarding VISUAL DESIGN is accepted as good-for-now, not final.** The
+  user intends a further design pass. Nothing outside `onboarding_page.dart`
+  depends on the slides' internals, so a redesign is a Figma pass plus swapping
+  copy, images and layout in one file.
+- **The mockup fade is owned in CODE, not the image.** The exports are fully
+  opaque (alpha 255 throughout) and fade by darkening toward `#0F0F0F`. A ramp
+  painted into pixels cannot be smoothed from code - anything added compounds
+  with it and steepens the falloff. **The Figma mockups still carry that baked
+  gradient; removing it would let the code-side ramp do the whole job and read
+  smoother.** Worth doing in the next design pass.
+- **Splash is painted, not an image.** It replaces
+  `assets/images/App_Load_d.png`, a fixed bitmap drawn with `BoxFit.cover` that
+  distorted on any aspect ratio it was not drawn for. It also replaces the
+  loading placeholder inside `FFRoute`, so a regression shows on every cold
+  start.
+- **THREE onboarding slides, not v1's four.** A deliberate change in the 2.0
+  design, not a port.
+- **The slide mockups ARE images**, exported from Figma at 3x (463KB total).
+  Decided 2026-07-19 against the general "avoid images" preference: they are
+  static marketing artwork of a fictional player, not functioning UI, and
+  rebuilding them from live components would mean maintaining three fake
+  screens plus a sparkline component nothing else needs yet. **They will drift
+  as the real screens evolve - re-export when the underlying frames change.**
+
+**Open: the NATIVE splash has not been touched.** iOS still has
+`LaunchScreen.storyboard` with `LaunchBackground`/`LaunchImage`, and
+`flutter_native_splash` is a dependency with no config block. That renders
+before Flutter boots, so if its background is not `#0F0F0F` there is a visible
+flash on every cold start ahead of the 2.0 splash. Invisible in debug, obvious
+on device. **Check on the device run; fix before cutover.**
+
+### Remaining in 4.9
+
+- 4.9b: the two undesigned states above. **This is all that is left.**
+
+**Carry-over defects for 4.11 — verify these do not return in the rebuild:**
+
+- **Duplicate narrative generation.** The v1 profile page swapped tab widgets by
+  type, so every return to the Development tab remounted it and fired another
+  paid Sonnet call. Fixed in v1 via request de-duplication in
+  `PlayerInsightService`; **the 2.0 rebuild must not reintroduce the pattern.**
+  Whatever replaces the tab control should either keep the tabs alive or hoist
+  the fetch above them.
+- **The server-side claim row is UNEXERCISED.** The claim-row guard in
+  generate-player-insight has never actually raced - the client dedup absorbed
+  every duplicate before it reached the server. Treat it as unverified
+  defense-in-depth and exercise it deliberately during 4.11.
+- **`readCached` ignores the game id.** It returns the player's most recent
+  insight regardless of which game generated it, so a stale narrative can render
+  instantly while the current one loads. Not fixed in v1; fix in the rebuild.
+| 4.12 | Games | Games list, filters, skeleton, live-in-progress, no-games |
+
+**4.12 built 2026-07-21.** `[x] built` · `[x] wired` · `[~] device-verified`
+(list, both empty states and the filters verified; the LIVE pill cannot be,
+see below).
+
+- **Fixes a real defect:** the v1 list ordered `created_at` ASCENDING, so it
+  opened on the oldest game a parent had ever logged.
+- **Two filter rows, behaving differently.** Players is a closed set of at most
+  three: it wraps, and is hidden entirely for a single player. Dates is
+  open-ended: it scrolls, or the filter block grows taller than the list.
+- **Chips come from the ROSTER, not the games.** Building them from the games
+  hid a player who had not played from their own filter, and made frame
+  `683:2755` unreachable - I had built an empty state that could not be opened.
+- **Three empty states, none sharing copy:** no games at all, a named player
+  with none, and a filter that matched nothing (the last is undesigned and
+  effectively unreachable, kept as a fallback).
+- **The header is INK**, deliberately matching the Players list rather than the
+  frame, which draws it light. Both share `kCiListHeaderContentHeight` - they
+  sat 9pt apart until that landed. **The frame should be updated to match.**
+- **The LIVE pill is built but unverifiable.** There are no live games in test
+  and creating one needs the tracker. RESUMING from the list is deferred to
+  4.13: v1 resumes through a client-state flag with no game id, and the 2.0
+  tracker does not exist yet.
+
+**Lesson repeated three times this phase** (Full Breakdown hero, the
+unreachable player-filter state, the no-games copy): **read every state frame
+before writing the state.** Reasoning about what a screen "should" do produced
+wrong copy, a wrong button, a wrong ground, and one screen that could never be
+reached.
+| 4.13 | New Game | Create → Setup → Live Tracker → Complete |
+
+**4.13 DONE 2026-07-22.** `[x] built` · `[x] wired` · `[x] device-verified`
+(setup, tracker, pause, complete, save, offline queue, force-quit resume and
+discard all signed off on device).
+
+- **THE SAVE DEFECT.** The stats row carried a `user_id` that
+  `player_game_stats` does not have. The games row went up first, so the first
+  real save produced a game with no stats and told the parent it would "sync
+  when you are back online" on a phone with full signal. Every unit test
+  passed: they all assert on the map, and the map was fine. **A map is not a
+  row.** `game_columns.dart` now holds the schema, the save path builds
+  against it and the tests assert against it.
+- **The outbox is a CROSS-VERSION FORMAT.** Fixing the save path could not
+  reach the game already queued, because the queue stores the BUILT ROWS, not
+  the snapshot - the bad key was frozen on disk and would have failed all
+  eight retries before going quiet. The uploader now conforms rows to the
+  column list before sending, and logs what it drops.
+- **`game_live` is dead in 2.0.** v1 created the games row at tip-off; 2.0
+  writes nothing until Save, which is what makes tracking work with no signal.
+  So the column is never true and the 4.12 LIVE pill was unreachable code.
+  **The live row renders from the LOCAL SNAPSHOT instead** - same frames
+  (`683:2597`, `379:1901`), different source, and it survives a gym with no
+  bars. The frames imply a server row; they should be annotated, not changed.
+- **Resume was the last real gap.** `LiveGameStore.read()` existed and nothing
+  called it, so a force-quit left the game safe on disk and unreachable, which
+  from a parent's side is the same as losing it. It now leads both the Games
+  list and Today.
+- **Today shows it too**, which the frames do not specify. The Games list was
+  the only place, so the screen the app OPENS ON said nothing about a game in
+  progress. When it is the only game it replaces "No games yet".
+- **`_finish()` falls back to popping its own route.** Resume was pushed
+  without `onFinished`, so a successful save left the parent stranded on Game
+  Complete and Discard looked inert. No call site can strand the flow now.
+- **One LIVE badge, one confirm dialog.** LIVE was hand-rolled twice at
+  h19 in a system whose badge is h24; it is `CiBadge.live()` now, and `CiBadge`
+  gained a semantic label because a screen reader was spelling out L-I-V-E.
+  The raw Material `AlertDialog` behind Discard became `CiConfirmDialog`,
+  shared with delete-player rather than becoming a third implementation.
+- **Deferred:** `games.event_type` is still null on every row - threading the
+  event's type through would have changed `LiveGameSnapshot`'s serialization
+  while a real queued game sat on the user's device. Its `fromJson` must
+  tolerate the older format first.
+
+**Confirm dialogs corrected 2026-07-22.** Raised on device against the Game
+Complete discard action. `CiConfirmDialog` was a Material `AlertDialog` with
+small corner text buttons and Cancel first; `370:1886` and `371:1901` both
+show a centered ExtraBold title, centered Medium body, the CONFIRMING action
+first as a full-width pill (orange destructive / ink neutral), and Cancel as
+a grey pill beneath. Wrong on layout, controls, order and colour.
+
+It was built from reasoning without reading the frame, then extracted into a
+shared component - so the error reached the discard dialog instead of being
+caught, and the doc comment justified Cancel-first as deliberate when the
+frame says the opposite. One component; delete-player was corrected with it.
+Copy kept as approved. Four tests now assert the SHAPE, not just the words.
+
+Still unbuilt: `371:1910` (Alert, single action) has no call site yet.
+
+**Lesson from 4.13: check whether it is already designed.** I proposed a
+design pass for the resume affordance and was one step from rebuilding two
+frames that already existed in the file.
+
+| 4.14 | Game Detail | Hero, stat rows, shooting blocks, scoring mix, insight card, remove game |
+
+**4.14 DONE 2026-07-23.** `[x] built` · `[x] wired` · `[x] device-verified`
+(all three entry points, a low-volume game, and Remove Game signed off on
+iPhone; Today's row fix landed after that pass and wants a glance).
+
+- **The database could not answer what the screen asks.** `game_insights`
+  stores ONE tier - `tier_context` for `highlight_metric` - and the frame
+  rates three. That is why the tier functions had only ever existed in
+  TypeScript: v1 displayed the server's single tier. `ppsaTier`,
+  `disruptTier` and `astTovTier` are now mirrored in `game_metrics.dart`.
+- **The insight card's eyebrow uses the COMPUTED tier**, not the stored one,
+  so it cannot say ELITE above a row saying Good.
+- **Absence is per-metric.** A game can clear the disruption floor and miss
+  the assist gate. A metric that falls short loses its row; only when none
+  qualify does the section go. Points, shooting and the scoring mix always
+  show - they are counts, not judgements.
+- **Remove Game opened to free users**, approved. v1 hid it without a
+  subscription. The dialog explains why keeping games matters rather than
+  warning them off, which is the same argument the save screen now makes.
+- **The save screen stopped promising an insight.** "Save to unlock Maya's
+  game insight" committed the app to producing one for a game that may earn
+  none. Now "some games earn a closer read". This also retired the plan to
+  generate on demand from Game Detail, so the card's loading and error states
+  (424:1904, 425:1909) are BUILT AND UNWIRED - sweep in 4.24 if nothing
+  claims them.
+
+**Two defects found here that were NOT in this item:**
+
+- **The live tracker header overflowed by 62px at 360pt** on ordinary stats,
+  shipped and signed off the day before. It survived device verification
+  because the verification device is wider than a large share of Android.
+  `narrow_screen_test.dart` now pumps both headers at 360.
+- **Today's recent-games rows pushed the games LIST, not the game**, since
+  4.10a. Tapping a specific game gave a list to search again.
+
+**Lesson from 4.14: "device-verified" has meant "verified on one wide
+iPhone."** Android is deliberately deferred, but width, text scaling, system
+back and safe areas are cheap to honour while building and expensive to
+retrofit.
+| 4.15 | Menu/Account | Menu, subscription, settings |
+
+**4.15 COMPLETE 2026-07-23.** `[x] built` · `[x] wired` · `[x]
+device-verified`, all four sub-phases. 4.15d (Delete Account) verified in the
+database: account, players, games, stats, ai_usage and subscription gone; the
+feedback note kept with its email nulled; another account's feedback
+untouched.
+
+- **The delete took THREE tries and the fault was never the code.** GoTrue's
+  admin.deleteUser 500'd untraceably (its errors are not in the request
+  logs). Switching to a SECURITY DEFINER rpc surfaced the real error in the
+  POSTGRES log: ai_usage's SET NULL references re-validate mid-cascade and the
+  row fails its own game_id check once a sibling game is deleted. The rpc now
+  clears this account's ai_usage first. Lesson: a delete that cascades through
+  SET NULL FKs cannot be trusted until run against real data - an isolated
+  superuser delete does not exercise the re-validation.
+- **Terms** points at courtsideiq.app/terms on both platforms now.
+- **Version** reads from the bundle (package_info_plus).
+- **Menu had no nav bar** - the only tab without one. Added.
+- **feedback.rating holds the category** (Bug/Idea/...) where v1 stored a
+  tier. Worth a rename migration eventually.
+
+**PROD PROMOTION for 4.15d needs, IN ORDER and each with approval:**
+1. Check orphaned public.users rows: `select count(*) from public.users u
+   where not exists (select 1 from auth.users a where a.id = u.id);`
+2. Migration 20260723000000 (the auth.users cascades).
+3. Migrations 20260723000001 + 20260723000002 (delete_current_user).
+4. The orphaned delete-account edge function on TEST is unused (rpc replaced
+   it) - safe to leave or remove; never deploy it to prod.
+
+**4.15c DONE 2026-07-23.** Help Center and Send Feedback, device-verified.
+
+- **FOUR v1 HELP ANSWERS STATED THINGS THE APP DOES NOT DO**: the player
+  limit as three for everyone (free is ONE, said twice), the free trial
+  promised to every new subscriber (monthly-only, first-time only), a
+  "Manage Your Subscription" button 2.0 renamed, and a stats list predating
+  the 2.0 tracker. None could be caught while the copy lived inside a
+  500-line widget. It is pure Dart now and the player-limit test reads
+  `kFreePlayerLimit`, so answer and code cannot drift.
+- **Reshaped to the frame:** six broad questions, not twelve narrow ones,
+  plus two carrying facts the frame predates - whether deleting an account
+  cancels the subscription, and why a quiet game earns no insight.
+- **Send Feedback drops v1's email field** and takes the session address.
+  A failed send KEEPS the message: the table is insert-only, so there is no
+  sent-items list to recover it from.
+- The confirmation sheet deliberately drops the frame's leftover "Position"
+  header and X, which came from the sheet it was duplicated from. **Worth
+  fixing in Figma.**
+- **`feedback.rating` now holds the category** (Bug / Idea / Question /
+  Other) where v1 stored Solid / Good / Elite. Reuse avoids a migration for
+  a rename; worth tidying later.
+
+**4.15a + 4.15b DONE 2026-07-23.** `[x] built` · `[x] wired` · `[x]
+device-verified`. Menu, Your Profile, Edit Name, Edit Email, Change Password.
+
+- **THE NAME WAS NEVER GOING TO SHOW.** `AuthUserInfo` never populates
+  displayName in this app, so `currentUserDisplayName` is permanently empty -
+  the hubs would have read "Your account" for every user forever. The name is
+  in `public.users`. Found only because Edit Name forced the question of
+  where it is written.
+- **An email change is a REQUEST.** Supabase mails a link to the new address
+  and the account keeps signing in with the old one until it is clicked. Said
+  before the tap, not only after.
+- **Supabase never checks the old password.** `updateUser` trusts the
+  session, so the frame's Current password field would be decoration and
+  anyone holding an unlocked phone could lock the owner out. The repository
+  re-authenticates first.
+- **A raw MaterialPageRoute is discarded under GoRouter here.** Change
+  Password had no v1 route to inherit and pushed one; it vanished before a
+  frame rendered. Every 2.0 screen without a v1 counterpart needs its own
+  routeName - which is DELETE ACCOUNT in 4.15d.
+- **Success Confirmation (667:2553) is Send Feedback's**, not generic - it
+  reads "We read every note." Moved to 4.15c. It also still carries a stale
+  "Position" header in Figma.
+- **Terms now points at courtsideiq.app/terms on both platforms.** v1 sent
+  iOS to Apple's standard EULA, leaving Android users reading terms that did
+  not govern their copy. Apple requires a custom EULA to carry their minimum
+  terms - a condition on the PAGE, worth confirming before submission.
+- **Version reads from the bundle** (package_info_plus, approved).
+- **Open:** the profile photo badge is inert. `public.users` has no photo
+  column, so a picker would drop its result. Needs a schema change.
+| 4.16 | Premium/Paywall | Carousel ×3 + Loading / Processing / Error / Already-Premium |
+| 4.17 | Locked & lapsed | Development locked, Profile locked, Players lapsed, Age-band transition |
+
+**4.17 BUILT 2026-07-23.** `[x] built` · `[x] wired` · `[ ] device-verified`.
+
+Most of this item was ALREADY DONE by 4.11 and the roadmap line did not say
+so: the lapse strips on the Players list and the profile, the Development
+data lock (156:704, "unlocks in N games" / no birth date), and the age-band
+notice all shipped then.
+
+What was actually missing: **nothing on the profile was premium-gated.** A
+free or lapsed parent had the full Breakdown. 663:2426 shows those actions as
+disabled "· Locked" chips over averages that all STAY VISIBLE - the strip
+says high-level stats only, and the frame means it.
+
+- Free AND lapsed both get the lock. The entitlement default is premium, so a
+  subscriber never sees a lock flash while RevenueCat is still answering.
+- The chip reads disabled but is TAPPABLE, and opens plans. A dead control
+  explains nothing.
+- The profile's paywall now goes through showPaywall, so renewing from here
+  reaches the 2.0 paywall rather than v1's sheet.
+
+**DELIBERATELY NOT BUILT: the "Trends · Locked" chip and the Trends teaser
+(331:1661).** Stats & Trends (307:1407) does not exist in 2.0 - it was scoped
+out of 4.11 - so a locked Trends chip would open the paywall and unlock into
+nothing. That is the "Save to unlock" promise this phase has already had to
+retract three times. Both remain a SEPARATE premium/trends item; build the
+screen first, then its lock.
+
+Each carries `[ ] built` · `[ ] wired` · `[ ] device-verified`.
+
+**Watch item:** paywall/onboarding snapshots are static clones of real screens. Fixing a source screen does **not** update them — re-clone on change.
+
+---
+
+## 4D — Polish and verification
+
+**Reordered 2026-07-23.** The original order verified before polishing and had
+no plan for the parents who already use v1. Both are fixed below: the cheap
+read-only checks come first, the device pass moves to LAST so it tests the
+thing that actually ships, and the upgrade experience becomes its own item.
+
+### 4.19 Copy audit — DO THIS FIRST
+Read-only, no device needed, and the errors it catches are the embarrassing
+kind to find after submission. No em dashes. Solid → Good → Elite ordering.
+Lowercase "app store". No screen displays a player attribute with no capture
+field. Prices and the trial rule match the store config. Every promise the app
+makes is one it can keep - this phase retracted three.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.19b UI polish pass
+Icons and visual detail ONLY. No behaviour, no copy, no new state. Batched
+deliberately: a polish change mixed into feature work is the one nobody
+re-tests. Comes after the copy audit so text and icon are settled together,
+and before the device pass so 4.18 exercises the final look.
+`[x] built` · `[x] wired` · `[x] device-verified`
+
+**Done 2026-07-23** (device-verified across several passes). Figma-authored
+first where a surface changed. Covered:
+- Figma nav icons + aligned empty states + premium banner; nav icons sized
+  correctly; clean split player icon.
+- Dot-burst spacing baked into the component (first ring one gap off the mark);
+  ambient lime glow (`CiAmbientGlow`) behind onboarding + the paywall carousel
+  (top wash only), onboarding capture clipped to the card radius and fading to
+  ink, dots→CTA spacing.
+- 13 stray spacing/radius literals tokenised.
+- Today account avatar reads the real name (public.users), Figma-styled with a
+  settings-glyph default; the inert profile camera badge hidden.
+- **App-wide neutral `CiAvatar`** (light-grey chip, ink initials, hairline
+  border) - the switcher opts into its filled/outlined states.
+- Shared `CiEmptyState` so Players + Games are identical by construction.
+- Dead Today bell removed; Create sheet uses the nav glyphs.
+- Already-Premium: burst centred between close and label, boxed close.
+- Game Detail: insight tag ellipsis fixed + right-aligned; box stats
+  right-aligned + tight with PTS on their baseline; AI spark standardised on
+  `auto_awesome`; full game share (matchup, date, box line, shooting %,
+  insight, development).
+
+**Deferred out of 4.19b — its own item: profile photo upload.** The Your
+Profile camera badge is hidden until this exists (a badge that opens nothing is
+a broken control). Needs the `image_picker` dependency, a Supabase Storage
+`avatars` bucket, an `avatar_url` column on `public.users`, and pick → upload →
+show wiring; `CiAvatar`/`TodayHero` already accept an `imageUrl`, so the render
+side is ready. The badge returns automatically the moment `onEditPhoto` is
+wired. `[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.19c "What's new in 2.0" for EXISTING parents
+**New item. The biggest gap in the original plan.**
+
+A parent who has used v1 for months opens 2.0 and every screen has moved. The
+onboarding built in 4.9 does not help them: it runs at SIGN-UP, and they are
+already signed in. Without something, the update reads as the app breaking.
+
+What it has to say, in this order: their data is safe and all still there;
+where the familiar things now live; what is genuinely new (Growth IQ, the
+development story, the rebuilt tracker). Reassurance BEFORE novelty - a parent
+worried their season is gone will not read a feature list.
+
+Needs a Figma pass before any code.
+
+**Detecting an upgrader is the hard part and it is not the same as "first
+launch".** A fresh install of 2.0 by a NEW parent must not see it. The test is
+a local flag absent AND the account already has players or games - that
+combination means an existing account meeting this UI for the first time,
+including on a new device.
+
+**Built as a single dark, celebratory sheet (`CiWhatsNewSheet`).** A DotBurst +
+CiLogoMark hero carries the "fresh look" so it stopped being a flat bullet, then
+four rows: Everything's safe, Growth IQ, Development story (the AI spark, kept to
+the AI row), A faster live tracker. `whatsNew2Seen` per-uid in FFAppState
+(`ff_whatsNew2SeenUids`, version-tagged). `WhatsNewGate` floats it over Today at
+`_homeScreen()`, nested in FirstRunGate. Mutual exclusion lives in
+`SupabaseFirstRunPolicy`: welcoming a new parent marks this sheet seen, so the
+two gates can never both fire. Behind `kUseWhatsNew2`.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[ ] device-verified`
+
+### 4.19d Toast / snackbar integration
+**New item.** The success + error toasts were designed (521:2009) but never
+built - the app still fired default snackbars, and one early account-confirm
+helper (`showAccountResult`) used full lime/orange backgrounds instead of the
+designed dark chip. Both broke consistency.
+
+Built `CiToast` + `showCiToast(type, actionLabel, onAction)` to the frame: a
+`#141414` chip (`CiPalette.inkRaised`), a 10pt status DOT carrying the meaning
+(lime = done, orange = problem, white = neutral/pending), white 14.5 Medium
+text, optional trailing action, floating above the tab bar with type-based
+auto-dismiss. Migrated the ~16 `lib/features/` call sites (auth, players, menu,
+premium, games); deleted `showAccountResult`. Left `lib/pages/` (legacy, 4.24
+deletion) and FlutterFlow's `showSnackbar` untouched. "Check your email"
+messages map to neutral (pending, not done); completed actions to success.
+
+Device-verified 2026-07-23: success (Edit Name), neutral (Edit Email), and
+error (Send Feedback in true airplane mode) all render the right dot on the
+dark chip. Also fixed a stray grabber-on-the-check overlap in the feedback-sent
+sheet (4.15c) found during the same pass.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
+
+### 4.19e App icon + logo mark refresh
+**New item.** The store app icon predates 2.0 and needs redesigning, and there
+is an updated logo mark coming from the user.
+
+**THE ASSETS EXIST. Branding page `923:3219`** in `uvHb6HXvIVFwzSSXPtEVoc`
+(added 2026-07-24, so this item is unblocked):
+
+| Asset | Node | Notes |
+|---|---|---|
+| Logo frame | `923:3226` | 1920x1080, holds the mark + wordmark |
+| **Logo Mark** | `923:3515` | VECTOR 174x174 - the updated mark |
+| `Subtract` | `923:3228` | VECTOR 174x174 - second mark vector, confirm which is current before porting |
+| **COURTSIDE.IQ wordmark** | `923:3229` | GROUP 969x102, 12 vectors |
+| **App Icon** | `923:3279` | 240x240: a `DotBurst` group (`923:3297`) + the mark (`923:3514`, 93x93) |
+
+The icon is the **DotBurst + the mark**, which is the same brand hero the
+paywall and the 4.19c sheet use - so the icon and the in-app heroes have to
+stay in agreement.
+
+**PART 1 - LOGO MARK: DONE, device-verified 2026-07-24.** The geometry changed,
+not just the corners: the vertical channel moved from `0.47` to centre and
+widened (`0.055 → 0.067`), and the cut terminations are rounded. That rounding
+is INTENTIONAL, including the fact that it stops reading as rounded at small
+sizes. So `CiLogoMark` moved from a `CustomPainter` to Figma's own SVG export
+rendered with `ColorFilter(srcIn)`: the shape is taken from the design rather
+than re-derived, while both standing rules still hold (vector scales, srcIn
+recolours). Public API unchanged, so all 13 call sites were untouched, and the
+old painter constants were DELETED rather than adjusted - they described the
+old mark. `923:3515` and `923:3228` are byte-identical, so there was no "which
+one is current" ambiguity. `DotBurst` needed no change: the path still fills
+its box as a full disc, so `markSize` ring spacing is unaffected.
+
+**TESTING GOTCHA WORTH KEEPING: flutter_svg does NOT surface a missing asset
+through `tester.takeException()`** - a deliberately bogus path renders an empty
+box and PASSES a "renders without throwing" test (verified with a probe).
+`test/ci_logo_mark_test.dart` therefore asserts the file exists at the path the
+widget requests AND parses it through the real `vg` parser. Any future
+asset-backed component needs the same treatment, or it can vanish silently on
+every surface at once.
+
+**PART 2 - APP ICON: built.** Derived from `923:3279` (burst + mark).
+`flutter_launcher_icons` was already a dev dependency and configured, so this
+was a source swap plus one real gap closed.
+
+- `scripts/build_app_icon.dart` turns the Figma export into both sources. It
+  exists because the export tool caps at 4x and the frame is 240pt, so the
+  master arrives at **960 with alpha**: iOS needs **1024 and rejects alpha**, so
+  the artwork is flattened onto ink and resized.
+- **THE ANDROID ADAPTIVE ICON WAS MISSING ENTIRELY** (no `mipmap-anydpi-v26`),
+  so every modern launcher was shrink-masking the legacy square PNG. Now
+  `adaptive_icon_background: '#0F0F0F'` + a pre-inset foreground. **The inset is
+  the load-bearing part:** a launcher crops BOTH layers to the inner ~66%, so
+  handing it the full-bleed artwork would zoom the mask into the middle and cut
+  the burst off around the mark. The script scales the artwork to 75% of a
+  transparent 1024 canvas - above the 66.7% safe zone so a rounder mask cannot
+  reveal a rim of flat background, at the cost of only the outermost ring of
+  decorative dots. The background colour matches the artwork's ground so the
+  two layers meet invisibly.
+- Regenerated: 21 iOS PNGs (1024 verified alpha-free), 5 Android mipmaps, the
+  new adaptive XML + `ic_launcher_foreground` drawables, a new `colors.xml`,
+  and the web icons.
+
+**THE TWO PLATFORMS NOW DIVERGE ON PURPOSE, and this is the thing to know
+before touching either.** iOS ships an **Apple Icon Composer** document,
+`ios/Runner/courtside-iq.icon` (gradient ground + `Logo Mark` and `DotBurst`
+layers, with Apple's shadow/translucency). That is what supplies the native
+light/dark/tinted variants `flutter_launcher_icons 0.13.1` cannot produce - the
+gap that was originally going to be deferred. Android keeps generating from the
+Figma artwork; the two are separate uploads and do not have to match asset for
+asset.
+
+Wiring, so it is reproducible:
+- The `.icon` is registered in `project.pbxproj` as a resource of the Runner
+  target with `lastKnownFileType = folder.iconcomposer.icon` (the exact type is
+  from Xcode's own `StandardFileTypes.xcspec`; guessing it wrong makes Xcode
+  treat the bundle as a plain folder and silently skip the icon).
+- `ASSETCATALOG_COMPILER_APPICON_NAME` = `courtside-iq` in ALL THREE configs.
+- **`flutter_launcher_icons` is now `ios: false`.** Leaving it true would
+  regenerate `AppIcon.appiconset` and make it ambiguous which icon ships.
+- Needs **Xcode 26+** (verified on 26.4.1). This is a real toolchain floor: an
+  older Xcode cannot compile a `.icon`.
+
+VERIFIED BY BUILDING, not by the file being present: `flutter build ios
+--release --no-codesign` produces `CFBundleIconName = courtside-iq` and an
+`Assets.car` containing `IconGroup` / `IconImageStack` entries for
+`courtside-iq_Assets/DotBurst`, `Logo Mark` and the gradient - i.e. the LAYERED
+stack, which is what the variant rendering needs. A green build alone proves
+nothing here.
+
+`ios/Runner/Assets.xcassets/AppIcon.appiconset` is deliberately LEFT IN PLACE
+for now as an instant rollback (flip the build setting back). It is unused, but
+it does still compile two stray `AppIcon*.png` into the bundle - delete it once
+the icon is confirmed on a device.
+
+**Must land before 4.22 cuts the build**, and it feeds 4.23's store assets (the
+listing icon has to match the installed one).
+
+Device-verified on iPhone 2026-07-24 (mark and icon), after which
+`AppIcon.appiconset` was deleted - the rollback it existed for is no longer
+needed, and it was still compiling two stray `AppIcon*.png` into the bundle.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
+
+### 4.19f Navigation transitions and a persistent nav shell
+**New item.** Two related complaints, both structural rather than cosmetic.
+
+**1. The bottom nav re-mounts on every tab change.** There is NO shell route
+(`ShellRoute` count in `nav.dart`: zero). Today, Players, Games, Menu and
+Player Profile each render their OWN `CiNavBar`, so `goNamed` replaces the
+whole scaffold - bar included - and the nav visibly reloads and animates with
+the page. The bar should stay fixed and only re-mount when moving to or from a
+screen that genuinely has no nav (auth, live tracker, paywall).
+
+Fix: a `StatefulShellRoute.indexedStack` owning one `CiNavBar`, with the four
+tabs as branches and the body swapping underneath. Two things follow for free:
+per-tab state and scroll position survive a tab switch, and pushed screens that
+should KEEP the nav (Player Profile, Game Detail, Trends - see the standing
+rule) keep it by living inside their branch instead of re-declaring the bar.
+Each tab screen then stops rendering its own bar.
+
+**2. Everything slides in from the right, and that is a default nobody chose.**
+`TransitionInfo.appDefault()` is `hasTransition: false`, which falls through to
+`MaterialPage`; on iOS that IS the Cupertino push slide. So the fly-in is
+inherited, not designed.
+
+Intended policy: **crossfade is the default**; the slide-from-right is RESERVED
+for genuine pushes that have a back affordance and a parent to return to - Edit
+Player, the account sub-screens, Game Detail. Tab switches must not slide at
+all once the shell lands, since the bar no longer moves. Keep it quick; a long
+fade on a tab switch reads as lag.
+
+**BUILT.** Shell first, then the policy, for the reason above.
+
+Part 1: `StatefulShellRoute.indexedStack` with one `CiNavBar` in `CiNavShell`;
+taps call `goBranch`, tapping the active tab pops that branch to its root. The
+landing gates moved from the Home route to wrap the SHELL - first-run has to
+cover the bar, and a gate inside the Home branch renders underneath it. Player
+Profile rides in the Players branch so it inherits the bar; Game Detail stays
+top-level because it renders none. Route names and paths are unchanged, so
+every `goNamed`/`pushNamed` still resolves and `kUseNavShell` reverts it all.
+
+Part 2: `TransitionInfo.appDefault()` is now a 200ms crossfade. It was
+`hasTransition: false`, which is NOT "no animation" - it falls through to
+MaterialPage, and on iOS that is the Cupertino slide. That is why everything
+flew in from the right, and why five screens had hand-rolled their own fade
+(all removed, they are the default now). `TransitionInfo.push()` +
+`slideInExtra()` opt the edit screens (Edit Name, Edit Email, Change Password,
+Delete Account) back into the slide.
+
+THREE TRAPS THIS TURNED UP, all worth remembering:
+- Collapsing a screen's bar condition to `kUseNavBar2 && !kUseNavShell` falls
+  through to the **v1 FlutterFlow bar**, not to no bar. The check is three-way
+  and the shell case must be tested first.
+- Today PUSHED its tab destinations (Menu, Players, Games). Under a shell a
+  push stacks the tab inside the current branch - Menu rendered with Home still
+  lit - so tab destinations must use `goNamed`.
+- A shared bar cannot call a screen's refresh, because it does not know what it
+  is sitting on. Resetting the branch refreshes but pops the tab to its root.
+  `players_revision.dart` announces instead, and screens reload themselves.
+
+**REGRESSION FOUND ON DEVICE, and it is the one to remember.** The bottom nav
+was missing entirely on a cold start. `/` builds the home screen INLINE through
+`_entryScreen`, so under the shell it rendered Today with the shell nowhere in
+that subtree - and Today no longer draws its own bar. Only `/home` is inside
+the shell. Fixed with `shellEntryRedirect`, which hands `/` over to `/home`
+once a parent is signed in (and leaves `/` alone while auth resolves, so the
+splash still shows, and for a signed-out parent, who belongs on onboarding).
+
+Sign-in had the same shape of bug: it PUSHED `HomeWidget.routeName`, and
+pushing a shell route from outside stacks it on the root navigator above the
+shell. Now `goNamedAuth`, which is also what sign-in means.
+
+**A SECOND ONE FOLLOWED, same shape.** Home then sat on the SPLASH forever with
+the bar showing, while every other tab loaded. `FFRoute` substitutes the splash
+for a route's real content while loading - once, at page-build time - and the
+shell's indexedStack keeps branch pages ALIVE, so a Home branch entered
+mid-splash is built AS the splash and never rebuilds. The other tabs worked
+because they were built later. Fixed twice over: the entry redirect also waits
+for `!loading`, and the splash stand-in now gets its OWN page key so the page
+is replaced rather than reused - which also covers a route deep-linked into
+mid-splash, where no redirect can help.
+
+**THE REAL LESSON, and the fix for the class.** All three regressions shared a
+shape: the shell changed structure and LIFETIME assumptions, and nothing in the
+suite booted the app - every test mounts a screen directly or drives a
+synthetic router built in the test. `test/router_boot_test.dart` now boots the
+REAL route table at `/` and asserts what the entry path lands in. Both
+regressions were confirmed catchable by reintroducing each one and watching the
+matching test fail. It asserts routing STRUCTURE only: screens reach Supabase
+in initState and are not exercised.
+
+That harness also turned up a latent fragility worth keeping fixed: both
+landing gates read `SupaFlow.client` OUTSIDE their try, so an unreachable
+Supabase threw instead of declining - on the one path every session starts on.
+They now return null and decline.
+
+**A THIRD AND FOURTH CLASS, found by checking the paywall on a FREE account.**
+Screens that must COVER the bar were landing in a shell BRANCH navigator
+instead of above the shell, by two different routes: `Navigator.of(context)`
+pushes onto the branch (the live tracker), and GoRouter's imperative push
+appends to the CURRENT match list, so even a top-level route pushed from a
+branch renders inside it (the paywall). Fixed with `rootNavigator: true` and a
+new `FFRoute.parentNavigatorKey` naming `appNavigatorKey`. Game Detail is
+deliberately NOT pinned - it keeps the bar per the standing rule, and the test
+asserts that distinction both ways.
+
+That check also found a bug that PREDATES the shell: the Players list, the
+create flow and the dashboard each built their own sheet around the v1
+`PaywallWidget` rather than calling `showPaywall`, so they ignored
+`kUsePaywall2` and showed a FREE parent the v1 paywall on the primary
+conversion path. And `showModalBottomSheet` defaults to
+`useRootNavigator: false`, so all ten raw sheets rendered inside the branch
+with the tabs over them. Both are now guarded by source-scanning tests: these
+are properties of how the app is WIRED, and a widget test only proves the one
+path it pumps.
+
+Device-verified 2026-07-24, every item confirmed explicitly: cold start shows
+the bar, sign-out/in shows it, tapping the active tab pops to root, the live
+tracker and paywall have none, onboarding and first-run have none, and on a
+FREE account the add-player gate reaches the 2.0 paywall with no bar from both
+the Players list and the create sheet.
+
+`[x] designed` · `[x] built` · `[x] wired` · `[x] device-verified`
+
+### 4.18 End-to-end passes — DO THIS LAST
+Moved after polish so it verifies what ships rather than an intermediate
+state. Full journey on iOS and Android in `--release`. Offline tracking with
+wifi cut mid-game. Entitlement: fresh / premium / lapsed / billing-issue.
+Growth IQ: <5 games, exactly 5, decline, age-band crossing. Force-quit
+mid-game and resume. Delete an account.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## 4E — Cutover to 2.0.0
+
+**Nothing here happens without explicit approval at the time.**
+
+**THE ORDER IN THIS SECTION IS LOAD-BEARING.** 4.20a before 4.20b is not
+tidiness: reversing them takes premium away from every paying subscriber.
+
+### 4.20a Backfill subscribers into prod `subscriptions` — BEFORE ANY ENFORCEMENT
+Prod enforces nothing today: `subscriptions` does not exist there, so every
+paying parent is premium purely because nothing checks. 2.0 brings the check
+with it.
+
+Apply the table and webhook to prod, backfill every existing subscriber from
+RevenueCat, and VERIFY THE ROW COUNT against RevenueCat's active-subscriber
+count before anything reads it. `is_premium()` answers false for anyone
+missing, so a short backfill silently downgrades real customers.
+
+**DONE 2026-07-27.** In order: `subscriptions` table + `is_premium()` applied
+to prod (verified: RLS on, callable); `revenuecat-webhook` deployed with
+`--no-verify-jwt`, secret set, fail-closed probes verified (401 bare / 401
+wrong secret / 405 GET); RevenueCat webhooks split sandbox->test and
+production->prod. Backfill swept ALL 308 prod users via `
+scripts/subscriptions_backfill.py` (API v2, scoped customer-read key, user
+list checksum-verified against prod): 111 unknown to RC, 188 no subscription,
+9 rows written - **7 active (all is_premium true), 2 expired (false)**, all
+env=production App Store `courtside_IQ_599_1m`. Inserts were ON CONFLICT DO
+NOTHING so live webhook rows always win. **Cross-check 2026-07-27: RevenueCat
+dashboard shows 8 active; our table holds 7. The 8th is
+$RCAnonymousID:3b111541... - an ANDROID (Play Store) purchase made before the
+app identified the customer, so it has NO Supabase account and cannot be
+backfilled (user_id FKs auth.users). Notable: all 7 identified subscribers
+are App Store, so this is the only Play subscriber. Self-heals: when that device signs in, RC aliases and transfers
+the sub, and the next RENEWAL event carries the real uid and writes the row.
+Until then that one parent would hit the player cap only when ADDING a player
+past 1; existing players are untouched. Watch prod webhook logs for it.**
+Enforcement is still NOT live - the RLS limit ships in 4.20b.
+`[x] built` · `[x] wired` · `[x] verified against prod`
+
+### 4.20b Promote schema to prod
+Backup first. In order: the account-deletion cascades (20260723000000),
+delete_current_user (20260723000001, 20260723000002), the age-band null
+(20260721000000), then the entitlement RLS.
+
+**DONE 2026-07-27.** Backup confirmed first; orphan check came back ZERO both
+directions. The promotion list grew by three discovered dependencies that were
+test-only: ai_usage (cascades + 4.21 functions need it), insight_json_nullable
+(claim rows), insight_delete_policy (claim cleanup). Skipped as verified
+no-ops: align_v_player_game_stats (view md5 identical on test and prod) and
+drop_insight_advisory_lock (functions never existed on prod). Applied in
+order: ai_usage -> insight_json_nullable -> insight_delete_policy -> cascades
+-> delete_current_user (final form incl. ai_usage pre-clear) -> age-band null
+-> entitlement RLS. All verified object-by-object, plus LIVE RLS probes in
+rolled-back transactions: a free user at the 1-player limit is DENIED
+(insufficient_privilege) and an active subscriber is ALLOWED; zero probe
+residue. Fresh blast radius at flip time: 7 premium all pass, 35 free
+over-limit keep every player (INSERT-only), zero paying customers affected.
+**Server-side entitlement enforcement is LIVE on prod as of this item.**
+`[x] built` · `[x] wired` · `[x] verified live on prod`
+
+### 4.20c Freeze earned per-game ratings across an age-band crossing
+**Found 2026-07-26 during the 4.18 F pass.** Decision #4 is "freeze earned
+ratings, NORMALIZE trends." The trend half is right (Growth IQ re-normalizes to
+the current band, which is correct for a trend series) and the transition banner
+is built (`age_band_service` + `age_band_notice`). The freeze half is NOT:
+`game_detail_repository._ageBand` derives the band from the player's CURRENT
+birth date via `player_profile_view`, and `game_detail_builder.dart:194`
+(`ppsaTier(value, row.ageBand)`) grades every historical game against it. So on a
+real boundary crossing (10U → 13U) every past game's earned tier badge
+retroactively re-grades against the higher bar - a "Good" night earned at 10U
+can drop to "Solid." That fights "every rating should feel acceptable."
+
+Only the STRUCTURED badge re-grades; the cached insight-card narrative is frozen
+already, so the two can even disagree on the same screen after a crossing.
+
+FIX (schema change, test-first, explicit approval, never prod without say-so):
+store the age band (or birth date) ON the game row at save time, backfill
+existing games, and switch the per-game tier builders to read the frozen
+per-game band instead of the current one. The Growth IQ engine keeps using the
+current band (that half is correct). Only bites on an actual crossing, so it is
+deferred here, not blocking the 2.0 number.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.21 Deploy Edge Functions to prod
+generate-game-insight and generate-player-insight are on prod at v1 and need
+the no-birth-date change. revenuecat-webhook needs `--no-verify-jwt` and its
+shared secret set BEFORE the backfill, or renewals arrive at a closed door.
+delete-account is NOT deployed: the rpc replaced it.
+
+**DONE 2026-07-27.** The webhook went live earlier in 4.20a (before the
+backfill, per the ordering rule). Both insight functions deployed with JWT
+verification ON, shared modules bundled, ANTHROPIC_API_KEY confirmed present,
+401 probes verified. Live v1.4.0 users now get the v2 single-game-scoped
+per-game prompt, and the player narrative runs the claim-row version - whose
+schema prerequisites (insight_json_nullable, insight_delete_policy) landed in
+4.20b by design. delete-account deliberately not deployed. Behavioral proof
+arrives with the next live-user game; watch function logs during 4.25.
+`[x] built` · `[x] wired` · `[x] deployed + probe-verified`
+
+### 4.24 Retire all v1 screens — GATES 4.22
+
+**Decision:** 2.0 ships with **zero** v1 screens.
+
+**This is the largest remaining item and the easiest to underestimate.**
+Deleting `lib/pages/` turns every route still pointing at a v1 screen into a
+CRASH rather than a stale screen, and several live paths still do: the v1
+paywall fallback, GameStatsWidget, AllGamesWidget, the menu sub-screens.
+
+- Confirm every entry in `docs/2-0-screen-coverage.md` is designed + built or
+  deliberately cut. ✓ (24 approved frames, app_appearance the one deliberate cut)
+- Remove the per-screen 2.0 flags - 2.0 becomes the only path. ✓ flags.dart
+  deleted; kUseTestSupabase (env, not a screen flag) is the only flag left.
+- Delete `lib/pages/`, its routes and orphaned widgets. ✓ 117 files, 52k lines:
+  lib/pages/, DashboardPage (+widgets), PlayerProfilePageV2 (+its tabs/cards),
+  the v1 AddPlayerSheet, openPlayerProfileV2. The v1-only routes
+  (GameStatTracker, EditPlayer, EditPlayerPosition, AppAppearance) had no
+  live callers and were removed.
+- **Route names and deep-link paths survive**: lib/index.dart now defines
+  abstract holder classes with the same class names and the exact v1
+  routeName/routePath values, so every goNamed and shipped deep link works
+  unchanged.
+- `flutter analyze` clean (0 errors); grep proves zero `pages/` imports. ✓
+- Full test suite green (694). ✓
+- Re-run 4.18 after deletion. A missed route surfaces here as a crash. ✓
+  Full device re-run passed 2026-07-26: every route edge exercised, no
+  crashes, no v1 screen appeared anywhere. The pass also surfaced and closed
+  two defects: CiField's tap target was smaller than the visible box, and the
+  reset-password back button was dead on a deep-link stack (and its recovery
+  session survived a force-quit, opening the next launch signed in - back now
+  tears the session down).
+`[x] built` · `[x] wired` · `[x] device-verified` — **DONE 2026-07-26**
+
+### 4.22 Flip flags and cut the build
+`_kUseTestSupabase = false`. Version `2.0.0`, build number above live. Local
+release pipeline (JDK 17 + FF keystore for Android, Transporter for iOS).
+
+**DONE 2026-07-29. BOTH STORES SUBMITTED, AWAITING REVIEW.** Cutover commit
+`ba78e6d`: flag false, version 2.0.0+300 (live was 1.4.0+234), 699 tests green
+on the flipped config.
+
+- **Android:** `flutter build appbundle --release` with JDK 17 from
+  `/opt/homebrew/opt/openjdk@17` (system Java is 25; the build needs 17).
+  68.6MB aab, `jarsigner -verify` = "jar verified". Uploaded to Play,
+  listing + screenshots + notes in, **staged rollout 24%**, submitted.
+  NOTE: Play folds "Start rollout" into "Save and submit for review" when the
+  release goes through review - the 24% begins automatically on approval.
+- **iOS:** `flutter build ipa` archived 2.0.0 (300) fine but IPA export failed
+  on two Apple-side gates: an unaccepted **PLA update** and **no iOS
+  Distribution certificate** on this Mac. Both cleared by accepting the
+  agreement, then distributing the archive through the Xcode Organizer
+  (`open build/ios/archive/Runner.xcarchive` -> Distribute App -> App Store
+  Connect -> Distribute), which mints the certificate automatically. Transporter
+  was not needed. Build attached in ASC and submitted for review.
+  CAUTION: a stale v1.4.0 `Courtside IQ.ipa` from June still sits in
+  `build/ios/ipa/` - never feed that to Transporter.
+- **Store copy/assets:** the approved 4.23 package went in as-is. Two upload
+  gotchas: Apple keywords must have **no spaces after commas** (96 chars with
+  spaces = 109 = rejected), and screenshots belong in the **6.9" slot**
+  (1320x2868); the 6.5" slot rejects them - click "Keep using 6.9" Display".
+- **Prod Supabase redirect URLs added:** `courtsideiq://reset-password` and
+  `courtsideiq://login-callback`.
+`[x] built` · `[x] wired` · `[x] submitted 2026-07-29`
+
+### 4.23 Store assets
+New screenshots, release notes and listing copy for the 2.0 UI. The release
+notes are the FIRST thing an existing parent reads about this change - they
+carry the same reassurance as 4.19c, in shorter form.
+
+**DONE 2026-07-26.** Copy approved (release notes, listing, rebuilt keywords)
+in `docs/store-assets-2-0.md`. Six screenshots designed on the Figma Store
+Screens page, user-signed-off, exported to `store-assets/`: App Store 6.9-inch
+set (1320x2868), Play set (1080x1920), Play feature graphic (1024x500), all
+opaque RGB. Upload happens when 4.22 creates the 2.0.0 version entries; also
+fix the iOS display-name casing (CourtSide -> Courtside) at submission.
+`[x] built` · `[x] wired` · `[x] approved` — upload rides with 4.22
+
+### 4.26a Player photo paths — unguessable, and not in a "null" folder
+
+**Done 2026-09-13.** Splits out of 4.26 below, which stays open.
+
+Two defects in one path string, both in FlutterFlow's uploader:
+
+1. **Enumerable names.** `_getStoragePath` names objects by
+   `DateTime.now().microsecondsSinceEpoch`, e.g. `pics/1776050991034336.jpg`.
+   The bucket is public, so a child's photo was fetchable by anyone who guessed
+   a nearby timestamp, unauthenticated.
+2. **A literal `null/` folder, live in 2.0.** `pickPlayerPhoto` never passed
+   `storageFolderPath`, and `_getStoragePath` interpolates the null straight
+   into the path. Only the v1.5 sheet passed `'pics'`, and that sheet is
+   unreachable. Every 2.0 upload lands in `null/`.
+
+Paths are now `players/<playerId>/<uuid v4>.<ext>` via
+`lib/features/players/player_photo_storage.dart`. The player id is itself a
+uuid, so the prefix leaks nothing and gives 4.26b's RLS policy something to
+scope by. Extensions come off an allow-list, since the extension reaches the
+path.
+
+**Replacing or removing a photo now deletes the old object.** Neither the old
+uploader nor "remove photo" did, which is why prod holds **107 objects for 31
+referenced photos**: 76 orphans, unreachable and still public.
+
+**Still returns a PUBLIC url, deliberately.** v1.4.0 clients read the same
+`players.player_profile_pic` column and render whatever string is in it, so
+storing a path would break every avatar on every phone still on v1 - a live
+population during a phased rollout. Unguessable names remove the enumeration
+attack now; the bucket flips in 4.26b.
+
+`[x] built` · `[x] wired` · `[ ] device-verified`
+
+**Device verification owed:** change a player's photo, confirm it uploads and
+renders, and confirm the previous object is gone from the bucket.
+
+### 4.26b Flip the photo bucket private — GATED ON v1 DRAINING
+
+**Found by the 2026-07-29 security sweep. Still open.** 4.26a removed the
+enumeration attack; this is the actual fix.
+
+Prod state as of 2026-09-13 (read-only queries):
+
+| | |
+|---|---|
+| Players | 256 |
+| With a photo | 31 |
+| Pointing at `pics/` | 30 |
+| Pointing at `null/` | 1 |
+| Objects in bucket | 107 |
+| Orphans | 76 |
+
+So the migration surface is **31 rows and 31 objects**, not 107. The original
+entry said flipping the bucket "would break every photo in the live v1 app",
+which is true but smaller than it sounds.
+
+**THE GATE IS THE ROLLOUT, NOT THE ENGINEERING.** v1.4.0 clients hold public
+urls and render them directly. The bucket cannot go private until v1 has
+drained or you accept broken avatars for whoever is left on it.
+
+When that is true:
+- copy the 31 referenced objects to `players/<playerId>/<uuid>.<ext>`
+- rewrite `players.player_profile_pic`, keeping a fallback while old urls drain
+- delete the 76 orphans
+- private bucket + RLS on `storage.objects` scoped by player owner
+- app reads via short-TTL signed urls rather than stored public urls
+
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+### 4.27 List loading skeletons — NEW
+
+The Players and Games lists rendered `CircularProgressIndicator` while loading,
+even though both had approved skeleton frames sitting unbuilt
+(`515:1975`, `682:2785`). Today already had one (`670:2559`,
+`today_skeleton.dart`), so the app was showing two different kinds of waiting
+on three screens of the same kind.
+
+**Built:**
+- `lib/courtside_iq/design/components/ci_skeleton.dart` — `CiBone`, extracted
+  from today_skeleton's private `_Bone` so all three screens share one shape.
+- `lib/features/players/widgets/players_list_skeleton.dart`
+- `lib/features/games/games_list_skeleton.dart`
+
+**Two deliberate divergences from the frames, both for the same reason.** A
+skeleton exists to hold the layout still; a placeholder that is a different
+size from the thing it replaces makes the list jump on arrival, which is worse
+than a spinner.
+- The Players frame draws a 188-tall row with a 96 gauge. The built
+  `PlayerListRow` is 208 with a 112 gauge. The skeleton imports
+  `kPlayerRowHeight` / `kPlayerRowGaugeSize` (made public in this change) so the
+  two cannot drift.
+- The Games frame draws the player chip row as 14-tall bars. Both chip rows are
+  `CiChipBar`, which is h32. Reserving 14 would drop the list 18pt on arrival.
+
+**One change to a shipped screen.** `CiBone` uses `border` where today_skeleton
+used `surfaceSunk`. The frames draw bones at `#E7E7E7` on white and `#3D3D3D`
+on ink; `surfaceSunk` resolves to `#F7F7F7` / `#1A1A1A`, and `#1A1A1A` on a
+`#0F0F0F` ground is very nearly invisible. `border` (`#E9E9E9` / `#2E2E2E`) is
+the closest the palette holds. Today's loading state is therefore slightly more
+visible than before, and closer to its own frame.
+
+`test/list_skeletons_test.dart` locks the anti-jump contract. 706 tests green
+(699 + 7), `flutter analyze` 375 issues / 0 errors, down from 379.
+
+`[x] built` · `[x] wired` · `[ ] device-verified`
+
+**Device verification still owed.** Both skeletons only appear while the first
+query is in flight, so they need a real run with real latency. Note this branch
+carries `_kUseTestSupabase = false` from the 4.22 cutover, so a device run hits
+PROD.
+
+### 4.25 Staged rollout and watch — NEW
+Do not ship 2.0 to everyone at once. This release changes every screen AND
+turns on entitlement enforcement that has never run in prod.
+
+- **iOS:** App Store Connect Phased Release (7-day ramp for automatic updates).
+- **Android:** Play staged rollout, starting small.
+- **Watch:** Crashlytics, and the support inbox for "where did my players go"
+  and "it says I am not premium". The second is the backfill failing, and it
+  is the one that costs customers.
+- **Hold the ramp** on either signal. Both stores allow pausing; neither
+  allows un-shipping.
+
+An existing FREE parent with more than one player keeps them - the policy is
+INSERT-only and removes nothing - but will meet a gate they have never seen
+when adding another. That is correct behaviour and still a support question
+worth expecting.
+
+**IN FLIGHT as of 2026-07-29.** Both stores submitted; rollout controls are
+already set (iOS Phased Release + Manual Release, Play staged at 24%), so
+approval does not ship to everyone.
+
+**On approval, in order:**
+1. iOS: click **Release** (Manual Release is on, so approval alone ships
+   nothing). Phased Release then ramps over 7 days.
+2. Watch, first 24-48h: **Crashlytics** for a 2.0-only crash signature;
+   the **support inbox** for "where did my players go" (should be
+   impossible - nothing was deleted) and "it says I am not premium" (the
+   backfill failing, and the one that costs customers - 7 rows are in and
+   verified, so treat any instance as urgent);
+   **prod Edge Function logs** for generate-game-insight / -player-insight
+   errors at real volume.
+3. **First real webhook renewal ~Aug 4** (earliest `current_period_end`).
+   Confirm `revenuecat-webhook` fires and writes: the row's `last_event_type`
+   should stop being 'BACKFILL'. That is also when the anonymous Android
+   subscriber can self-heal into a real row.
+4. **Hold the ramp** on either signal. Both stores allow pausing; neither
+   allows un-shipping.
+
+**Post-rollout cleanup (once 100% on both stores):** delete the two stale
+Supabase redirect URLs (`courtside-iq.flutterflow.app/resetPassword`,
+`webapp://courtsideiq.app`) - kept during the ramp because in-flight v1
+recovery emails still point at the first one.
+`[ ] built` · `[ ] wired` · `[ ] device-verified`
+
+---
+
+## 2.0 Rebuild sequencing
+
+**PR 0 (audit):** 4.0 screen coverage audit → `docs/2-0-screen-coverage.md`. Read-only, no code. Produces the Figma design backlog.
+**PR 1 (foundations):** 4.1 Growth IQ + 4.2 telemetry + 4.6 migration hygiene. No user-visible change.
+**PR 2:** 4.4 entitlement + 4.3 throttle.
+**PR 3:** 4.5 offline tracking.
+**PR 3.5:** 4.6b Flutter/Dart SDK upgrade — on its own, never mixed with feature work. An SDK bump
+plus a dependency cascade is hard enough to review without unrelated changes in the diff. Scope is
+known from the spike: two package bumps, three call sites, ~half a day. Ordering question resolved
+(keep this position).
+**PR 4:** 4.7 + 4.8 design system.
+**PR 5–13:** one per screen flow (4.9–4.17). Each is gated on its frames being *designed* in the coverage doc.
+**PR 14:** 4.19 copy audit + 4.19b UI polish. Read-only checks and visual-only
+changes, no behaviour.
+**PR 15:** 4.19c "What's new in 2.0" — gated on its Figma pass.
+**PR 16:** 4.18 end-to-end passes on device, against the final look.
+**PR 17:** 4.24 v1 retirement — delete `lib/pages/`, re-run 4.18.
+**PR 18:** 4E cutover — backfill FIRST, then schema, functions, flags, staged
+rollout.
+
+**Figma design work runs in parallel** from PR 0 onward: every gap the audit finds gets designed and approved before its screen PR opens. Design is never the thing a code PR waits on mid-flight.
+
+**Start with PR 0, then PR 1.** The audit is cheap, read-only, and sizes the unknown — it tells us how much Figma work Phase 4 actually contains before we commit to a schedule. Then Growth IQ, which is the hard dependency: every 2.0 screen shows the number, so nothing above it can be honestly built or verified until the formula is real and tested.

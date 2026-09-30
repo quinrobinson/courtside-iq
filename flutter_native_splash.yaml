@@ -1,9 +1,17 @@
 flutter_native_splash:
-  color: "#000000"
-  color_dark: "#000000"
+  # Ink #0F0F0F everywhere - the same ground as the Flutter splash, the app
+  # icon and CiColors.onInk.bg (Release 2.1, 2026-09-28). These were #000000,
+  # so a cold start stepped icon-on-ink -> pure black -> ink on Android and
+  # black -> ink on iOS. Change them together or the step comes back.
+  color: "#0F0F0F"
+  color_dark: "#0F0F0F"
   android_12:
-    color: "#000000"
-    color_dark: "#000000"
+    color: "#0F0F0F"
+    color_dark: "#0F0F0F"
+    # The launcher icon sits on a circle of this colour; matching the ground
+    # makes the circle disappear so only the mark shows.
+    icon_background_color: "#0F0F0F"
+    icon_background_color_dark: "#0F0F0F"
   android: true
   ios: true
-  web: true
+  web: false

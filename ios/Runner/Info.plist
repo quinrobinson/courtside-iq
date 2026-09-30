@@ -42,6 +42,20 @@
 					<string>webapp</string>
 				</array>
 			</dict>
+			<!-- Password recovery deep link: courtsideiq://reset-password
+			     Distinct from the generic "webapp" scheme above, which another
+			     app could plausibly claim - and a collision on a recovery link
+			     would open someone's password reset in the wrong app. -->
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>com.mycompany.courtsideiq</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>courtsideiq</string>
+				</array>
+			</dict>
 		</array>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -53,6 +67,8 @@
 		<string>In order to take a picture or video, this app requires permission to access the camera.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>In order to upload data, this app requires permission to access the photo library.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Courtside IQ does not use your location. This notice is required by a photo and camera component included in the app.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>
