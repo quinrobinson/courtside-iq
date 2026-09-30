@@ -127,7 +127,7 @@ void main() {
     // SAVED rows say what the game meant (2026-09-29).
     const lead = ValueKey('game-row-lead');
 
-    testWidgets('saved game with an insight: its first sentence and the spark',
+    testWidgets('saved game with an insight: its summary and the spark',
         (tester) async {
       await pump(
         tester,
@@ -144,7 +144,8 @@ void main() {
               text: 'Maya attacked the rim all night. Her free throws lagged.'),
         ),
       );
-      expect(find.text('Maya attacked the rim all night.'), findsOneWidget);
+      // An older insight with no model summary: derived, name dropped.
+      expect(find.text('Attacked the rim all night'), findsOneWidget);
       expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
       expect(find.descendant(of: find.byKey(lead), matching: find.text('22')),
           findsOneWidget);

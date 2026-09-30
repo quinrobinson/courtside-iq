@@ -135,6 +135,9 @@ class GameFeedEntry {
         ftAttempt: ftAttempt,
         insight: insight,
         ageBand: ageBand,
+        // The summary never repeats the player's name; strip it if the
+        // model or an older insight led with it.
+        playerFirstName: playerName.trim().split(' ').first,
       );
 
   /// This entry with [band] filled in when it has none of its own. The

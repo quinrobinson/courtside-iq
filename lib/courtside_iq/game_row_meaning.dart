@@ -10,8 +10,13 @@
 //
 // THE MEANING LINE, first match wins:
 //
-//   1. insight   the first sentence of the stored AI insight. It is the most
-//                specific thing anyone has said about this game.
+//   1. insight   a one-line SUMMARY of the stored AI insight, never the
+//                insight cut short (Quin, 2026-09-30): at most 52 characters
+//                so it fits two lines unclipped, and no player name, which
+//                was redundant on every stacked row. The model writes it
+//                (`summary`, prompt v3); older insights get one derived from
+//                the text by [deriveSummary]. The full insight lives on Game
+//                Detail. When neither fits, the row falls through to 2.
 //   2. tier      the best rating Game Detail gives this game, with its skill
 //                name. Computed by buildGameDetail itself, not recomputed
 //                here: the row and the screen it opens must never disagree,
@@ -111,6 +116,69 @@ String firstSentence(String text) {
   return m == null ? t : t.substring(0, m.end).trim();
 }
 
+/// The longest summary a game row shows. MEASURED, not guessed
+/// (test/game_row_summary_fit_test.dart): on a 360pt phone with the avatar
+/// showing, the text column is 179pt and wide 55-character lines only just
+/// make two lines; 390pt phones take about 60. The model is asked for 50.
+/// Mirrors SUMMARY_MAX_CHARS in supabase/functions/_shared/insight_summary.ts.
+const int kSummaryMaxChars = 52;
+
+/// Tidies a summary line: no leading player name ("Maya's", "Maya"), no
+/// closing period, sentence case. Null when nothing is left or it is over
+/// [kSummaryMaxChars]. Mirrors cleanSummary in insight_summary.ts.
+String? cleanSummary(String? raw, {String? firstName}) {
+  if (raw == null) return null;
+  var s = raw.trim().replaceAll(RegExp(r'\s*—\s*'), ', ');
+  final name = firstName?.trim() ?? '';
+  if (name.isNotEmpty) {
+    s = s.replaceFirst(
+        RegExp('^${RegExp.escape(name)}(?:[\'’]s)?\\s+', caseSensitive: false),
+        '');
+  }
+  s = s.replaceFirst(RegExp(r'[.!\s]+$'), '').trim();
+  if (s.isEmpty) return null;
+  s = s[0].toUpperCase() + s.substring(1);
+  return s.length <= kSummaryMaxChars ? s : null;
+}
+
+/// Where a long insight clause can be shortened, tried from the right: each
+/// cut drops a trailing qualifier ("... as a combo guard") and keeps the
+/// headline in front of it.
+const _cutBefore = [
+  ' as a ', ' as an ', ' as the ', ' when ', ' which ', ' while ', ' and ',
+  ' showing ', ' shows ', ' including ', ' with ', ' for ',
+];
+
+/// A summary for an insight written before the model wrote one: the first
+/// clause of the first sentence, without the name, shortened at a natural
+/// break until it fits. Null when no break gets it under the limit, so the
+/// row shows its tier instead of a clipped sentence.
+String? deriveSummary(String text, {String? firstName}) {
+  var s = firstSentence(text).replaceAll(RegExp(r'\s*\([^)]*\)'), '');
+  final comma = s.indexOf(', ');
+  if (comma >= 20) s = s.substring(0, comma);
+  s = s.replaceFirst(RegExp(r'[.!?\s]+$'), '');
+  var cleaned = cleanSummary(s, firstName: firstName);
+  if (cleaned != null) return cleaned;
+  // Over the limit: strip the name first so the cuts measure the real line.
+  final name = firstName?.trim() ?? '';
+  if (name.isNotEmpty) {
+    s = s.replaceFirst(
+        RegExp('^${RegExp.escape(name)}(?:[\'’]s)?\\s+', caseSensitive: false),
+        '');
+  }
+  while (s.length > kSummaryMaxChars) {
+    var at = -1;
+    for (final cut in _cutBefore) {
+      final i = s.lastIndexOf(cut);
+      if (i >= 20 && i > at) at = i;
+    }
+    if (at < 0) return null;
+    s = s.substring(0, at).replaceFirst(RegExp(r'[,\s]+$'), '');
+  }
+  return cleanSummary(s, firstName: firstName);
+}
+
 /// Builds the row's lead and meaning for one saved game.
 ///
 /// [ageBand] is needed for the scoring-efficiency tier, which is age
@@ -127,6 +195,7 @@ GameRowMeaning buildGameRowMeaning({
   required int ftAttempt,
   GameInsight? insight,
   AgeBand? ageBand,
+  String? playerFirstName,
 }) {
   if (isZeroPerformance(
     points: points,
@@ -160,13 +229,19 @@ GameRowMeaning buildGameRowMeaning({
           ? null
           : GameRowLead('${ranked.first.$1}', ranked.first.$2);
 
-  // 1. The insight's first sentence.
+  // 1. The insight's one-line summary: the model's, else one derived from
+  // the text. Neither fitting falls through to the tier, never to a clip.
   if (insight != null && insight.hasText) {
-    return GameRowMeaning(
-      lead: lead,
-      kind: GameRowMeaningKind.insight,
-      text: firstSentence(insight.text!),
-    );
+    final summary =
+        cleanSummary(insight.summary, firstName: playerFirstName) ??
+            deriveSummary(insight.text!, firstName: playerFirstName);
+    if (summary != null) {
+      return GameRowMeaning(
+        lead: lead,
+        kind: GameRowMeaningKind.insight,
+        text: summary,
+      );
+    }
   }
 
   // 2. The best tier, exactly as Game Detail rates this game. Only the

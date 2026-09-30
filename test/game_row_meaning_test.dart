@@ -22,6 +22,8 @@ GameRowMeaning _m({
   int fgAttempt = 0,
   int ftAttempt = 0,
   String? insight,
+  String? summary,
+  String? firstName,
   AgeBand? ageBand,
 }) =>
     buildGameRowMeaning(
@@ -34,8 +36,11 @@ GameRowMeaning _m({
       turnovers: turnovers,
       fgAttempt: fgAttempt,
       ftAttempt: ftAttempt,
-      insight: insight == null ? null : GameInsight(text: insight),
+      insight: insight == null
+          ? null
+          : GameInsight(text: insight, summary: summary),
       ageBand: ageBand,
+      playerFirstName: firstName,
     );
 
 void main() {
@@ -63,34 +68,109 @@ void main() {
     });
   });
 
-  group('meaning: insight', () {
-    test('the first sentence of the insight', () {
+  group('meaning: insight summary', () {
+    test("the model's summary wins over the text", () {
       final m = _m(
-        points: 12,
-        fgAttempt: 9,
-        insight: 'Maya attacked the rim all night. Her free throws lagged.',
+        points: 18,
+        fgAttempt: 12,
+        firstName: 'Jada',
+        insight: 'Jada made efficient use of her scoring opportunities with '
+            '18 points, showing she is developing a reliable touch.',
+        summary: 'Made efficient use of her chances with 18 points',
       );
       expect(m.kind, GameRowMeaningKind.insight);
-      expect(m.text, 'Maya attacked the rim all night.');
+      expect(m.text, 'Made efficient use of her chances with 18 points');
     });
 
-    test('! and ? end a sentence too', () {
-      expect(_m(points: 2, insight: 'What a finish! More to come.').text,
-          'What a finish!');
-      expect(_m(points: 2, insight: 'Ready for more?  Next game.').text,
-          'Ready for more?');
-    });
-
-    test('a decimal is not a sentence end', () {
+    test('a summary that leads with the name loses it', () {
       expect(
-          _m(points: 2, insight: 'She scored 1.4 points per shot. Great.')
-              .text,
-          'She scored 1.4 points per shot.');
+          cleanSummary("Maya's best shooting night yet.", firstName: 'Maya'),
+          'Best shooting night yet');
+      expect(cleanSummary('maya attacked the rim', firstName: 'Maya'),
+          'Attacked the rim');
     });
 
-    test('no terminator: the whole trimmed text', () {
-      expect(_m(points: 2, insight: '  Steady night at the line  ').text,
+    test('a summary over the limit is not shown clipped', () {
+      final long = 'A' * (kSummaryMaxChars + 1);
+      expect(cleanSummary(long), isNull);
+      // ... so the row derives one from the text instead.
+      expect(
+          _m(points: 2, insight: 'Steady night at the line.', summary: long)
+              .text,
           'Steady night at the line');
+    });
+
+    // The real older insights from the test database, 2026-09-30.
+    test('older insights: first clause, no name', () {
+      expect(
+          deriveSummary(
+              "Jordan's scoring efficiency was really impressive this game, "
+              "showing he's making smart decisions when he has the ball.",
+              firstName: 'Jordan'),
+          'Scoring efficiency was really impressive this game');
+      expect(
+          deriveSummary(
+              'Jada made efficient use of her scoring opportunities with 18 '
+              "points, showing she's developing a reliable offensive touch.",
+              firstName: 'Jada'),
+          // 62 characters whole, so it is cut at the last natural break.
+          'Made efficient use of her scoring opportunities');
+    });
+
+    test('older insights: a long clause is shortened at a natural break', () {
+      expect(
+          deriveSummary(
+              'Jordan showed good activity on the court with 7 points and '
+              'solid decision-making as a combo guard. With more games...',
+              firstName: 'Jordan'),
+          'Showed good activity on the court with 7 points');
+    });
+
+    test('older insights: parentheses are dropped', () {
+      final s = deriveSummary(
+          "Jada's efficiency with her scoring opportunities (0.85 points per "
+          "shot attempt) shows she's making smart decisions when she gets "
+          'the ball in her spots as a stretch 4, and her solid effort.',
+          firstName: 'Jada')!;
+      expect(s.contains('('), isFalse);
+      expect(s.startsWith('Jada'), isFalse);
+      expect(s.length, lessThanOrEqualTo(kSummaryMaxChars));
+    });
+
+    test('every derived summary fits and never ends in a period', () {
+      const samples = [
+        "Jada's 21 points came with Elite-level efficiency, showing she's "
+            'making excellent decisions with the ball.',
+        'Jada put on an impressive scoring performance with 17 points, and '
+            'what really stands out is her Elite-level efficiency.',
+        'You were a force on the glass with 6 total rebounds including 2 on '
+            'the offensive end.',
+        'Jada showed real offensive polish this game, converting her scoring '
+            'chances at a Good level for her age group.',
+      ];
+      for (final t in samples) {
+        final s = deriveSummary(t, firstName: 'Jada');
+        expect(s, isNotNull, reason: t);
+        expect(s!.length, lessThanOrEqualTo(kSummaryMaxChars), reason: s);
+        expect(s.endsWith('.'), isFalse, reason: s);
+        expect(s.startsWith('Jada'), isFalse, reason: s);
+      }
+    });
+
+    test('nothing fits: falls through to the next meaning, never clipped', () {
+      final m = _m(
+        defReb: 3,
+        insight: 'Supercalifragilisticexpialidocious-level rebounding '
+            'performances everywhere tonight across every single quarter.',
+      );
+      expect(m.kind, GameRowMeaningKind.stats);
+    });
+
+    test('firstSentence still ends at . ! or ? and skips decimals', () {
+      expect(firstSentence('What a finish! More to come.'), 'What a finish!');
+      expect(firstSentence('She scored 1.4 points per shot. Great.'),
+          'She scored 1.4 points per shot.');
+      expect(firstSentence('  Steady night  '), 'Steady night');
     });
 
     test('an insight beats a tier', () {

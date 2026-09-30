@@ -13,6 +13,7 @@ import {
   getAgeBand,
 } from "../_shared/metrics.ts";
 import { PPSA_MIN_ATTEMPTS } from "../_shared/metrics_config.ts";
+import { cleanSummary, SUMMARY_TARGET_CHARS } from "../_shared/insight_summary.ts";
 import { logAiUsage, withinDailyLimit, type ClaudeUsage } from "../_shared/ai_usage.ts";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
@@ -20,7 +21,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const MODEL = "claude-haiku-4-5-20251001";
-const PROMPT_VERSION = "v2";
+// v3 (2026-09-30): adds `summary`, the one-line headline for game rows.
+const PROMPT_VERSION = "v3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -45,6 +47,7 @@ Guidelines:
 - Never list raw stats; always connect them to development
 - Never use em dashes ("—"). Use commas, periods, or parentheses instead. This is strict.
 - Close with one small, encouraging observation about this game. You may add one small thing to try next time, but only if it is tied to something that happened in this game.
+- summary is a separate headline for a list of games, not a shortened insight. At most ${SUMMARY_TARGET_CHARS} characters. Do NOT use the player's name and do not start with a pronoun (He, She, They, You). Sentence case, no closing period. Say what stood out in THIS game so it reads differently from other games, for example "Scoring efficiency was really impressive this game" or "Made efficient use of her chances with 18 points".
 - highlight_metric MUST be one of "ppsa", "ast_tov", "disrupt", "effort" whenever any tier (Solid/Good/Elite) is provided for that metric. Only return null if no tier data is given.
 - Output valid JSON only`;
 
@@ -79,6 +82,7 @@ Game stats:
 Return JSON with this exact shape:
 {
   "text": "The insight, 2 to 3 sentences",
+  "summary": "One-line headline, at most ${SUMMARY_TARGET_CHARS} characters, no name",
   "highlight_metric": "ppsa" | "ast_tov" | "disrupt" | "effort" | null,
   "tier_context": "Solid" | "Good" | "Elite" | null
 }`;
@@ -108,8 +112,9 @@ function pickHighlightMetric(tiers: {
   return best?.key ?? null;
 }
 
-async function callClaude(userPrompt: string): Promise<{
+async function callClaude(userPrompt: string, firstName: string): Promise<{
   text: string;
+  summary: string | null;
   highlight_metric: string | null;
   tier_context: string | null;
   usage: ClaudeUsage | null;
@@ -150,6 +155,8 @@ async function callClaude(userPrompt: string): Promise<{
   const text = String(parsed.text ?? "").replace(/\s*—\s*/g, ", ");
   return {
     text,
+    // Null when over the limit or unusable; the app then derives the row line.
+    summary: cleanSummary(parsed.summary, firstName),
     highlight_metric: parsed.highlight_metric ?? null,
     tier_context: parsed.tier_context ?? null,
     usage: body.usage ?? null,
@@ -217,6 +224,7 @@ Deno.serve(async (req) => {
       version: 1,
       model: null,
       text: null,
+      summary: null,
       highlight_metric: null,
       tier_context: null,
       prompt_version: PROMPT_VERSION,
@@ -275,7 +283,7 @@ Deno.serve(async (req) => {
 
   let claudeResp;
   try {
-    claudeResp = await callClaude(userPrompt);
+    claudeResp = await callClaude(userPrompt, firstName);
   } catch (e) {
     console.error("claude_error", e);
     // Log the failed attempt too, so error rate is visible alongside spend.
@@ -317,6 +325,7 @@ Deno.serve(async (req) => {
     version: 1,
     model: MODEL,
     text: claudeResp.text,
+    summary: claudeResp.summary,
     highlight_metric: highlightMetric,
     tier_context: claudeResp.tier_context,
     prompt_version: PROMPT_VERSION,
