@@ -15,6 +15,7 @@
 // device signed into the same account must see it. logIn(uid) is what ties
 // the entitlement to the login rather than the handset.
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -131,7 +132,10 @@ class PaywallRepository {
     // return false there, and cancel must not raise the red error state - the
     // parent chose to stop.
     final package = revenue_cat.offerings?.current?.getPackage(packageId);
-    if (package == null) return PurchaseOutcome.failed;
+    if (package == null) {
+      _log('no package "$packageId" in the current offering');
+      return PurchaseOutcome.failed;
+    }
 
     try {
       // ignore: deprecated_member_use
@@ -148,11 +152,19 @@ class PaywallRepository {
       if (code == PurchasesErrorCode.productAlreadyPurchasedError) {
         return PurchaseOutcome.alreadyPremium;
       }
+      // The paywall shows one generic "didn't go through" for every failure,
+      // which is right for a parent and useless for us: the 2.1 sandbox test
+      // (2026-09-30) failed with no store sheet and nothing to say why. The
+      // store's own code and message go to the device log.
+      _log('failed: ${code.name} (${e.code}) ${e.message} ${e.details}');
       return PurchaseOutcome.failed;
-    } catch (_) {
+    } catch (e) {
+      _log('failed: $e');
       return PurchaseOutcome.failed;
     }
   }
+
+  static void _log(String message) => debugPrint('[purchase] $message');
 
   /// Restores a purchase made on another device or a reinstall. Apple
   /// REQUIRES this control on any screen that sells a subscription.
