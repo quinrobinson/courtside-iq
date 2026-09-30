@@ -385,4 +385,32 @@ void main() {
     expect(source, isNot(contains("isEntitled('premium_users')")),
         reason: 'premium is decided in entitlement_status.dart, not here');
   });
+
+  for (final size in const [Size(360, 640), Size(360, 720), Size(393, 852)]) {
+    testWidgets(
+        'on a ${size.width.toInt()}x${size.height.toInt()} screen the slide '
+        'dots sit above the plans', (tester) async {
+      // Quin, Android, 2026-09-28: the dots sat on top of the Monthly row.
+      // The slide block was a fixed 330 tall; on a short screen it spilled
+      // over the plans instead of shrinking. Every other test here renders on
+      // a 2000-tall view, which is why none caught it.
+      tester.view.physicalSize = size * 3;
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(MaterialApp(
+        theme: CiTheme.base(),
+        home: PaywallPage(repository: _FakePaywallRepo()),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: 'no overflow');
+      final dots = tester.getRect(find.byType(CiPageDots));
+      final monthly = tester.getRect(find.text(PaywallCopy.monthlyTitle));
+      expect(dots.bottom, lessThan(monthly.top - 12),
+          reason: 'dots must clear the Monthly row');
+    });
+  }
 }

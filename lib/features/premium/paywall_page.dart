@@ -286,46 +286,72 @@ class _PaywallPageState extends State<PaywallPage> {
               // with all the slack dumped above the pricing. That gave the card
               // no breathing room from the close/logo row and left a wide gap
               // under the dots; splitting the slack puts air on both sides.
+              // SCALES DOWN ON SHORT SCREENS (Quin, Android, 2026-09-28). The
+              // block is a fixed 330-tall carousel plus headline and dots; on
+              // a short Android screen it spilled over the plans and the dots
+              // sat on the Monthly row. FittedBox.scaleDown keeps the design
+              // exact where it fits and shrinks it as one piece where it does
+              // not. The SizedBox pins the width the slides lay out at, since
+              // FittedBox hands its child unbounded constraints.
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // The static premium headline travels with the centred
-                    // block, snug above the feature shot, left at the gutter.
-                    // A little larger than the carousel's own h2 headlines.
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text('Go Premium',
-                            style: CiType.h2
-                                .copyWith(color: c.text, fontSize: 30)),
-                      ),
-                    ),
-                    const SizedBox(height: CiSpace.s3),
-                    SizedBox(
-                      height: 330,
-                      child: PageView.builder(
-                        controller: _pages,
-                        itemCount: kPaywallSlides.length,
-                        onPageChanged: (i) => setState(() => _slide = i),
-                        itemBuilder: (context, i) =>
-                            _Slide(slide: kPaywallSlides[i]),
-                      ),
-                    ),
-                    const SizedBox(height: CiSpace.s4),
-                    // LEFT, under the copy, at the content gutter.
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: CiPageDots(
-                          count: kPaywallSlides.length,
-                          index: _slide,
+                child: LayoutBuilder(
+                  builder: (context, box) => Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: SizedBox(
+                        width: box.maxWidth,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // The static premium headline travels with the centred
+                            // block, snug above the feature shot, left at the gutter.
+                            // A little larger than the carousel's own h2 headlines.
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: _gutter,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Go Premium',
+                                  style: CiType.h2.copyWith(
+                                    color: c.text,
+                                    fontSize: 30,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: CiSpace.s3),
+                            SizedBox(
+                              height: 330,
+                              child: PageView.builder(
+                                controller: _pages,
+                                itemCount: kPaywallSlides.length,
+                                onPageChanged: (i) =>
+                                    setState(() => _slide = i),
+                                itemBuilder: (context, i) =>
+                                    _Slide(slide: kPaywallSlides[i]),
+                              ),
+                            ),
+                            const SizedBox(height: CiSpace.s4),
+                            // LEFT, under the copy, at the content gutter.
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: _gutter,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: CiPageDots(
+                                  count: kPaywallSlides.length,
+                                  index: _slide,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
               Container(height: CiSpace.hairline, color: c.hairline),
