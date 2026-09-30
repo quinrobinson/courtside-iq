@@ -67,6 +67,8 @@
 		<string>In order to take a picture or video, this app requires permission to access the camera.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>In order to upload data, this app requires permission to access the photo library.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Courtside IQ does not use your location. This notice is required by a photo and camera component included in the app.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>
