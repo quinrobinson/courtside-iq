@@ -13,7 +13,9 @@
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/game_detail_builder.dart';
 import '/courtside_iq/games_list_builder.dart';
+import '/courtside_iq/metrics_config.dart';
 
 /// The screen's whole data set: the roster the chips come from, and the games
 /// the rows come from.
@@ -36,14 +38,15 @@ class GamesRepository {
 
     final profileRows = await SupaFlow.client
         .from('player_profile_view')
-        .select('player_id, player_first_name, player_profile_pic')
+        .select('player_id, player_first_name, player_profile_pic, age_band')
         .eq('user_id', uid) as List;
 
     final gameRows = await SupaFlow.client
         .from('v_player_game_stats')
         .select(
           'game_id, player_id, created_at, opponent_team, '
-          'points, off_reb, def_reb, assist, steal, turnover',
+          'points, off_reb, def_reb, assist, steal, turnover, block, '
+          'fg_attempt, ft_attempt, game_insights_json',
         )
         .eq('user_id', uid)
         .order('created_at', ascending: false) as List;
@@ -63,6 +66,8 @@ class GamesRepository {
 
     final names = <String, String>{};
     final photos = <String, String?>{};
+    // For the scoring-efficiency tier on each row, which is age relative.
+    final bands = <String, AgeBand?>{};
     final roster = <GameRosterEntry>[];
     for (final r in profileRows) {
       final id = r['player_id'] as String?;
@@ -70,6 +75,7 @@ class GamesRepository {
       final name = r['player_first_name'] as String? ?? '';
       names[id] = name;
       photos[id] = r['player_profile_pic'] as String?;
+      bands[id] = ageBandFromString(r['age_band'] as String?);
       roster.add(GameRosterEntry(playerId: id, firstName: name));
     }
 
@@ -92,6 +98,12 @@ class GamesRepository {
         assists: _int(r['assist']),
         steals: _int(r['steal']),
         turnovers: _int(r['turnover']),
+        blocks: _int(r['block']),
+        offRebounds: _int(r['off_reb']),
+        fgAttempt: _int(r['fg_attempt']),
+        ftAttempt: _int(r['ft_attempt']),
+        insight: parseGameInsight(r['game_insights_json']),
+        ageBand: bands[playerId],
       );
     }).toList();
 

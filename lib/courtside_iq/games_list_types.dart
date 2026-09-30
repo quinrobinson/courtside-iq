@@ -4,6 +4,9 @@
 // dragging in anything Flutter-shaped, and so the widget layer imports one
 // thing rather than two.
 
+import 'game_detail_builder.dart';
+import 'metrics_config.dart';
+
 /// One logged game, reduced to what the list needs.
 class GameListRow {
   final String gameId;
@@ -23,6 +26,17 @@ class GameListRow {
   /// Still being tracked. At most one game is live at a time.
   final bool isLive;
 
+  // What the row needs to say what the game meant (2026-09-29). See
+  // game_row_meaning.dart.
+  final int blocks;
+
+  /// The offensive part of [rebounds].
+  final int offRebounds;
+  final int fgAttempt;
+  final int ftAttempt;
+  final GameInsight? insight;
+  final AgeBand? ageBand;
+
   const GameListRow({
     required this.gameId,
     required this.playerId,
@@ -36,6 +50,12 @@ class GameListRow {
     this.steals = 0,
     this.turnovers = 0,
     this.isLive = false,
+    this.blocks = 0,
+    this.offRebounds = 0,
+    this.fgAttempt = 0,
+    this.ftAttempt = 0,
+    this.insight,
+    this.ageBand,
   });
 }
 

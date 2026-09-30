@@ -3,7 +3,9 @@
 // Measured from Player Profile — Games (98:583):
 //
 //   header  SectionHeader "Games" / "N Games"
-//   rows    RecentGameRow with showPlayer = false, 124 tall, hairline between
+//   rows    RecentGameRow with showPlayer = false, hairline between. Since
+//           2026-09-29 a saved game reads as what it meant (lead number and
+//           one meaning line), not a five-stat grid - see game_feed_row.dart
 //
 // The row is the SAME component Today uses, with the avatar and player name
 // dropped. Repeating the player's name on every row of their own profile
@@ -18,6 +20,7 @@ import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/metrics_config.dart' show AgeBand;
 import '/features/home/widgets/game_feed_row.dart';
 
 class GamesView extends StatelessWidget {
@@ -25,10 +28,15 @@ class GamesView extends StatelessWidget {
     super.key,
     required this.games,
     this.onOpenGame,
+    this.ageBand,
   });
 
   /// Newest first.
   final List<GameFeedEntry> games;
+
+  /// This player's KNOWN band, applied to every row so its scoring-efficiency
+  /// tier can be rated. Null costs that tier only.
+  final AgeBand? ageBand;
 
   final void Function(String gameId)? onOpenGame;
 
@@ -72,7 +80,7 @@ class GamesView extends StatelessWidget {
         if (i == games.length + 1) return const SizedBox.shrink();
         final g = games[i - 1];
         return GameFeedRow(
-          entry: g,
+          entry: g.withAgeBand(ageBand),
           showPlayer: false,
           onTap: onOpenGame == null ? null : () => onOpenGame!(g.gameId),
         );

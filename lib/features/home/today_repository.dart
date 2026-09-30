@@ -11,6 +11,8 @@
 
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/courtside_iq/game_detail_builder.dart';
+import '/courtside_iq/metrics_config.dart';
 import '/courtside_iq/today_builder.dart';
 import '/courtside_iq/today_snapshot.dart';
 import 'widgets/game_feed_row.dart';
@@ -77,7 +79,8 @@ class TodayRepository {
         .select(
           'player_id, game_id, created_at, first_name, last_name, '
           'player_profile_pic, opponent_team, points, fg_attempt, ft_attempt, '
-          'off_reb, def_reb, assist, steal, turnover, block',
+          'off_reb, def_reb, assist, steal, turnover, block, '
+          'game_insights_json',
         )
         .eq('user_id', uid)
         .order('created_at', ascending: false) as List;
@@ -100,13 +103,21 @@ class TodayRepository {
 
     final games = gameRows.map(_toGameRow).toList();
 
+    // Each game row rates its scoring efficiency against its player's band,
+    // which only the profile view carries.
+    final bands = <String, AgeBand?>{
+      for (final p in players) p.playerId: ageBandFromString(p.ageBand),
+    };
+
     return TodayData(
       headerPlayers: headerSnapshots(
         buildTodaySnapshots(players: players, games: games),
       ),
       // Already newest-first from the query.
-      recentGames:
-          gameRows.take(kTodayRecentGamesLimit).map(_toFeedEntry).toList(),
+      recentGames: gameRows
+          .take(kTodayRecentGamesLimit)
+          .map((r) => _toFeedEntry(r, bands))
+          .toList(),
       playerCount: players.length,
     );
   }
@@ -155,12 +166,13 @@ class TodayRepository {
         block: _int(r['block']),
       );
 
-  static GameFeedEntry _toFeedEntry(dynamic r) {
+  static GameFeedEntry _toFeedEntry(dynamic r, Map<String, AgeBand?> bands) {
     final first = (r['first_name'] as String? ?? '').trim();
     final last = (r['last_name'] as String? ?? '').trim();
+    final playerId = r['player_id'] as String? ?? '';
     return GameFeedEntry(
       gameId: r['game_id'] as String? ?? '',
-      playerId: r['player_id'] as String? ?? '',
+      playerId: playerId,
       playerName: [first, last].where((s) => s.isNotEmpty).join(' '),
       playerPhotoUrl: r['player_profile_pic'] as String?,
       opponent: r['opponent_team'] as String?,
@@ -171,6 +183,12 @@ class TodayRepository {
       assists: _int(r['assist']),
       steals: _int(r['steal']),
       turnovers: _int(r['turnover']),
+      blocks: _int(r['block']),
+      offRebounds: _int(r['off_reb']),
+      fgAttempt: _int(r['fg_attempt']),
+      ftAttempt: _int(r['ft_attempt']),
+      insight: parseGameInsight(r['game_insights_json']),
+      ageBand: bands[playerId],
     );
   }
 

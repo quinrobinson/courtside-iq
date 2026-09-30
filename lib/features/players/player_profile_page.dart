@@ -28,6 +28,7 @@ import '/courtside_iq/design/components/ci_segmented_tabs.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/metrics_config.dart' show AgeBand, ageBandFromString;
 import '/courtside_iq/player_averages.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/features/home/entitlement_status.dart';
@@ -328,7 +329,12 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
           cached: _cachedInsight,
           onAddBirthDate: _addBirthDate,
         ),
-        _Games(future: _gamesFuture, playerId: _playerId),
+        _Games(
+          future: _gamesFuture,
+          playerId: _playerId,
+          // knownAgeBand: an assumed band must not rate this child's games.
+          ageBand: ageBandFromString(player?.knownAgeBand),
+        ),
       ],
     );
   }
@@ -336,10 +342,11 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
 
 /// Binds the hoisted games future to the 2.0 [GamesView].
 class _Games extends StatelessWidget {
-  const _Games({required this.future, required this.playerId});
+  const _Games({required this.future, required this.playerId, this.ageBand});
 
   final Future<List<GameFeedEntry>>? future;
   final String playerId;
+  final AgeBand? ageBand;
 
   @override
   Widget build(BuildContext context) {
@@ -351,6 +358,7 @@ class _Games extends StatelessWidget {
         }
         return GamesView(
           games: snap.data!,
+          ageBand: ageBand,
           onOpenGame: (gameId) => context.pushNamed(
             GameStatsWidget.routeName,
             queryParameters: {

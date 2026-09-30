@@ -13,6 +13,24 @@
 // The stat values are Light 22, the same relationship the hero uses: numbers
 // are large but not heavy, so a row of them reads as information rather than
 // as five competing headlines.
+//
+// SAVED GAMES SAY WHAT THE GAME MEANT (Quin, 2026-09-29 design review). The
+// five-stat grid above now belongs to the LIVE row only. A saved game is one
+// horizontal row, 24 side / 16 vertical padding, 12 gaps:
+//
+//   left    avatar 38 (when showPlayer)
+//   middle  title SemiBold 15, "vs Opponent · date" Medium 12 muted, then
+//           ONE meaning line (game_row_meaning.dart), 6pt below (10 for insight):
+//             insight  lime-wash card, radius 10, padding 10/8: the spark 14
+//                      centred on line one + first sentence, Medium 13 on an
+//                      18 line, 2 lines max
+//             tier     the Game Detail tier chip (CiBadge.tier) + skill name
+//             stats    "7 rebounds, 3 steals", Medium 13 textSoft
+//   right   the lead number Light 28 over its label Medium 10 muted
+//
+// A zero-performance game draws neither the line nor the lead: nothing, not
+// a zero. The same widget serves Today, the Games list and the profile's
+// Games tab, so all three change together.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +41,9 @@ import '/courtside_iq/design/components/ci_section_header.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/game_detail_builder.dart';
+import '/courtside_iq/game_row_meaning.dart';
+import '/courtside_iq/metrics_config.dart';
 
 /// One recent game, already reduced to what the row shows.
 class GameFeedEntry {
@@ -40,6 +61,12 @@ class GameFeedEntry {
     required this.steals,
     required this.turnovers,
     this.isLive = false,
+    this.blocks = 0,
+    this.offRebounds = 0,
+    this.fgAttempt = 0,
+    this.ftAttempt = 0,
+    this.insight,
+    this.ageBand,
   });
 
   final String gameId;
@@ -74,6 +101,71 @@ class GameFeedEntry {
   /// `games.game_live` is the source. There is at most one at a time, so this
   /// is true for one row at most.
   final bool isLive;
+
+  // --- What the saved-game row needs to say what the game MEANT ------------
+  //
+  // Defaulted, not required: live rows are built from in-memory tracker
+  // stats and keep the five-stat look, so they never read these.
+
+  final int blocks;
+
+  /// The offensive part of [rebounds]. Disruption weighs the two kinds
+  /// differently, so the total alone cannot rate the game.
+  final int offRebounds;
+
+  final int fgAttempt;
+  final int ftAttempt;
+
+  /// The stored AI insight, parsed with the same reader Game Detail uses.
+  final GameInsight? insight;
+
+  /// Needed for the scoring-efficiency tier. Null costs that tier only.
+  final AgeBand? ageBand;
+
+  /// The lead number and the meaning line. See game_row_meaning.dart.
+  GameRowMeaning get meaning => buildGameRowMeaning(
+        points: points,
+        offReb: offRebounds,
+        defReb: rebounds - offRebounds,
+        assists: assists,
+        steals: steals,
+        blocks: blocks,
+        turnovers: turnovers,
+        fgAttempt: fgAttempt,
+        ftAttempt: ftAttempt,
+        insight: insight,
+        ageBand: ageBand,
+        // The summary never repeats the player's name; strip it if the
+        // model or an older insight led with it.
+        playerFirstName: playerName.trim().split(' ').first,
+      );
+
+  /// This entry with [band] filled in when it has none of its own. The
+  /// profile knows the band once for every row, so it adds it here rather
+  /// than the query carrying it per game.
+  GameFeedEntry withAgeBand(AgeBand? band) => ageBand != null || band == null
+      ? this
+      : GameFeedEntry(
+          gameId: gameId,
+          playerId: playerId,
+          playerName: playerName,
+          playerPhotoUrl: playerPhotoUrl,
+          opponent: opponent,
+          playedAt: playedAt,
+          eventName: eventName,
+          points: points,
+          rebounds: rebounds,
+          assists: assists,
+          steals: steals,
+          turnovers: turnovers,
+          isLive: isLive,
+          blocks: blocks,
+          offRebounds: offRebounds,
+          fgAttempt: fgAttempt,
+          ftAttempt: ftAttempt,
+          insight: insight,
+          ageBand: band,
+        );
 
   /// "vs Northside Hawks  ·  Sat, Mar 8", dropping whichever half is missing.
   ///
@@ -123,7 +215,92 @@ class GameFeedRow extends StatelessWidget {
   final bool showPlayer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      entry.isLive ? _buildLive(context) : _buildSaved(context);
+
+  /// A saved game: what it meant, not a box score. See the file header.
+  Widget _buildSaved(BuildContext context) {
+    final c = CiColors.of(context);
+    final title = showPlayer ? entry.playerName : entry.opponentTitle;
+    final subtitle = showPlayer ? entry.subtitle : entry.dateSubtitle;
+    final meaning = entry.meaning;
+    final lead = meaning.lead;
+    final line = _MeaningLine.of(meaning);
+
+    return Semantics(
+      button: onTap != null,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+              CiSpace.screen, CiSpace.s4, CiSpace.screen, CiSpace.s4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (showPlayer) ...[
+                CiAvatar(
+                  name: entry.playerName,
+                  imageUrl: entry.playerPhotoUrl,
+                  size: 38,
+                ),
+                const SizedBox(width: CiSpace.s3),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: CiType.rowTitle.copyWith(
+                            color: c.text, fontWeight: CiWeight.semiBold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                    if (subtitle.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(subtitle,
+                          style: CiType.caption.copyWith(
+                              color: c.textMuted,
+                              fontWeight: CiWeight.medium),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                    ],
+                    if (line != null) ...[
+                      // 10 above the insight card, which needs the air to
+                      // read as its own thing; 6 above a tier or stats line.
+                      SizedBox(
+                          height: meaning.kind == GameRowMeaningKind.insight
+                              ? 10
+                              : 6),
+                      line,
+                    ],
+                  ],
+                ),
+              ),
+              if (lead != null) ...[
+                const SizedBox(width: CiSpace.s3),
+                Column(
+                  key: const ValueKey('game-row-lead'),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(lead.value,
+                        style: CiType.statSm.copyWith(
+                            color: c.text, fontSize: 28, letterSpacing: -1)),
+                    const SizedBox(height: 2),
+                    Text(lead.label,
+                        style: CiType.micro.copyWith(
+                            color: c.textMuted, fontWeight: CiWeight.medium)),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The game being tracked right now. Keeps the five-stat look: nothing has
+  /// been rated yet, and the numbers are still moving.
+  Widget _buildLive(BuildContext context) {
     final c = CiColors.of(context);
     final title = showPlayer ? entry.playerName : entry.opponentTitle;
     final subtitle = showPlayer ? entry.subtitle : entry.dateSubtitle;
@@ -196,6 +373,88 @@ class GameFeedRow extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// The one line under the opponent and date. Null for a game with nothing
+/// to say, so the row draws no empty gap.
+class _MeaningLine extends StatelessWidget {
+  const _MeaningLine._(this.meaning);
+
+  static Widget? of(GameRowMeaning m) =>
+      m.kind == GameRowMeaningKind.none || m.text == null
+          ? null
+          : _MeaningLine._(m);
+
+  final GameRowMeaning meaning;
+
+  /// One line of the insight sentence: 13pt text on an 18pt line.
+  static const double _insightLineHeight = 18;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final text = meaning.text!;
+    final style = CiType.labelTight.copyWith(fontWeight: CiWeight.medium);
+    return switch (meaning.kind) {
+      // ON THE LIME WASH (Quin, 2026-09-30 device check): as a bare line
+      // under the date it sat too tight and blended in with the tier and
+      // stats rows. The wash is the Game Detail insight card's own ground, so
+      // the row previews what the tap opens; full width so it reads as a
+      // card, never as a second tier chip.
+      GameRowMeaningKind.insight => Container(
+          key: const ValueKey('game-row-insight'),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+              horizontal: CiSpace.s2 + 2, vertical: CiSpace.s2),
+          decoration: BoxDecoration(
+            color: c.accentGoodWash,
+            borderRadius: CiRadius.controlR,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // THE insight spark, as on the insight card and the profile's
+              // development blocks: this line is Courtside IQ's own words.
+              // Boxed at one line's height so it centres on the FIRST line
+              // however the sentence wraps.
+              SizedBox(
+                width: 14,
+                height: _insightLineHeight,
+                child: Center(
+                  child: Icon(Icons.auto_awesome, size: 14, color: c.onAccent),
+                ),
+              ),
+              const SizedBox(width: CiSpace.s2),
+              Expanded(
+                child: Text(text,
+                    style: style.copyWith(
+                        color: c.onAccent, height: _insightLineHeight / 13),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+        ),
+      GameRowMeaningKind.tier => Row(
+          key: const ValueKey('game-row-tier'),
+          children: [
+            CiBadge.tier(tier: meaning.tier!),
+            const SizedBox(width: CiSpace.s2),
+            Flexible(
+              child: Text(text,
+                  style: style.copyWith(color: c.text),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      _ => Text(text,
+          key: const ValueKey('game-row-stats'),
+          style: style.copyWith(color: c.textSoft),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis),
+    };
   }
 }
 

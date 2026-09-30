@@ -4,7 +4,8 @@
 // 156:704:
 //
 //   summary   DotGauge with the Growth IQ, a trend chip, and the headline
-//   sections  "What's Working" and "Room to Grow" on limeWash (#F1FFD2)
+//   sections  "What's Working" on limeWash (#F1FFD2), "Room to Grow" on
+//             orangeWash (#FFE7DC) (Quin, 2026-09-29)
 //   focus     "WATCH NEXT GAME" on an ink block - the one thing to watch for
 //   footer    "About this story"
 //   locked    progress dots, "unlocks in N games", "Track a Game"
@@ -232,11 +233,23 @@ class _Story extends StatelessWidget {
         // one block is what keeps an existing user's story on screen instead
         // of an empty tab while the v3 insight regenerates.
         if (!insight.hasSplitNarrative && _has(insight.text))
-          _WashBlock(title: 'The Story', body: insight.text!),
+          _WashBlock(
+            title: 'The Story',
+            body: insight.text!,
+            tone: _WashTone.good,
+          ),
         if (_has(insight.whatsWorking))
-          _WashBlock(title: "What's Working", body: insight.whatsWorking!),
+          _WashBlock(
+            title: "What's Working",
+            body: insight.whatsWorking!,
+            tone: _WashTone.good,
+          ),
         if (_has(insight.needsDevelopment))
-          _WashBlock(title: 'Room to Grow', body: insight.needsDevelopment!),
+          _WashBlock(
+            title: 'Room to Grow',
+            body: insight.needsDevelopment!,
+            tone: _WashTone.energy,
+          ),
         if (_has(insight.growthEdge))
           _FocusBlock(
             label: 'WATCH NEXT GAME',
@@ -252,22 +265,38 @@ class _Story extends StatelessWidget {
   static bool _has(String? s) => s != null && s.trim().isNotEmpty;
 }
 
-/// A lime-wash block. Used for both the positive and the growth section on
-/// purpose: "Room to Grow" is not a warning, and giving it an alarm colour
-/// would tell a parent their child is failing at the moment the app is trying
-/// to point somewhere useful.
+/// Which wash a narrative block sits on.
+enum _WashTone { good, energy }
+
+/// A tinted narrative block. "What's Working" (and the legacy single-block
+/// story) sits on the lime wash; "Room to Grow" sits on the soft orange wash.
+///
+/// This used to be lime for both, on the reasoning that "Room to Grow" is not
+/// a warning and an alarm colour would tell a parent their child is failing.
+/// Quin reviewed it on 2026-09-29 and chose the orange wash (#FFE7DC): lime
+/// means "earned" in this system, and room to grow is not earned yet. At this
+/// softness the orange reads warm, not as a warning, so the original concern
+/// still holds. Do not swap in the full orange accent here.
 class _WashBlock extends StatelessWidget {
-  const _WashBlock({required this.title, required this.body});
+  const _WashBlock({
+    required this.title,
+    required this.body,
+    required this.tone,
+  });
 
   final String title;
   final String body;
+  final _WashTone tone;
 
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     return Container(
       width: double.infinity,
-      color: c.accentGoodWash,
+      color: switch (tone) {
+        _WashTone.good => c.accentGoodWash,
+        _WashTone.energy => c.accentEnergyWash,
+      },
       // 22 top / 32 bottom, measured from 128:608. The bottom is heavier on
       // purpose: it is what separates one narrative block from the next.
       padding: const EdgeInsets.fromLTRB(

@@ -98,9 +98,14 @@ class GameDetailRow {
 
 /// The stored AI insight.
 class GameInsight {
-  const GameInsight({this.text, this.highlightMetric, this.storedTier});
+  const GameInsight(
+      {this.text, this.summary, this.highlightMetric, this.storedTier});
 
   final String? text;
+
+  /// The one-line headline for game rows (prompt v3, 2026-09-30). Absent on
+  /// older insights; the row then derives one (see game_row_meaning.dart).
+  final String? summary;
 
   /// 'ppsa' | 'ast_tov' | 'disrupt' | 'effort', or null on legacy rows.
   final String? highlightMetric;
@@ -113,6 +118,27 @@ class GameInsight {
   final String? storedTier;
 
   bool get hasText => (text ?? '').trim().isNotEmpty;
+}
+
+/// Reads `game_insights_json` ({text, summary, highlight_metric, tier_context}).
+///
+/// Null for a row this build cannot read, or one with neither text nor a
+/// metric. Hoisted out of GameDetailRepository on 2026-09-29 so the game rows
+/// on Today, Games and the profile read the insight the same way Game Detail
+/// does, rather than each list growing its own parser.
+GameInsight? parseGameInsight(Object? raw) {
+  if (raw is! Map) return null;
+  final text = raw['text'] as String?;
+  final summary = raw['summary'] as String?;
+  final metric = raw['highlight_metric'] as String?;
+  final tier = raw['tier_context'] as String?;
+  if (text == null && metric == null) return null;
+  return GameInsight(
+    text: text,
+    summary: summary,
+    highlightMetric: metric,
+    storedTier: tier,
+  );
 }
 
 /// One rated row in the Development section.

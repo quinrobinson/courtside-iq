@@ -10,6 +10,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../game_metrics.dart';
 import '../../growth_iq.dart';
 import '../tokens/ci_colors.dart';
 import '../tokens/ci_metrics.dart';
@@ -17,6 +18,10 @@ import '../tokens/ci_type.dart';
 
 enum CiBadgeTone {
   good,
+
+  /// Lime-wash fill, ink text: a positive that is not the top of the scale.
+  /// The Good tier (2026-09-29, matching Figma's tier chips).
+  goodWash,
   energy,
   neutral,
 
@@ -118,6 +123,28 @@ class CiBadge extends StatelessWidget {
     );
   }
 
+  /// A game tier tag: "Elite", "Good", "Solid".
+  ///
+  /// ELITE full lime, GOOD lime-wash, SOLID neutral (Quin, 2026-09-29): the
+  /// Figma tier chips, which the app had drifted from (Good was neutral like
+  /// Solid). Only Elite takes the full accent, so lime still means
+  /// "excellent" rather than "rated"; Good gets the wash because it is a
+  /// positive result, and Solid stays neutral because it is the entry level,
+  /// never a warning.
+  ///
+  /// Lifted out of Game Detail's development rows on 2026-09-29 so the game
+  /// rows on Today, Games and the profile draw the SAME chip as the screen
+  /// they open, rather than a lookalike.
+  factory CiBadge.tier({Key? key, required GameTier tier}) => CiBadge(
+        key: key,
+        label: tier.label,
+        tone: switch (tier) {
+          GameTier.elite => CiBadgeTone.good,
+          GameTier.good => CiBadgeTone.goodWash,
+          GameTier.solid => CiBadgeTone.neutral,
+        },
+      );
+
   /// "LIVE" — a game being tracked right now.
   ///
   /// ORANGE MEANS "HAPPENING NOW" HERE, not "attention". It is the only place
@@ -147,6 +174,7 @@ class CiBadge extends StatelessWidget {
 
     final (Color bg, Color fg, Color? border) = switch (tone) {
       CiBadgeTone.good => (c.accentGood, c.onAccent, null),
+      CiBadgeTone.goodWash => (c.accentGoodWash, c.onAccent, null),
       CiBadgeTone.energy => (c.accentEnergy, c.onAccent, null),
       CiBadgeTone.neutral => (c.surfaceSunk, c.textMuted, c.border),
       // No fill at all, so it reads as an annotation rather than a chip.

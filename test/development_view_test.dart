@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_badge.dart';
+import 'package:courtside_i_q/courtside_iq/design/tokens/ci_colors.dart';
 import 'package:courtside_i_q/courtside_iq/growth_iq.dart';
 import 'package:courtside_i_q/features/player_insight/models/player_insight.dart';
 import 'package:courtside_i_q/features/players/widgets/development_view.dart';
@@ -50,6 +51,25 @@ void main() {
     expect(find.text("What's Working"), findsOneWidget);
     expect(find.text('Room to Grow'), findsOneWidget);
     expect(find.text('LEGACY COPY'), findsNothing);
+  });
+
+  testWidgets("What's Working is lime wash, Room to Grow is orange wash",
+      (tester) async {
+    // Quin, 2026-09-29: lime means "earned"; room to grow is not earned yet.
+    await tester.pumpWidget(_host(DevelopmentView(
+      firstName: 'Maya',
+      insight: _insight(),
+    )));
+
+    Color washBehind(String title) {
+      final box = tester.widget<Container>(find
+          .ancestor(of: find.text(title), matching: find.byType(Container))
+          .first);
+      return box.color!;
+    }
+
+    expect(washBehind("What's Working"), CiPalette.limeWash);
+    expect(washBehind('Room to Grow'), CiPalette.orangeWash);
   });
 
   testWidgets('falls back to the legacy text when there is no split narrative',

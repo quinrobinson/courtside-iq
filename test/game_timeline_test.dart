@@ -130,10 +130,58 @@ void main() {
       expect(_lane(lanes, 'PTS').value, '8');
     });
 
-    test('defense combines steals and blocks', () {
+    test('defense splits steals and blocks, like AST·TO', () {
       final lanes = buildTimelineLanes(
           _confirmed([LiveStat.steals, LiveStat.steals, LiveStat.blocks]));
-      expect(_lane(lanes, 'STL·BLK').value, '3');
+      expect(_lane(lanes, 'STL·BLK').value, '2·1');
+      expect(_lane(lanes, 'STL·BLK').pair, (2, 1));
+    });
+
+    test('steals are filled, blocks are hollow', () {
+      final lanes =
+          buildTimelineLanes(_confirmed([LiveStat.steals, LiveStat.blocks]));
+      expect(_lane(lanes, 'STL·BLK').plays.map((p) => p.filled), [true, false]);
+    });
+
+    test('only the paired lanes carry a pair', () {
+      final lanes = buildTimelineLanes(_confirmed([
+        LiveStat.twoMade, LiveStat.defReb, LiveStat.assists, LiveStat.blocks,
+      ]));
+      expect(_lane(lanes, 'PTS').pair, isNull);
+      expect(_lane(lanes, 'REB').pair, isNull);
+      expect(_lane(lanes, 'AST·TO').pair, (1, 0));
+      expect(_lane(lanes, 'STL·BLK').pair, (0, 1));
+    });
+  });
+
+  group('the key note reads this game back in words', () {
+    test('uses the game\'s own figures, pluralised correctly', () {
+      final lanes = buildTimelineLanes(_confirmed([
+        ...List.filled(4, LiveStat.assists),
+        ...List.filled(2, LiveStat.turnovers),
+        ...List.filled(2, LiveStat.steals),
+        LiveStat.blocks,
+      ]));
+      expect(timelineKeyNote(lanes),
+          '4·2 means 4 assists and 2 turnovers. 2·1 means 2 steals and 1 block.');
+    });
+
+    test('singular on both sides', () {
+      final lanes = buildTimelineLanes(
+          _confirmed([LiveStat.assists, LiveStat.turnovers]));
+      expect(timelineKeyNote(lanes), '1·1 means 1 assist and 1 turnover.');
+    });
+
+    test('a lane that is not shown gets no sentence', () {
+      final lanes = buildTimelineLanes(
+          _confirmed([LiveStat.twoMade, LiveStat.steals, LiveStat.steals]));
+      expect(timelineKeyNote(lanes), '2·0 means 2 steals and 0 blocks.');
+    });
+
+    test('no paired lane, no note', () {
+      final lanes =
+          buildTimelineLanes(_confirmed([LiveStat.twoMade, LiveStat.defReb]));
+      expect(timelineKeyNote(lanes), isNull);
     });
   });
 
@@ -313,6 +361,47 @@ void main() {
       expect(find.text('PTS'), findsOneWidget);
       expect(find.text('4'), findsOneWidget);
       expect(find.text('POINTS'), findsNothing);
+    });
+
+    testWidgets('the key is collapsed by default', (tester) async {
+      await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.assists]));
+      expect(find.text('How to read this'), findsOneWidget);
+      expect(find.byKey(const ValueKey('timeline-key-body')), findsNothing);
+      expect(find.text('made'), findsNothing);
+    });
+
+    testWidgets('tapping opens the key in place, and again closes it',
+        (tester) async {
+      await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.assists]));
+      final toggle = find.byKey(const ValueKey('timeline-key-toggle'));
+      final before = tester.getTopLeft(toggle);
+
+      await tester.tap(toggle);
+      await tester.pump();
+      expect(find.byKey(const ValueKey('timeline-key-body')), findsOneWidget);
+      expect(find.text('made'), findsOneWidget);
+      expect(find.text('free-throw trip'), findsOneWidget);
+      // The link does not move when the key opens under it.
+      expect(tester.getTopLeft(toggle), before);
+
+      await tester.tap(toggle);
+      await tester.pump();
+      expect(find.byKey(const ValueKey('timeline-key-body')), findsNothing);
+    });
+
+    testWidgets('the key lists only the lanes this game shows', (tester) async {
+      await pump(tester, _confirmed([LiveStat.twoMade, LiveStat.steals, LiveStat.blocks]));
+      await tester.tap(find.byKey(const ValueKey('timeline-key-toggle')));
+      await tester.pump();
+      final body = find.byKey(const ValueKey('timeline-key-body'));
+      expect(find.descendant(of: body, matching: find.text('PTS')), findsOneWidget);
+      expect(find.descendant(of: body, matching: find.text('STL·BLK')), findsOneWidget);
+      expect(find.descendant(of: body, matching: find.text('REB')), findsNothing);
+      expect(find.descendant(of: body, matching: find.text('AST·TO')), findsNothing);
+      expect(find.text('steal'), findsOneWidget);
+      expect(find.text('block'), findsOneWidget);
+      expect(find.text('assist'), findsNothing);
+      expect(find.text('1·1 means 1 steal and 1 block.'), findsOneWidget);
     });
 
     testWidgets('22 plays fit the column: nothing scrolls sideways', (tester) async {

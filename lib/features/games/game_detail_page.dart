@@ -528,15 +528,9 @@ class _DevelopmentRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: CiSpace.s3),
-          CiBadge(
-            label: row.tier.label,
-            // Elite is the only tier that takes the accent. Good and Solid
-            // are both fine outcomes, and painting all three lime would make
-            // the colour mean "rated" rather than "excellent".
-            tone: row.tier == GameTier.elite
-                ? CiBadgeTone.good
-                : CiBadgeTone.neutral,
-          ),
+          // Elite alone takes the accent; see CiBadge.tier. Shared with the
+          // game rows in every list, so the row and this screen match.
+          CiBadge.tier(tier: row.tier),
         ],
       ),
     );

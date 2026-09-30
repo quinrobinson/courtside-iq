@@ -19,6 +19,19 @@
 // The "+" beside team and event adds one INLINE. A parent standing courtside
 // should not have to leave for the profile to add the team their kid just
 // joined - which is what the 4.11d pick-lists were built to make possible.
+//
+// CHOOSE A PLAYER FIRST (Quin, 2026-09-29 design review). "Who's playing?"
+// sits over the player tiles in every state, one player or several. With one
+// player that player is preselected, as before. With several, nobody is, and
+// Team, Opponent AND Event are all dimmed the same way (0.5, no input) until
+// a player is chosen - Opponent used to stay live beside two dead pickers,
+// which read as a bug. The muted "Select a player above..." line is gone: the
+// label over the tiles says it, and a tap on any dimmed field NUDGES the
+// tiles instead - their rings pulse to lime and back once over 600ms. With
+// reduced motion the rings go lime for the same 600ms with no animation.
+
+import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -69,8 +82,41 @@ class NewGameSetupPage extends StatefulWidget {
   State<NewGameSetupPage> createState() => _NewGameSetupPageState();
 }
 
-class _NewGameSetupPageState extends State<NewGameSetupPage> {
+/// How long the "choose a player first" nudge lasts, animated or static.
+const Duration kPlayerNudgeDuration = Duration(milliseconds: 600);
+
+class _NewGameSetupPageState extends State<NewGameSetupPage>
+    with SingleTickerProviderStateMixin {
   final _opponent = TextEditingController();
+
+  /// Drives the ring pulse on the player tiles. 0 -> 1 over the nudge; the
+  /// highlight is the sine of it, so it rises to lime and falls back once.
+  late final AnimationController _nudge =
+      AnimationController(vsync: this, duration: kPlayerNudgeDuration);
+
+  /// The reduced-motion nudge: rings held at lime, no animation.
+  bool _staticNudge = false;
+  Timer? _staticNudgeTimer;
+
+  /// Points a parent who tapped a dimmed field at the player tiles.
+  void _nudgePlayers() {
+    if (MediaQuery.of(context).disableAnimations) {
+      _staticNudgeTimer?.cancel();
+      setState(() => _staticNudge = true);
+      _staticNudgeTimer = Timer(kPlayerNudgeDuration, () {
+        if (mounted) setState(() => _staticNudge = false);
+      });
+      return;
+    }
+    _nudge.forward(from: 0);
+  }
+
+  /// 0 = no nudge, 1 = rings fully lime.
+  double get _nudgeAmount => _staticNudge
+      ? 1
+      : _nudge.isAnimating
+          ? math.sin(math.pi * _nudge.value).clamp(0.0, 1.0)
+          : 0;
 
   Future<List<PlayerListEntry>>? _playersFuture;
   String? _playerId;
@@ -101,6 +147,8 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
 
   @override
   void dispose() {
+    _staticNudgeTimer?.cancel();
+    _nudge.dispose();
     _opponent.dispose();
     super.dispose();
   }
@@ -161,20 +209,25 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
               final players = snap.data ?? const <PlayerListEntry>[];
               return Column(
                 children: [
-                  _Hero(
-                    // Nobody to pick while the list is loading or unreachable;
-                    // the hero still carries the back button.
-                    players: loading || failed
-                        ? const <PlayerListEntry>[]
-                        : players,
-                    selectedId: _playerId,
-                    onSelect: (id) => setState(() {
-                      _playerId = id;
-                      // Teams and events belong to ONE player, so a selection
-                      // made for someone else is not theirs to carry over.
-                      _team = null;
-                      _event = null;
-                    }),
+                  AnimatedBuilder(
+                    animation: _nudge,
+                    builder: (context, _) => _Hero(
+                      // Nobody to pick while the list is loading or
+                      // unreachable; the hero still carries the back button.
+                      players: loading || failed
+                          ? const <PlayerListEntry>[]
+                          : players,
+                      selectedId: _playerId,
+                      nudge: _nudgeAmount,
+                      onSelect: (id) => setState(() {
+                        _playerId = id;
+                        // Teams and events belong to ONE player, so a
+                        // selection made for someone else is not theirs to
+                        // carry over.
+                        _team = null;
+                        _event = null;
+                      }),
+                    ),
                   ),
                   Expanded(
                     child: loading
@@ -188,44 +241,50 @@ class _NewGameSetupPageState extends State<NewGameSetupPage> {
                                     CiSpace.screen,
                                     CiSpace.s6),
                                 children: [
-                                  // Team and Opponent stay disabled until a
-                                  // player is chosen, which is not obvious - a
-                                  // parent can tap a greyed picker and get
-                                  // nothing. Say what to do first.
-                                  if (_playerId == null) ...[
-                                    Text(
-                                      'Select a player above to set the team '
-                                      'and opponent.',
-                                      style: CiType.bodySm
-                                          .copyWith(color: c.textMuted),
+                                  // All three wait for a player, and all three
+                                  // look it. A tap on any of them while locked
+                                  // nudges the player tiles instead.
+                                  _Locked(
+                                    key: const ValueKey('setup-team'),
+                                    locked: _playerId == null,
+                                    onLockedTap: _nudgePlayers,
+                                    child: _PickerRow(
+                                      label: 'Team',
+                                      value: _team,
+                                      placeholder: 'Select team',
+                                      enabled: _playerId != null,
+                                      onTap: _pickTeam,
+                                      onAdd: _pickTeam,
                                     ),
-                                    const SizedBox(height: CiSpace.s5),
-                                  ],
-                                  _PickerRow(
-                                    label: 'Team',
-                                    value: _team,
-                                    placeholder: 'Select team',
-                                    enabled: _playerId != null,
-                                    onTap: _pickTeam,
-                                    onAdd: _pickTeam,
                                   ),
                                   const SizedBox(height: CiSpace.s5),
-                                  CiField(
-                                    label: 'Opponent',
-                                    controller: _opponent,
-                                    placeholder: 'Enter opponent name',
-                                    // Start depends on this, so the button has
-                                    // to re-evaluate as they type.
-                                    onChanged: (_) => setState(() {}),
+                                  _Locked(
+                                    key: const ValueKey('setup-opponent'),
+                                    locked: _playerId == null,
+                                    onLockedTap: _nudgePlayers,
+                                    child: CiField(
+                                      label: 'Opponent',
+                                      controller: _opponent,
+                                      placeholder: 'Enter opponent name',
+                                      enabled: _playerId != null,
+                                      // Start depends on this, so the button
+                                      // has to re-evaluate as they type.
+                                      onChanged: (_) => setState(() {}),
+                                    ),
                                   ),
                                   const SizedBox(height: CiSpace.s5),
-                                  _PickerRow(
-                                    label: 'Event  ·  Optional',
-                                    value: _event,
-                                    placeholder: 'Select event',
-                                    enabled: _playerId != null,
-                                    onTap: _pickEvent,
-                                    onAdd: _pickEvent,
+                                  _Locked(
+                                    key: const ValueKey('setup-event'),
+                                    locked: _playerId == null,
+                                    onLockedTap: _nudgePlayers,
+                                    child: _PickerRow(
+                                      label: 'Event  ·  Optional',
+                                      value: _event,
+                                      placeholder: 'Select event',
+                                      enabled: _playerId != null,
+                                      onTap: _pickEvent,
+                                      onAdd: _pickEvent,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -303,11 +362,15 @@ class _Hero extends StatelessWidget {
     required this.players,
     required this.selectedId,
     required this.onSelect,
+    this.nudge = 0,
   });
 
   final List<PlayerListEntry> players;
   final String? selectedId;
   final ValueChanged<String> onSelect;
+
+  /// 0..1: how far the unchosen tiles' rings are pulled toward lime.
+  final double nudge;
 
   @override
   Widget build(BuildContext context) {
@@ -343,7 +406,17 @@ class _Hero extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: CiSpace.s5),
+          const SizedBox(height: CiSpace.s3),
+          // Shown in every state, one player or several: it names what the
+          // tiles are for, and it is what the nudge points a parent back to.
+          // White at 72% on ink, via the ground's own text token.
+          Text(
+            "Who's playing?",
+            textAlign: TextAlign.center,
+            style: CiType.rowLabel
+                .copyWith(color: c.text.withValues(alpha: 0.72)),
+          ),
+          const SizedBox(height: CiSpace.s2),
           // 78 apart in the frame, which is the 54 tile plus a 24 gap.
           Wrap(
             spacing: 24,
@@ -354,6 +427,7 @@ class _Hero extends StatelessWidget {
                 _PlayerTile(
                   player: p,
                   selected: p.playerId == selectedId,
+                  nudge: nudge,
                   onTap: () => onSelect(p.playerId),
                 ),
             ],
@@ -378,11 +452,16 @@ class _PlayerTile extends StatelessWidget {
     required this.player,
     required this.selected,
     required this.onTap,
+    this.nudge = 0,
   });
 
   final PlayerListEntry player;
   final bool selected;
   final VoidCallback onTap;
+
+  /// 0..1 pull of the ring toward the chosen look. Only ever non-zero while
+  /// nobody is chosen, since the nudge only fires then.
+  final double nudge;
 
   @override
   Widget build(BuildContext context) {
@@ -405,8 +484,10 @@ class _PlayerTile extends StatelessWidget {
                 name: player.displayName,
                 imageUrl: player.profilePic,
                 size: 54,
-                ringColor: selected ? c.accentGood : c.border,
-                ringWidth: selected ? 2 : 1.35,
+                ringColor: selected
+                    ? c.accentGood
+                    : Color.lerp(c.border, c.accentGood, nudge)!,
+                ringWidth: selected ? 2 : 1.35 + (2 - 1.35) * nudge,
               ),
               const SizedBox(height: CiSpace.s2),
               Text(
@@ -425,6 +506,32 @@ class _PlayerTile extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Catches taps on a field that is waiting for a player.
+///
+/// A disabled input swallows its taps and does nothing, which is exactly the
+/// dead end this replaces. While [locked], the child takes no input at all and
+/// a tap anywhere on it calls [onLockedTap] (the nudge). Unlocked, it is
+/// transparent.
+class _Locked extends StatelessWidget {
+  const _Locked({
+    super.key,
+    required this.locked,
+    required this.onLockedTap,
+    required this.child,
+  });
+
+  final bool locked;
+  final VoidCallback onLockedTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: locked ? onLockedTap : null,
+        child: AbsorbPointer(absorbing: locked, child: child),
+      );
 }
 
 /// A picker field with a trailing "+" that adds a new one inline.
