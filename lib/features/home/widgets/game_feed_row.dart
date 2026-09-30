@@ -19,9 +19,11 @@
 // horizontal row, 24 side / 16 vertical padding, 12 gaps:
 //
 //   left    avatar 38 (when showPlayer)
-//   middle  title SemiBold 15, "vs Opponent · date" Medium 12 muted, then 6pt
-//           and ONE meaning line (game_row_meaning.dart):
-//             insight  the spark 14 + first sentence, Medium 13, 2 lines max
+//   middle  title SemiBold 15, "vs Opponent · date" Medium 12 muted, then
+//           ONE meaning line (game_row_meaning.dart), 6pt below (10 for insight):
+//             insight  lime-wash card, radius 10, padding 10/8: the spark 14
+//                      centred on line one + first sentence, Medium 13 on an
+//                      18 line, 2 lines max
 //             tier     the Game Detail tier chip (CiBadge.tier) + skill name
 //             stats    "7 rebounds, 3 steals", Medium 13 textSoft
 //   right   the lead number Light 28 over its label Medium 10 muted
@@ -259,7 +261,12 @@ class GameFeedRow extends StatelessWidget {
                           overflow: TextOverflow.ellipsis),
                     ],
                     if (line != null) ...[
-                      const SizedBox(height: 6),
+                      // 10 above the insight card, which needs the air to
+                      // read as its own thing; 6 above a tier or stats line.
+                      SizedBox(
+                          height: meaning.kind == GameRowMeaningKind.insight
+                              ? 10
+                              : 6),
                       line,
                     ],
                   ],
@@ -378,30 +385,53 @@ class _MeaningLine extends StatelessWidget {
 
   final GameRowMeaning meaning;
 
+  /// One line of the insight sentence: 13pt text on an 18pt line.
+  static const double _insightLineHeight = 18;
+
   @override
   Widget build(BuildContext context) {
     final c = CiColors.of(context);
     final text = meaning.text!;
     final style = CiType.labelTight.copyWith(fontWeight: CiWeight.medium);
     return switch (meaning.kind) {
-      GameRowMeaningKind.insight => Row(
+      // ON THE LIME WASH (Quin, 2026-09-30 device check): as a bare line
+      // under the date it sat too tight and blended in with the tier and
+      // stats rows. The wash is the Game Detail insight card's own ground, so
+      // the row previews what the tap opens; full width so it reads as a
+      // card, never as a second tier chip.
+      GameRowMeaningKind.insight => Container(
           key: const ValueKey('game-row-insight'),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // THE insight spark, as on the insight card and the profile's
-            // development blocks: this line is Courtside IQ's own words.
-            Padding(
-              padding: const EdgeInsets.only(top: 1),
-              child: Icon(Icons.auto_awesome, size: 14, color: c.text),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(text,
-                  style: style.copyWith(color: c.text),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis),
-            ),
-          ],
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+              horizontal: CiSpace.s2 + 2, vertical: CiSpace.s2),
+          decoration: BoxDecoration(
+            color: c.accentGoodWash,
+            borderRadius: CiRadius.controlR,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // THE insight spark, as on the insight card and the profile's
+              // development blocks: this line is Courtside IQ's own words.
+              // Boxed at one line's height so it centres on the FIRST line
+              // however the sentence wraps.
+              SizedBox(
+                width: 14,
+                height: _insightLineHeight,
+                child: Center(
+                  child: Icon(Icons.auto_awesome, size: 14, color: c.onAccent),
+                ),
+              ),
+              const SizedBox(width: CiSpace.s2),
+              Expanded(
+                child: Text(text,
+                    style: style.copyWith(
+                        color: c.onAccent, height: _insightLineHeight / 13),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
         ),
       GameRowMeaningKind.tier => Row(
           key: const ValueKey('game-row-tier'),
