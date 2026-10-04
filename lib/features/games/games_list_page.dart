@@ -43,6 +43,7 @@ import '/features/games/games_revision.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'games_repository.dart';
+import 'start_game_flow.dart';
 
 class GamesListPage extends StatefulWidget {
   const GamesListPage({
@@ -69,7 +70,7 @@ class _GamesListPageState extends State<GamesListPage> {
 
   /// Start a new game. Same destination as the empty state's "Start a game",
   /// so the two cannot drift apart.
-  void _newGame() => context.pushNamed(NewGameWidget.routeName);
+  void _newGame() => runStartGameFlow(context);
 
   /// The game still being tracked on this phone, if there is one.
   LiveGameSnapshot? _live;
@@ -470,7 +471,7 @@ class _Empty extends StatelessWidget {
       // The dead-end filter fallback offers no button - see [invites]; the
       // designed empties (no games, or a named player) get "Start a game".
       ctaLabel: invites ? 'Start a game' : null,
-      onCta: invites ? () => context.pushNamed(NewGameWidget.routeName) : null,
+      onCta: invites ? () => runStartGameFlow(context) : null,
     );
   }
 }

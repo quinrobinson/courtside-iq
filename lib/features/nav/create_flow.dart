@@ -11,12 +11,13 @@
 
 import 'package:flutter/material.dart';
 
+import '/courtside_iq/player_gating.dart';
+import '/features/games/game_allowance.dart';
+import '/features/games/start_game_flow.dart';
 import '/features/home/entitlement_status.dart';
 import '/features/players/add_player_flow.dart';
 import '/features/premium/paywall_launcher.dart';
 import '/features/players/players_repository.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '/index.dart';
 import 'create_sheet.dart';
 
 /// [onPlayerAdded] is how the SCREEN BEHIND THE SHEET learns to refetch.
@@ -30,18 +31,26 @@ Future<void> handleCreateTap(
   PlayersRepository repository = const PlayersRepository(),
   VoidCallback? onPlayerAdded,
 }) async {
-  final players = await repository.load();
+  // The allowance is read up front now (3.8): the sheet's "1 free game left"
+  // subtitle needs it before the parent chooses.
+  final (players, allowance) =
+      await (repository.load(), loadGameAllowance()).wait;
   if (!context.mounted) return;
 
   final choice = await presentCreateSheet(
     context,
     hasPlayers: players.isNotEmpty,
+    isPremium: allowance.isPremium,
+    newGameHint: newGameRowFreeHint(
+      isPremium: allowance.isPremium,
+      gameCount: allowance.gameCount,
+    ),
   );
   if (choice == null || !context.mounted) return;
 
   switch (choice) {
     case CreateChoice.newGame:
-      context.pushNamed(NewGameWidget.routeName);
+      await runStartGameFlow(context, allowance: allowance);
     case CreateChoice.newPlayer:
       // Entitlement is read HERE, after the sheet closed, rather than up
       // front: it is only needed on this branch, and a parent who never taps

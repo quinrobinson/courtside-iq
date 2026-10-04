@@ -78,7 +78,15 @@ EntitlementStatus entitlementStatus({
 /// committed set.
 const EntitlementStatus? kDebugForceEntitlement = null;
 
-Future<EntitlementStatus> fetchEntitlementStatus() async {
+Future<EntitlementStatus> fetchEntitlementStatus() async =>
+    await tryFetchEntitlementStatus() ?? EntitlementStatus.never;
+
+/// The same read, but null when it FAILED rather than defaulting to never.
+///
+/// The game gate (3.8) needs the difference: in a gym with no signal, a failed
+/// read must fall back to the last known status, or a paying parent would be
+/// stopped from starting a game. Banners keep the never default above.
+Future<EntitlementStatus?> tryFetchEntitlementStatus() async {
   if (kDebugForceEntitlement != null) return kDebugForceEntitlement!;
   try {
     final uid = currentUserUid;
@@ -87,6 +95,6 @@ Future<EntitlementStatus> fetchEntitlementStatus() async {
         : (await Purchases.logIn(uid)).customerInfo;
     return entitlementStatusOf(info);
   } catch (_) {
-    return EntitlementStatus.never;
+    return null;
   }
 }
