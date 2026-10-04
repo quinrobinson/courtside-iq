@@ -92,6 +92,11 @@ class PaywallCopy {
   static const weeklySub = 'Billed weekly';
   static const weeklyPer = 'per week';
 
+  /// What Premium adds, in one line that does not swipe (roadmap 3.8, Figma
+  /// 1182:5427). The slides sell the story; this states the two limits that
+  /// change, so a parent who arrived from a gate sees why it matters.
+  static const includes = ['Unlimited games', 'Up to 3 players'];
+
   static const cta = 'Start free trial';
 
   /// The CTA when the selected plan has no trial. "Start free trial" on the

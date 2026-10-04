@@ -125,6 +125,23 @@ void main() {
       expect(find.text(r'$1.99'), findsOneWidget);
     });
 
+    testWidgets('states what Premium adds under the dots (3.8)',
+        (tester) async {
+      await _pump(tester, _FakePaywallRepo());
+      expect(find.text('Unlimited games'), findsOneWidget);
+      expect(find.text('Up to 3 players'), findsOneWidget);
+    });
+
+    testWidgets('still fits an iPhone SE screen with the new line',
+        (tester) async {
+      await _pump(tester, _FakePaywallRepo());
+      tester.view.physicalSize = const Size(750, 1334);
+      tester.view.devicePixelRatio = 2.0;
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('Start free trial'), findsOneWidget);
+    });
+
     testWidgets('shows the static "Go Premium" headline', (tester) async {
       await _pump(tester, _FakePaywallRepo());
       expect(find.text('Go Premium'), findsOneWidget);

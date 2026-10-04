@@ -347,6 +347,12 @@ class _PaywallPageState extends State<PaywallPage> {
                                 ),
                               ),
                             ),
+                            // What Premium adds (3.8, Figma 1182:5427): fixed,
+                            // not on a slide, so it is read whichever slide
+                            // is showing. Centred, 16 under the dots.
+                            const SizedBox(height: CiSpace.s4),
+                            const _Includes(),
+                            const SizedBox(height: CiSpace.s4),
                           ],
                         ),
                       ),
@@ -461,6 +467,42 @@ class _Slide extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// "✓ Unlimited games   ✓ Up to 3 players", measured from Figma 1182:5427:
+/// 16 lime checks, 8 to the label, 20 between items, 14 Medium muted.
+class _Includes extends StatelessWidget {
+  const _Includes();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    // A Wrap, not a Row: one line at the designed size (268 wide), but large
+    // accessibility text wraps to two centred lines instead of overflowing.
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 20,
+      runSpacing: CiSpace.s2,
+      children: [
+        for (final label in PaywallCopy.includes)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check, size: 16, color: c.accentGood),
+              const SizedBox(width: CiSpace.s2),
+              Text(
+                label,
+                style: CiType.bodySm.copyWith(
+                  color: c.textMuted,
+                  fontWeight: CiWeight.medium,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }
