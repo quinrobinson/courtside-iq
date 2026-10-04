@@ -56,6 +56,11 @@ Future<void> uploadPendingGame(PendingGame game) {
     upsert: (table, rows) =>
         client.from(table).upsert(rows, onConflict: 'id'),
     requestInsight: generateGameInsight,
+    // RLS refusals arrive as 42501. On the games upsert that is the free-game
+    // policy (3.8). An expired session would also be 42501; the queue holds the
+    // game either way (nothing is lost), and the held sheet only shows when
+    // the client agrees the parent is free and at the allowance.
+    isLimitRefusal: (e) => e is PostgrestException && e.code == '42501',
   );
 }
 

@@ -22,6 +22,7 @@ import 'dart:developer' as dev;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'game_upload_steps.dart' show GameLimitRefusal;
 import 'pending_game.dart';
 
 /// Uploads one game. Returns normally on success, throws on failure.
@@ -80,9 +81,16 @@ class GameSyncQueue {
 
   Future<int> pending() async => (await _read()).length;
 
-  /// Games that exhausted their retries and need a nudge or a look.
-  Future<List<PendingGame>> stuck() async =>
-      (await _read()).where((g) => g.attempts >= maxAttempts).toList();
+  /// Games that exhausted their retries and need a nudge or a look. A game
+  /// held for the free limit is never "stuck" - it is waiting on purpose.
+  Future<List<PendingGame>> stuck() async => (await _read())
+      .where((g) => !g.heldForLimit && g.attempts >= maxAttempts)
+      .toList();
+
+  /// Games the server refused because the free game allowance is used (3.8).
+  /// Kept on the phone indefinitely; they sync once the account is premium.
+  Future<List<PendingGame>> heldForLimit() async =>
+      (await _read()).where((g) => g.heldForLimit).toList();
 
   // --- the main path ---------------------------------------------------------
 
@@ -104,6 +112,9 @@ class GameSyncQueue {
       await _uploader(game);
       await _remove(game.gameId);
       return true;
+    } on GameLimitRefusal {
+      await _markHeld(game.gameId);
+      return false;
     } catch (e) {
       await _recordFailure(game.gameId, e.toString());
       dev.log('game queued for later sync: $e', name: 'GameSyncQueue');
@@ -129,6 +140,11 @@ class GameSyncQueue {
           await _uploader(game);
           await _remove(game.gameId);
           uploaded++;
+        } on GameLimitRefusal {
+          // Not a network failure: the next game may sync fine (a premium
+          // purchase, or a re-save of a game already on the server), so mark
+          // this one held and keep going rather than breaking.
+          await _markHeld(game.gameId);
         } catch (e) {
           await _recordFailure(game.gameId, e.toString());
           // Stop on the first failure: if the network is down, hammering the
@@ -178,6 +194,16 @@ class GameSyncQueue {
   Future<void> _remove(String gameId) async {
     final games = await _read();
     games.removeWhere((g) => g.gameId == gameId);
+    await _write(games);
+  }
+
+  Future<void> _markHeld(String gameId) async {
+    final games = await _read();
+    final i = games.indexWhere((g) => g.gameId == gameId);
+    if (i == -1) return;
+    // No attempts bump: held is a state, not a failure, and burning attempts
+    // would eventually mark a perfectly safe game as stuck.
+    games[i] = games[i].copyWith(heldForLimit: true);
     await _write(games);
   }
 

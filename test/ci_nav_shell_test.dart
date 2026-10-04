@@ -8,6 +8,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:courtside_i_q/courtside_iq/game_sync/pending_game.dart';
+import 'package:courtside_i_q/features/games/game_allowance.dart';
+import 'package:courtside_i_q/features/games/held_game_gate.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:courtside_i_q/features/nav/ci_nav_bar.dart';
@@ -61,6 +65,7 @@ GoRouter _router() => GoRouter(
             navigationShell: navigationShell,
             firstRunPolicy: const _QuietFirstRun(),
             whatsNewPolicy: const _QuietWhatsNew(),
+            heldGamePolicy: const _NoHeldGames(),
           ),
           branches: [
             // Players carries a pushable detail route, so the reset-to-root
@@ -189,4 +194,19 @@ void main() {
     expect(tester.widget<CiNavBar>(find.byType(CiNavBar)).active,
         CiNavTab.players);
   });
+}
+
+/// The held-game reminder (3.8) with nothing held, so the shell tests never
+/// reach the sync queue, RevenueCat or Supabase.
+class _NoHeldGames implements HeldGamePolicy {
+  const _NoHeldGames();
+  @override
+  Future<List<PendingGame>> held() async => const [];
+  @override
+  Future<GameAllowance> allowance() async =>
+      const GameAllowance(isPremium: true, gameCount: 0);
+  @override
+  Stream<int> get changes => const Stream.empty();
+  @override
+  Future<void> syncNow() async {}
 }

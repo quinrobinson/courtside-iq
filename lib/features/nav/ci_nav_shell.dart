@@ -26,6 +26,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '/features/games/held_game_gate.dart';
 import '/features/onboarding/first_run_gate.dart';
 import '/features/onboarding/whats_new_gate.dart';
 import '/features/players/players_revision.dart';
@@ -48,6 +49,7 @@ class CiNavShell extends StatelessWidget {
     required this.navigationShell,
     this.firstRunPolicy,
     this.whatsNewPolicy,
+    this.heldGamePolicy,
   });
 
   final StatefulNavigationShell navigationShell;
@@ -57,6 +59,9 @@ class CiNavShell extends StatelessWidget {
   /// network before it could assert anything about the bar.
   final FirstRunPolicy? firstRunPolicy;
   final WhatsNew2Policy? whatsNewPolicy;
+
+  /// The held-game reminder (3.8). Injected by tests for the same reason.
+  final HeldGamePolicy? heldGamePolicy;
 
   CiNavTab get _active => navigationShell.currentIndex < kNavShellBranches.length
       ? kNavShellBranches[navigationShell.currentIndex]
@@ -103,6 +108,12 @@ class CiNavShell extends StatelessWidget {
     // finishes onboarding before the upgrade sheet is even considered. The two
     // are mutually exclusive (first-run marks the upgrade sheet seen), and the
     // nesting makes it true by construction rather than by coincidence.
+    // Innermost: a held 4th game is only worth mentioning once onboarding and
+    // the upgrade sheet are out of the way.
+    shell = HeldGameGate(
+      policy: heldGamePolicy ?? const QueueHeldGamePolicy(),
+      child: shell,
+    );
     shell = WhatsNewGate(
       policy: whatsNewPolicy ?? const SupabaseWhatsNew2Policy(),
       child: shell,
