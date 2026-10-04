@@ -680,6 +680,64 @@ Fold fouls into a "game impact" or "availability" signal for older age bands.
 
 Subtle "Ratings could be more accurate" indicator when insight was generated with middle-band fallback due to missing birth date.
 
+### 3.8 Free tier: restore the 3-game limit — NEW (target: shipped before the November season)
+
+| b | w | v | Notes |
+|---|---|---|---|
+| ⬜ | ⬜ | ⬜ | Plan below, approved before any code. Figma first for the limit moment. |
+
+**Why (found 2026-10-03/04 while writing the site's pricing copy).** Free in 2.0 is
+1 player with NO game limit (migration `20260719000001` deliberately added none, on the reading
+that the roadmap's "1 player / 3 games" was wrong). Quin: the last release always had a 3-game
+limit, and the Play listing advertised "one player profile and up to three games". The v1 code in
+this repo (from 2026-04-18) has `hideAddGame()` encoding the rule but never calls it, so the wall
+probably lived in an earlier FlutterFlow build. Prod data supports a wall: free accounts by games
+logged are 1 = 23, 2 = 23, **3 = 12, 4 = 0**, 5 = 2, 6 = 1, 11+ = 4 (159 free, 93 with zero
+games). All 7 premium accounts have 4+ games. 2.0 shipped in the off-season (games/month: Jan 88,
+Aug 6, Sep 6), so the gap has not cost much yet. It will once the season starts.
+
+**The rule.** Free = 1 player and 3 games. Premium = up to 3 players, unlimited games. The 4th game
+is where the paywall appears.
+
+**Decisions to confirm before the plan is approved**
+1. What counts as a game: a `games` row for the user (every saved game, all players). Recommended.
+2. Grandfathering: the 8 free accounts already over 3 games keep every game they have (INSERT-only,
+   exactly like the player limit). They meet the wall on their next new game. Recommended.
+3. Where the wall sits: BEFORE a game starts (New Game / Start tracking), never at save. A parent
+   must never track a whole game and then lose it. Recommended.
+
+**Work, in order**
+1. **Figma (uvHb6, Screens page, Premium/Paywall section):** the "You've used your 3 free games"
+   moment, reached from Start game on the 4th game. Reuse the player-gate sheet shape
+   (`player_gates.dart`: ink sheet, dot-burst mark, benefit list, lime "See plans", "Not now").
+   Also: a quiet "2 of 3 free games used" hint on New Game for free users, and the paywall's
+   benefit line updated to name unlimited games. Approve before code.
+2. **Migration (test first):** `game_count(uid)` (SECURITY DEFINER, like `player_count`),
+   `free_game_limit()` returning 3, and the `games` INSERT policy changed to
+   `is_premium(auth.uid()) or game_count(auth.uid()) < free_game_limit()`. INSERT-only, so
+   SELECT/UPDATE/DELETE and existing data are untouched. Probe both directions with rolled-back
+   inserts (free at 3: denied; premium: allowed), as 4.20b did.
+3. **Client gate:** `lib/courtside_iq/` pure function `canStartGame(isPremium, gameCount)` with
+   `kFreeGameLimit = 3` beside `kFreePlayerLimit` in `player_gating.dart`, unit-tested. Wire it to
+   every entry that starts a game (New Game, Today, Games tab, player profile). Cache the count so
+   the gate works offline.
+4. **Offline safety:** `uploadPendingGame` must treat an RLS denial as "keep the game locally and
+   show the paywall", never drop it. Test: free account at 3 games, track a 4th fully offline, then
+   reconnect. Expected: the game is kept, the paywall appears, buying Premium syncs it.
+5. **Purchase lag:** after buying, the webhook writes `subscriptions` a moment later. The client
+   must trust RevenueCat's entitlement for the gate and retry the insert, so a new subscriber is
+   never blocked by the server for those seconds.
+6. **Copy, shipped in the same release:** paywall, What's New ("Free now includes 3 games"),
+   store listings (`docs/store-assets-2-0.md` currently says "no game limits"), FAQ, and the new
+   site's pricing section ("Free for one player and three games. Go Premium for unlimited games and
+   up to three players."). The site copy goes live only with this build.
+7. **Verify on device:** free fresh account (games 1-3 fine, 4th shows the gate), grandfathered
+   account (keeps old games, gated on the next), premium (never gated), offline 4th game, purchase
+   from the gate then start the game.
+
+**Not in scope here:** the bigger leak is earlier. 58% of free accounts never log a game at all.
+That is an onboarding problem and gets its own item.
+
 ---
 
 ## Sequencing at a glance
