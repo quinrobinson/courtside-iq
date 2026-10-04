@@ -684,7 +684,7 @@ Subtle "Ratings could be more accurate" indicator when insight was generated wit
 
 | b | w | v | Notes |
 |---|---|---|---|
-| ⬜ | ⬜ | ⬜ | Plan below, approved before any code. Figma first for the limit moment. |
+| ✅ | ✅ | ⬜ | Built and wired on `phase-3-8-free-game-limit` (2026-10-04): migration on TEST (probed), gating rules, gate + offline-held sheets, start-game flow at all 4 entry points, New Game hint, paywall line, help + store/site copy (`docs/store-copy-3-8.md`). 900 tests green. Device pass and prod promotion pending. |
 
 **Why (found 2026-10-03/04 while writing the site's pricing copy).** Free in 2.0 is
 1 player with NO game limit (migration `20260719000001` deliberately added none, on the reading
