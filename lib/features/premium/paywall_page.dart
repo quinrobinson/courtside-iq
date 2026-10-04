@@ -349,10 +349,13 @@ class _PaywallPageState extends State<PaywallPage> {
                             ),
                             // What Premium adds (3.8, Figma 1182:5427): fixed,
                             // not on a slide, so it is read whichever slide
-                            // is showing. Centred, 16 under the dots.
-                            const SizedBox(height: CiSpace.s4),
+                            // is showing. It summarises the PLANS, so it sits
+                            // with them: 24 clear of the carousel's dots, 12
+                            // above the plan list (Quin, device pass: evenly
+                            // spaced it floated between the two).
+                            const SizedBox(height: CiSpace.s6),
                             const _Includes(),
-                            const SizedBox(height: CiSpace.s4),
+                            const SizedBox(height: CiSpace.s3),
                           ],
                         ),
                       ),
