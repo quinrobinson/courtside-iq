@@ -141,4 +141,41 @@ void main() {
       expect(held.copyWith(attempts: 2).heldForLimit, isTrue);
     });
   });
+
+  group('games stuck on 2.0, after the update', () {
+    // A free parent on 2.0 tracks a 4th game, the server refuses it, and 2.0
+    // retries it to stuck. 2.1 must still catch it as held.
+    PendingGame stuckGame() => _game('g4')
+        .copyWith(attempts: GameSyncQueue.maxAttempts);
+
+    test('the first 2.1 launch retries it and holds it', () async {
+      SharedPreferences.setMockInitialValues({
+        'ciq_pending_games_v1': PendingGame.encodeList([stuckGame()]),
+      });
+      final q = GameSyncQueue(
+          uploader: (g) async => throw const GameLimitRefusal());
+
+      await q.resetStuckOnce();
+      await q.flush();
+
+      final held = await q.heldForLimit();
+      expect(held.single.gameId, 'g4');
+      expect(await q.stuck(), isEmpty);
+    });
+
+    test('runs once per install, so a game stuck later stays stuck',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      final q = GameSyncQueue(uploader: (g) async => throw Exception('net'));
+      await q.resetStuckOnce();
+
+      SharedPreferences.setMockInitialValues({
+        'ciq_pending_games_v1': PendingGame.encodeList([stuckGame()]),
+        'ciq_stuck_reset_v2_1': true,
+      });
+      await q.resetStuckOnce();
+
+      expect((await q.stuck()).single.attempts, GameSyncQueue.maxAttempts);
+    });
+  });
 }

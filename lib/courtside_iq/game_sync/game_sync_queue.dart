@@ -48,6 +48,9 @@ class GameSyncQueue {
   /// stuck. Retrying invisibly forever hides a real problem from the parent.
   static const maxAttempts = 8;
 
+  /// Set once [resetStuckOnce] has run on this install.
+  static const _stuckResetKey = 'ciq_stuck_reset_v2_1';
+
   final GameUploader _uploader;
   final Connectivity _connectivity;
 
@@ -166,7 +169,7 @@ class GameSyncQueue {
   /// on next launch, not sit waiting for a connectivity *change* that may
   /// never come if the phone is already online.
   void startAutoFlush() {
-    unawaited(flush());
+    unawaited(resetStuckOnce().then((_) => flush()));
     _connSub ??= _connectivity.onConnectivityChanged.listen((results) {
       final online = results.any((r) => r != ConnectivityResult.none);
       if (online) unawaited(flush());
@@ -187,6 +190,28 @@ class GameSyncQueue {
         g.attempts >= maxAttempts ? g.copyWith(attempts: 0) : g,
     ]);
     await flush();
+  }
+
+  /// ONE FRESH ROUND FOR GAMES THAT GOT STUCK BEFORE 2.1 (3.8).
+  ///
+  /// 2.0 has no free game limit on the client, so once the server limit is
+  /// on, a free parent still on 2.0 can track a 4th game the server refuses.
+  /// 2.0 keeps it and retries until it is stuck. [flush] skips stuck games,
+  /// so after the update that game would never be retried, never recognised
+  /// as a limit refusal, and never shown as held: invisible on the phone.
+  /// One reset per install lets the 2.1 flush see the refusal and hold it.
+  /// Games stuck for any other reason simply get one more round.
+  Future<void> resetStuckOnce() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_stuckResetKey) ?? false) return;
+    final games = await _read();
+    if (games.any((g) => g.attempts >= maxAttempts)) {
+      await _write([
+        for (final g in games)
+          g.attempts >= maxAttempts ? g.copyWith(attempts: 0) : g,
+      ]);
+    }
+    await prefs.setBool(_stuckResetKey, true);
   }
 
   // --- internals -------------------------------------------------------------
