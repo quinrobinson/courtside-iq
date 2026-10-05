@@ -38,6 +38,7 @@ import '/features/players/info_copy.dart';
 import '/features/players/players_revision.dart';
 import '/features/games/games_revision.dart';
 import '/features/menu/account_repository.dart';
+import '/features/premium/entitlement_revision.dart';
 import '/features/premium/paywall_launcher.dart';
 import 'entitlement_status.dart';
 import 'widgets/today_promo_banner.dart';
@@ -101,6 +102,10 @@ class _TodayPageState extends State<TodayPage> {
     // Same for a game saved or synced: the feed is kept alive by the shell and
     // would otherwise keep showing games from before the new one existed.
     gamesRevision.addListener(_refresh);
+    // And for the premium state: a purchase made from the add-player gate or
+    // Menu must clear the "Unlock Premium" banner here too, not only one made
+    // from this screen's own banner.
+    entitlementRevision.addListener(_loadEntitlement);
     // The v1 gate lives on home_widget, which this screen replaces, so
     // without this the birth-date prompt is dead on every 2.0 build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -117,6 +122,7 @@ class _TodayPageState extends State<TodayPage> {
   void dispose() {
     playersRevision.removeListener(_refresh);
     gamesRevision.removeListener(_refresh);
+    entitlementRevision.removeListener(_loadEntitlement);
     super.dispose();
   }
 
@@ -194,15 +200,9 @@ class _TodayPageState extends State<TodayPage> {
     openPaywall: _openPaywall,
   );
 
-  Future<void> _openPaywall() async {
-    await showPaywall(context);
-    // RE-READ AFTER THE PAYWALL CLOSES. Entitlement was fetched once on
-    // init, so a parent who subscribed came back to a screen that still
-    // believed they were on the free tier - the gate kept appearing until
-    // something else happened to refresh. A purchase must take effect the
-    // moment they return.
-    if (mounted) await _loadEntitlement();
-  }
+  // No re-read after the paywall closes: a purchase reaches this screen through
+  // entitlementRevision, wherever the paywall was opened from.
+  Future<void> _openPaywall() => showPaywall(context);
 
   @override
   Widget build(BuildContext context) {
