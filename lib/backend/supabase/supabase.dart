@@ -20,7 +20,7 @@ export 'storage/storage.dart';
 //
 // 4.22 set this to `false` to cut 2.0.0. It goes back to `false` before this
 // branch merges anywhere that ships.
-const bool _kUseTestSupabase = true;
+const bool _kUseTestSupabase = false;
 
 const _kProdSupabaseUrl = 'https://ejwgxsszmfabujdqxxdz.supabase.co';
 const _kProdSupabaseAnonKey =
