@@ -57,7 +57,7 @@ void main() {
     expect(find.text('Your game is safe on this phone'), findsOneWidget);
     expect(find.textContaining('vs Eagles'), findsOneWidget);
 
-    await tester.tap(find.text('Keep it on this phone'));
+    await tester.tap(find.text('Not now, keep it on this phone'));
     await tester.pumpAndSettle();
 
     // A reconnect flush changes the queue: no second sheet this launch.

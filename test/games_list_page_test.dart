@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:courtside_i_q/courtside_iq/game_sync/pending_game.dart';
+
 import 'package:courtside_i_q/courtside_iq/design/ci_theme.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_field.dart';
 import 'package:courtside_i_q/courtside_iq/games_list_builder.dart';
@@ -82,10 +84,14 @@ Future<void> _pump(
   WidgetTester tester,
   List<GameListRow> rows, {
   List<GameRosterEntry>? roster,
+  List<PendingGame> held = const [],
 }) async {
   await tester.pumpWidget(MaterialApp(
     theme: CiTheme.base(),
-    home: GamesListPage(repository: _FakeRepo(rows, roster: roster)),
+    home: GamesListPage(
+      repository: _FakeRepo(rows, roster: roster),
+      loadHeld: () async => held,
+    ),
   ));
   await tester.pumpAndSettle();
 }
@@ -304,5 +310,49 @@ void main() {
 
     expect(repo.loads, greaterThan(before),
         reason: 'a game change must trigger a refetch');
+  });
+
+  group('held game on this phone (roadmap 3.8, Figma 1192:5593)', () {
+    PendingGame heldGame() => PendingGame(
+          gameId: 'h1',
+          statsId: 'hs1',
+          gameRow: {
+            'id': 'h1',
+            'player_id': 'p1',
+            'opponent_team': 'Eagles',
+            'started_at': '2026-05-10T18:00:00Z',
+          },
+          statsRow: {'id': 'hs1', 'game_id': 'h1', 'points': 9},
+          queuedAt: DateTime(2026, 5, 10),
+          heldForLimit: true,
+        );
+
+    testWidgets('leads the list, waiting state, no score', (tester) async {
+      await _pump(tester, [_g(points: 30)], held: [heldGame()]);
+      expect(find.text('Saved on this phone'), findsOneWidget);
+      expect(find.text('Go Premium to add it'), findsOneWidget);
+      expect(find.textContaining('vs Eagles'), findsOneWidget);
+      // It sits above the saved game.
+      final heldY = tester.getTopLeft(find.text('Saved on this phone')).dy;
+      final savedY = tester.getTopLeft(find.textContaining('vs Hawks')).dy;
+      expect(heldY, lessThan(savedY));
+      // No lead number for a game that is not on the record: the only "9"
+      // would be its points, and it must not show.
+      expect(find.text('9'), findsNothing);
+    });
+
+    testWidgets('tapping it opens the held sheet', (tester) async {
+      await _pump(tester, [_g()], held: [heldGame()]);
+      await tester.tap(find.text('Saved on this phone'));
+      await tester.pumpAndSettle();
+      expect(find.text('Your game is safe on this phone'), findsOneWidget);
+      expect(find.text('Not now, keep it on this phone'), findsOneWidget);
+    });
+
+    testWidgets('a held game alone is not the empty state', (tester) async {
+      await _pump(tester, const [], held: [heldGame()],
+          roster: const [GameRosterEntry(playerId: 'p1', firstName: 'Maya')]);
+      expect(find.text('Saved on this phone'), findsOneWidget);
+    });
   });
 }

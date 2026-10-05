@@ -61,6 +61,7 @@ class GameFeedEntry {
     required this.steals,
     required this.turnovers,
     this.isLive = false,
+    this.isHeld = false,
     this.blocks = 0,
     this.offRebounds = 0,
     this.fgAttempt = 0,
@@ -101,6 +102,10 @@ class GameFeedEntry {
   /// `games.game_live` is the source. There is at most one at a time, so this
   /// is true for one row at most.
   final bool isLive;
+
+  /// A game held on the phone because the free allowance is used (roadmap
+  /// 3.8). Not on the server yet, so it shows a waiting state and no score.
+  final bool isHeld;
 
   // --- What the saved-game row needs to say what the game MEANT ------------
   //
@@ -198,6 +203,10 @@ class GameFeedEntry {
   }
 }
 
+/// Held-game row copy (roadmap 3.8, Figma 1192:5710).
+const kHeldGameChip = 'Saved on this phone';
+const kHeldGameAction = 'Go Premium to add it';
+
 class GameFeedRow extends StatelessWidget {
   const GameFeedRow({
     super.key,
@@ -215,8 +224,81 @@ class GameFeedRow extends StatelessWidget {
   final bool showPlayer;
 
   @override
-  Widget build(BuildContext context) =>
-      entry.isLive ? _buildLive(context) : _buildSaved(context);
+  Widget build(BuildContext context) => entry.isLive
+      ? _buildLive(context)
+      : entry.isHeld
+          ? _buildHeld(context)
+          : _buildSaved(context);
+
+  /// A game held on this phone (Figma 1192:5710): the saved row's shape with a
+  /// calm grey "Saved on this phone" chip where the rating goes, and NO lead
+  /// number - a game that is not on the record yet should not show a stat next
+  /// to ones that are. Grey, not orange or red: it is waiting, not wrong.
+  Widget _buildHeld(BuildContext context) {
+    final c = CiColors.of(context);
+    final title = showPlayer ? entry.playerName : entry.opponentTitle;
+    final subtitle = showPlayer ? entry.subtitle : entry.dateSubtitle;
+    return Semantics(
+      button: onTap != null,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+              CiSpace.screen, CiSpace.s4, CiSpace.screen, CiSpace.s4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (showPlayer) ...[
+                CiAvatar(
+                  name: entry.playerName,
+                  imageUrl: entry.playerPhotoUrl,
+                  size: 38,
+                ),
+                const SizedBox(width: CiSpace.s3),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: CiType.rowTitle.copyWith(
+                            color: c.text, fontWeight: CiWeight.semiBold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                    if (subtitle.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(subtitle,
+                          style: CiType.caption.copyWith(
+                              color: c.textMuted,
+                              fontWeight: CiWeight.medium),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                    ],
+                    const SizedBox(height: 6),
+                    Row(
+                      key: const ValueKey('game-row-held'),
+                      children: [
+                        const CiBadge(label: kHeldGameChip),
+                        const SizedBox(width: CiSpace.s2),
+                        Flexible(
+                          child: Text(kHeldGameAction,
+                              style: CiType.labelTight.copyWith(
+                                  color: c.textMuted,
+                                  fontWeight: CiWeight.medium),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   /// A saved game: what it meant, not a box score. See the file header.
   Widget _buildSaved(BuildContext context) {

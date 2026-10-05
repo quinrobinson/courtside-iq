@@ -113,7 +113,7 @@ Future<bool> showOfflineGameHeldGate(
             ? 'Growth IQ and the player story keep building'
             : "Growth IQ and $playerFirstName's story keep building",
       ],
-      quietLabel: 'Keep it on this phone',
+      quietLabel: 'Not now, keep it on this phone',
     ),
   );
 }

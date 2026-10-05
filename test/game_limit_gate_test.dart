@@ -76,7 +76,7 @@ void main() {
         findsOneWidget);
     // Dismissing must not read as deleting the game.
     expect(find.text('Not now'), findsNothing);
-    await tester.tap(find.text('Keep it on this phone'));
+    await tester.tap(find.text('Not now, keep it on this phone'));
     await tester.pumpAndSettle();
     expect(result, isFalse);
   });
