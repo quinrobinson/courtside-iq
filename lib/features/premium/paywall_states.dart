@@ -261,6 +261,7 @@ class PaywallSlideCard extends StatelessWidget {
   static const _h = 155.0;
 
   String get _asset => switch (art) {
+    PaywallSlideArt.unlimited => 'assets/images/paywall/slide_unlimited.png',
     PaywallSlideArt.story => 'assets/images/paywall/slide_story.png',
     PaywallSlideArt.trend => 'assets/images/paywall/slide_trend.png',
     PaywallSlideArt.insight => 'assets/images/paywall/slide_insight.png',
@@ -269,6 +270,9 @@ class PaywallSlideCard extends StatelessWidget {
   /// What a screen reader says instead of describing a picture it cannot
   /// read. Each card IS the argument its slide is making.
   String get _semantics => switch (art) {
+    PaywallSlideArt.unlimited =>
+      'Three players, Maya, Jordan and Avery, with 28, 19 and 23 games '
+          'tracked this season.',
     PaywallSlideArt.story =>
       "An example insight: Maya's scoring efficiency keeps climbing.",
     PaywallSlideArt.trend =>
