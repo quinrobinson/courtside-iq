@@ -433,11 +433,18 @@ class _Slide extends StatelessWidget {
             children: [
               Icon(slide.icon, size: 15, color: c.accentGood),
               const SizedBox(width: 6),
-              Text(
-                slide.label,
-                style: CiType.caption.copyWith(
-                  color: c.accentGood,
-                  fontWeight: CiWeight.semiBold,
+              // Flexible: "UNLIMITED GAMES · 3 PLAYERS" (3.8) is the longest
+              // eyebrow, and at large text sizes it must give way rather than
+              // push the row off the screen.
+              Flexible(
+                child: Text(
+                  slide.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CiType.caption.copyWith(
+                    color: c.accentGood,
+                    fontWeight: CiWeight.semiBold,
+                  ),
                 ),
               ),
             ],

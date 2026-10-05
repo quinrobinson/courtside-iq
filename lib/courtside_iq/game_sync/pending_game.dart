@@ -48,6 +48,12 @@ class PendingGame {
   /// Last failure, kept for diagnosis. Never shown raw to a parent.
   final String? lastError;
 
+  /// The server refused this game because the free allowance is used up
+  /// (roadmap 3.8). It is NOT a failure and NOT stuck: it stays on the phone
+  /// indefinitely, does not burn attempts, and syncs once the account is
+  /// premium. Absent (false) on every game queued before 3.8.
+  final bool heldForLimit;
+
   const PendingGame({
     required this.gameId,
     required this.statsId,
@@ -57,12 +63,14 @@ class PendingGame {
     this.eventRows = const [],
     this.attempts = 0,
     this.lastError,
+    this.heldForLimit = false,
   });
 
   /// EVERY FIELD HAS TO BE CARRIED. This runs on each retry to bump attempts,
   /// so anything omitted here is silently dropped the first time an upload
   /// fails - which is exactly when the data matters most.
-  PendingGame copyWith({int? attempts, String? lastError}) => PendingGame(
+  PendingGame copyWith({int? attempts, String? lastError, bool? heldForLimit}) =>
+      PendingGame(
         gameId: gameId,
         statsId: statsId,
         gameRow: gameRow,
@@ -71,6 +79,7 @@ class PendingGame {
         queuedAt: queuedAt,
         attempts: attempts ?? this.attempts,
         lastError: lastError ?? this.lastError,
+        heldForLimit: heldForLimit ?? this.heldForLimit,
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,6 +91,7 @@ class PendingGame {
         'queuedAt': queuedAt.toIso8601String(),
         'attempts': attempts,
         'lastError': lastError,
+        'heldForLimit': heldForLimit,
       };
 
   static PendingGame fromJson(Map<String, dynamic> j) => PendingGame(
@@ -103,6 +113,7 @@ class PendingGame {
             DateTime.tryParse(j['queuedAt'] as String? ?? '') ?? DateTime.now(),
         attempts: (j['attempts'] as num?)?.toInt() ?? 0,
         lastError: j['lastError'] as String?,
+        heldForLimit: j['heldForLimit'] as bool? ?? false,
       );
 
   static String encodeList(List<PendingGame> games) =>

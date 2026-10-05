@@ -8,6 +8,7 @@ import 'package:courtside_i_q/courtside_iq/design/components/ci_button.dart';
 import 'package:courtside_i_q/courtside_iq/design/components/ci_field.dart';
 import 'package:courtside_i_q/courtside_iq/player_averages.dart';
 import 'package:courtside_i_q/courtside_iq/players_list_builder.dart';
+import 'package:courtside_i_q/features/games/game_allowance.dart';
 import 'package:courtside_i_q/features/games/new_game_setup_page.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
 import 'package:courtside_i_q/features/players/players_repository.dart';
@@ -39,6 +40,8 @@ Future<NewGameSetup?> _pump(
   WidgetTester tester,
   List<PlayerListEntry> players, {
   bool reduceMotion = false,
+  GameAllowance allowance =
+      const GameAllowance(isPremium: true, gameCount: 0),
 }) async {
   NewGameSetup? result;
   await tester.pumpWidget(MaterialApp(
@@ -52,6 +55,7 @@ Future<NewGameSetup?> _pump(
     home: NewGameSetupPage(
       repository: _FakeRepo(players),
       onStart: (s) => result = s,
+      loadAllowance: () async => allowance,
     ),
   ));
   await tester.pumpAndSettle();
@@ -219,5 +223,36 @@ void main() {
     expect(chosen.ringColor, CiColors.onInk.accentGood);
     // Everyone else keeps the hairline.
     expect(avatars.where((a) => a.ringWidth == 2).length, 1);
+  });
+
+  group('free games hint (roadmap 3.8)', () {
+    final maya = [_player('p1', 'Maya')];
+
+    // One pump per test: re-pumping the same page keeps its State, so the
+    // hint would not reload.
+    testWidgets('shows 1 of 3 for a free parent', (tester) async {
+      await _pump(tester, maya,
+          allowance: const GameAllowance(isPremium: false, gameCount: 1));
+      expect(find.text('1 of 3 free games used'), findsOneWidget);
+    });
+
+    testWidgets('shows 2 of 3 with no sales line', (tester) async {
+      await _pump(tester, maya,
+          allowance: const GameAllowance(isPremium: false, gameCount: 2));
+      expect(find.text('2 of 3 free games used'), findsOneWidget);
+      expect(find.textContaining('Premium'), findsNothing);
+    });
+
+    testWidgets('is hidden for premium', (tester) async {
+      await _pump(tester, maya,
+          allowance: const GameAllowance(isPremium: true, gameCount: 2));
+      expect(find.textContaining('free games used'), findsNothing);
+    });
+
+    testWidgets('is hidden before the first game', (tester) async {
+      await _pump(tester, maya,
+          allowance: const GameAllowance(isPremium: false, gameCount: 0));
+      expect(find.textContaining('free games used'), findsNothing);
+    });
   });
 }

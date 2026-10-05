@@ -30,20 +30,40 @@ import '/courtside_iq/design/tokens/ci_colors.dart';
 Future<CreateChoice?> presentCreateSheet(
   BuildContext context, {
   required bool hasPlayers,
+  bool isPremium = true,
+  String? newGameHint,
 }) {
   return showCiSheet<CreateChoice>(
     context,
-    child: CreateSheet(hasPlayers: hasPlayers),
+    child: CreateSheet(
+      hasPlayers: hasPlayers,
+      isPremium: isPremium,
+      newGameHint: newGameHint,
+    ),
   );
 }
 
 enum CreateChoice { newGame, newPlayer }
 
 class CreateSheet extends StatelessWidget {
-  const CreateSheet({super.key, required this.hasPlayers});
+  const CreateSheet({
+    super.key,
+    required this.hasPlayers,
+    this.isPremium = true,
+    this.newGameHint,
+  });
 
   /// Drives whether "New game" is offered at all.
   final bool hasPlayers;
+
+  /// Free parents see the player row's subtitle as what Premium adds, since
+  /// "up to 3" is not what THEY get (Figma 1184:5451). Defaults to premium so
+  /// the copy only changes when a caller knows the parent is free.
+  final bool isPremium;
+
+  /// Replaces the "New game" subtitle when set: "1 free game left", from
+  /// newGameRowFreeHint (roadmap 3.8). Null keeps the normal subtitle.
+  final String? newGameHint;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +83,7 @@ class CreateSheet extends StatelessWidget {
                 size: 24,
               ),
               title: 'New game',
-              subtitle: 'Track a game for a player',
+              subtitle: newGameHint ?? 'Track a game for a player',
               showDivider: true,
               onTap: () => Navigator.of(context).pop(CreateChoice.newGame),
             ),
@@ -75,8 +95,11 @@ class CreateSheet extends StatelessWidget {
             ),
             title: 'New player',
             // States the cap up front, so the limit is not a surprise
-            // discovered by hitting it.
-            subtitle: 'Add a player to track (up to 3)',
+            // discovered by hitting it. For a free parent the cap is
+            // Premium's, so it says whose it is.
+            subtitle: isPremium
+                ? 'Add a player to track (up to 3)'
+                : 'Premium tracks up to 3',
             onTap: () => Navigator.of(context).pop(CreateChoice.newPlayer),
           ),
         ],

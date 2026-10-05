@@ -42,8 +42,10 @@ import '/courtside_iq/design/components/ci_field.dart';
 import '/courtside_iq/design/tokens/ci_colors.dart';
 import '/courtside_iq/design/tokens/ci_metrics.dart';
 import '/courtside_iq/design/tokens/ci_type.dart';
+import '/courtside_iq/player_gating.dart';
 import '/courtside_iq/players_list_builder.dart';
 import '/features/players/players_repository.dart';
+import 'game_allowance.dart';
 import 'game_setup_pickers.dart';
 
 /// What the setup screen produces. The tracker takes it from here.
@@ -68,9 +70,14 @@ class NewGameSetupPage extends StatefulWidget {
     super.key,
     this.repository = const PlayersRepository(),
     this.onStart,
+    this.loadAllowance = loadGameAllowance,
   });
 
   final PlayersRepository repository;
+
+  /// Where the free-games hint reads from. Injected so tests never touch
+  /// RevenueCat or Supabase (roadmap 3.8).
+  final Future<GameAllowance> Function() loadAllowance;
 
   /// Called with the setup once the parent taps Start Game.
   ///
@@ -123,10 +130,30 @@ class _NewGameSetupPageState extends State<NewGameSetupPage>
   String? _team;
   String? _event;
 
+  /// Free games used, when the quiet "1 of 3 / 2 of 3" hint should show
+  /// (roadmap 3.8, Figma 1182:5522 / 1182:5585). Null hides it: premium,
+  /// before the first game, or not yet known.
+  int? _freeGamesUsed;
+
   @override
   void initState() {
     super.initState();
     _playersFuture = _loadPlayers();
+    _loadFreeGamesHint();
+  }
+
+  /// Best-effort and silent: the hint is information, never a gate. The gate
+  /// already ran in runStartGameFlow before this screen opened.
+  Future<void> _loadFreeGamesHint() async {
+    try {
+      final a = await widget.loadAllowance();
+      if (!mounted) return;
+      final hint =
+          freeGamesUsedHint(isPremium: a.isPremium, gameCount: a.gameCount);
+      setState(() => _freeGamesUsed = hint == null ? null : a.gameCount);
+    } catch (_) {
+      // No hint is better than a wrong one.
+    }
   }
 
   /// Loads the players and preselects a lone one. Kept separate from initState
@@ -297,10 +324,20 @@ class _NewGameSetupPageState extends State<NewGameSetupPage>
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(CiSpace.screen, 0,
                             CiSpace.screen, CiSpace.s6),
-                        child: CiButton(
-                          label: 'Start Game',
-                          expand: true,
-                          onPressed: _canStart ? () => _start(players) : null,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_freeGamesUsed != null) ...[
+                              _FreeGamesHint(used: _freeGamesUsed!),
+                              const SizedBox(height: CiSpace.s4),
+                            ],
+                            CiButton(
+                              label: 'Start Game',
+                              expand: true,
+                              onPressed:
+                                  _canStart ? () => _start(players) : null,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -310,6 +347,47 @@ class _NewGameSetupPageState extends State<NewGameSetupPage>
           ),
         );
       }),
+    );
+  }
+}
+
+/// The quiet free-games count above Start Game (Figma 1182:5522, measured):
+/// three 6px dots 4 apart (solid ink = used, ink outline = left), 10 gap, then
+/// 13 Medium muted text. Information, not a warning - no colour, no button.
+class _FreeGamesHint extends StatelessWidget {
+  const _FreeGamesHint({required this.used});
+
+  final int used;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CiColors.of(context);
+    final label =
+        freeGamesUsedHint(isPremium: false, gameCount: used) ?? '';
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < kFreeGameLimit; i++) ...[
+            if (i > 0) const SizedBox(width: 4),
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: i < used ? c.text : null,
+                border: i < used
+                    ? null
+                    : Border.all(color: c.text, width: 1.25),
+              ),
+            ),
+          ],
+          const SizedBox(width: 10),
+          Text(label, style: CiType.labelTight.copyWith(color: c.textMuted)),
+        ],
+      ),
     );
   }
 }

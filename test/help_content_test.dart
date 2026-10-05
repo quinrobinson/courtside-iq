@@ -12,12 +12,27 @@ import 'package:courtside_i_q/courtside_iq/player_gating.dart';
 
 void main() {
   group('the facts it states', () {
+    test('the free plan is one player AND three games (3.8)', () {
+      // Folded into the subscription answer rather than a ninth topic: the
+      // Help frame (507:1964) has eight.
+      final sub = kHelpTopics.firstWhere(
+        (t) => t.question.contains('subscription work'),
+      );
+      expect(sub.answer, contains('one player and three games for free'));
+      expect(sub.answer, contains('unlimited games'));
+      expect(sub.answer, contains('stays safe on your phone'));
+      // Live tracking is free; the old answer sold it as a premium feature.
+      expect(sub.answer, isNot(contains('live stat tracking')));
+      expect(kFreeGameLimit, 3);
+    });
+
     test('the free tier is ONE player, not three', () {
       // v1 said "up to 3 player profiles per account" in TWO answers with no
       // mention of a free limit. A parent added their second child and hit an
       // upgrade gate the help center had told them was not there.
-      final players = kHelpTopics
-          .firstWhere((t) => t.question.contains('add another player'));
+      final players = kHelpTopics.firstWhere(
+        (t) => t.question.contains('add another player'),
+      );
       expect(players.answer, contains('one player for free'));
       expect(players.answer, contains('raises that to three'));
       // And the numbers still match the code.
@@ -28,8 +43,9 @@ void main() {
     test('the trial is monthly-only and first-time-only', () {
       // v1 promised it to "every new subscriber". A weekly subscriber was
       // promised a trial they could never get.
-      final sub = kHelpTopics
-          .firstWhere((t) => t.question.contains('subscription work'));
+      final sub = kHelpTopics.firstWhere(
+        (t) => t.question.contains('subscription work'),
+      );
       expect(sub.answer, contains('monthly plan also comes with'));
       expect(sub.answer, contains('not subscribed before'));
       expect(sub.answer, contains('weekly plan does not'));
@@ -38,15 +54,17 @@ void main() {
     test('cancelling is described as happening in the app store', () {
       // Not in Courtside IQ. The single most expensive thing to get wrong
       // here: a parent who believes we cancelled it keeps being billed.
-      final sub = kHelpTopics
-          .firstWhere((t) => t.question.contains('subscription work'));
+      final sub = kHelpTopics.firstWhere(
+        (t) => t.question.contains('subscription work'),
+      );
       expect(sub.answer, contains('app store'));
       expect(sub.answer, isNot(contains('Manage Your Subscription')));
     });
 
     test('deleting an account is said NOT to cancel the subscription', () {
-      final delete = kHelpTopics
-          .firstWhere((t) => t.question.startsWith('Does deleting'));
+      final delete = kHelpTopics.firstWhere(
+        (t) => t.question.startsWith('Does deleting'),
+      );
       expect(delete.answer, startsWith('No'));
       expect(delete.answer, contains('app store'));
     });
@@ -54,8 +72,9 @@ void main() {
     test('the locked Growth IQ answer covers BOTH causes', () {
       // Five games and a missing birth date need different things from the
       // parent. An answer naming only one leaves half of them stuck.
-      final locked = kHelpTopics
-          .firstWhere((t) => t.question.contains('see a rating yet'));
+      final locked = kHelpTopics.firstWhere(
+        (t) => t.question.contains('see a rating yet'),
+      );
       expect(locked.answer, contains('five games'));
       expect(locked.answer, contains('birth date'));
     });
@@ -78,12 +97,15 @@ void main() {
     });
 
     test('the tier hierarchy reads Solid, Good, Elite', () {
-      final tiers =
-          kHelpTopics.firstWhere((t) => t.question.contains('Solid'));
-      expect(tiers.answer.indexOf('Solid'),
-          lessThan(tiers.answer.indexOf('Good')));
-      expect(tiers.answer.indexOf('Good'),
-          lessThan(tiers.answer.indexOf('Elite')));
+      final tiers = kHelpTopics.firstWhere((t) => t.question.contains('Solid'));
+      expect(
+        tiers.answer.indexOf('Solid'),
+        lessThan(tiers.answer.indexOf('Good')),
+      );
+      expect(
+        tiers.answer.indexOf('Good'),
+        lessThan(tiers.answer.indexOf('Elite')),
+      );
       // Solid is the ENTRY level. This is the one thing here that gets
       // misread as a poor grade.
       // The frame's own line, and the one that makes the point: no level

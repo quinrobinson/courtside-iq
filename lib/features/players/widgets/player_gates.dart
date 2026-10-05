@@ -15,7 +15,11 @@
 // THE CAP DIALOG DOES NOT SELL. The parent already pays; offering them premium
 // at their own cap would be insulting. It offers management instead.
 //
-// Display and routing only - neither surface reads or writes entitlement.
+// Roadmap 3.8 adds two GAME gates on the same ink sheet (Figma 1182:5313 and
+// the offline-held 1182:5370). All three share _InkGateSheet so they cannot
+// drift apart.
+//
+// Display and routing only - no surface here reads or writes entitlement.
 
 import 'package:flutter/material.dart';
 
@@ -37,7 +41,91 @@ Future<bool> showAddPlayerUpgradeGate(BuildContext context) async {
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => const _UpgradeGateSheet(),
+    builder: (_) => const _InkGateSheet(
+      title: 'Track more players',
+      body: 'Free includes $kFreePlayerLimit player. '
+          'Go Premium to track up to $kPremiumPlayerLimit.',
+      benefits: [
+        'Track up to $kPremiumPlayerLimit players',
+        'Development trends over time',
+        'The full player story',
+      ],
+      quietLabel: 'Not now',
+    ),
+  );
+  return result ?? false;
+}
+
+/// The free-tier GAME gate (roadmap 3.8, Figma 1182:5313): a free parent
+/// starting a 4th game. Same ink sheet family as the player gate. Returns true
+/// if the parent chose to see plans.
+///
+/// The line names no number on purpose, so it stays true for accounts that
+/// were already over three games when the limit arrived.
+Future<bool> showGameLimitGate(
+  BuildContext context, {
+  String? playerFirstName,
+}) =>
+    _showInkGate(
+      context,
+      _InkGateSheet(
+        title: "You've used your $kFreeGameLimit free games",
+        body: playerFirstName == null
+            ? 'Your games and insights stay right where they are. '
+                'Go Premium to keep tracking.'
+            : "$playerFirstName's games and insights stay right where they "
+                'are. Go Premium to keep tracking.',
+        benefits: [
+          'Unlimited games every season',
+          'Track up to $kPremiumPlayerLimit players',
+          playerFirstName == null
+              ? 'Growth IQ and the player story keep building'
+              : "Growth IQ and $playerFirstName's story keep building",
+        ],
+        quietLabel: 'Not now',
+      ),
+    );
+
+/// The offline-held variant (Figma 1182:5370): a 4th game tracked with no
+/// signal that the server refused at sync. The game is NOT lost - it stays on
+/// the phone indefinitely - so the quiet action says so instead of "Not now",
+/// which could read as discarding it. Returns true if the parent chose plans.
+Future<bool> showOfflineGameHeldGate(
+  BuildContext context, {
+  String? opponent,
+  String? playerFirstName,
+}) {
+  final who = playerFirstName == null ? 'your' : "$playerFirstName's";
+  final hasOpponent = opponent != null && opponent.trim().isNotEmpty;
+  return _showInkGate(
+    context,
+    _InkGateSheet(
+      title: 'Your game is safe on this phone',
+      body: hasOpponent
+          ? 'You tracked a game vs ${opponent.trim()} offline after your '
+              '$kFreeGameLimit free games. Go Premium to add it to $who games.'
+          : 'You tracked a game offline after your $kFreeGameLimit free '
+              'games. Go Premium to add it to $who games.',
+      benefits: [
+        'Unlimited games every season',
+        'Track up to $kPremiumPlayerLimit players',
+        playerFirstName == null
+            ? 'Growth IQ and the player story keep building'
+            : "Growth IQ and $playerFirstName's story keep building",
+      ],
+      quietLabel: 'Not now, keep it on this phone',
+    ),
+  );
+}
+
+Future<bool> _showInkGate(BuildContext context, Widget sheet) async {
+  final result = await showModalBottomSheet<bool>(
+    // Covers the nav bar, as the player gate does.
+    useRootNavigator: true,
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => sheet,
   );
   return result ?? false;
 }
@@ -51,8 +139,20 @@ Future<bool> showPlayerCapReached(BuildContext context) async {
   return result ?? false;
 }
 
-class _UpgradeGateSheet extends StatelessWidget {
-  const _UpgradeGateSheet();
+/// The ink upgrade sheet shared by the player gate and the two game gates, so
+/// the three cannot drift apart (Figma 652:2192, 1182:5313, 1182:5370).
+class _InkGateSheet extends StatelessWidget {
+  const _InkGateSheet({
+    required this.title,
+    required this.body,
+    required this.benefits,
+    required this.quietLabel,
+  });
+
+  final String title;
+  final String body;
+  final List<String> benefits;
+  final String quietLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -75,20 +175,17 @@ class _UpgradeGateSheet extends StatelessWidget {
                 // Dot-burst C is itself a burst, so the old burst went.
                 const CiLogoMark(size: 64),
                 const SizedBox(height: CiSpace.s5),
-                Text('Track more players',
+                Text(title,
                     textAlign: TextAlign.center,
                     style: CiType.h3.copyWith(color: c.text)),
                 const SizedBox(height: CiSpace.s2),
                 Text(
-                  'Free includes $kFreePlayerLimit player. '
-                  'Go Premium to track up to $kPremiumPlayerLimit.',
+                  body,
                   textAlign: TextAlign.center,
                   style: CiType.bodySm.copyWith(color: c.textMuted),
                 ),
                 const SizedBox(height: CiSpace.s6),
-                const _Benefit('Track up to $kPremiumPlayerLimit players'),
-                const _Benefit('Development trends over time'),
-                const _Benefit('The full player story'),
+                for (final b in benefits) _Benefit(b),
                 const SizedBox(height: CiSpace.s7),
                 CiButton(
                   label: 'See plans',
@@ -98,7 +195,7 @@ class _UpgradeGateSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: CiSpace.s2),
                 _QuietAction(
-                  label: 'Not now',
+                  label: quietLabel,
                   onTap: () => Navigator.of(context).pop(false),
                 ),
               ],

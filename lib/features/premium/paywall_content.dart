@@ -1,6 +1,7 @@
 // Paywall carousel content — Phase 4.16
 //
-// The three slides from 234:910 / 237:1354 / 237:889. Only the top block
+// The four slides: Unlimited (1196:5555, 3.8) first, then 234:910 / 237:1354
+// / 237:889. Only the top block
 // swipes - an example card, a category label, a headline and a line of body.
 // The pricing, the button and the footer sit still beneath them.
 //
@@ -11,7 +12,7 @@ import 'package:flutter/material.dart';
 
 /// Which example a slide shows in its card, so the screen can render the right
 /// mock without the content file importing widgets it does not need.
-enum PaywallSlideArt { story, trend, insight }
+enum PaywallSlideArt { unlimited, story, trend, insight }
 
 class PaywallSlide {
   const PaywallSlide({
@@ -28,6 +29,7 @@ class PaywallSlide {
   /// for the game insight. One shared sparkle on all three lost the point
   /// that each slide sells a different thing.
   IconData get icon => switch (art) {
+        PaywallSlideArt.unlimited => Icons.group_outlined,
         PaywallSlideArt.story => Icons.show_chart,
         PaywallSlideArt.trend => Icons.bar_chart,
         PaywallSlideArt.insight => Icons.track_changes,
@@ -40,6 +42,16 @@ class PaywallSlide {
 }
 
 const List<PaywallSlide> kPaywallSlides = [
+  // FIRST for every entry (Quin, 2026-10-05, roadmap 3.8, Figma 1196:5555):
+  // since free became 1 player and 3 games, this is the clearest reason to
+  // pay, and a parent arriving from the game limit lands on it.
+  PaywallSlide(
+    art: PaywallSlideArt.unlimited,
+    label: 'UNLIMITED GAMES · 3 PLAYERS',
+    headline: 'Keep the whole season',
+    body: 'Track every game for up to three players, each with their own '
+        'story.',
+  ),
   PaywallSlide(
     art: PaywallSlideArt.story,
     label: "WHAT'S WORKING",

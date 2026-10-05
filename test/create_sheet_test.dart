@@ -77,4 +77,23 @@ void main() {
     await tester.pumpAndSettle();
     expect(choice, CreateChoice.newPlayer);
   });
+
+  group('free parent (roadmap 3.8, Figma 1184:5451)', () {
+    testWidgets('shows "1 free game left" when one is left', (tester) async {
+      await tester.pumpWidget(_host(const CreateSheet(
+        hasPlayers: true,
+        isPremium: false,
+        newGameHint: '1 free game left',
+      )));
+      expect(find.text('1 free game left'), findsOneWidget);
+      expect(find.text('Track a game for a player'), findsNothing);
+    });
+
+    testWidgets('names the player cap as Premium\'s', (tester) async {
+      await tester.pumpWidget(
+          _host(const CreateSheet(hasPlayers: true, isPremium: false)));
+      expect(find.text('Premium tracks up to 3'), findsOneWidget);
+      expect(find.text('Add a player to track (up to 3)'), findsNothing);
+    });
+  });
 }

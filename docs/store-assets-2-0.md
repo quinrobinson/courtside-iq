@@ -29,6 +29,9 @@ it says Premium. Must not ship under 2.0.
    players/parents/coaches.
 3. Tier copy matches the shipped app: free = 1 player, Premium = up to 3,
    no game limits, "Premium" not "Pro Plan".
+   **SUPERSEDED by roadmap 3.8 (2026-10-04):** free is 1 player AND 3 games.
+   The replacement tier lines are in `docs/store-copy-3-8.md` and ship with
+   the build that enforces the limit.
 
 ---
 

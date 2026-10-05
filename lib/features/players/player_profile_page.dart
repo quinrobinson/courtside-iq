@@ -39,6 +39,7 @@ import '/features/player_insight/data/player_insight_service.dart';
 import '/features/player_insight/models/player_insight.dart';
 import '/features/home/widgets/game_feed_row.dart';
 import '/features/players/add_player_flow.dart';
+import '/features/games/start_game_flow.dart';
 import '/features/players/birth_date_gate.dart';
 import '/features/players/birth_date_sheet.dart';
 import '/features/players/edit_player_page.dart';
@@ -566,7 +567,7 @@ class _Development extends StatelessWidget {
           needsBirthDate: p != null && !p.hasBirthDate,
           onAddBirthDate:
               p == null ? null : () => onAddBirthDate(p.playerId),
-          onTrackGame: () => context.pushNamed(NewGameWidget.routeName),
+          onTrackGame: () => runStartGameFlow(context),
           onAbout: () => showCiInfoSheet(
             context,
             title: InfoCopy.developmentStoryTitle,

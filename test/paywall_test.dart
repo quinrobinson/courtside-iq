@@ -125,6 +125,16 @@ void main() {
       expect(find.text(r'$1.99'), findsOneWidget);
     });
 
+    testWidgets('leads with the Unlimited slide (3.8, Figma 1196:5555)',
+        (tester) async {
+      await _pump(tester, _FakePaywallRepo());
+      expect(kPaywallSlides.first.art, PaywallSlideArt.unlimited);
+      expect(kPaywallSlides, hasLength(4));
+      expect(find.text('Keep the whole season'), findsOneWidget);
+      // The old checkmark line is gone; the slide replaced it.
+      expect(find.text('Unlimited games'), findsNothing);
+    });
+
     testWidgets('shows the static "Go Premium" headline', (tester) async {
       await _pump(tester, _FakePaywallRepo());
       expect(find.text('Go Premium'), findsOneWidget);

@@ -17,6 +17,19 @@ typedef RowUpserter = Future<void> Function(
 /// Asks the server for a game's insight.
 typedef InsightRequester = Future<void> Function(String gameId);
 
+/// The server refused the GAME row because the free game allowance is used up
+/// (roadmap 3.8: the games INSERT policy). Thrown instead of the raw database
+/// error so the queue can HOLD the game rather than count a failure.
+class GameLimitRefusal implements Exception {
+  const GameLimitRefusal();
+
+  @override
+  String toString() => 'GameLimitRefusal: free game allowance used';
+}
+
+/// Whether an error from the games upsert is that policy refusing the row.
+typedef LimitRefusalTest = bool Function(Object error);
+
 /// games, then stat_events, then player_game_stats, then the insight.
 ///
 /// EVENTS BEFORE STATS, and EVENTS CAN FAIL THE UPLOAD. Since G1.14 the
@@ -43,6 +56,7 @@ Future<void> runGameUpload(
   PendingGame game, {
   required RowUpserter upsert,
   required InsightRequester requestInsight,
+  LimitRefusalTest? isLimitRefusal,
 }) async {
   // Conform BEFORE sending. A queued game holds the rows as they were built,
   // so one written by an older build can carry a key this schema does not
@@ -62,8 +76,17 @@ Future<void> runGameUpload(
     }
   }
 
-  // The game first: both other tables reference it by foreign key.
-  await upsert('games', [gameRow.row]);
+  // The game first: both other tables reference it by foreign key. A refusal
+  // HERE is the free-game limit (3.8); nothing after it has been sent, so the
+  // whole game stays intact in the queue.
+  try {
+    await upsert('games', [gameRow.row]);
+  } catch (e) {
+    if (isLimitRefusal != null && isLimitRefusal(e)) {
+      throw const GameLimitRefusal();
+    }
+    rethrow;
+  }
 
   if (game.eventRows.isNotEmpty) {
     await upsert('stat_events', [

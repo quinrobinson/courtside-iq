@@ -83,9 +83,12 @@ const List<HelpTopic> kHelpTopics = [
   HelpTopic(
     question: 'How does my subscription work?',
     answer:
-        'A subscription unlocks everything: live stat tracking, unlimited '
-        'game history, up to three players, season averages, Growth IQ and '
-        'the read on each game. It is \$1.99 per week or \$5.99 per month, '
+        'Every account can track one player and three games for free, and '
+        'each of those games gets its full read. A subscription adds '
+        'unlimited games and up to three players, and keeps Growth IQ and '
+        'the development story building all season. If you track a fourth '
+        'game without a signal, it stays safe on your phone and is added to '
+        'your games as soon as you subscribe. It is \$1.99 per week or \$5.99 per month, '
         'and the monthly plan is the better value across a season. The '
         'monthly plan also comes with a 7-day free trial if you have not '
         'subscribed before, which the weekly plan does not. Cancelling and '

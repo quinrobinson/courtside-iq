@@ -43,15 +43,28 @@ import '/features/games/games_revision.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'games_repository.dart';
+import 'start_game_flow.dart';
+import '/courtside_iq/game_sync/pending_game.dart';
+import '/courtside_iq/game_sync/supabase_game_uploader.dart';
+import '/features/players/widgets/player_gates.dart';
+import '/features/premium/paywall_launcher.dart';
+
+/// The real held-game source: the app's sync queue.
+Future<List<PendingGame>> _queuedHeldGames() => gameSyncQueue.heldForLimit();
 
 class GamesListPage extends StatefulWidget {
   const GamesListPage({
     super.key,
     this.repository = const GamesRepository(),
     this.store = const LiveGameStore(),
+    this.loadHeld = _queuedHeldGames,
   });
 
   final GamesRepository repository;
+
+  /// Games held on this phone for the free limit (roadmap 3.8). Injected so
+  /// tests never touch the real queue.
+  final Future<List<PendingGame>> Function() loadHeld;
 
   /// Where an unfinished game lives. Read from disk, NOT from the server:
   /// tracking writes no game row until Save, so there is nothing to fetch.
@@ -69,15 +82,21 @@ class _GamesListPageState extends State<GamesListPage> {
 
   /// Start a new game. Same destination as the empty state's "Start a game",
   /// so the two cannot drift apart.
-  void _newGame() => context.pushNamed(NewGameWidget.routeName);
+  void _newGame() => runStartGameFlow(context);
 
   /// The game still being tracked on this phone, if there is one.
   LiveGameSnapshot? _live;
+
+  /// Games the server refused for the free limit, held on this phone (3.8).
+  /// Shown at the top so a parent who was told "your game is safe" can SEE it
+  /// (device pass: without this the game seemed to vanish).
+  List<PendingGame> _held = const [];
 
   @override
   void initState() {
     super.initState();
     _readLive();
+    _readHeld();
     // The shell keeps this tab alive, so a game saved (or synced) elsewhere
     // does not reach it on its own - it kept showing the list from before the
     // game existed. Reload when the set of games changes.
@@ -97,6 +116,31 @@ class _GamesListPageState extends State<GamesListPage> {
     _refresh();
   }
 
+  Future<void> _readHeld() async {
+    List<PendingGame> held;
+    try {
+      held = await widget.loadHeld();
+    } catch (_) {
+      held = const [];
+    }
+    held = [...held]..sort((a, b) => b.queuedAt.compareTo(a.queuedAt));
+    if (mounted) setState(() => _held = held);
+  }
+
+  /// The held game's own sheet, then the paywall, then a sync attempt so a
+  /// new subscriber sees it move into the list straight away.
+  Future<void> _openHeld(PendingGame game, String? playerName) async {
+    final wantsPlans = await showOfflineGameHeldGate(
+      context,
+      opponent: game.gameRow['opponent_team'] as String?,
+      playerFirstName: playerName,
+    );
+    if (!wantsPlans || !mounted) return;
+    await showPaywall(context);
+    await gameSyncQueue.flush();
+    if (mounted) await _refresh();
+  }
+
   Future<void> _readLive() async {
     final live = await widget.store.read();
     if (mounted) setState(() => _live = live);
@@ -107,7 +151,7 @@ class _GamesListPageState extends State<GamesListPage> {
     setState(() {
       _future = next;
     });
-    await Future.wait([next, _readLive()]);
+    await Future.wait([next, _readLive(), _readHeld()]);
   }
 
   /// Open the resume dialog for the unfinished game.
@@ -184,6 +228,18 @@ class _GamesListPageState extends State<GamesListPage> {
                     live != null &&
                     dateId == kAllDatesKey &&
                     (_playerId == kAllPlayersId || _playerId == live.playerId);
+                // Held games follow the same filter rules as the live row:
+                // no played-on day on the server yet, so a date filter hides
+                // them, and a player filter keeps only that player's.
+                final names = {for (final r in data.roster) r.playerId: r.firstName};
+                final held = dateId == kAllDatesKey
+                    ? [
+                        for (final g in _held)
+                          if (_playerId == kAllPlayersId ||
+                              _playerId == g.gameRow['player_id'])
+                            g,
+                      ]
+                    : const <PendingGame>[];
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -237,7 +293,7 @@ class _GamesListPageState extends State<GamesListPage> {
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: _refresh,
-                        child: rows.isEmpty && !showLive
+                        child: rows.isEmpty && !showLive && held.isEmpty
                             ? _Empty(
                                 // Naming the player turns "nothing here" into
                                 // an answer to the question they just asked.
@@ -265,7 +321,10 @@ class _GamesListPageState extends State<GamesListPage> {
                                 // that happened and the only row still
                                 // changing, so anything above it would be
                                 // stale by comparison.
-                                itemCount: rows.length + (showLive ? 1 : 0) + 1,
+                                itemCount: rows.length +
+                                    (showLive ? 1 : 0) +
+                                    held.length +
+                                    1,
                                 separatorBuilder: (_, __) => const CiHairline(),
                                 itemBuilder: (context, i) {
                                   if (showLive) {
@@ -290,6 +349,34 @@ class _GamesListPageState extends State<GamesListPage> {
                                     }
                                     i -= 1;
                                   }
+                                  if (i < held.length) {
+                                    final h = held[i];
+                                    final name = names[
+                                            h.gameRow['player_id'] as String?] ??
+                                        '';
+                                    return GameFeedRow(
+                                      entry: GameFeedEntry(
+                                        gameId: h.gameId,
+                                        playerName: name,
+                                        opponent:
+                                            h.gameRow['opponent_team'] as String?,
+                                        playedAt: DateTime.tryParse(
+                                                h.gameRow['started_at']
+                                                        as String? ??
+                                                    '')
+                                            ?.toLocal(),
+                                        points: 0,
+                                        rebounds: 0,
+                                        assists: 0,
+                                        steals: 0,
+                                        turnovers: 0,
+                                        isHeld: true,
+                                      ),
+                                      onTap: () => _openHeld(
+                                          h, name.isEmpty ? null : name),
+                                    );
+                                  }
+                                  i -= held.length;
                                   if (i == rows.length) {
                                     return const SizedBox.shrink();
                                   }
@@ -470,7 +557,7 @@ class _Empty extends StatelessWidget {
       // The dead-end filter fallback offers no button - see [invites]; the
       // designed empties (no games, or a named player) get "Start a game".
       ctaLabel: invites ? 'Start a game' : null,
-      onCta: invites ? () => context.pushNamed(NewGameWidget.routeName) : null,
+      onCta: invites ? () => runStartGameFlow(context) : null,
     );
   }
 }
