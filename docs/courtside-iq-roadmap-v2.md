@@ -684,7 +684,7 @@ Subtle "Ratings could be more accurate" indicator when insight was generated wit
 
 | b | w | v | Notes |
 |---|---|---|---|
-| ✅ | ✅ | ⬜ | Built and wired on `phase-3-8-free-game-limit` (2026-10-04): migration on TEST (probed), gating rules, gate + offline-held sheets, start-game flow at all 4 entry points, New Game hint, paywall line, help + store/site copy (`docs/store-copy-3-8.md`). 900 tests green. Device pass and prod promotion pending. |
+| ✅ | ✅ | ✅ | Built and wired on `phase-3-8-free-game-limit` (2026-10-04): migration on TEST (probed), gating rules, gate + offline-held sheets, start-game flow at all 4 entry points, New Game hint, held-game row in the Games list, Unlimited paywall slide (leads the carousel), help + store/site copy (`docs/store-copy-3-8.md`). 902 tests green. **Device pass 2026-10-04** on Quin's iPhone (TEST, free account): hint, create subtitle, limit sheet, offline hold, held row, sync after limit, paywall. **Premium path** verified on the simulator with the forced entitlement (New game goes straight to setup, no sheet); a real purchase is proven by the 2.1 sandbox check. **Prod migration pending**, with the 2.1 release and Quin's approval. |
 
 **Why (found 2026-10-03/04 while writing the site's pricing copy).** Free in 2.0 is
 1 player with NO game limit (migration `20260719000001` deliberately added none, on the reading
