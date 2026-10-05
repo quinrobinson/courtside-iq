@@ -13,6 +13,7 @@ import 'package:courtside_i_q/courtside_iq/today_snapshot.dart';
 import 'package:courtside_i_q/features/home/today_repository.dart';
 import 'package:courtside_i_q/features/home/entitlement_status.dart';
 import 'package:courtside_i_q/features/home/today_page.dart';
+import 'package:courtside_i_q/features/premium/entitlement_revision.dart';
 import 'package:courtside_i_q/features/home/widgets/game_feed_row.dart';
 import 'package:courtside_i_q/features/home/widgets/today_promo_banner.dart';
 
@@ -280,6 +281,26 @@ void main() {
       final banner = tester.widget<TodayPromoBanner>(find.byType(TodayPromoBanner));
       expect(banner.purpose, TodayPromoPurpose.upgrade);
       expect(find.text('Unlock Premium'), findsOneWidget);
+    });
+
+    testWidgets('a purchase made elsewhere clears the banner', (tester) async {
+      // The 2.1 sandbox purchase: bought from the add-player gate, came back
+      // to Today, and it still said "Unlock Premium" until the banner itself
+      // was tapped. RevenueCat's listener announces now; Today re-reads.
+      var status = EntitlementStatus.never;
+      await tester.pumpWidget(MaterialApp(
+        home: TodayPage(
+          repository: _FakeRepo(_dataWithGames()),
+          entitlementReader: () async => status,
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('Unlock Premium'), findsOneWidget);
+
+      status = EntitlementStatus.premium;
+      notifyEntitlementChanged();
+      await tester.pumpAndSettle();
+      expect(find.byType(TodayPromoBanner), findsNothing);
     });
 
     testWidgets('lapsed sees the renew banner', (tester) async {
