@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Confirm your email for Courtside IQ</title>
+</head>
+<body style="margin:0;padding:0;background:#F2F3EE;-webkit-text-size-adjust:100%;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#F2F3EE;">One tap and you&#x27;re ready to add your player.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F2F3EE" style="background:#F2F3EE;">
+  <tr><td align="center" style="padding:32px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+      <tr><td bgcolor="#0F0F0F" style="background:#0F0F0F;border-radius:18px 18px 0 0;padding:28px 32px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="vertical-align:middle;"><img src="https://ejwgxsszmfabujdqxxdz.supabase.co/storage/v1/object/public/brand/mark-144.png" width="40" height="40" alt="" style="display:block;border:0;width:40px;height:40px;"></td>
+          <td style="vertical-align:middle;padding-left:12px;font-family:'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:18px;font-weight:700;color:#FFFFFF;letter-spacing:-0.01em;">Courtside IQ</td>
+        </tr></table>
+      </td></tr>
+      <tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:0 0 18px 18px;padding:36px 32px 32px;font-family:'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <h1 style="margin:0 0 12px;font-size:26px;line-height:1.2;font-weight:800;color:#15170F;letter-spacing:-0.02em;">Confirm your email</h1>
+        <p style="margin:0 0 28px;font-size:16px;line-height:1.55;color:#565B4E;">Thanks for joining Courtside IQ. Tap the button below to confirm this is your email, then head back to the app to add your player.</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td bgcolor="#9DFF00" style="background:#9DFF00;border-radius:999px;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 28px;font-family:'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:15px;font-weight:600;line-height:18px;color:#0F0F0F;text-decoration:none;border-radius:999px;">Confirm email</a>
+          </td>
+        </tr></table>
+        <p style="margin:28px 0 0;font-size:14px;line-height:1.5;color:#565B4E;">If you didn't create a Courtside IQ account, you can ignore this email.</p>
+        <div style="margin:28px 0 0;padding-top:20px;border-top:1px solid #E1E3DA;">
+          <p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:#565B4E;">Button not working? Copy this link into your browser:</p>
+          <p style="margin:0;font-size:13px;line-height:1.5;word-break:break-all;"><a href="{{ .ConfirmationURL }}" style="color:#15170F;text-decoration:underline;">{{ .ConfirmationURL }}</a></p>
+        </div>
+      </td></tr>
+      <tr><td align="center" style="padding:20px 24px 0;font-family:'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:12px;line-height:1.5;color:#565B4E;">
+        Courtside IQ helps parents see how their player grows, game by game.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
