@@ -212,7 +212,10 @@ class _FFButtonWidgetState extends State<FFButtonWidget> {
     if ((widget.icon != null || widget.iconData != null) && !loading) {
       Widget icon = widget.icon ??
           FaIcon(
-            widget.iconData!,
+            // font_awesome_flutter 11 wraps IconData in FaIconData for type
+            // safety. FaIconData is a thin wrapper, so this is exactly what
+            // FaIcon(iconData) did before the bump.
+            FaIconData(widget.iconData!),
             size: widget.options.iconSize,
             color: widget.options.iconColor,
           );

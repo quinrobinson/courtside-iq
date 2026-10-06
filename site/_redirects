@@ -1,0 +1,6 @@
+# Old and likely addresses for the legal pages. The app links to /policy and /terms directly.
+/privacy                /policy  301
+/privacy-policy         /policy  301
+/terms-and-conditions   /terms   301
+/download               /get     302
+/app                    /get     302

@@ -64,7 +64,9 @@ class _FlutterFlowIconButtonState extends State<FlutterFlowIconButton> {
     if (isFontAwesome) {
       FaIcon icon = widget.icon as FaIcon;
       effectiveIcon = FaIcon(
-        icon.icon,
+        // FaIcon extends Icon, so `icon.icon` is the inherited IconData?.
+        // font_awesome_flutter 11 requires the FaIconData wrapper.
+        icon.icon == null ? null : FaIconData(icon.icon!),
         size: icon.size,
       );
       iconSize = icon.size;

@@ -10,12 +10,14 @@ import 'auth/supabase_auth/supabase_user_provider.dart';
 import 'auth/supabase_auth/auth_util.dart';
 
 import '/backend/supabase/supabase.dart';
-import 'package:ff_theme/flutter_flow/flutter_flow_theme.dart';
+import '/courtside_iq/game_sync/supabase_game_uploader.dart';
+import '/features/auth/password_recovery_listener.dart';
+import '/features/auth/signup_confirmation_listener.dart';
+import '/features/games/games_revision.dart';
+import '/features/dev/token_gallery_page.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'flutter_flow/nav/nav.dart';
-import 'index.dart';
 import 'flutter_flow/revenue_cat_util.dart' as revenue_cat;
 
 /// App is a light-mode design: status bar must always show dark (black) icons.
@@ -27,6 +29,17 @@ const _lightModeStatusBar = SystemUiOverlayStyle(
   statusBarIconBrightness: Brightness.dark, // Android
   statusBarBrightness: Brightness.light,    // iOS
 );
+
+/// The LEAST time the splash (the Dot-burst C on ink) stays up: 3 s, Quin
+/// 2026-09-28 (was 2.5 s). It is a floor, not a fixed time - the splash also
+/// waits for the auth state to resolve, so a slow start holds it longer. The
+/// clock starts when MyApp mounts, i.e. when the splash first paints; the
+/// native launch screen before it (plain ink) does not count.
+const Duration kSplashMinDuration = Duration(seconds: 3);
+
+/// Dev-only: boot into the design-token gallery instead of the app.
+/// Never commit this as true.
+const bool kShowTokenGallery = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,12 +56,46 @@ void main() async {
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
 
+  // Phase 4.5: drain any game queued offline, and keep draining whenever
+  // connectivity returns. Flushes once immediately so a game saved in a gym
+  // last night syncs on launch rather than waiting for a connectivity change.
+  gameSyncQueue.startAutoFlush();
+
+  // Bridge the pure sync queue to the game-showing screens without the queue
+  // importing the app layer: when the queue changes - a game synced on
+  // reconnect drops the pending count - tell those screens to reload, so a
+  // game that goes up minutes later appears on its own.
+  gameSyncQueue.pendingCount.listen((_) => notifyGamesChanged());
+
+  // Phase 4.9: a recovery email opens courtsideiq://reset-password. The
+  // Supabase SDK establishes the session; this routes to the reset screen.
+  // Started before runApp so a COLD start from the email link is caught.
+  PasswordRecoveryListener.instance.start();
+
+  // Phase 4.18: a signup confirmation email opens courtsideiq://login-callback.
+  // The SDK would sign the parent straight in; this instead lands them on the
+  // sign-in screen (consistent with confirming on another device) with a
+  // success toast. Started before runApp so a COLD start from the link is
+  // caught.
+  SignupConfirmationListener.instance.start();
+
   await revenue_cat.initialize(
     "appl_qUqQLfzwGyGbActDYFmZwkLAcsP",
     "goog_spQjbEAFjEqPtbbDzXlBbaypJCn",
     debugLogEnabled: false,
     loadDataAfterLaunch: true,
   );
+
+  // Phase 4.7 dev switch: boot straight into the design-token gallery to
+  // review tokens visually. MUST be false for any real build - it replaces
+  // the entire app. Delete this block once 4B is signed off.
+  if (kShowTokenGallery) {
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const TokenGalleryPage(),
+    ));
+    return;
+  }
 
   runApp(MultiProvider(
     providers: [
@@ -80,8 +127,6 @@ class MyAppScrollBehavior extends MaterialScrollBehavior {
 class _MyAppState extends State<MyApp> {
   Locale? _locale;
 
-  ThemeMode _themeMode = ThemeMode.system;
-
   late AppStateNotifier _appStateNotifier;
   late GoRouter _router;
   String getRoute([RouteMatch? routeMatch]) {
@@ -111,7 +156,7 @@ class _MyAppState extends State<MyApp> {
       });
     jwtTokenStream.listen((_) {});
     Future.delayed(
-      Duration(milliseconds: 2500),
+      kSplashMinDuration,
       () => _appStateNotifier.stopShowingSplashImage(),
     );
   }
@@ -119,10 +164,6 @@ class _MyAppState extends State<MyApp> {
   void setLocale(String language) {
     safeSetState(() => _locale = createLocale(language));
   }
-
-  void setThemeMode(ThemeMode mode) => safeSetState(() {
-        _themeMode = mode;
-      });
 
   @override
   Widget build(BuildContext context) {
@@ -157,10 +198,9 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all(false),
+          thumbVisibility: WidgetStateProperty.all(false),
         ),
       ),
-      themeMode: _themeMode,
       routerConfig: _router,
       ),
     );

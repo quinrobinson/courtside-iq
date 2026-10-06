@@ -1,0 +1,109 @@
+// Saving a finished game — Phase 4.13
+//
+// Turns a LiveGameSnapshot into the two rows the database holds, and hands
+// them to the offline queue.
+//
+// IT ALWAYS GOES THROUGH THE QUEUE, even with full signal. The queue writes
+// locally BEFORE attempting the network, so a save that fails mid-flight is
+// still a game the parent keeps. Calling Supabase directly when online would
+// mean two code paths, and the rarely-exercised one would be the one that
+// runs in a gym with no bars.
+//
+// The insight is requested by the uploader, not here - see
+// supabase_game_uploader.dart. That is what makes an offline game get its
+// insight when it finally syncs.
+
+import '/auth/supabase_auth/auth_util.dart';
+import '/courtside_iq/game_sync/game_sync_queue.dart';
+import '/courtside_iq/game_sync/supabase_game_uploader.dart';
+import '/courtside_iq/stat_event.dart';
+import 'live_game_store.dart';
+
+/// What happened, so the screen can say so.
+enum SaveOutcome {
+  /// Uploaded and confirmed.
+  synced,
+
+  /// Written locally and waiting for signal. NOT a failure - the game is safe.
+  queued,
+}
+
+class GameSaver {
+  const GameSaver({GameSyncQueue? queue}) : _queue = queue;
+
+  final GameSyncQueue? _queue;
+
+  GameSyncQueue get _q => _queue ?? gameSyncQueue;
+
+  /// Saves [snapshot] and returns whether it reached the server.
+  ///
+  /// Never throws: a save that cannot reach Supabase is queued, and a queued
+  /// game is a saved game. The only thing a parent could act on is signal, and
+  /// the screen tells them about that.
+  Future<SaveOutcome> save(LiveGameSnapshot snapshot) async {
+    final s = snapshot.stats;
+    final userId = currentUserUid;
+
+    final pending = buildPendingGame(
+      gameRow: {
+        'user_id': userId,
+        'player_id': snapshot.playerId,
+        'opponent_team': snapshot.opponent,
+        'player_team_name': snapshot.team,
+        'event_name': snapshot.event,
+        // The game is finished the moment it is saved. Leaving this true
+        // would leave a LIVE pill on the games list forever.
+        'game_live': false,
+        'created_at': snapshot.startedAt.toUtc().toIso8601String(),
+        // Distinct from created_at on purpose. created_at is when the ROW was
+        // written, which for a game queued in a gym is whenever the queue
+        // later flushed. These two are when the parent actually tracked.
+        'started_at': snapshot.startedAt.toUtc().toIso8601String(),
+        'ended_at': DateTime.now().toUtc().toIso8601String(),
+      },
+      // NO user_id HERE. player_game_stats does not have that column - it
+      // reaches the owner through game_id - and sending it made PostgREST
+      // reject the row. The games row had already gone up by then, so the
+      // first real save produced a game with no stats and a "will sync when
+      // you are back online" message on a phone with full signal.
+      statsRow: {
+        'player_id': snapshot.playerId,
+        'points': s.points,
+        'two_made': s.twoMade,
+        'two_attempt': s.twoMade + s.twoMissed,
+        'three_made': s.threeMade,
+        'three_attempt': s.threeMade + s.threeMissed,
+        'fg_made': s.fgMade,
+        'fg_attempt': s.fgAttempted,
+        'ft_made': s.ftMade,
+        'ft_attempt': s.ftAttempted,
+        'off_reb': s.offReb,
+        'def_reb': s.defReb,
+        'assist': s.assists,
+        'steal': s.steals,
+        'block': s.blocks,
+        'turnover': s.turnovers,
+      },
+      // One row per tap, voided ones included. They are sent so the void is
+      // recorded, and excluded from every rollup by status - the parent sees
+      // the corrected game, and the correction rate stays measurable.
+      eventRows: [
+        for (final e in snapshot.events)
+          {
+            'player_id': snapshot.playerId,
+            'event_type': kStatEventType[e.stat],
+            'sequence_no': e.sequenceNo,
+            'recorded_at': e.recordedAt.toUtc().toIso8601String(),
+            'elapsed_ms':
+                e.recordedAt.difference(snapshot.startedAt).inMilliseconds,
+            'source': 'parent_tap',
+            'status': e.isConfirmed ? 'confirmed' : 'voided',
+          },
+      ],
+    );
+
+    return await _q.enqueueAndTry(pending)
+        ? SaveOutcome.synced
+        : SaveOutcome.queued;
+  }
+}

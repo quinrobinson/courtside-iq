@@ -3,6 +3,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import '/app_state.dart';
+import '/features/premium/entitlement_revision.dart';
 
 export 'package:purchases_flutter/purchases_flutter.dart'
     show Package, Offering;
@@ -68,6 +69,8 @@ Future initialize(
       // self-corrects on renewal, expiry, purchase, and restore.
       FFAppState().isUserPremium =
           info.entitlements.active.containsKey('premium_users');
+      // And tell the screens that show premium state (Today's banner).
+      notifyEntitlementChanged();
     });
   } on Exception catch (e) {
     print("RevenueCat initialization failed: $e");

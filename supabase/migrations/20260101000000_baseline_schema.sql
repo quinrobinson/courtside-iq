@@ -1,0 +1,161 @@
+-- BASELINE SCHEMA (Phase 4.6)
+--
+-- The base tables (players, games, player_game_stats, users, and the lookup
+-- tables) were created through FlutterFlow and the Supabase dashboard, never
+-- through a migration. The tracked history therefore began at
+-- `merge_game_insights`, which ALTERs tables it assumes already exist - so a
+-- blank project could not be stood up from this directory.
+--
+-- That gap has already cost us once: test and prod silently diverged on
+-- v_player_game_stats, and it surfaced as a runtime "column does not exist"
+-- error in the Games tab rather than as a failed migration.
+--
+-- This file captures the structure as it exists in PROD (the source of truth)
+-- on 2026-07-18. It is deliberately dated 2026-01-01 so it sorts BEFORE the
+-- April migrations and a from-scratch replay runs in the correct order.
+--
+-- IMPORTANT: this is intentionally a no-op against both existing databases -
+-- every statement is IF NOT EXISTS. Applying it to test or prod changes
+-- nothing. Its only job is to make a blank project reproducible.
+--
+-- NOT INCLUDED (deliberate): RLS policies, triggers, functions, grants, and
+-- the storage/auth schemas. Those live in their own migrations or in Supabase
+-- platform config. Row data is never included.
+
+-- ---------------------------------------------------------------------------
+-- users - mirrors auth.users, one row per account
+-- ---------------------------------------------------------------------------
+create table if not exists public.users (
+  id                uuid primary key references auth.users(id) on update cascade on delete cascade,
+  created_at        timestamptz default now(),
+  first_name        text,
+  last_name         text,
+  user_email        text not null unique,
+  status            boolean default true,
+  deactivate_date   date
+);
+
+-- ---------------------------------------------------------------------------
+-- players
+-- birth_date added later by 20260419000001_add_birth_date; included here so a
+-- fresh replay lands on the current shape.
+-- ---------------------------------------------------------------------------
+create table if not exists public.players (
+  id                  uuid primary key default gen_random_uuid(),
+  created_at          timestamptz default now(),
+  first_name          text not null,
+  last_name           text,
+  player_position     text not null,
+  user_id             uuid not null references public.users(id) on update cascade on delete cascade,
+  team_name           text,
+  player_profile_pic  text,
+  birth_date          date
+);
+
+-- ---------------------------------------------------------------------------
+-- games
+-- NOTE: user_id is text here, not uuid. Inconsistent with players.user_id, but
+-- this is what prod has - the baseline records reality, it does not fix it.
+-- ---------------------------------------------------------------------------
+create table if not exists public.games (
+  id                uuid primary key default gen_random_uuid(),
+  created_at        timestamptz default now(),
+  opponent_team     text,
+  game_live         boolean not null default false,
+  user_id           text,
+  player_id         uuid references public.players(id) on update cascade on delete cascade,
+  player_team_name  text,
+  event_name        text,
+  event_type        text
+);
+
+-- ---------------------------------------------------------------------------
+-- player_game_stats
+-- game_insights is jsonb here: the text -> jsonb conversion and the merge of
+-- player_game_insights happened in 20260419000000_merge_game_insights.
+-- ---------------------------------------------------------------------------
+create table if not exists public.player_game_stats (
+  id             uuid primary key default gen_random_uuid(),
+  game_id        uuid not null references public.games(id)   on update cascade on delete cascade,
+  player_id      uuid not null references public.players(id) on update cascade on delete cascade,
+  points         integer default 0,
+  fg_made        integer default 0,
+  fg_attempt     integer default 0,
+  two_made       integer default 0,
+  two_attempt    integer default 0,
+  three_made     integer default 0,
+  three_attempt  integer default 0,
+  ft_made        integer default 0,
+  ft_attempt     integer default 0,
+  off_reb        integer default 0,
+  def_reb        integer default 0,
+  assist         integer default 0,
+  steal          integer default 0,
+  turnover       integer default 0,
+  block          integer default 0,
+  off_foul       integer default 0,
+  def_foul       integer default 0,
+  game_insights  jsonb
+);
+
+-- ---------------------------------------------------------------------------
+-- player_teams - a player can appear on multiple teams; team is a per-game
+-- attribute, which is why it is not authoritative on the player record.
+-- ---------------------------------------------------------------------------
+create table if not exists public.player_teams (
+  id          bigint generated by default as identity primary key,
+  created_at  timestamptz not null default now(),
+  team_name   text,
+  player_id   uuid references public.players(id) on update cascade on delete cascade,
+  user_id     uuid
+);
+
+-- ---------------------------------------------------------------------------
+-- game_events
+-- ---------------------------------------------------------------------------
+create table if not exists public.game_events (
+  id          bigint generated by default as identity primary key,
+  created_at  timestamptz not null default now(),
+  event_name  text,
+  event_type  text,
+  user_id     uuid,
+  player_id   uuid
+);
+
+-- ---------------------------------------------------------------------------
+-- feedback
+-- ---------------------------------------------------------------------------
+create table if not exists public.feedback (
+  id          bigint generated by default as identity primary key,
+  created_at  timestamptz not null default now(),
+  rating      text,
+  feedback    text,
+  email       text
+);
+
+-- ---------------------------------------------------------------------------
+-- Lookup tables
+-- ---------------------------------------------------------------------------
+create table if not exists public.event_types_list (
+  id           bigint generated by default as identity primary key,
+  name         text,
+  description  text
+);
+
+create table if not exists public.player_positions_list (
+  id             bigint generated by default as identity primary key,
+  position_name  text default ''::text
+);
+
+-- ---------------------------------------------------------------------------
+-- player_game_insights (LEGACY) - DELIBERATELY NOT CREATED HERE
+--
+-- Phase 0.3 merged this table into player_game_stats.game_insights and
+-- specified dropping it afterwards. TEST dropped it. PROD never did, so it
+-- still exists there with stale text-format insights.
+--
+-- The baseline records the INTENDED schema, not prod's every artifact, so a
+-- fresh project must not resurrect it. Prod's leftover copy is tracked as tech
+-- debt: dropping it touches production and needs its own reviewed migration
+-- plus explicit approval. Do not fold that into this file.
+-- ---------------------------------------------------------------------------

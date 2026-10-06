@@ -13,13 +13,16 @@ import {
   getAgeBand,
 } from "../_shared/metrics.ts";
 import { PPSA_MIN_ATTEMPTS } from "../_shared/metrics_config.ts";
+import { cleanSummary, SUMMARY_TARGET_CHARS } from "../_shared/insight_summary.ts";
+import { logAiUsage, withinDailyLimit, type ClaudeUsage } from "../_shared/ai_usage.ts";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const MODEL = "claude-haiku-4-5-20251001";
-const PROMPT_VERSION = "v1";
+// v3 (2026-09-30): adds `summary`, the one-line headline for game rows.
+const PROMPT_VERSION = "v3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,19 +38,22 @@ function json(body: unknown, status = 200) {
 
 const systemPrompt = `You are a youth basketball development specialist writing a short insight for a parent about their child's game. Your voice is warm, encouraging, and grounded. You help parents see how numbers connect to their player's growth.
 
+This insight is about THIS ONE GAME only. Do not summarize the player's development across games, judge their overall strengths and weaknesses, or produce a "what's working / what to work on / what to watch for" verdict. That cross-game development story is shown elsewhere in the app.
+
 Guidelines:
 - 2 to 3 sentences
 - Use the player's first name naturally
 - Reference specific tier language (Solid, Good, Elite) only when provided
 - Never list raw stats; always connect them to development
 - Never use em dashes ("—"). Use commas, periods, or parentheses instead. This is strict.
-- Close with one small, encouraging observation or thing to watch for next time
+- Close with one small, encouraging observation about this game. You may add one small thing to try next time, but only if it is tied to something that happened in this game.
+- summary is a separate headline for a list of games, not a shortened insight. At most ${SUMMARY_TARGET_CHARS} characters. Do NOT use the player's name and do not start with a pronoun (He, She, They, You). Sentence case, no closing period. Say what stood out in THIS game so it reads differently from other games, for example "Scoring efficiency was really impressive this game" or "Made efficient use of her chances with 18 points".
 - highlight_metric MUST be one of "ppsa", "ast_tov", "disrupt", "effort" whenever any tier (Solid/Good/Elite) is provided for that metric. Only return null if no tier data is given.
 - Output valid JSON only`;
 
 function buildUserPrompt(args: {
   firstName: string;
-  ageBand: string;
+  ageBand: string | null;
   position: string | null;
   points: number;
   ppsaValue: number;
@@ -64,18 +70,19 @@ function buildUserPrompt(args: {
 
   return `Generate a game insight for ${args.firstName}'s recent game.
 
-Age band: ${args.ageBand}
+Age band: ${args.ageBand ?? "unknown (no birth date on file)"}
 Position: ${args.position ?? "unknown"}
 
 Game stats:
 - Points: ${args.points}
-- Scoring efficiency (PPSA): ${args.ppsaValue.toFixed(2)} — ${args.ppsaTierLabel ?? "not yet rated"} for ${args.ageBand}
+- Scoring efficiency (PPSA): ${args.ppsaValue.toFixed(2)} — ${args.ppsaTierLabel ?? "not yet rated"}${args.ageBand ? ` for ${args.ageBand}` : " (age unknown, so no age-relative tier)"}
 - ${astTovLine}
 - Effort + Disruption: ${args.disrupt} — ${args.disruptTierLabel ?? "not yet rated"}
 
 Return JSON with this exact shape:
 {
   "text": "The insight, 2 to 3 sentences",
+  "summary": "One-line headline, at most ${SUMMARY_TARGET_CHARS} characters, no name",
   "highlight_metric": "ppsa" | "ast_tov" | "disrupt" | "effort" | null,
   "tier_context": "Solid" | "Good" | "Elite" | null
 }`;
@@ -105,10 +112,12 @@ function pickHighlightMetric(tiers: {
   return best?.key ?? null;
 }
 
-async function callClaude(userPrompt: string): Promise<{
+async function callClaude(userPrompt: string, firstName: string): Promise<{
   text: string;
+  summary: string | null;
   highlight_metric: string | null;
   tier_context: string | null;
+  usage: ClaudeUsage | null;
 }> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -146,8 +155,11 @@ async function callClaude(userPrompt: string): Promise<{
   const text = String(parsed.text ?? "").replace(/\s*—\s*/g, ", ");
   return {
     text,
+    // Null when over the limit or unusable; the app then derives the row line.
+    summary: cleanSummary(parsed.summary, firstName),
     highlight_metric: parsed.highlight_metric ?? null,
     tier_context: parsed.tier_context ?? null,
+    usage: body.usage ?? null,
   };
 }
 
@@ -182,7 +194,7 @@ Deno.serve(async (req) => {
       fg_attempt, ft_attempt, assist, turnover,
       steal, block, off_reb, def_reb,
       game_insights,
-      players:player_id ( id, first_name, birth_date, player_position )
+      players:player_id ( id, user_id, first_name, birth_date, player_position )
     `)
     .eq("game_id", gameId)
     .maybeSingle();
@@ -212,6 +224,7 @@ Deno.serve(async (req) => {
       version: 1,
       model: null,
       text: null,
+      summary: null,
       highlight_metric: null,
       tier_context: null,
       prompt_version: PROMPT_VERSION,
@@ -253,13 +266,51 @@ Deno.serve(async (req) => {
     disruptTierLabel,
   });
 
+  // Circuit breaker: bound the blast radius of a retry loop or client bug.
+  if (!(await withinDailyLimit(player?.user_id ?? null))) {
+    await logAiUsage({
+      function_name: "generate-game-insight",
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
+      user_id: player?.user_id ?? null,
+      player_id: stats.player_id ?? null,
+      game_id: stats.game_id ?? null,
+      succeeded: false,
+      error_kind: "throttled",
+    });
+    return json({ error: "rate_limited" }, 429);
+  }
+
   let claudeResp;
   try {
-    claudeResp = await callClaude(userPrompt);
+    claudeResp = await callClaude(userPrompt, firstName);
   } catch (e) {
     console.error("claude_error", e);
+    // Log the failed attempt too, so error rate is visible alongside spend.
+    // A failed call still burned input tokens on Anthropic's side in some
+    // cases, and a silent absence would read as "no usage" rather than "broke".
+    await logAiUsage({
+      function_name: "generate-game-insight",
+      model: MODEL,
+      prompt_version: PROMPT_VERSION,
+      user_id: player?.user_id ?? null,
+      player_id: stats.player_id ?? null,
+      game_id: stats.game_id ?? null,
+      succeeded: false,
+      error_kind: e instanceof Error ? e.message.slice(0, 120) : "unknown",
+    });
     return json({ error: "insight_unavailable" }, 502);
   }
+
+  await logAiUsage({
+    function_name: "generate-game-insight",
+    model: MODEL,
+    prompt_version: PROMPT_VERSION,
+    usage: claudeResp.usage,
+    user_id: player?.user_id ?? null,
+    player_id: stats.player_id ?? null,
+    game_id: stats.game_id ?? null,
+  });
 
   // Deterministic fallback: if Claude omits highlight_metric, pick the
   // metric with the strongest tier so the game-row tag never silently
@@ -274,6 +325,7 @@ Deno.serve(async (req) => {
     version: 1,
     model: MODEL,
     text: claudeResp.text,
+    summary: claudeResp.summary,
     highlight_metric: highlightMetric,
     tier_context: claudeResp.tier_context,
     prompt_version: PROMPT_VERSION,
