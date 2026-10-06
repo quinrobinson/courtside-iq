@@ -63,10 +63,9 @@ item of the **2.0 Rebuild**, not a phase of anything:
 | Phase 0-7 in `docs/overhaul-plan.md` | Design system overhaul only. Its Phase 4 is spacing. |
 | G0.x-G4.x | `docs/video-and-events-plan.md` gates, the active track |
 
-**The roadmap path above is correct on this branch and WRONG ON `main`**, which still says
-`docs/roadmap.md` (a file that does not exist). `main` is 249 commits behind and carries none of
-the 2.0 work, so a session started from `main` reads a broken path. Fixed on `phase-4-sdk-upgrade`
-in `b263ebe`; the real fix is getting `main` current.
+**`main` is current** as of 2026-10-06 (PR #27 merged `release/2.1.0` into it), so the roadmap
+path above is right on every branch. It was 354 commits behind before that and pointed at a
+`docs/roadmap.md` that does not exist. Keep `main` current after each release.
 
 ## Current work
 
