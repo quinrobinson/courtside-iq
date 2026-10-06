@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F0F0F">
+<link rel="canonical" href="https://www.courtsideiq.app/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Courtside IQ">
+<meta property="og:title" content="Courtside IQ: see the player, not just the stats">
+<meta property="og:description" content="Youth basketball development for parents. Track games from the stands and see your player's growth with Growth IQ.">
+<meta property="og:url" content="https://www.courtsideiq.app/">
+<meta property="og:image" content="https://www.courtsideiq.app/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-itunes-app" content="app-id=6748415872">
+<title>Courtside IQ</title>
+<meta name="description" content="Youth basketball development for parents. Track games from the stands and see your player's growth with Growth IQ.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
+<style>
+/* Layout: an Apple-style scroll story. White and ink bands alternate like the app's two grounds.
+   Five pinned "scenes" (sticky stage inside a tall runway): the scroll position is the timeline. */
+:root{
+  --white:#FFFFFF; --ink:#0F0F0F; --ink-app:#111111; --ink-soft:#1A1A1A; --black:#000000;
+  --g50:#F7F7F7; --g100:#F1F1F1; --g150:#E9E9E9; --g200:#DFDFDF; --g300:#C9C9C9;
+  --g400:#A8A8A8; --g500:#8A8A8A; --g600:#6B6B6B; --g700:#474747;
+  --lime:#9DFF00; --lime-h:#93EE00; --lime-wash:#F1FFD2;
+  --orange:#FF4F00; --orange-wash:#FFE7DC;
+  --dk-border:#2E2E2E; --dk-faint:#222222; --dk-empty:#3A3A3A;
+  --bg:var(--white); --fg:var(--ink);
+  --font:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+  /* the app's radius tokens, used strictly (circles use 50%, the device bezel is a device) */
+  --r-chip:6px; --r-control:10px; --r-card:14px; --r-dialog:18px; --r-pill:999px;
+  --nav:76px; --pill:0px;
+  --gutter:clamp(16px,5.5vw,80px);
+  --maxw:1440px;
+  --ease:cubic-bezier(.2,0,0,1);
+  /* One soft lime light shared by the two back-to-back dark sections. Meet Growth IQ carries it at its bottom-left
+     and The season at its top-left, same size and strength, so where the two meet it reads as a single light
+     spanning the seam. Tones follow the app's ambient wash (CiAmbientGlow), softened to one source. Static. */
+  --glow-r:circle 62vw;
+  --glow-c:rgba(157,255,0,.11) 0%,rgba(157,255,0,.045) 38%,rgba(157,255,0,.012) 68%,rgba(157,255,0,0) 100%;
+}
+/* The brand is one hybrid theme on two fixed grounds (white + ink), not a light/dark pair.
+   The guard blocks deliberately re-declare the same values so a dark OS setting cannot flip it. */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#FFFFFF; --fg:#0F0F0F; } }
+:root[data-theme="dark"]{ --bg:#FFFFFF; --fg:#0F0F0F; }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"lnum" 1;overflow-x:clip}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font-family:inherit;color:inherit}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:var(--r-chip)}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ico{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.ico.fill{fill:currentColor;stroke:none}
+.ink{background:var(--ink);color:var(--white)}
+.paper{background:var(--white);color:var(--ink)}
+
+/* type */
+.h-hero{font-weight:800;font-size:clamp(44px,4.9vw,72px);line-height:.96;letter-spacing:-.05em}
+.h-big{font-weight:800;font-size:clamp(32px,4.4vw,62px);line-height:1.0;letter-spacing:-.042em}
+.lede{font-size:clamp(17px,1.35vw,20px);line-height:1.5;color:var(--g700);max-width:52ch}
+.ink .lede{color:var(--g300)}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g700)}
+
+/* buttons */
+/* Buttons follow the app's CiButton (lib/courtside_iq/design/components/ci_button.dart):
+   Md h48, padding 24, SemiBold 15; Sm h40, padding 16, SemiBold 13; pill radius, icon gap 8. */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:var(--r-pill);
+  font-weight:600;font-size:15px;text-decoration:none;border:0;cursor:pointer;transition:background .2s var(--ease),transform .2s var(--ease)}
+.btn-lime{background:var(--lime);color:var(--ink)}
+.btn-lime:hover{background:var(--lime-h)}
+.btn-ghost{background:var(--g800,#2A2A2A);color:var(--white)}
+.btn-ghost:hover{background:#363636}
+.btn:active{transform:scale(.98)}
+.stores{display:flex;flex-wrap:wrap;gap:12px}
+.store{display:inline-flex;flex-direction:column;justify-content:center;gap:1px;height:54px;min-width:160px;padding:0 20px;border-radius:var(--r-chip);
+  background:var(--ink);color:var(--white);text-decoration:none;line-height:1.05;transition:background .2s var(--ease)}
+.store:hover{background:#262626}
+.store small{font-size:11px;font-weight:500;color:var(--g300)}
+.store span{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.ink .store{background:var(--black);box-shadow:inset 0 0 0 1px var(--g700)}
+
+/* ---------- nav: ink, lime mark, white wordmark. Three review options (A default) ---------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;height:var(--nav)}
+.nav-in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--ink);color:var(--white)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:18px;letter-spacing:-.02em;color:var(--white)}
+.brand svg{width:30px;height:30px;color:var(--lime)}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a:not(.btn){text-decoration:none;font-size:15px;font-weight:500;color:var(--g300)}
+.nav-links a:not(.btn):hover{color:var(--white)}
+.nav .btn{height:40px;padding:0 16px;font-size:13px}
+/* floating ink bar, inset from the edges (Quin picked option B, 2026-10-02) */
+.nav{padding:10px var(--gutter);pointer-events:none}
+.nav-in{pointer-events:auto;max-width:calc(var(--maxw) - 2 * var(--gutter));margin-inline:auto;padding:0 10px 0 16px;border-radius:var(--r-chip);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12),0 16px 32px -16px rgba(0,0,0,.7)}
+
+/* ---------- hero: white ground, the live tracker on the phone, the game on an arena-style ticker,
+   and the result card showing what it adds up to (Growth IQ). Quin picked variant F, 2026-10-03. ---------- */
+.hero{position:relative;overflow:hidden;background:var(--white);color:var(--ink);
+  margin-top:calc(-1 * (var(--nav) + env(safe-area-inset-top,0px)));padding-top:calc(var(--nav) + env(safe-area-inset-top,0px))}
+.hero-grid{position:relative;z-index:1}
+.hero .lede strong{color:var(--ink)}
+.aud{font-size:15px;font-weight:600;color:var(--g700)}
+/* ticker: the game, play by play, like the arena board */
+.ticker{position:absolute;z-index:4;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;background:var(--ink);color:var(--white);overflow:hidden;border-top:1px solid var(--dk-border)}
+.ticker .tag{position:relative;z-index:2;flex:none;display:flex;align-items:center;gap:10px;height:100%;padding:0 18px 0 var(--gutter);background:var(--ink);box-shadow:16px 0 16px -8px var(--ink)}
+.ticker .clock{font-size:13px;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.ticker .tk-track{display:flex;white-space:nowrap;animation:tick 38s linear infinite}
+.ticker .tk-track span{display:inline-flex;align-items:center;gap:10px;padding:0 28px;font-size:15px;font-weight:600;color:var(--g300);border-left:1px solid var(--dk-border)}
+.ticker .tk-track span b{color:var(--white);font-weight:700}
+.ticker .tk-track span em{font-style:normal;height:22px;padding:0 7px;border-radius:var(--r-chip);background:var(--lime);color:var(--ink);display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(48px,7vw,104px);align-items:center;padding-top:clamp(48px,8vh,104px)}
+.hero-copy{display:flex;flex-direction:column;gap:28px;padding-bottom:calc(clamp(64px,10vh,120px) + 64px);min-width:0}
+.hero-copy .lede{max-width:54ch}
+.strike{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;font-size:clamp(18px,1.9vw,26px);letter-spacing:-.01em}
+.strike del{position:relative;text-decoration:none;color:var(--g600);font-weight:400}
+.strike del::after{content:"";position:absolute;left:-4px;right:-4px;top:55%;height:3px;border-radius:var(--r-chip);background:var(--orange);
+  transform-origin:left center;animation:strike 900ms cubic-bezier(.6,0,.2,1) 400ms both}
+@keyframes strike{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.strike strong{font-weight:700}
+.hero .stores{margin-top:12px}
+.hero-phone{position:relative;margin:0;align-self:end;margin-bottom:-28px;margin-right:clamp(0px,3vw,48px)}
+.hero-phone .iphone{--w:clamp(290px,23vw,340px)}
+
+/* ---------- iPhone-style frame (original drawing). Device corner sizes scale with --w and are the device's own, not UI radii ---------- */
+.iphone{--w:340px;position:relative;width:var(--w);max-width:100%;aspect-ratio:71.6/147.6;flex:none;justify-self:center;
+  border-radius:calc(var(--w) * .165);padding:calc(var(--w) * .011);
+  background:linear-gradient(150deg,#6d7074 0%,#2e3033 22%,#1c1d1f 50%,#2e3033 78%,#74777b 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 1px 0 rgba(255,255,255,.08),0 44px 90px -34px rgba(15,15,15,.55)}
+.iphone-bezel{height:100%;border-radius:calc(var(--w) * .154);background:#030303;padding:calc(var(--w) * .033);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.iphone-screen{position:relative;height:100%;overflow:hidden;border-radius:calc(var(--w) * .121);background:var(--ink-app)}
+.iphone-screen > img{width:100%;height:100%;object-fit:cover;object-position:top center}
+.island{position:absolute;z-index:4;top:calc(var(--w) * .026);left:50%;transform:translateX(-50%);width:calc(var(--w) * .3);height:calc(var(--w) * .088);
+  border-radius:calc(var(--w) * .044);background:#000;pointer-events:none}
+.hw{position:absolute;width:3px;border-radius:2px;background:linear-gradient(90deg,#44464a,#8a8d91 60%,#3a3c3f)}
+.hw.l{left:-2px} .hw.r{right:-2px;background:linear-gradient(270deg,#44464a,#8a8d91 60%,#3a3c3f)}
+.hw.act{top:16.5%;height:4%} .hw.vu{top:23.5%;height:7.2%} .hw.vd{top:32%;height:7.2%} .hw.pw{top:26%;height:11%}
+.live-pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:var(--r-chip);background:var(--orange);color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.04em}
+.live-pill i{width:6px;height:6px;border-radius:50%;background:var(--ink)}
+/* result card: after the game, the Growth IQ it adds up to (DotGauge on light: lime filled, grey empty) */
+.grow{position:absolute;z-index:3;left:-46%;top:46%;width:300px;color:var(--ink);display:flex;flex-direction:column;gap:10px;padding:14px 16px 14px;border-radius:var(--r-chip);background:var(--white);
+  box-shadow:0 0 0 1px var(--g150),0 24px 48px -20px rgba(15,15,15,.4)}
+.grow .top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;font-weight:600;color:var(--g700)}
+.grow .badge{height:24px;font-size:12px}
+.grow .body{display:flex;align-items:center;gap:16px}
+.grow .gauge{width:80px}
+.grow .g-num{font-size:30cqw}
+.grow .k{font-size:13px;font-weight:600;color:var(--g700)}
+.grow .n{display:block;font-size:34px;font-weight:300;letter-spacing:-.04em;line-height:1;margin:3px 0 2px}
+.grow .why{font-size:14px;line-height:1.4;color:var(--g700);padding-top:10px;border-top:1px solid var(--g150)}
+.grow .why b{color:var(--ink)}
+
+/* ---------- gauge ---------- */
+.gauge{position:relative;aspect-ratio:1/1;container-type:inline-size;flex:none}
+.gauge > svg{position:absolute;inset:0;width:100%;height:100%}
+.gauge circle{transition:fill .25s var(--ease)}
+/* the centre stack stays inside the inner ring at every size */
+.g-mid{position:absolute;inset:22%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3cqw;text-align:center}
+.g-num{font-size:25cqw;line-height:.86;font-weight:300;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.g-sub{font-size:5.2cqw;font-weight:500;color:var(--g400);white-space:nowrap}
+.badge{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:var(--r-chip);font-size:14px;font-weight:600;white-space:nowrap}
+.gauge .badge{height:max(20px,8.6cqw);padding:0 max(7px,3cqw);font-size:max(11px,4.4cqw)}
+.badge.rising{background:var(--lime);color:var(--ink)}
+.badge.steady{background:var(--ink-soft);box-shadow:inset 0 0 0 1px var(--dk-border);color:var(--g300)}
+.badge.building{background:var(--ink-soft);color:var(--g400)}
+
+/* ---------- scenes: sticky stage inside a tall runway ---------- */
+.scene{position:relative}
+.stage{position:sticky;top:calc(var(--nav) + env(safe-area-inset-top,0px));height:calc(100svh - var(--nav) - env(safe-area-inset-top,0px));
+  overflow:hidden;display:flex;align-items:center}
+.stage > .wrap{width:100%}
+.scene[data-scene="intro"]{height:230vh}
+.scene[data-scene="season"]{height:320vh}
+.scene[data-scene="moved"]{height:360vh}
+.scene[data-scene="built"]{height:360vh}
+.scene[data-scene="levels"]{height:280vh}
+#meet .stage{background-image:radial-gradient(var(--glow-r) at 0% 100%,var(--glow-c))}
+#season .stage{background-image:radial-gradient(var(--glow-r) at 0% 0%,var(--glow-c))}
+.static-only{display:none}
+.hint{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--g400)}
+.hint .ico{width:18px;height:18px}
+
+/* intro */
+.intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(40px,7vw,140px);align-items:center}
+.intro .copy{max-width:640px}
+.intro .copy{display:flex;flex-direction:column;gap:clamp(18px,3vh,30px);min-width:0}
+.intro h2{font-size:clamp(40px,5.8vw,88px)}
+.intro .lede{font-size:clamp(18px,1.5vw,22px)}
+.intro .gauge{width:min(70vh,660px)}
+.intro figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.intro figcaption{font-size:14px;color:var(--g400)}
+.points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.points li{display:grid;grid-template-columns:48px minmax(0,1fr);gap:4px 16px;align-items:start;padding:16px 0;border-top:1px solid var(--dk-border);
+  color:var(--g400);transition:color .35s var(--ease)}
+.points li:last-child{border-bottom:1px solid var(--dk-border)}
+.points .ib{width:48px;height:48px;border-radius:var(--r-chip);display:grid;place-items:center;background:var(--ink-soft);color:var(--g400);transition:background .35s var(--ease),color .35s var(--ease)}
+.points b{display:block;font-size:clamp(18px,1.7vw,24px);font-weight:700;letter-spacing:-.015em;line-height:1.2}
+.points span{display:block;font-size:16px;margin-top:3px}
+.points li.on{color:var(--white)}
+.points li.on .ib{background:var(--lime);color:var(--ink)}
+.points li.on span{color:var(--g300)}
+
+/* season */
+.season{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(40px,7vw,140px);align-items:center}
+.season .gauge{width:min(66vh,580px)}
+.season .copy{display:flex;flex-direction:column;gap:clamp(18px,3vh,32px);min-width:0;max-width:640px}
+.season h2{font-size:clamp(30px,3.6vw,54px)}
+.wk{display:flex;align-items:baseline;gap:12px;font-size:17px;font-weight:500;color:var(--g400)}
+.wk b{font-size:clamp(56px,6vw,96px);font-weight:300;letter-spacing:-.045em;color:var(--white);line-height:.9;font-variant-numeric:tabular-nums;width:1.12em;text-align:center}
+.note{font-size:clamp(21px,1.9vw,30px);line-height:1.28;font-weight:300;letter-spacing:-.015em;width:min(100%,34ch);height:calc(1.28em * 3);overflow:hidden}
+.bars{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;align-items:end;height:48px}
+.bars i{display:block;height:26px;border-radius:var(--r-chip);background:var(--dk-empty);transition:background .25s var(--ease),height .25s var(--ease)}
+.bars i.played{background:var(--g300)}
+.bars i.rise{background:var(--lime)}
+.bars i.now{height:48px}
+.bar-labels{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--g400);margin-top:10px}
+.static-notes{list-style:none;margin:0;padding:0;columns:2;column-gap:40px;font-size:15px;color:var(--g300)}
+.static-notes li{break-inside:avoid;padding:8px 0;border-top:1px solid var(--dk-border)}
+.static-notes b{color:var(--white);font-weight:600;margin-right:6px}
+
+/* moved */
+.moved{display:flex;flex-direction:column;align-items:center;gap:clamp(16px,3vh,32px);text-align:center}
+.moved .head{display:flex;flex-direction:column;align-items:center;gap:12px}
+.chart{position:relative;width:min(100%,calc((100svh - var(--nav) - 230px) * 2.33));min-width:min(100%,600px);aspect-ratio:1000/430;text-align:left}
+.chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ax{font:500 17px var(--font);fill:var(--g600)}
+.lab{font:600 17px var(--font);fill:var(--g700);letter-spacing:.1px}
+.lab-short{display:none}
+.brk{fill:none;stroke:var(--g400);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.start-l{stroke:var(--ink);stroke-width:2;stroke-dasharray:4 6}
+.grid-l{stroke:var(--g150);stroke-width:2}
+.curve{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.pt{fill:var(--ink);transition:fill .3s var(--ease),opacity .3s var(--ease)}
+.pt.hollow{fill:var(--white);stroke:var(--g600);stroke-width:3}
+.pt.act,.pt.end{fill:var(--lime);stroke:var(--ink);stroke-width:4}
+.mk circle{fill:var(--ink)}
+.mk text{font:700 18px var(--font);fill:var(--white);text-anchor:middle;dominant-baseline:central}
+.mk{transition:opacity .3s var(--ease)}
+.endlab{font:800 26px var(--font);fill:var(--ink);letter-spacing:-.5px;transition:opacity .3s var(--ease)}
+.co{position:absolute;left:var(--x);top:var(--y);width:min(300px,42vw);transform:translate(calc(-100% + 26px),calc(-100% - 40px));
+  background:var(--white);border-radius:var(--r-chip);padding:16px 18px;box-shadow:0 0 0 1px var(--g150),0 18px 40px -18px rgba(15,15,15,.35);
+  opacity:0;visibility:hidden;transition:opacity .3s var(--ease),visibility .3s}
+.co::after{content:"";position:absolute;right:25px;top:100%;width:2px;height:40px;background:var(--ink)}
+.co.on{opacity:1;visibility:visible}
+.co .tag{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--g700);margin-bottom:8px}
+.co .n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--white);display:grid;place-items:center;font-size:13px;font-weight:700}
+.co .d{margin-left:auto;height:24px;padding:0 8px;border-radius:var(--r-chip);display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+.co .d.up{background:var(--lime);color:var(--ink)}
+.co .d.dn{background:var(--g100);color:var(--g700)}
+.co .d.on1{background:var(--ink);color:var(--white)}
+.co h3{font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.co p{font-size:15px;line-height:1.45;color:var(--g700)}
+.co-slot{display:none}
+
+/* built: three stepped panels */
+.built{display:flex;flex-direction:column;gap:clamp(18px,3.4vh,36px)}
+.bsteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.bsteps li{display:flex;flex-direction:column;gap:10px;font-size:15px;font-weight:600;color:var(--g600);transition:color .3s var(--ease)}
+.bsteps li::before{content:"";height:3px;border-radius:var(--r-chip);background:var(--g150);transition:background .3s var(--ease)}
+.bsteps li.on{color:var(--ink)}
+.bsteps li.on::before,.bsteps li.done::before{background:var(--ink)}
+.bpanels{display:grid}
+.bp{grid-area:1/1;align-self:center;opacity:0;visibility:hidden;transform:translateY(28px);min-width:0;
+  transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1),visibility 0s linear .7s}
+.bp.past{transform:translateY(-28px)}
+.bp.on{opacity:1;visibility:visible;transform:none;transition:opacity .6s cubic-bezier(.22,1,.36,1) .12s,transform .8s cubic-bezier(.22,1,.36,1) .12s,visibility 0s}
+.bp.on > *{animation:bpIn .8s cubic-bezier(.22,1,.36,1) both}
+.bp.on > *:nth-child(2){animation-delay:.08s} .bp.on > *:nth-child(3){animation-delay:.16s} .bp.on > *:nth-child(4){animation-delay:.24s}
+@keyframes bpIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.bp h3{font-size:clamp(24px,2.6vw,36px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:clamp(16px,3vh,28px);max-width:26ch}
+/* scale */
+.ends-big{display:flex;justify-content:space-between;align-items:flex-end}
+.ends-big span{font-size:clamp(64px,9vw,136px);font-weight:300;letter-spacing:-.05em;line-height:.85}
+.ruler{position:relative;padding-top:44px;margin-top:12px}
+.ruler .dots{display:grid;grid-template-columns:repeat(60,minmax(0,1fr));gap:clamp(2px,.35vw,5px)}
+.ruler .dots i{display:block;aspect-ratio:1/1;border-radius:50%;background:var(--g200);transition:background .2s var(--ease)}
+.ruler .dots i.on{background:var(--ink)}
+.ruler .flag{position:absolute;top:0;left:var(--at);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+.ruler .flag span{height:28px;padding:0 10px;border-radius:var(--r-chip);background:var(--lime);color:var(--ink);font-size:14px;font-weight:700;display:inline-flex;align-items:center;white-space:nowrap}
+.ruler .flag::after{content:"";width:2px;height:10px;background:var(--ink)}
+.why40{display:flex;gap:14px;align-items:flex-start;margin-top:clamp(16px,3vh,28px);font-size:clamp(17px,1.5vw,21px);line-height:1.4;color:var(--g700);max-width:60ch}
+.why40 b{color:var(--ink)}
+.why40 .ico{color:var(--ink);margin-top:2px}
+/* mix */
+.mixgrid{display:grid;grid-template-columns:7fr 3fr}
+.mixgrid > div{min-width:0}
+.mixgrid .pct{display:flex;align-items:baseline;font-size:clamp(64px,9vw,136px);line-height:.88;font-weight:300;letter-spacing:-.05em}
+.mixgrid .pct small{font-size:.38em;margin-left:2px;letter-spacing:-.02em}
+.mixgrid .b-col{padding-left:16px}
+.segs{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,7fr) 9fr;gap:4px;margin:14px 0 10px}
+.seg{height:20px;border-radius:var(--r-chip);background:var(--g100);overflow:hidden}
+.seg span{display:block;height:100%;background:var(--ink);transform-origin:left center;transform:scaleX(0)}
+.seg.b span{background:var(--lime);box-shadow:inset 0 0 0 1px rgba(15,15,15,.12)}
+.seglabs{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,7fr) 9fr;gap:4px;font-size:14px;font-weight:600;color:var(--g700)}
+.seglabs span{display:flex;align-items:center;gap:6px;min-width:0}
+.mixcap{grid-column:1 / -1;display:grid;grid-template-columns:7fr 3fr;margin-top:clamp(14px,2.4vh,22px);font-size:clamp(15px,1.3vw,18px);line-height:1.4;color:var(--g700)}
+.mixcap p:last-child{padding-left:16px}
+.mixcap b{color:var(--ink);display:block;font-size:clamp(17px,1.5vw,21px);margin-bottom:2px}
+/* rules */
+.rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rules li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:4px 20px;align-items:center;padding:clamp(12px,2.2vh,20px) 0;border-top:1px solid var(--g150);color:var(--g600);transition:color .3s var(--ease)}
+.rules li:last-child{border-bottom:1px solid var(--g150)}
+.rules .ib{width:56px;height:56px;border-radius:var(--r-chip);background:var(--g100);color:var(--g600);display:grid;place-items:center;grid-row:span 2;transition:background .3s var(--ease),color .3s var(--ease)}
+.rules .ib .ico{width:26px;height:26px}
+.rules b{font-size:clamp(20px,2vw,28px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.rules p{font-size:16px}
+.rules li.on{color:var(--ink)}
+.rules li.on .ib{background:var(--lime);color:var(--ink)}
+.rules li.on p{color:var(--g700)}
+
+/* levels */
+.levels{display:flex;flex-direction:column;gap:clamp(22px,4vh,44px)}
+.tiers{display:flex;align-items:center;flex-wrap:nowrap;gap:clamp(10px,2.2vw,32px)}
+.tw{font-weight:800;font-size:clamp(34px,7.4vw,112px);letter-spacing:-.05em;line-height:.95;color:var(--g500);transition:color .35s var(--ease)}
+.tw.on{color:var(--white)}
+.tw.done{color:var(--g400)}
+.tiers .ico{width:clamp(18px,3vw,40px);height:clamp(18px,3vw,40px);color:var(--g600)}
+.track{height:2px;background:var(--dk-border);overflow:hidden}
+.track span{display:block;height:100%;background:var(--lime);transform-origin:left center;transform:scaleX(0)}
+.tds{display:grid}
+.td{grid-area:1/1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,480px);gap:24px 56px;align-items:center;opacity:0;visibility:hidden;transform:translateY(10px);
+  transition:opacity .35s var(--ease),transform .35s var(--ease),visibility .35s}
+.td.on{opacity:1;visibility:visible;transform:none}
+.td .say{font-size:clamp(22px,2.3vw,32px);font-weight:300;line-height:1.25;letter-spacing:-.015em;max-width:26ch}
+.td .say strong{font-weight:700}
+.row-card{background:var(--white);color:var(--ink);border-radius:var(--r-chip);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.row-card .k{font-size:13px;color:var(--g600);font-weight:500;margin-bottom:6px}
+.row-card b{display:block;font-size:17px;font-weight:600}
+.row-card span{display:block;font-size:14px;color:var(--g600);margin-top:3px}
+.chip{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:var(--r-chip);font-size:14px;font-weight:600;white-space:nowrap;flex:none}
+.chip.Elite{background:var(--lime);color:var(--ink)}
+.chip.Good{background:var(--lime-wash);color:var(--ink)}
+.chip.Solid{background:var(--g50);color:var(--g600);box-shadow:inset 0 0 0 1px var(--g150)}
+.fine{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:var(--g400);max-width:70ch}
+.fine .ico{width:20px;height:20px;margin-top:1px}
+
+/* decode */
+.decode{background:var(--g50);padding-block:clamp(88px,14vh,160px)}
+.decode .head{display:flex;flex-direction:column;gap:14px}
+.decode-left{display:flex;flex-direction:column;gap:clamp(36px,5vh,52px);min-width:0;max-width:780px}
+.decode-body{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(48px,6vw,96px);align-items:start}
+.tabs{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.tab{display:flex;gap:12px;align-items:flex-start;text-align:left;max-width:100%;padding:14px 22px 14px 14px;border-radius:var(--r-chip);border:0;cursor:pointer;
+  background:var(--white);font-size:16px;font-weight:600;letter-spacing:-.01em;transition:background .25s var(--ease),color .25s var(--ease)}
+.tab:hover{background:var(--g100)}
+.tab .pl{width:28px;height:28px;border-radius:var(--r-chip);display:grid;place-items:center;background:var(--ink);color:var(--white);flex:none;transition:transform .3s var(--ease),background .25s}
+.tab .pl .ico{width:16px;height:16px;stroke-width:2.2}
+.tab .tt{padding-top:3px}
+.tab .more{display:none;font-weight:500;font-size:14px;color:var(--g300);margin-top:3px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--white)}
+.tab[aria-selected="true"]:hover{background:var(--ink)}
+.tab[aria-selected="true"] .pl{background:var(--lime);color:var(--ink);transform:rotate(45deg)}
+.tab[aria-selected="true"] .more{display:block}
+.story{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.story-h{grid-column:1 / -1;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.wash{border-radius:var(--r-chip);padding:16px 18px 18px;color:var(--ink)}
+.wash.good{background:var(--lime-wash)}
+.wash.energy{background:var(--orange-wash)}
+.wash .t{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin-bottom:8px}
+.wash .t .ico{width:17px;height:17px}
+.wash p{font-size:15px;line-height:1.45}
+.decode-note{margin-top:24px;font-size:14px;color:var(--g600);text-align:center}
+
+/* game-screen device: same iPhone frame, sized here */
+.device{--w:min(360px,100%)}
+.device-fig{margin:0;display:flex;flex-direction:column;align-items:center;gap:20px;justify-self:end}
+.why{width:min(360px,100%);font-size:15px;line-height:1.45;color:var(--g700)}
+.why b{display:block;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g600);margin-bottom:4px}
+.scr{height:100%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;background:linear-gradient(var(--ink-app) 0 50%,var(--white) 50%);transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.scr::-webkit-scrollbar{display:none}
+.scr.swap{opacity:0;transform:translateY(8px)}
+.a-ink{background:var(--ink-app);color:var(--white)}
+.a-light{background:var(--white);min-height:420px}
+.a-status{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;height:24px;padding:14px 22px 0;box-sizing:content-box}
+.a-status i{display:inline-block;width:16px;height:10px;border-radius:var(--r-chip);background:var(--white);margin-left:4px}
+.a-status i:last-child{width:22px}
+.a-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 14px}
+.a-btn{width:34px;height:34px;border-radius:var(--r-chip);box-shadow:inset 0 0 0 1px var(--dk-border);display:grid;place-items:center}
+.a-btn .ico{width:16px;height:16px}
+.a-bar b{font-size:16px;font-weight:600}
+.a-who{display:flex;align-items:center;gap:12px;padding:0 20px 18px}
+.a-av{width:40px;height:40px;border-radius:50%;background:var(--ink-soft);box-shadow:inset 0 0 0 1px var(--dk-border);display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:600;line-height:1;letter-spacing:0;text-align:center;flex:none}
+.a-who b{display:block;font-size:14px;font-weight:600}
+.a-who div span{display:block;font-size:12px;color:var(--g400);margin-top:2px}
+.a-pts{display:flex;align-items:flex-end;gap:6px;padding:14px 20px;border-top:1px solid var(--dk-border)}
+.a-pts > b{font-size:44px;font-weight:300;letter-spacing:-.04em;line-height:.9}
+.a-pts > span{font-size:12px;color:var(--g400);padding-bottom:5px;letter-spacing:.02em}
+.a-mini{display:flex;gap:14px;text-align:center;margin-left:auto;padding-bottom:3px}
+.a-mini b{display:block;font-size:18px;font-weight:300;line-height:1}
+.a-mini span{display:block;font-size:10px;color:var(--g400);margin-top:3px;letter-spacing:.02em}
+.a-tiles{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--dk-border)}
+.a-tiles div{padding:14px 16px 16px;border-left:1px solid var(--dk-border)}
+.a-tiles div:first-child{border-left:0}
+.a-tiles span{display:block;font-size:12px;color:var(--g400)}
+.a-tiles b{display:block;font-size:28px;font-weight:300;letter-spacing:-.03em;margin-top:6px}
+.a-tiles b.none{color:var(--g600)}
+.a-ins{background:var(--lime-wash);padding:16px 20px 18px;color:var(--ink)}
+.a-ins .top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}
+.a-ins .top span{display:flex;align-items:center;gap:6px;color:var(--g700)}
+.a-ins .top .ico{width:15px;height:15px}
+.a-ins .top b{font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:11px;text-align:right}
+.a-ins p{font-size:15px;line-height:1.42;margin-top:10px}
+.a-sec{padding:14px 20px;font-size:15px;font-weight:600;color:var(--g600);border-bottom:1px solid var(--g150);border-top:1px solid var(--g150)}
+.a-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px;border-bottom:1px solid var(--g150);color:var(--ink)}
+.a-row b{display:block;font-size:15px;font-weight:600}
+.a-row span{display:block;font-size:12px;color:var(--g600);margin-top:2px}
+.a-row .chip{height:24px;font-size:12px;padding:0 8px}
+
+/* fair */
+.fair{padding-block:clamp(96px,15vh,176px)}
+.fair-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(48px,9vw,180px);align-items:center}
+.fair .copy{display:flex;flex-direction:column;gap:18px;min-width:0}
+.vals{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 56px}
+.vals li{display:flex;flex-direction:column;gap:10px;padding-top:20px;border-top:1px solid var(--g150)}
+.vals .ib{width:48px;height:48px;border-radius:var(--r-chip);background:var(--g100);color:var(--ink);display:grid;place-items:center}
+.vals b{font-size:19px;font-weight:700;letter-spacing:-.015em}
+.vals p{font-size:15px;color:var(--g700)}
+.shot{margin:0;display:flex;flex-direction:column;align-items:center;gap:18px;width:320px}
+.shot .iphone{--w:300px}
+.shot figcaption{font-size:14px;color:var(--g600);text-align:center;max-width:28ch}
+
+/* pricing */
+.pricing{padding-block:clamp(96px,15vh,176px)}
+.pricing .head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;margin-bottom:clamp(40px,6vh,64px)}
+.pricing .head .mark{width:72px;height:72px}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;max-width:1120px;margin-inline:auto}
+.plan{border-radius:var(--r-chip);padding:clamp(24px,3vw,36px);background:var(--ink-soft);box-shadow:inset 0 0 0 1px var(--dk-border);display:flex;flex-direction:column;gap:22px;min-width:0}
+.plan.prem{background:var(--black)}
+.plan .ph{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.plan .ph h3{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.trial{height:28px;padding:0 10px;border-radius:var(--r-chip);background:var(--lime);color:var(--ink);font-size:13px;font-weight:700;display:inline-flex;align-items:center;white-space:nowrap}
+.price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price b{font-size:clamp(52px,5.4vw,72px);font-weight:300;letter-spacing:-.045em;line-height:.9}
+.price span{font-size:16px;color:var(--g400)}
+.seats{display:flex;gap:16px}
+.seat{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;color:var(--g400)}
+.seat .gauge{width:72px}
+.seat .g-mid{inset:0;font-size:15px;font-weight:700;color:var(--white)}
+.seat .g-mid .ico{width:20px;height:20px}
+.seat.empty .ring{width:72px;height:72px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--dk-border);display:grid;place-items:center;color:var(--g600)}
+.feats{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.feats li{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:var(--g300)}
+.feats .ico{width:20px;height:20px;color:var(--lime);margin-top:1px}
+.opts{border:0;margin:0;padding:0;display:flex;flex-direction:column;border-radius:var(--r-chip);overflow:hidden;box-shadow:inset 0 0 0 1px var(--dk-border)}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px 18px;cursor:pointer;transition:background .2s var(--ease)}
+.opt + .opt{border-top:1px solid var(--dk-border)}
+.opt:hover{background:#0B0B0B}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .rd{width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--g300);display:grid;place-items:center}
+.opt .rd::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink);opacity:0}
+.opt input:checked + .rd{background:var(--lime);box-shadow:none}
+.opt input:checked + .rd::after{opacity:1}
+.opt input:focus-visible + .rd{outline:2px solid var(--white);outline-offset:3px}
+.opt b{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.opt b small{font-size:12px;font-weight:600;padding:2px 8px;border-radius:var(--r-chip);box-shadow:inset 0 0 0 1px var(--white)}
+.opt .s{font-size:14px;color:var(--g400)}
+.opt .pr{text-align:right}
+.opt .pr b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.opt .pr span{font-size:13px;color:var(--g400)}
+.plan .btn{width:100%}
+.plan .small{font-size:13px;color:var(--g400);text-align:center;margin-top:-8px}
+.pricing .after{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.pricing .after p{font-size:14px;color:var(--g400)}
+
+/* faq (unchanged) */
+.faq{padding-block:clamp(96px,14vh,160px)}
+.faq-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,6vw,80px);align-items:start}
+.faq h2{position:sticky;top:calc(var(--nav) + 40px)}
+.faq details{border-top:1px solid var(--g150)}
+.faq details:last-child{border-bottom:1px solid var(--g150)}
+.faq summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 0;cursor:pointer;font-size:clamp(17px,1.4vw,20px);font-weight:600;letter-spacing:-.01em}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .ico{transition:transform .25s var(--ease);color:var(--g500)}
+.faq details[open] summary .ico{transform:rotate(180deg)}
+.faq details p{padding:0 0 24px;font-size:16px;color:var(--g700);max-width:62ch}
+
+/* footer */
+.foot{padding-block:56px calc(56px + var(--pill))}
+.foot .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.foot nav{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
+.foot nav a{text-decoration:none;color:var(--g300);font-size:15px}
+.foot nav a:hover{color:var(--white)}
+.foot .mail{font-size:15px;color:var(--white);user-select:all}
+.foot small{display:block;width:100%;font-size:13px;color:var(--g400);padding-top:24px;border-top:1px solid var(--dk-border)}
+
+/* QR card (desktop) + get pill (phone) */
+.qr{position:fixed;right:24px;bottom:24px;z-index:70;display:none;align-items:stretch;gap:16px;padding:14px 44px 14px 14px;border-radius:var(--r-chip);background:var(--ink);color:var(--white);
+  box-shadow:0 0 0 1px var(--dk-border),0 24px 48px -20px rgba(15,15,15,.6);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.qr .code-wrap{background:var(--white);padding:7px;border-radius:var(--r-chip);flex:none;display:flex;aspect-ratio:1/1}
+.qr svg.code{width:104px;height:104px;display:block}
+.qr > div{display:flex;flex-direction:column;justify-content:center}
+.qr .qr-mark{width:22px;height:22px;color:var(--lime);margin-bottom:8px;display:block}
+.qr b{display:block;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.qr span{display:block;font-size:13px;color:var(--g300);margin-top:2px;max-width:18ch}
+.qr .x{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:var(--r-chip);border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--g400)}
+.qr .x:hover{background:var(--ink-soft);color:var(--white)}
+.qr .x .ico{width:16px;height:16px}
+.qr.away{opacity:0;transform:translateY(12px);pointer-events:none}
+.getpill{position:fixed;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:70;display:none;height:48px;border-radius:var(--r-pill);
+  background:var(--lime);color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 0 0 1px rgba(15,15,15,.08),0 12px 30px -12px rgba(15,15,15,.5);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.getpill .ico{width:18px;height:18px}
+.getpill.away{opacity:0;transform:translateY(16px);pointer-events:none}
+@media (min-width:1024px){ .qr{display:flex} }
+
+/* ---------- tablet / phone ---------- */
+@media (max-width:1023px){
+  .intro .gauge{width:min(46vh,400px)}
+  .season .gauge{width:min(46vh,380px)}
+  .grow{left:-36%}
+}
+@media (max-width:760px){
+  :root{--pill:78px}
+  :root{--nav:66px}
+  .nav{padding:8px 12px}
+  .nav-links a:not(.btn){display:none}
+  .nav .btn{display:none}
+  .getpill{display:flex}
+  .stage{padding-bottom:var(--pill)}
+  .stage > .wrap{max-height:100%}
+
+  .hero-grid{grid-template-columns:1fr;gap:28px;padding-top:28px}
+  .ticker{height:52px}
+  .ticker .tag{padding-left:16px}
+  .ticker .tk-track span{font-size:14px;padding:0 20px}
+  .hero-copy{padding-bottom:0;gap:16px}
+  .hero-phone{justify-self:center;margin:0 0 -120px}
+  .hero-phone .iphone{--w:260px}
+  .grow{left:-34px;top:26%;width:236px;padding:12px 14px 14px;gap:10px}
+  .grow .why{display:none}
+  .grow .gauge{width:72px}
+  .grow .n{font-size:34px}
+
+  .intro{grid-template-columns:1fr;gap:18px}
+  .intro figure{order:-1}
+  .intro .gauge{width:min(32vh,250px)}
+  .intro figcaption{display:none}
+  .intro .copy{gap:14px}
+  .intro h2{font-size:40px}
+  .points li{padding:10px 0;grid-template-columns:38px minmax(0,1fr)}
+  .points .ib{width:38px;height:38px}
+  .points .ib .ico{width:20px;height:20px}
+  .points b{font-size:17px}
+  .points span{display:none}
+  .intro .lede{font-size:16px}
+
+  .season{grid-template-columns:1fr;gap:16px;justify-items:center}
+  .season .gauge{width:min(32vh,250px)}
+  .season .copy{width:100%;gap:12px}
+  .season h2{font-size:24px}
+  .wk b{font-size:48px}
+  .note{font-size:19px;width:100%;height:calc(1.28em * 3)}
+  .bars{height:34px;gap:5px}
+  .bars i{height:18px}
+  .bars i.now{height:34px}
+  .hint{display:none}
+  .static-notes{columns:1}
+
+  .moved .head .lede{font-size:15px}
+  .chart{width:100%;min-width:0}
+  .ax{font-size:40px}
+  .lab{font-size:40px}
+  .lab-long{display:none}
+  .lab-short{display:inline}
+  .zone{transform:translateY(22px)}
+  .lab.g1{display:none}
+  .curve{stroke-width:7}
+  .mk text{font-size:26px}
+  .endlab{font-size:38px}
+  .co{display:none}
+  .co-slot{display:grid;width:100%;text-align:left}
+  .co-slot .co{display:block;grid-area:1/1;position:relative;left:auto;top:auto;width:auto;transform:none;box-shadow:0 0 0 1px var(--g150)}
+  .co-slot .co::after{display:none}
+
+  .built{gap:14px}
+  .bsteps li{font-size:13px}
+  .bp h3{font-size:22px;margin-bottom:12px}
+  .ends-big span{font-size:64px}
+  .why40{font-size:16px}
+  .mixgrid .pct{font-size:56px}
+  .seglabs{font-size:11px}
+  .seglabs .ico{display:none}
+  .mixcap{grid-template-columns:1fr;gap:10px;font-size:14px}
+  .mixcap p:last-child{padding-left:0}
+  .mixcap b{font-size:16px}
+  .rules li{grid-template-columns:44px minmax(0,1fr);gap:2px 14px;padding:10px 0}
+  .rules .ib{width:44px;height:44px;border-radius:var(--r-chip)}
+  .rules .ib .ico{width:22px;height:22px}
+  .rules b{font-size:18px}
+  .rules p{font-size:14px}
+
+  .tw{font-size:clamp(28px,9vw,40px)}
+  .tiers{gap:8px}
+  .td{grid-template-columns:1fr;gap:18px}
+  .td .say{font-size:20px}
+  .fine{font-size:13px}
+
+  .decode-body{grid-template-columns:minmax(0,1fr);gap:20px}
+  .tabs{flex-direction:row;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);padding-bottom:4px;gap:8px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab,.tab[aria-selected="true"]{flex:none;white-space:nowrap;padding:8px 14px 8px 8px}
+  .tab[aria-selected="true"] .more{display:none}
+  .tab .tt{padding-top:2px}
+  .device{--w:min(330px,100%)}
+  .story{grid-template-columns:1fr}
+  .decode-left{display:contents}
+  .decode .head{order:1} .tabs{order:2} .device-fig{order:3} .story{order:4;margin-top:12px}
+
+  .fair-grid{grid-template-columns:1fr}
+  .vals{grid-template-columns:1fr;gap:20px}
+  .shot{display:none}
+  .shot .iphone{--w:250px}
+
+  .plans{grid-template-columns:1fr}
+  .faq-grid{grid-template-columns:1fr}
+  .faq h2{position:static}
+}
+@media (max-width:760px) and (max-height:740px){ .rules p{display:none} .why40{font-size:15px} }
+@media (max-width:340px){
+  .opt{grid-template-columns:auto minmax(0,1fr)}
+  .opt .pr{grid-column:2;text-align:left}
+}
+
+/* ---------- static mode: reduced motion, the scroll library did not load, or a stage that cannot fit ---------- */
+html.static .scene,.scene.unpin{height:auto !important}
+html.static .stage,.unpin .stage{position:relative;top:auto;height:auto;overflow:visible;padding-block:clamp(72px,11vh,120px)}
+html.static .static-only,.unpin .static-only{display:block}
+html.static .hint,.unpin .hint{display:none}
+html.static .co,html.static .co-slot .co,.unpin .co,.unpin .co-slot .co{position:relative;left:auto;top:auto;width:auto;transform:none;opacity:1;visibility:visible;display:block;box-shadow:0 0 0 1px var(--g150)}
+html.static .co::after,.unpin .co::after{display:none}
+html.static .co-slot,.unpin .co-slot,html.static .chart .co,.unpin .chart .co{display:none}
+html.static .co-list,.unpin .co-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:100%;text-align:left}
+html.static .td,.unpin .td,html.static .bp,.unpin .bp{grid-area:auto;opacity:1;visibility:visible;transform:none}
+html.static .td,.unpin .td{padding-block:20px;border-top:1px solid var(--dk-border)}
+html.static .bp,.unpin .bp{padding-block:28px;border-top:1px solid var(--g150)}
+html.static .bp > *,.unpin .bp > *{animation:none}
+html.static .bsteps,.unpin .bsteps{display:none}
+html.static .points li,.unpin .points li{color:var(--white)}
+html.static .points li span,.unpin .points li span{color:var(--g300)}
+@media (max-width:760px){ html.static .co-list,.unpin .co-list{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+
+<!-- Icon set: 24px grid, 2px live-area inset, 1.75 stroke, round caps and joins. Slashed icons knock out the
+     strokes under the slash with a mask so the cross reads cleanly. The spark is the app's filled insight glyph. -->
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="168" height="168">
+      <feGaussianBlur stdDeviation="2.6" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .7 0" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <mask id="slash-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+      <rect width="24" height="24" fill="#fff"/><path d="M4 4l16 16" stroke="#000" stroke-width="5" stroke-linecap="round"/>
+    </mask>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5c.7 4.9 4.6 8.8 9.5 9.5-4.9.7-8.8 4.6-9.5 9.5-.7-4.9-4.6-8.8-9.5-9.5 4.9-.7 8.8-4.6 9.5-9.5z"/></symbol>
+    <symbol id="i-age" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 7.5h3.5M7 12h5.5M7 16.5h3.5"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3.5 16.5l5.5-5.5 4 4 7-7"/><path d="M15 8h5v5"/></symbol>
+    <symbol id="i-norank" viewBox="0 0 24 24"><g mask="url(#slash-cut)"><path d="M3 20.5h18"/><path d="M4 20.5V14h5.5M9.5 20.5V9h5v11.5M14.5 12.5H20v8"/><path d="M11.2 12.6l1.3-1v5.2"/></g><path d="M4 4l16 16"/></symbol>
+    <symbol id="i-noscore" viewBox="0 0 24 24"><g mask="url(#slash-cut)"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M12 5.5v13"/><path d="M7 10v4M17 10v4"/></g><path d="M4 4l16 16"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><path d="M12 14.5v2"/></symbol>
+    <symbol id="i-five" viewBox="0 0 24 24"><path d="M6 6.5v11M10 6.5v11M14 6.5v11M18 6.5v11"/><path d="M3.5 15.5l17-7"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M10 9v6M14 9v6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M5.5 12v7.5h13V12"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-score" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5v17"/></symbol>
+    <symbol id="i-assist" viewBox="0 0 24 24"><path d="M4 16c3-6 9-8 16-8"/><path d="M16 4.5l4 3.5-4 3.5"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M7 12V6.5a1.5 1.5 0 0 1 3 0V11M10 10V5a1.5 1.5 0 0 1 3 0v6M13 10.5V6.5a1.5 1.5 0 0 1 3 0V13"/><path d="M16 11.5a1.5 1.5 0 0 1 3 0V14a6.5 6.5 0 0 1-6.5 6.5h-.5A6 6 0 0 1 6 14.5l-1.6-3a1.4 1.4 0 0 1 2.4-1.4L7 11"/></symbol>
+    <symbol id="mark" viewBox="29.18 26.17 201.66 201.66"><g fill="currentColor">
+      <circle cx="181.37" cy="165.70" r="5.40" fill-opacity=".30"/><circle cx="164.61" cy="179.23" r="5.92" fill-opacity=".37"/><circle cx="142.89" cy="185.53" r="6.47" fill-opacity=".44"/><circle cx="119.37" cy="182.35" r="7.05" fill-opacity=".51"/><circle cx="98.42" cy="168.85" r="7.65" fill-opacity=".58"/><circle cx="85.01" cy="146.38" r="8.29" fill-opacity=".65"/><circle cx="83.52" cy="118.95" r="8.96" fill-opacity=".72"/><circle cx="96.16" cy="93.02" r="9.66" fill-opacity=".79"/><circle cx="121.45" cy="76.36" r="10.40" fill-opacity=".86"/><circle cx="153.25" cy="75.69" r="11.18" fill-opacity=".93"/><circle cx="181.37" cy="93.71" r="12.00"/>
+      <circle cx="207.42" cy="187.56" r="6.75" fill-opacity=".30"/><circle cx="189.53" cy="203.82" r="7.20" fill-opacity=".35"/><circle cx="167.07" cy="215.04" r="7.68" fill-opacity=".40"/><circle cx="141.42" cy="219.66" r="8.17" fill-opacity=".45"/><circle cx="114.54" cy="216.47" r="8.68" fill-opacity=".50"/><circle cx="88.94" cy="204.85" r="9.21" fill-opacity=".55"/><circle cx="67.50" cy="185.05" r="9.76" fill-opacity=".60"/><circle cx="53.15" cy="158.36" r="10.33" fill-opacity=".65"/><circle cx="48.51" cy="127.23" r="10.92" fill-opacity=".70"/><circle cx="55.32" cy="95.27" r="11.54" fill-opacity=".75"/><circle cx="73.99" cy="66.92" r="12.18" fill-opacity=".80"/><circle cx="103.04" cy="46.97" r="12.84" fill-opacity=".85"/><circle cx="138.91" cy="39.71" r="13.54" fill-opacity=".90"/><circle cx="176.03" cy="47.92" r="14.25" fill-opacity=".95"/><circle cx="207.42" cy="71.86" r="15.00"/>
+    </g></symbol>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>Courtside IQ</a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#meet">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">Questions</a>
+      <a class="btn btn-lime js-store" href="https://apps.apple.com/us/app/courtside-iq/id6748415872">Get the app</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 1. HERO: white ground, the live tracker, the game on a ticker, and the Growth IQ it adds up to -->
+<section class="hero" id="hero" aria-labelledby="hero-h">
+  <div class="ticker" aria-label="Sample game, play by play">
+    <div class="tag"><span class="live-pill"><i></i>LIVE</span><span class="clock">Q3 4:12</span></div>
+    <div class="tk-track">
+      <span><b>Maya #12</b>2PT make <em>+2</em></span><span><b>Maya #12</b>Assist to #5</span><span><b>Maya #12</b>Steal, fast break</span><span><b>Maya #12</b>FT 1 of 2 <em>+1</em></span><span><b>Maya #12</b>Defensive rebound</span><span><b>Growth IQ</b>82, Rising <em>+3</em></span>
+      <span aria-hidden="true"><b>Maya #12</b>2PT make <em>+2</em></span><span aria-hidden="true"><b>Maya #12</b>Assist to #5</span><span aria-hidden="true"><b>Maya #12</b>Steal, fast break</span><span aria-hidden="true"><b>Maya #12</b>FT 1 of 2 <em>+1</em></span><span aria-hidden="true"><b>Maya #12</b>Defensive rebound</span><span aria-hidden="true"><b>Growth IQ</b>82, Rising <em>+3</em></span>
+    </div>
+  </div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="strike"><del>Basketball stat tracker</del><strong>Youth basketball development</strong></p>
+      <h1 class="h-hero" id="hero-h">Every kid is somewhere on the way up.</h1>
+      <p class="lede">Track every basketball game from the stands, one tap per play. Courtside IQ turns makes, misses, assists and steals into <strong>Growth IQ</strong>, a fair read on your player's growth.</p>
+      <p class="aud">For basketball parents of players 8 to 18.</p>
+      <div class="stores">
+        <a class="store" href="https://apps.apple.com/us/app/courtside-iq/id6748415872"><small>Download on the</small><span>App Store</span></a>
+        <a class="store" href="https://play.google.com/store/apps/details?id=com.mycompany.courtsideiq"><small>Get it on</small><span>Google Play</span></a>
+      </div>
+    </div>
+    <figure class="hero-phone">
+      <div class="iphone"><span class="hw l act"></span><span class="hw l vu"></span><span class="hw l vd"></span><span class="hw r pw"></span><div class="iphone-bezel"><div class="iphone-screen"><span class="island"></span><img src="assets/live-tracker.jpg" width="780" height="1688" alt="The Courtside IQ live tracker: 12 points, and Make or Miss buttons for 2PT, 3PT and free throws"></div></div></div>
+      <div class="grow" aria-label="After the game: Maya's Growth IQ is 82 and Rising, up 3 over her last three games">
+        <div class="top"><span>After the game</span><span class="badge rising">Rising</span></div>
+        <div class="body">
+          <div class="gauge" data-gauge="card" data-v="82" data-fill="lime" aria-hidden="true"><div class="g-mid"><span class="g-num">82</span></div></div>
+          <div><span class="k">Maya's Growth IQ</span><span class="n">Up 3</span><span class="k">over her last three games</span></div>
+        </div>
+        <p class="why">Her scoring and playmaking are both climbing.</p>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- 2. MEET GROWTH IQ: pinned, gauge scales up and fills (with a soft glow) as you scroll, statements step -->
+<section class="scene ink" id="meet" data-scene="intro" aria-labelledby="meet-h">
+  <div class="stage">
+    <div class="wrap">
+      <div class="intro">
+        <div class="copy">
+          <h2 class="h-big" id="meet-h">Meet Growth IQ.</h2>
+          <p class="lede">One number from 40 to 99 for how your player is developing, built from the games you track.</p>
+          <ol class="points">
+            <li data-at=".28"><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-age"/></svg></span><div><b>Measured for their age</b><span>Read against their own age group, from 8 to 18.</span></div></li>
+            <li data-at=".52"><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg></span><div><b>Moves when something real changes</b><span>It follows the trend, so one night never defines a player.</span></div></li>
+            <li data-at=".76"><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-norank"/></svg></span><div><b>Never a ranking</b><span>No leaderboards and no team scores. Just your player's own path.</span></div></li>
+          </ol>
+        </div>
+        <figure>
+          <div class="gauge" data-gauge="intro" data-v="40" data-fill="lime" data-empty="dk" data-glow="1" role="img" aria-label="Growth IQ gauge, 82 and Rising for Maya's sample season">
+            <div class="g-mid"><span class="g-num" id="intro-num">82</span><span class="badge rising" id="intro-badge">Rising</span></div>
+          </div>
+          <figcaption>Maya's Growth IQ after 10 games of a sample season</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. THE SEASON: pinned gauge, 10 games advance with scroll, number climbs, lime only when Rising -->
+<section class="scene ink" id="season" data-scene="season" aria-labelledby="season-h">
+  <div class="stage">
+    <div class="wrap">
+      <div class="season">
+        <div class="gauge" data-gauge="season" data-v="0" data-fill="white" data-empty="dk" data-glow="1" role="img" aria-label="Growth IQ gauge for the selected game" id="season-gauge">
+          <div class="g-mid"><span class="g-num" id="s-num">1</span><span class="g-sub" id="s-sub">of 5 games</span><span class="badge building" id="s-badge">Building</span></div>
+        </div>
+        <div class="copy">
+          <h2 class="h-big" id="season-h">Growth is hard to see in one game. Easy to see in a season.</h2>
+          <p class="wk"><span>Game</span><b id="s-week">1</b><span>of 10</span></p>
+          <p class="note" id="s-note" aria-live="polite">Game 1 is in. Growth IQ waits for five games, so one night can't define her.</p>
+          <div>
+            <div class="bars" id="s-bars" aria-hidden="true"></div>
+            <div class="bar-labels"><span>Game 1, September</span><span>Game 10, December</span></div>
+          </div>
+          <p class="hint"><svg class="ico" aria-hidden="true"><use href="#i-down"/></svg>Keep scrolling to play Maya's season</p>
+          <ol class="static-only static-notes" id="s-static"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. WHAT MOVED IT: pinned chart. Collecting zone, the start line, the curve draws, then moments 1, 2, 3 -->
+<section class="scene paper" id="moved" data-scene="moved" aria-labelledby="moved-h">
+  <div class="stage">
+    <div class="wrap">
+      <div class="moved">
+        <div class="head">
+          <h2 class="h-big" id="moved-h">The number moves when something real changes.</h2>
+          <p class="lede">Each point is a game in Maya's sample season. Big nights nudge it. Quiet nights barely dent it.</p>
+        </div>
+        <div class="chart" id="chart">
+          <svg viewBox="0 0 1000 430" role="img" aria-label="Maya's Growth IQ by game. Games 1 to 4 are collected without a number. Growth IQ starts at 74 at game 5 and reaches 82 at game 10." id="chart-svg"></svg>
+          <div class="co" data-m="1"><div class="tag"><span class="n">1</span>Game 5<span class="d on1">On at 74</span></div><h3>Growth IQ switches on</h3><p>After five games there is enough to read her fairly. She starts at 74, measured for her age group.</p></div>
+          <div class="co" data-m="2"><div class="tag"><span class="n">2</span>Game 6<span class="d up">Up 2</span></div><h3>A big night, a small move</h3><p>10 points on 7 shots is Elite scoring for her age. The number goes up 2, not 20. One game never makes a season.</p></div>
+          <div class="co" data-m="3"><div class="tag"><span class="n">3</span>Game 7<span class="d dn">Down 1</span></div><h3>A quiet game</h3><p>Two points and a lot of defense. The number dips by 1 and holds, because the five-game window remembers the good games too.</p></div>
+        </div>
+        <div class="co-slot" id="co-slot" aria-live="polite"></div>
+        <div class="static-only co-list" id="co-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. HOW IT'S BUILT: pinned on white. Three steps: the scale, the mix, the rules -->
+<section class="scene paper" id="built" data-scene="built" aria-labelledby="built-h">
+  <div class="stage">
+    <div class="wrap">
+      <div class="built">
+        <h2 class="h-big" id="built-h">One number, built in the open.</h2>
+        <ol class="bsteps" aria-hidden="true"><li data-s="0">The scale</li><li data-s="1">The mix</li><li data-s="2">The rules</li></ol>
+        <div class="bpanels">
+          <div class="bp on" data-s="0">
+            <h3>Growth IQ runs from 40 to 99.</h3>
+            <div class="ends-big" aria-hidden="true"><span>40</span><span>99</span></div>
+            <div class="ruler" role="img" aria-label="Growth IQ scale from 40 to 99, Maya at 82">
+              <div class="flag" id="flag" style="--at:0%"><span id="flag-t">Maya, 40</span></div>
+              <div class="dots" id="ruler-dots"></div>
+            </div>
+            <p class="why40"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><span><b>Why start at 40?</b> So no one ever opens the app to a failing grade. Every player starts on the board.</span></p>
+          </div>
+          <div class="bp" data-s="1">
+            <h3>70% is how she plays for her age. 30% is how much she's growing.</h3>
+            <div class="mixgrid">
+              <div><span class="pct">70<small>%</small></span></div>
+              <div class="b-col"><span class="pct">30<small>%</small></span></div>
+              <div class="segs" aria-hidden="true"><span class="seg"><span></span></span><span class="seg"><span></span></span><span class="seg"><span></span></span><span class="seg b"><span></span></span></div>
+              <div class="seglabs"><span><svg class="ico" aria-hidden="true" style="width:16px;height:16px"><use href="#i-score"/></svg>Scoring efficiency</span><span><svg class="ico" aria-hidden="true" style="width:16px;height:16px"><use href="#i-assist"/></svg>Playmaking</span><span><svg class="ico" aria-hidden="true" style="width:16px;height:16px"><use href="#i-hand"/></svg>Disruption</span><span><svg class="ico" aria-hidden="true" style="width:16px;height:16px"><use href="#i-trend"/></svg>Improvement</span></div>
+              <div class="mixcap">
+                <p><b>How she plays</b>Scoring efficiency, playmaking and disruption count equally, each read against her age group.</p>
+                <p><b>How much she's growing</b>Her last 5 games against the 5 before.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bp" data-s="2">
+            <h3>Three rules keep it fair.</h3>
+            <ol class="rules">
+              <li data-k="0"><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-five"/></svg></span><b>It shows after five games.</b><p>One game can't define her, so the number waits until there is enough to read.</p></li>
+              <li data-k="1"><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-norank"/></svg></span><b>It never ranks her against anyone.</b><p>It reads her against her age group and her own recent games. Not teammates, not other kids.</p></li>
+              <li data-k="2"><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-pause"/></svg></span><b>It pauses while she moves up an age group.</b><p>Ratings hold through the change, so a birthday never looks like a slump.</p></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. EVERY LEVEL: pinned on ink. Solid, then Good, then Elite step with an app row for each -->
+<section class="scene ink" id="levels" data-scene="levels" aria-labelledby="levels-h">
+  <div class="stage">
+    <div class="wrap">
+      <div class="levels">
+        <h2 class="h-big" id="levels-h">Every level is a real place to grow from.</h2>
+        <div>
+          <div class="tiers" aria-hidden="true">
+            <span class="tw on" data-t="0">Solid</span><svg class="ico"><use href="#i-arrow"/></svg>
+            <span class="tw" data-t="1">Good</span><svg class="ico"><use href="#i-arrow"/></svg>
+            <span class="tw" data-t="2">Elite</span>
+          </div>
+          <div class="track" style="margin-top:18px"><span id="lv-track"></span></div>
+        </div>
+        <div class="tds">
+          <div class="td on" data-t="0">
+            <p class="say"><strong>Solid.</strong> The skill is there and working. Every rating starts here, and it is a real place to grow from.</p>
+            <div class="row-card"><div><p class="k">From a game this season</p><b>Scoring Efficiency</b><span>7 points on 7 shots and 2 free throws</span></div><span class="chip Solid">Solid</span></div>
+          </div>
+          <div class="td" data-t="1">
+            <p class="say"><strong>Good.</strong> Above the line for her age, game after game.</p>
+            <div class="row-card"><div><p class="k">From a game this season</p><b>Playmaking</b><span>3 assists, 1 turnover</span></div><span class="chip Good">Good</span></div>
+          </div>
+          <div class="td" data-t="2">
+            <p class="say"><strong>Elite.</strong> A standout for her age group. Rare, and worth noticing.</p>
+            <div class="row-card"><div><p class="k">From a game this season</p><b>Scoring Efficiency</b><span>18 points on 12 shots and 4 free throws</span></div><span class="chip Elite">Elite</span></div>
+          </div>
+        </div>
+        <p class="fine"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>A rating only shows when there is enough to read fairly: 5 shots for scoring, 3 assists for playmaking. A quiet night shows nothing, never a zero.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. EVERY GAME, DECODED: device + toggles, then the Development story -->
+<section class="decode" id="games" aria-labelledby="games-h">
+  <div class="wrap">
+    <div class="decode-body">
+      <div class="decode-left">
+        <div class="head">
+          <h2 class="h-big" id="games-h">Every game, decoded.</h2>
+          <p class="lede">Same player, four very different nights. Pick one to see the stat line you tap in from the stands, and what Courtside IQ writes back.</p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Sample games" id="tabs"></div>
+        <div class="story">
+          <p class="story-h">Every few games, the Development tab adds the bigger picture.</p>
+          <div class="wash good"><p class="t"><svg class="ico fill" aria-hidden="true"><use href="#i-spark"/></svg>What's working</p><p>Maya's scoring efficiency keeps climbing. She's finishing strong inside and picking smarter shots every game.</p></div>
+          <div class="wash energy"><p class="t"><svg class="ico fill" aria-hidden="true"><use href="#i-spark"/></svg>Room to grow</p><p>Free throws are the next step. The reps are there and the percentage is trending up game over game.</p></div>
+        </div>
+      </div>
+      <figure class="device-fig">
+        <div class="iphone device" aria-label="Courtside IQ Game screen"><span class="hw l act"></span><span class="hw l vu"></span><span class="hw l vd"></span><span class="hw r pw"></span><div class="iphone-bezel"><div class="iphone-screen"><span class="island"></span><div class="scr" id="scr" role="tabpanel" tabindex="0"></div></div></div></div>
+        <figcaption class="why" id="why" aria-live="polite"></figcaption>
+      </figure>
+    </div>
+    <p class="decode-note">Sample games and story with example insights in the app's voice. The ratings follow the app's real rules for her age group.</p>
+  </div>
+</section>
+
+<!-- 8. FAIR BY DESIGN -->
+<section class="fair paper" id="fair" aria-labelledby="fair-h">
+  <div class="wrap fair-grid">
+    <div class="copy">
+      <h2 class="h-big" id="fair-h">No team scores, no leaderboards.</h2>
+      <p class="lede">Youth sports has plenty of box scores and rankings. Courtside IQ is built around one player and their own growth, and that shapes what it refuses to show.</p>
+      <ul class="vals">
+        <li><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-noscore"/></svg></span><b>No team scores</b><p>The app follows your player, not the scoreboard. There is no final score to log and nothing to win or lose.</p></li>
+        <li><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-norank"/></svg></span><b>No leaderboards</b><p>Your player is never ranked against teammates or other kids. Growth IQ is a read on one player, not a place in line.</p></li>
+        <li><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-age"/></svg></span><b>Measured for their age</b><p>A 9-year-old and a 16-year-old are each read against their own age group, so the numbers mean the same thing at every age.</p></li>
+        <li><span class="ib"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg></span><b>Private to your family</b><p>Profiles belong to your account. No public pages, no shared rankings, nothing posted anywhere.</p></li>
+      </ul>
+    </div>
+    <figure class="shot">
+      <div class="iphone"><span class="hw l act"></span><span class="hw l vu"></span><span class="hw l vd"></span><span class="hw r pw"></span><div class="iphone-bezel"><div class="iphone-screen"><span class="island"></span><img src="assets/game-complete.jpg" width="780" height="1688" alt="The Game complete screen: Maya's 22 points, rebounds, assists and shooting, with no team score" loading="lazy"></div></div></div>
+      <figcaption>Game complete shows your player, not the scoreboard.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 9. PRICING: ink stage, the mark, the gauge as seats, lime CTA like the app paywall -->
+<section class="pricing ink" id="pricing" aria-labelledby="pricing-h">
+  <div class="wrap">
+    <div class="head">
+      <svg class="mark" aria-hidden="true" style="color:var(--lime)"><use href="#mark"/></svg>
+      <h2 class="h-big" id="pricing-h">Start free. Three games on us.</h2>
+      <p class="lede">Track one player's first three games at no cost, with a read on every one. Go Premium to keep going all season.</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <div class="ph"><h3>Free</h3></div>
+        <div class="price"><b>$0</b><span>for one player, three games</span></div>
+        <div class="seats" aria-label="One player">
+          <div class="seat"><div class="gauge" data-gauge="seat" data-v="82" data-fill="lime" data-empty="dk"><div class="g-mid">M</div></div>Maya</div>
+          <div class="seat empty" aria-hidden="true"><div class="ring"><svg class="ico"><use href="#i-lock"/></svg></div>Premium</div>
+          <div class="seat empty" aria-hidden="true"><div class="ring"><svg class="ico"><use href="#i-lock"/></svg></div>Premium</div>
+        </div>
+        <ul class="feats">
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Track three games from the stands, even offline</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>An insight after every game you save</li>
+        </ul>
+        <a class="btn btn-ghost js-store" href="https://apps.apple.com/us/app/courtside-iq/id6748415872" style="margin-top:auto">Get the app, free</a>
+      </div>
+      <div class="plan prem">
+        <div class="ph"><h3>Premium</h3><span class="trial">7-day free trial</span></div>
+        <div class="price"><b id="prem-price">$5.99</b><span id="prem-per">a month, after 7 days free</span></div>
+        <div class="seats" aria-label="Up to three players">
+          <div class="seat"><div class="gauge" data-gauge="seat" data-v="82" data-fill="lime" data-empty="dk"><div class="g-mid">M</div></div>Maya</div>
+          <div class="seat"><div class="gauge" data-gauge="seat" data-v="71" data-fill="lime" data-empty="dk"><div class="g-mid"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg></div></div>Player 2</div>
+          <div class="seat"><div class="gauge" data-gauge="seat" data-v="63" data-fill="lime" data-empty="dk"><div class="g-mid"><svg class="ico" aria-hidden="true"><use href="#i-user"/></svg></div></div>Player 3</div>
+        </div>
+        <ul class="feats">
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Unlimited games every season</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Up to three players</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Growth IQ and the development story</li>
+        </ul>
+        <fieldset class="opts">
+          <legend class="sr">Choose a Premium plan</legend>
+          <label class="opt"><input type="radio" name="plan" id="plan-month" value="month" checked><span class="rd"></span><span><b>Monthly <small>Best value</small></b><span class="s">7-day free trial</span></span><span class="pr"><b>$5.99</b><span>per month</span></span></label>
+          <label class="opt"><input type="radio" name="plan" id="plan-week" value="week"><span class="rd"></span><span><b>Weekly</b><span class="s">Billed weekly</span></span><span class="pr"><b>$1.99</b><span>per week</span></span></label>
+        </fieldset>
+        <a class="btn btn-lime js-store" id="plan-cta" href="https://apps.apple.com/us/app/courtside-iq/id6748415872">Start free trial</a>
+        <p class="small" id="plan-small">Unlimited games, up to three players. 7-day free trial, then $5.99/mo. You start it in the app.</p>
+      </div>
+    </div>
+    <div class="after">
+      <div class="stores">
+        <a class="store" href="https://apps.apple.com/us/app/courtside-iq/id6748415872"><small>Download on the</small><span>App Store</span></a>
+        <a class="store" href="https://play.google.com/store/apps/details?id=com.mycompany.courtsideiq"><small>Get it on</small><span>Google Play</span></a>
+      </div>
+      <p>Cancel any time in your app store settings.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10. FAQ -->
+<section class="faq paper" id="faq" aria-labelledby="faq-h">
+  <div class="wrap faq-grid">
+    <h2 class="h-big" id="faq-h">Questions parents ask</h2>
+    <div>
+      <details open><summary>What ages is it for?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Players from 8 to 18. Every rating is read against your player's own age group, so a 9-year-old and a 16-year-old are each measured fairly for where they are.</p></details>
+      <details><summary>What does the free plan include?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>One player and three games, each with its full read, so you can see exactly what Courtside IQ does with a game. Growth IQ needs five games to mean something, so it arrives with Premium, along with unlimited games and up to three players.</p></details>
+      <details><summary>Why can't I see a Growth IQ yet?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Growth IQ needs five games before it shows, so one big or quiet night can't define your player. Until then, every game still gets its own insight. On the free plan, Premium unlocks the games that get you there.</p></details>
+      <details><summary>Is my player compared to other kids?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>No. There are no leaderboards and no team scores. Growth IQ reads your player against what is typical for their age and against their own recent games, never against teammates.</p></details>
+      <details><summary>Who can see my player's information?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Player profiles belong to your account and there are no public profiles. Our privacy policy explains exactly what is stored and why.</p></details>
+      <details><summary>Do I need signal in the gym?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>No. Track the whole game without a connection and it syncs when you are back online. The insight arrives once it does.</p></details>
+      <details><summary>How do I cancel Premium?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Cancel any time in your app store subscription settings. On the monthly plan, cancelling before the 7-day trial ends means you are not charged.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot ink">
+  <div class="wrap">
+    <a class="brand" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>Courtside IQ</a>
+    <nav aria-label="Footer">
+      <a href="/policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/support">Support</a>
+      <a class="mail" href="mailto:support@courtsideiq.app">support@courtsideiq.app</a>
+    </nav>
+    <small>Made for basketball parents. 2026 Courtside IQ.</small>
+  </div>
+</footer>
+
+<aside class="qr away" id="qr" aria-label="Get the app on your phone">
+  <span class="code-wrap"><svg class="code" id="qr-code" viewBox="-1 -1 31 31" role="img" aria-label="QR code that opens Courtside IQ in your app store" shape-rendering="crispEdges"><rect x="-1" y="-1" width="31" height="31" fill="#FFFFFF"/><g fill="#0F0F0F"><rect x="0" y="0" width="1" height="1"/><rect x="1" y="0" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="3" y="0" width="1" height="1"/><rect x="4" y="0" width="1" height="1"/><rect x="5" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="11" y="0" width="1" height="1"/><rect x="13" y="0" width="1" height="1"/><rect x="14" y="0" width="1" height="1"/><rect x="15" y="0" width="1" height="1"/><rect x="18" y="0" width="1" height="1"/><rect x="20" y="0" width="1" height="1"/><rect x="22" y="0" width="1" height="1"/><rect x="23" y="0" width="1" height="1"/><rect x="24" y="0" width="1" height="1"/><rect x="25" y="0" width="1" height="1"/><rect x="26" y="0" width="1" height="1"/><rect x="27" y="0" width="1" height="1"/><rect x="28" y="0" width="1" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="10" y="1" width="1" height="1"/><rect x="13" y="1" width="1" height="1"/><rect x="15" y="1" width="1" height="1"/><rect x="17" y="1" width="1" height="1"/><rect x="19" y="1" width="1" height="1"/><rect x="20" y="1" width="1" height="1"/><rect x="22" y="1" width="1" height="1"/><rect x="28" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="8" y="2" width="1" height="1"/><rect x="9" y="2" width="1" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="13" y="2" width="1" height="1"/><rect x="14" y="2" width="1" height="1"/><rect x="15" y="2" width="1" height="1"/><rect x="17" y="2" width="1" height="1"/><rect x="18" y="2" width="1" height="1"/><rect x="22" y="2" width="1" height="1"/><rect x="24" y="2" width="1" height="1"/><rect x="25" y="2" width="1" height="1"/><rect x="26" y="2" width="1" height="1"/><rect x="28" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="9" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="13" y="3" width="1" height="1"/><rect x="15" y="3" width="1" height="1"/><rect x="20" y="3" width="1" height="1"/><rect x="22" y="3" width="1" height="1"/><rect x="24" y="3" width="1" height="1"/><rect x="25" y="3" width="1" height="1"/><rect x="26" y="3" width="1" height="1"/><rect x="28" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="8" y="4" width="1" height="1"/><rect x="15" y="4" width="1" height="1"/><rect x="17" y="4" width="1" height="1"/><rect x="18" y="4" width="1" height="1"/><rect x="22" y="4" width="1" height="1"/><rect x="24" y="4" width="1" height="1"/><rect x="25" y="4" width="1" height="1"/><rect x="26" y="4" width="1" height="1"/><rect x="28" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/><rect x="8" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="10" y="5" width="1" height="1"/><rect x="11" y="5" width="1" height="1"/><rect x="13" y="5" width="1" height="1"/><rect x="14" y="5" width="1" height="1"/><rect x="15" y="5" width="1" height="1"/><rect x="17" y="5" width="1" height="1"/><rect x="19" y="5" width="1" height="1"/><rect x="22" y="5" width="1" height="1"/><rect x="28" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="12" y="6" width="1" height="1"/><rect x="14" y="6" width="1" height="1"/><rect x="16" y="6" width="1" height="1"/><rect x="18" y="6" width="1" height="1"/><rect x="20" y="6" width="1" height="1"/><rect x="22" y="6" width="1" height="1"/><rect x="23" y="6" width="1" height="1"/><rect x="24" y="6" width="1" height="1"/><rect x="25" y="6" width="1" height="1"/><rect x="26" y="6" width="1" height="1"/><rect x="27" y="6" width="1" height="1"/><rect x="28" y="6" width="1" height="1"/><rect x="11" y="7" width="1" height="1"/><rect x="12" y="7" width="1" height="1"/><rect x="16" y="7" width="1" height="1"/><rect x="17" y="7" width="1" height="1"/><rect x="18" y="7" width="1" height="1"/><rect x="19" y="7" width="1" height="1"/><rect x="20" y="7" width="1" height="1"/><rect x="1" y="8" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="6" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="9" y="8" width="1" height="1"/><rect x="12" y="8" width="1" height="1"/><rect x="14" y="8" width="1" height="1"/><rect x="15" y="8" width="1" height="1"/><rect x="17" y="8" width="1" height="1"/><rect x="19" y="8" width="1" height="1"/><rect x="21" y="8" width="1" height="1"/><rect x="23" y="8" width="1" height="1"/><rect x="24" y="8" width="1" height="1"/><rect x="26" y="8" width="1" height="1"/><rect x="0" y="9" width="1" height="1"/><rect x="3" y="9" width="1" height="1"/><rect x="4" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="8" y="9" width="1" height="1"/><rect x="9" y="9" width="1" height="1"/><rect x="10" y="9" width="1" height="1"/><rect x="12" y="9" width="1" height="1"/><rect x="13" y="9" width="1" height="1"/><rect x="14" y="9" width="1" height="1"/><rect x="15" y="9" width="1" height="1"/><rect x="17" y="9" width="1" height="1"/><rect x="18" y="9" width="1" height="1"/><rect x="21" y="9" width="1" height="1"/><rect x="22" y="9" width="1" height="1"/><rect x="23" y="9" width="1" height="1"/><rect x="24" y="9" width="1" height="1"/><rect x="25" y="9" width="1" height="1"/><rect x="26" y="9" width="1" height="1"/><rect x="27" y="9" width="1" height="1"/><rect x="28" y="9" width="1" height="1"/><rect x="3" y="10" width="1" height="1"/><rect x="4" y="10" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="7" y="10" width="1" height="1"/><rect x="9" y="10" width="1" height="1"/><rect x="10" y="10" width="1" height="1"/><rect x="13" y="10" width="1" height="1"/><rect x="15" y="10" width="1" height="1"/><rect x="16" y="10" width="1" height="1"/><rect x="18" y="10" width="1" height="1"/><rect x="21" y="10" width="1" height="1"/><rect x="25" y="10" width="1" height="1"/><rect x="26" y="10" width="1" height="1"/><rect x="28" y="10" width="1" height="1"/><rect x="1" y="11" width="1" height="1"/><rect x="4" y="11" width="1" height="1"/><rect x="7" y="11" width="1" height="1"/><rect x="8" y="11" width="1" height="1"/><rect x="12" y="11" width="1" height="1"/><rect x="14" y="11" width="1" height="1"/><rect x="17" y="11" width="1" height="1"/><rect x="21" y="11" width="1" height="1"/><rect x="23" y="11" width="1" height="1"/><rect x="24" y="11" width="1" height="1"/><rect x="25" y="11" width="1" height="1"/><rect x="27" y="11" width="1" height="1"/><rect x="28" y="11" width="1" height="1"/><rect x="1" y="12" width="1" height="1"/><rect x="2" y="12" width="1" height="1"/><rect x="3" y="12" width="1" height="1"/><rect x="5" y="12" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/><rect x="10" y="12" width="1" height="1"/><rect x="11" y="12" width="1" height="1"/><rect x="12" y="12" width="1" height="1"/><rect x="14" y="12" width="1" height="1"/><rect x="17" y="12" width="1" height="1"/><rect x="19" y="12" width="1" height="1"/><rect x="23" y="12" width="1" height="1"/><rect x="25" y="12" width="1" height="1"/><rect x="28" y="12" width="1" height="1"/><rect x="2" y="13" width="1" height="1"/><rect x="3" y="13" width="1" height="1"/><rect x="7" y="13" width="1" height="1"/><rect x="11" y="13" width="1" height="1"/><rect x="12" y="13" width="1" height="1"/><rect x="18" y="13" width="1" height="1"/><rect x="22" y="13" width="1" height="1"/><rect x="24" y="13" width="1" height="1"/><rect x="26" y="13" width="1" height="1"/><rect x="27" y="13" width="1" height="1"/><rect x="28" y="13" width="1" height="1"/><rect x="3" y="14" width="1" height="1"/><rect x="5" y="14" width="1" height="1"/><rect x="6" y="14" width="1" height="1"/><rect x="8" y="14" width="1" height="1"/><rect x="11" y="14" width="1" height="1"/><rect x="13" y="14" width="1" height="1"/><rect x="14" y="14" width="1" height="1"/><rect x="16" y="14" width="1" height="1"/><rect x="18" y="14" width="1" height="1"/><rect x="20" y="14" width="1" height="1"/><rect x="21" y="14" width="1" height="1"/><rect x="22" y="14" width="1" height="1"/><rect x="24" y="14" width="1" height="1"/><rect x="28" y="14" width="1" height="1"/><rect x="0" y="15" width="1" height="1"/><rect x="1" y="15" width="1" height="1"/><rect x="2" y="15" width="1" height="1"/><rect x="3" y="15" width="1" height="1"/><rect x="11" y="15" width="1" height="1"/><rect x="12" y="15" width="1" height="1"/><rect x="13" y="15" width="1" height="1"/><rect x="17" y="15" width="1" height="1"/><rect x="18" y="15" width="1" height="1"/><rect x="19" y="15" width="1" height="1"/><rect x="20" y="15" width="1" height="1"/><rect x="22" y="15" width="1" height="1"/><rect x="23" y="15" width="1" height="1"/><rect x="25" y="15" width="1" height="1"/><rect x="27" y="15" width="1" height="1"/><rect x="28" y="15" width="1" height="1"/><rect x="2" y="16" width="1" height="1"/><rect x="3" y="16" width="1" height="1"/><rect x="6" y="16" width="1" height="1"/><rect x="13" y="16" width="1" height="1"/><rect x="14" y="16" width="1" height="1"/><rect x="17" y="16" width="1" height="1"/><rect x="19" y="16" width="1" height="1"/><rect x="27" y="16" width="1" height="1"/><rect x="0" y="17" width="1" height="1"/><rect x="2" y="17" width="1" height="1"/><rect x="3" y="17" width="1" height="1"/><rect x="5" y="17" width="1" height="1"/><rect x="7" y="17" width="1" height="1"/><rect x="8" y="17" width="1" height="1"/><rect x="10" y="17" width="1" height="1"/><rect x="12" y="17" width="1" height="1"/><rect x="18" y="17" width="1" height="1"/><rect x="22" y="17" width="1" height="1"/><rect x="23" y="17" width="1" height="1"/><rect x="24" y="17" width="1" height="1"/><rect x="25" y="17" width="1" height="1"/><rect x="28" y="17" width="1" height="1"/><rect x="2" y="18" width="1" height="1"/><rect x="6" y="18" width="1" height="1"/><rect x="7" y="18" width="1" height="1"/><rect x="9" y="18" width="1" height="1"/><rect x="15" y="18" width="1" height="1"/><rect x="16" y="18" width="1" height="1"/><rect x="20" y="18" width="1" height="1"/><rect x="25" y="18" width="1" height="1"/><rect x="28" y="18" width="1" height="1"/><rect x="2" y="19" width="1" height="1"/><rect x="7" y="19" width="1" height="1"/><rect x="8" y="19" width="1" height="1"/><rect x="13" y="19" width="1" height="1"/><rect x="14" y="19" width="1" height="1"/><rect x="15" y="19" width="1" height="1"/><rect x="16" y="19" width="1" height="1"/><rect x="17" y="19" width="1" height="1"/><rect x="18" y="19" width="1" height="1"/><rect x="25" y="19" width="1" height="1"/><rect x="0" y="20" width="1" height="1"/><rect x="1" y="20" width="1" height="1"/><rect x="2" y="20" width="1" height="1"/><rect x="5" y="20" width="1" height="1"/><rect x="6" y="20" width="1" height="1"/><rect x="7" y="20" width="1" height="1"/><rect x="10" y="20" width="1" height="1"/><rect x="14" y="20" width="1" height="1"/><rect x="16" y="20" width="1" height="1"/><rect x="17" y="20" width="1" height="1"/><rect x="19" y="20" width="1" height="1"/><rect x="20" y="20" width="1" height="1"/><rect x="21" y="20" width="1" height="1"/><rect x="22" y="20" width="1" height="1"/><rect x="23" y="20" width="1" height="1"/><rect x="24" y="20" width="1" height="1"/><rect x="25" y="20" width="1" height="1"/><rect x="27" y="20" width="1" height="1"/><rect x="28" y="20" width="1" height="1"/><rect x="8" y="21" width="1" height="1"/><rect x="9" y="21" width="1" height="1"/><rect x="13" y="21" width="1" height="1"/><rect x="14" y="21" width="1" height="1"/><rect x="15" y="21" width="1" height="1"/><rect x="16" y="21" width="1" height="1"/><rect x="18" y="21" width="1" height="1"/><rect x="20" y="21" width="1" height="1"/><rect x="24" y="21" width="1" height="1"/><rect x="26" y="21" width="1" height="1"/><rect x="27" y="21" width="1" height="1"/><rect x="28" y="21" width="1" height="1"/><rect x="0" y="22" width="1" height="1"/><rect x="1" y="22" width="1" height="1"/><rect x="2" y="22" width="1" height="1"/><rect x="3" y="22" width="1" height="1"/><rect x="4" y="22" width="1" height="1"/><rect x="5" y="22" width="1" height="1"/><rect x="6" y="22" width="1" height="1"/><rect x="9" y="22" width="1" height="1"/><rect x="12" y="22" width="1" height="1"/><rect x="15" y="22" width="1" height="1"/><rect x="17" y="22" width="1" height="1"/><rect x="18" y="22" width="1" height="1"/><rect x="19" y="22" width="1" height="1"/><rect x="20" y="22" width="1" height="1"/><rect x="22" y="22" width="1" height="1"/><rect x="24" y="22" width="1" height="1"/><rect x="28" y="22" width="1" height="1"/><rect x="0" y="23" width="1" height="1"/><rect x="6" y="23" width="1" height="1"/><rect x="15" y="23" width="1" height="1"/><rect x="17" y="23" width="1" height="1"/><rect x="18" y="23" width="1" height="1"/><rect x="19" y="23" width="1" height="1"/><rect x="20" y="23" width="1" height="1"/><rect x="24" y="23" width="1" height="1"/><rect x="25" y="23" width="1" height="1"/><rect x="27" y="23" width="1" height="1"/><rect x="0" y="24" width="1" height="1"/><rect x="2" y="24" width="1" height="1"/><rect x="3" y="24" width="1" height="1"/><rect x="4" y="24" width="1" height="1"/><rect x="6" y="24" width="1" height="1"/><rect x="8" y="24" width="1" height="1"/><rect x="11" y="24" width="1" height="1"/><rect x="13" y="24" width="1" height="1"/><rect x="17" y="24" width="1" height="1"/><rect x="19" y="24" width="1" height="1"/><rect x="20" y="24" width="1" height="1"/><rect x="21" y="24" width="1" height="1"/><rect x="22" y="24" width="1" height="1"/><rect x="23" y="24" width="1" height="1"/><rect x="24" y="24" width="1" height="1"/><rect x="0" y="25" width="1" height="1"/><rect x="2" y="25" width="1" height="1"/><rect x="3" y="25" width="1" height="1"/><rect x="4" y="25" width="1" height="1"/><rect x="6" y="25" width="1" height="1"/><rect x="9" y="25" width="1" height="1"/><rect x="12" y="25" width="1" height="1"/><rect x="13" y="25" width="1" height="1"/><rect x="14" y="25" width="1" height="1"/><rect x="17" y="25" width="1" height="1"/><rect x="23" y="25" width="1" height="1"/><rect x="26" y="25" width="1" height="1"/><rect x="27" y="25" width="1" height="1"/><rect x="0" y="26" width="1" height="1"/><rect x="2" y="26" width="1" height="1"/><rect x="3" y="26" width="1" height="1"/><rect x="4" y="26" width="1" height="1"/><rect x="6" y="26" width="1" height="1"/><rect x="9" y="26" width="1" height="1"/><rect x="10" y="26" width="1" height="1"/><rect x="11" y="26" width="1" height="1"/><rect x="13" y="26" width="1" height="1"/><rect x="15" y="26" width="1" height="1"/><rect x="16" y="26" width="1" height="1"/><rect x="18" y="26" width="1" height="1"/><rect x="19" y="26" width="1" height="1"/><rect x="20" y="26" width="1" height="1"/><rect x="21" y="26" width="1" height="1"/><rect x="27" y="26" width="1" height="1"/><rect x="28" y="26" width="1" height="1"/><rect x="0" y="27" width="1" height="1"/><rect x="6" y="27" width="1" height="1"/><rect x="8" y="27" width="1" height="1"/><rect x="9" y="27" width="1" height="1"/><rect x="11" y="27" width="1" height="1"/><rect x="13" y="27" width="1" height="1"/><rect x="14" y="27" width="1" height="1"/><rect x="15" y="27" width="1" height="1"/><rect x="17" y="27" width="1" height="1"/><rect x="18" y="27" width="1" height="1"/><rect x="20" y="27" width="1" height="1"/><rect x="23" y="27" width="1" height="1"/><rect x="25" y="27" width="1" height="1"/><rect x="27" y="27" width="1" height="1"/><rect x="28" y="27" width="1" height="1"/><rect x="0" y="28" width="1" height="1"/><rect x="1" y="28" width="1" height="1"/><rect x="2" y="28" width="1" height="1"/><rect x="3" y="28" width="1" height="1"/><rect x="4" y="28" width="1" height="1"/><rect x="5" y="28" width="1" height="1"/><rect x="6" y="28" width="1" height="1"/><rect x="10" y="28" width="1" height="1"/><rect x="12" y="28" width="1" height="1"/><rect x="13" y="28" width="1" height="1"/><rect x="16" y="28" width="1" height="1"/><rect x="17" y="28" width="1" height="1"/><rect x="20" y="28" width="1" height="1"/><rect x="22" y="28" width="1" height="1"/><rect x="24" y="28" width="1" height="1"/><rect x="25" y="28" width="1" height="1"/><rect x="27" y="28" width="1" height="1"/></g></svg></span>
+  <div><svg class="qr-mark" aria-hidden="true"><use href="#mark"/></svg><b>Scan to get the app</b><span>Point your phone's camera here. It opens your app store.</span></div>
+  <button class="x" type="button" id="qr-x" aria-label="Hide the QR card"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+</aside>
+<a class="getpill away js-store" id="getpill" href="https://apps.apple.com/us/app/courtside-iq/id6748415872">Get Courtside IQ, free<svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const C = { lime:"#9DFF00", white:"#FFFFFF", ink:"#0F0F0F", dk:"#3A3A3A", g300:"#C9C9C9" };
+const clamp = (v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const ease = t=>1-Math.pow(1-t,3);
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+let reduce = false; try{ reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+
+/* ---------- data: Maya's sample season, 10 games (real thresholds) ---------- */
+const N = 10;
+const SEASON = [null,null,null,null,74,76,75,77,80,82];
+const NOTES = [
+  "Game 1 is in. Growth IQ waits for five games, so one night can't define her.",
+  "Game 2. Still collecting. No number yet, on purpose.",
+  "Game 3. Her first game with 3 assists, so Playmaking gets its first rating.",
+  "Game 4. A cold shooting night. It counts as reps, not a grade.",
+  "Game 5. Growth IQ switches on at 74, measured for her age group.",
+  "10 points on 7 shots, Elite scoring for her age. Up 2, not 20.",
+  "A quiet game with a lot of defense. The number dips by 1 and holds.",
+  "Three steals and a block. Disruption moves up to Good, and she's Rising.",
+  "3 of 4 at the free throw line and smarter shots. Up 3.",
+  "Up 8 since Growth IQ switched on. Free throws are next."
+];
+/* Rising: up 3 or more on the game three back (games 8 to 10 here) */
+const isRising = i => i>=7 && SEASON[i]!=null && SEASON[i-3]!=null && SEASON[i]-SEASON[i-3]>=3;
+
+/* ---------- DotGauge: app geometry (168 box, 30 outer dots r74 d6, 24 inner r56 d5), fills clockwise from 12 ---------- */
+const gauges = {};
+function buildGauge(el){
+  const svg = document.createElementNS(NS,"svg");
+  svg.setAttribute("viewBox","0 0 168 168"); svg.setAttribute("aria-hidden","true");
+  const dots = [];
+  [[30,74,3],[24,56,2.5]].forEach(([n,r,rad])=>{
+    for(let i=0;i<n;i++){
+      const a = -Math.PI/2 + i*2*Math.PI/n;
+      const c = document.createElementNS(NS,"circle");
+      c.setAttribute("cx",(84+r*Math.cos(a)).toFixed(2)); c.setAttribute("cy",(84+r*Math.sin(a)).toFixed(2)); c.setAttribute("r",rad);
+      svg.appendChild(c); dots.push({c,i,n});
+    }
+  });
+  el.insertBefore(svg, el.firstChild);
+  const glow = el.dataset.glow==="1";
+  const g = { el, fill: C[el.dataset.fill]||C.lime, empty: el.dataset.empty==="dk"?C.dk:C.g300,
+    set(v, fill){ const f = v==null?0:clamp((v-40)/59); const col = fill||g.fill;
+      dots.forEach(d=>{ const on = d.i < Math.round(f*d.n); d.c.setAttribute("fill", on?col:g.empty);
+        if(glow && on && col===C.lime) d.c.setAttribute("filter","url(#glow)"); else d.c.removeAttribute("filter"); }); } };
+  g.set(+el.dataset.v||null);
+  return g;
+}
+$$("[data-gauge]").forEach((el,i)=>{ gauges[el.dataset.gauge+(el.dataset.gauge==="seat"?i:"")] = buildGauge(el); });
+
+/* ---------- scene 1: intro ---------- */
+const introG = gauges.intro, introNum = $("#intro-num"), introBadge = $("#intro-badge"), introPts = $$("#meet .points li");
+function renderIntro(p){
+  const f = ease(clamp(p/0.7));
+  const v = Math.round(40 + 42*f);
+  introG.set(v);
+  introNum.textContent = v;
+  introG.el.style.transform = "scale(" + (0.84 + 0.16*f).toFixed(3) + ")";
+  const done = f>0.98;
+  introBadge.textContent = done ? "Rising" : "Growth IQ";
+  introBadge.className = "badge " + (done ? "rising" : "steady");
+  introPts.forEach(li=>li.classList.toggle("on", p>=+li.dataset.at));
+}
+
+/* ---------- scene 2: season ---------- */
+const sNum=$("#s-num"), sSub=$("#s-sub"), sBadge=$("#s-badge"), sWeek=$("#s-week"), sNote=$("#s-note"), sBars=$("#s-bars");
+sBars.innerHTML = SEASON.map(()=>"<i></i>").join("");
+const barEls = Array.from(sBars.children);
+$("#s-static").innerHTML = NOTES.map((n,i)=>"<li><b>Game "+(i+1)+"</b>"+n+"</li>").join("");
+let curWeek = -1, shownNum = null, numRaf = 0;
+function tweenNum(to){
+  cancelAnimationFrame(numRaf);
+  const from = shownNum==null ? to : shownNum; const t0 = performance.now();
+  const step = now=>{ const t = reduce?1:clamp((now-t0)/320); const v = Math.round(from+(to-from)*ease(t)); sNum.textContent=v; shownNum=v; if(t<1) numRaf=requestAnimationFrame(step); };
+  numRaf = requestAnimationFrame(step);
+}
+function renderSeason(p){
+  const w = Math.min(N-1, Math.floor(clamp((p-0.02)/0.94)*N));
+  if(w===curWeek) return; curWeek = w;
+  const v = SEASON[w], rising = isRising(w);
+  gauges.season.set(v, rising?C.lime:C.white);
+  if(v==null){ cancelAnimationFrame(numRaf); shownNum=null; sNum.textContent = w+1; sSub.hidden=false; sBadge.textContent="Building"; sBadge.className="badge building"; }
+  else { sSub.hidden=true; tweenNum(v); sBadge.textContent = rising?"Rising":"Steady"; sBadge.className = "badge "+(rising?"rising":"steady"); }
+  gauges.season.el.setAttribute("aria-label", v==null ? "Game "+(w+1)+": Growth IQ building, "+(w+1)+" of 5 games" : "Game "+(w+1)+": Growth IQ "+v+(rising?", Rising":", Steady"));
+  sWeek.textContent = w+1; sNote.textContent = NOTES[w];
+  barEls.forEach((b,k)=>{ b.className = (k<=w ? (isRising(k)?"rise":"played") : "") + (k===w?" now":""); });
+}
+
+/* ---------- scene 3: what moved it (chart) ---------- */
+const X = i=>70 + i*(890/9);
+const Y = v=>318 - (v-70)/16*270;
+const BASE = 346, AXY = 420;
+const svg = $("#chart-svg");
+(function buildChart(){
+  let h = "";
+  [70,75,80].forEach(v=>{ h += '<line class="grid-l" x1="'+(X(0)-16)+'" x2="980" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="ax" x="'+(X(0)-16)+'" y="'+(Y(v)-12)+'" text-anchor="start">'+v+'</text>'; });
+  // the start line and its label
+  h += '<line class="start-l" x1="'+X(4)+'" x2="'+X(4)+'" y1="24" y2="'+(BASE+18)+'"/>';
+  h += '<text class="lab" x="'+(X(4)+12)+'" y="30" dominant-baseline="hanging"><tspan class="lab-long">Growth IQ starts at game 5</tspan><tspan class="lab-short">Starts at game 5</tspan></text>';
+  // the collecting zone: a thin bracket under games 1 to 4, label centred beneath it
+  const b0 = X(0)-16, b1 = X(3)+16, by = BASE+26;
+  h += '<path class="brk" d="M'+b0+' '+(by-8)+'V'+by+'H'+b1+'V'+(by-8)+'"/>';
+  h += '<text class="lab zone" x="'+((b0+b1)/2)+'" y="'+(by+24)+'" text-anchor="middle"><tspan class="lab-long">Games 1 to 4: collecting</tspan><tspan class="lab-short">Collecting</tspan></text>';
+  // axis labels on one baseline
+  h += '<text class="lab g1" x="'+X(0)+'" y="'+AXY+'" text-anchor="middle">Game 1</text><text class="lab" x="'+X(4)+'" y="'+AXY+'" text-anchor="middle">Game 5</text><text class="lab" x="'+X(9)+'" y="'+AXY+'" text-anchor="middle">Game 10</text>';
+  const pts = []; for(let i=4;i<N;i++) pts.push([X(i),Y(SEASON[i])]);
+  let d = "M"+pts[0][0].toFixed(1)+" "+pts[0][1].toFixed(1);
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2, t=0.18;
+    d += " C"+(p1[0]+(p2[0]-p0[0])*t).toFixed(1)+" "+(p1[1]+(p2[1]-p0[1])*t).toFixed(1)+" "+(p2[0]-(p3[0]-p1[0])*t).toFixed(1)+" "+(p2[1]-(p3[1]-p1[1])*t).toFixed(1)+" "+p2[0].toFixed(1)+" "+p2[1].toFixed(1);
+  }
+  h += '<path class="curve" id="curve" d="'+d+'"/>';
+  for(let i=0;i<N;i++){
+    if(SEASON[i]==null) h += '<circle class="pt hollow" data-i="'+i+'" cx="'+X(i)+'" cy="'+BASE+'" r="9"/>';
+    else h += '<circle class="pt" data-i="'+i+'" cx="'+X(i)+'" cy="'+Y(SEASON[i])+'" r="9"/>';
+  }
+  [[4,1],[5,2],[6,3]].forEach(([i,n])=>{ h += '<g class="mk" data-m="'+n+'" style="opacity:0"><circle cx="'+X(i)+'" cy="'+(Y(SEASON[i])+40)+'" r="15"/><text x="'+X(i)+'" y="'+(Y(SEASON[i])+40)+'">'+n+'</text></g>'; });
+  h += '<text class="endlab" id="endlab" x="'+(X(9)-4)+'" y="'+(Y(82)-30)+'" text-anchor="end" style="opacity:0">82, Rising</text>';
+  svg.innerHTML = h;
+})();
+const MOMENT_I = {1:4,2:5,3:6};
+const coEls = $$("#chart .co");
+coEls.forEach(c=>{ const i = MOMENT_I[c.dataset.m]; c.style.setProperty("--x",(X(i)/10).toFixed(2)+"%"); c.style.setProperty("--y",(Y(SEASON[i])/4.3).toFixed(2)+"%"); });
+const curve = $("#curve"), curveLen = curve.getTotalLength();
+curve.style.strokeDasharray = curveLen;
+const ptEls = $$("#chart-svg .pt"), mkEls = $$("#chart-svg .mk"), endlab = $("#endlab");
+const coSlot = $("#co-slot");
+coEls.forEach(c=>{ coSlot.appendChild(c.cloneNode(true)); $("#co-list").appendChild(c.cloneNode(true)); });
+const slotEls = Array.from(coSlot.children);
+function renderMoved(p){
+  const draw = clamp((p-0.04)/0.26);
+  curve.style.strokeDashoffset = (curveLen*(1-draw)).toFixed(1);
+  const xReach = X(4) + (X(N-1)-X(4))*draw;
+  ptEls.forEach(el=>{ const i=+el.dataset.i; el.style.opacity = (SEASON[i]==null || (draw>0 && X(i) <= xReach+1)) ? 1 : 0; });
+  let m = 0; if(p>=0.32) m=1; if(p>=0.52) m=2; if(p>=0.72) m=3; if(p>=0.9) m=4;
+  ptEls.forEach(el=>{ const i=+el.dataset.i; const a = m>=1 && m<=3 && MOMENT_I[m]===i, e = m===4 && i===N-1;
+    el.classList.toggle("act", a); el.classList.toggle("end", e); el.setAttribute("r", (a||e) ? 15 : 9); });
+  mkEls.forEach(g=>{ const n=+g.dataset.m; g.style.opacity = (n===m) ? 1 : 0; });
+  coEls.forEach(c=>c.classList.toggle("on", +c.dataset.m===m));
+  slotEls.forEach(c=>{ const on = m>0 && +c.dataset.m===Math.min(m,3); c.classList.toggle("on", on); c.style.visibility = on?"visible":"hidden"; c.style.opacity = on?1:0; });
+  endlab.style.opacity = m===4 ? 1 : 0;
+}
+
+/* ---------- scene 4: how it's built (scale, mix, rules) ---------- */
+const rDots = $("#ruler-dots"); rDots.innerHTML = Array.from({length:60},()=>"<i></i>").join("");
+const rEls = Array.from(rDots.children), flag=$("#flag"), flagT=$("#flag-t");
+const bSteps=$$("#built .bsteps li"), bPanels=$$("#built .bp"), segs=$$("#built .seg span"), rules=$$("#built .rules li");
+function renderBuilt(p){
+  const s = p<0.3?0:(p<0.62?1:2);
+  bSteps.forEach((li,k)=>{ li.classList.toggle("on",k===s); li.classList.toggle("done",k<s); });
+  bPanels.forEach((el,k)=>{ el.classList.toggle("on",k===s); el.classList.toggle("past",k<s); });
+  const t1 = ease(clamp(p/0.22)), v = Math.round(40 + 42*t1), idx = v-40;
+  rEls.forEach((e,k)=>e.classList.toggle("on", k<=idx));
+  flag.style.setProperty("--at", ((idx+0.5)/60*100).toFixed(2)+"%");
+  flagT.textContent = "Maya, " + v;
+  const t2 = clamp((p-0.32)/0.24);
+  segs.forEach((e,k)=>{ e.style.transform = "scaleX("+ease(clamp(t2*4-k)).toFixed(3)+")"; });
+  rules.forEach((li,k)=>li.classList.toggle("on", p >= 0.64 + k*0.11));
+}
+
+/* ---------- scene 5: levels ---------- */
+const tws=$$("#levels .tw"), tds=$$("#levels .td"), lvTrack=$("#lv-track");
+function renderLevels(p){
+  const t = p<0.34?0:(p<0.67?1:2);
+  tws.forEach(e=>{ const k=+e.dataset.t; e.classList.toggle("on",k===t); e.classList.toggle("done",k<t); });
+  tds.forEach(e=>e.classList.toggle("on", +e.dataset.t===t));
+  lvTrack.style.transform = "scaleX("+clamp(p/0.95).toFixed(3)+")";
+}
+
+const RENDER = { intro:renderIntro, season:renderSeason, moved:renderMoved, built:renderBuilt, levels:renderLevels };
+
+/* ---------- every game, decoded (rows follow the app: a metric under its data threshold gets no row) ---------- */
+const SCEN = [
+  { title:"The big scoring night", line:"18 points, shots falling", game:"vs Northside Hawks", date:"Sat, Jan 10",
+    d:{pts:18,fgm:7,fga:12,tpm:1,tpa:3,ftm:3,fta:4,reb:4,ast:2,stl:1,blk:0,to:2},
+    label:"Scoring Efficiency · Elite",
+    text:"Maya made the most of her chances tonight, an Elite scoring night for her age group. She picked good shots and finished them, which is exactly how efficient scorers are built.",
+    rows:[["Scoring Efficiency","18 points on 12 shots and 4 free throws","Elite"],["Disruption","1 steal, 4 rebounds","Solid"]],
+    why:"1.31 points per shot attempt. For her age group, Elite starts at 1.15." },
+  { title:"The quiet game, loud defense", line:"2 points, 4 steals", game:"vs Cedar Park Suns", date:"Sun, Jan 18",
+    d:{pts:2,fgm:1,fga:3,tpm:0,tpa:0,ftm:0,fta:0,reb:6,ast:1,stl:4,blk:1,to:1},
+    label:"Disruption · Elite",
+    text:"Maya didn't need the ball to shape this game. Her hands and hustle added up to an Elite night of effort and disruption for her age, the kind of defense that shows up whether shots fall or not.",
+    rows:[["Disruption","4 steals, 1 block, 6 rebounds","Elite"]],
+    why:"Her effort plays added up to 13, right where Elite starts. Three shots is too few to rate scoring, so there is no row for it." },
+  { title:"The rough shooting night", line:"6 points on 13 shots", game:"vs Eastlake Raptors", date:"Sat, Jan 24",
+    d:{pts:6,fgm:2,fga:13,tpm:0,tpa:4,ftm:2,fta:4,reb:3,ast:3,stl:1,blk:0,to:1},
+    label:"Playmaking · Good",
+    text:"Shots didn't fall for Maya tonight, and every scorer has nights like this. She kept her head up and kept finding teammates, a Good night of playmaking for her age.",
+    rows:[["Playmaking","3 assists, 1 turnover","Good"],["Disruption","1 steal, 3 rebounds","Solid"]],
+    why:"0.41 points per shot is below Solid, so the app shows no scoring rating instead of a low grade." },
+  { title:"The playmaking game", line:"6 assists, 1 turnover", game:"vs Valley Titans", date:"Sat, Jan 31",
+    d:{pts:7,fgm:3,fga:7,tpm:0,tpa:1,ftm:1,fta:2,reb:3,ast:6,stl:2,blk:0,to:1},
+    label:"Playmaking · Elite",
+    text:"Maya ran the floor like a point guard tonight, and her teammates got their best looks because of it. Six assists against one turnover is Elite decision-making for her age.",
+    rows:[["Scoring Efficiency","7 points on 7 shots and 2 free throws","Solid"],["Playmaking","6 assists, 1 turnover","Elite"],["Disruption","2 steals, 3 rebounds","Solid"]],
+    why:"Six assists for every turnover. Elite needs 4 to 1 with at least 4 assists." }
+];
+const pct=(m,a)=>a?Math.round(m/a*100)+"%":null;
+const icon=(id,cls)=>'<svg class="ico'+(cls?" "+cls:"")+'" aria-hidden="true"><use href="#'+id+'"/></svg>';
+const shotTile=(label,m,a)=>{ const v=pct(m,a); return '<div><span>'+label+'</span><b class="'+(v?"":"none")+'">'+(v||"-")+'</b></div>'; };
+function screenHTML(s){
+  const d=s.d;
+  return '<div class="a-ink"><div class="a-status"><span>9:41</span><span><i></i><i></i><i></i></span></div>'+
+    '<div class="a-bar"><span class="a-btn">'+icon("i-back")+'</span><b>Game</b><span class="a-btn">'+icon("i-share")+'</span></div>'+
+    '<div class="a-who"><span class="a-av">MC</span><div><b>'+s.game+'</b><span>'+s.date+'</span></div></div>'+
+    '<div class="a-pts"><b>'+d.pts+'</b><span>PTS</span><div class="a-mini">'+
+      [["REB",d.reb],["AST",d.ast],["STL",d.stl],["BLK",d.blk],["TO",d.to]].map(x=>'<div><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join("")+'</div></div>'+
+    '<div class="a-tiles">'+shotTile("Field Goal",d.fgm,d.fga)+shotTile("3-Point",d.tpm,d.tpa)+shotTile("Free Throw",d.ftm,d.fta)+'</div></div>'+
+    '<div class="a-light"><div class="a-ins"><div class="top"><span>'+icon("i-spark","fill")+'Courtside IQ</span><b>'+s.label+'</b></div><p>'+s.text+'</p></div>'+
+    '<div class="a-sec">Development</div>'+
+    s.rows.map(r=>'<div class="a-row"><div><b>'+r[0]+'</b><span>'+r[1]+'</span></div><span class="chip '+r[2]+'">'+r[2]+'</span></div>').join("")+'</div>';
+}
+const tabsEl=$("#tabs"), scr=$("#scr"), whyEl=$("#why");
+tabsEl.innerHTML = SCEN.map((s,i)=>'<button class="tab" role="tab" type="button" id="tab-'+i+'" aria-controls="scr" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'">'+
+  '<span class="pl">'+icon("i-plus")+'</span><span class="tt">'+s.title+'<span class="more">'+s.line+'</span></span></button>').join("");
+const tabEls = $$("#tabs .tab");
+let curSc = -1, swapT = 0;
+function pick(i, focus){
+  if(i===curSc) return;
+  const first = curSc<0; curSc=i;
+  tabEls.forEach((t,k)=>{ t.setAttribute("aria-selected", k===i); t.tabIndex = k===i?0:-1; });
+  scr.setAttribute("aria-labelledby","tab-"+i);
+  whyEl.innerHTML = "<b>How it read this game</b>"+SCEN[i].why;
+  if(focus) tabEls[i].focus();
+  if(tabsEl.scrollWidth>tabsEl.clientWidth){ tabsEl.scrollTo({left:tabEls[i].offsetLeft - 16, behavior: reduce?"auto":"smooth"}); }
+  const put = ()=>{ scr.innerHTML = screenHTML(SCEN[i]); scr.scrollTop=0; scr.classList.remove("swap"); };
+  if(first||reduce){ put(); return; }
+  clearTimeout(swapT); scr.classList.add("swap"); swapT = setTimeout(put, 200);
+}
+tabEls.forEach((t,i)=>{
+  t.addEventListener("click",()=>pick(i));
+  t.addEventListener("keydown",e=>{ const n=tabEls.length;
+    if(e.key==="ArrowDown"||e.key==="ArrowRight"){ e.preventDefault(); pick((i+1)%n,true); }
+    if(e.key==="ArrowUp"||e.key==="ArrowLeft"){ e.preventDefault(); pick((i-1+n)%n,true); } });
+});
+
+/* ---------- pricing plan picker ---------- */
+const cta=$("#plan-cta"), small=$("#plan-small");
+$$('input[name="plan"]').forEach(r=>r.addEventListener("change",()=>{
+  const m = $("#plan-month").checked;
+  cta.textContent = m ? "Start free trial" : "Get Premium weekly";
+  $("#prem-price").textContent = m ? "$5.99" : "$1.99";
+  $("#prem-per").textContent = m ? "a month, after 7 days free" : "a week, billed weekly";
+  small.textContent = m ? "Unlimited games, up to three players. 7-day free trial, then $5.99/mo. You start it in the app." : "Unlimited games, up to three players. $1.99 a week, no trial. You start it in the app.";
+}));
+
+/* ---------- store links follow the device ---------- */
+if(/Android/i.test(navigator.userAgent||"")) $$(".js-store").forEach(a=>a.href="https://play.google.com/store/apps/details?id=com.mycompany.courtsideiq");
+
+
+/* ---------- floating CTAs: show after the hero, hide over pinned scenes and the pricing/footer ---------- */
+const qr=$("#qr"), pill=$("#getpill");
+let qrDismissed=false; try{ qrDismissed = sessionStorage.getItem("ciq-qr")==="1"; }catch(e){}
+$("#qr-x").addEventListener("click",()=>{ qrDismissed=true; qr.classList.add("away"); try{ sessionStorage.setItem("ciq-qr","1"); }catch(e){} });
+const vis = { hero:true, pricing:false, foot:false, fair:false, scene:false };
+function syncFloat(){
+  const off = vis.hero || vis.pricing || vis.foot;
+  qr.classList.toggle("away", off || vis.scene || vis.fair || qrDismissed);
+  pill.classList.toggle("away", off);
+}
+if("IntersectionObserver" in window){
+  const io = new IntersectionObserver(es=>{ es.forEach(e=>{ vis[e.target.dataset.watch]=e.isIntersecting; }); syncFloat(); }, {threshold:0});
+  [["#hero","hero"],["#pricing","pricing"],[".foot","foot"],["#fair","fair"]].forEach(([sel,k])=>{ const el=$(sel); el.dataset.watch=k; io.observe(el); });
+} else { vis.hero=false; syncFloat(); }
+
+/* ---------- scroll engine ---------- */
+const scenes = $$(".scene");
+let fit = ()=>{};
+function goStatic(){
+  document.documentElement.classList.add("static");
+  scenes.forEach(sc=>RENDER[sc.dataset.scene](1));
+  mkEls.forEach(g=>g.style.opacity=1);
+}
+pick(0);
+if(reduce || !window.gsap || !window.ScrollTrigger){ goStatic(); }
+else {
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize:true });
+  const navH = ()=>document.querySelector(".nav").offsetHeight;
+  /* A scene whose stage cannot fit the viewport (landscape phones, short windows) unpins and shows its end state, stacked. */
+  fit = ()=>{
+    scenes.forEach(sc=>{
+      sc.classList.remove("unpin");
+      const st=sc.querySelector(".stage"), w=st.querySelector(".wrap");
+      const avail = st.clientHeight - parseFloat(getComputedStyle(st).paddingBottom||0);
+      if(w.scrollHeight > avail + 2) sc.classList.add("unpin");
+    });
+  };
+  fit();
+  let rz=0; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ fit(); ScrollTrigger.refresh(); },150); });
+  let active = 0;
+  scenes.forEach(sc=>{
+    const fn = RENDER[sc.dataset.scene];
+    const run = p=>{ if(sc.classList.contains("unpin")){ fn(1); if(sc.id==="moved") mkEls.forEach(g=>g.style.opacity=1); } else fn(p); };
+    run(0);
+    ScrollTrigger.create({ trigger:sc, start:()=>"top top+="+navH(), end:"bottom bottom",
+      onUpdate:s=>run(s.progress), onRefresh:s=>run(s.progress),
+      onToggle:s=>{ active += s.isActive?1:-1; vis.scene = active>0; syncFloat(); } });
+  });
+  window.addEventListener("load",()=>ScrollTrigger.refresh());
+}
+
+})();
+</script>
+</body>
+</html>
