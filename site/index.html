@@ -112,6 +112,8 @@ h1,h2,h3{text-wrap:balance}
 .hero-grid{position:relative;z-index:1}
 .hero .lede strong{color:var(--ink)}
 .aud{font-size:15px;font-weight:600;color:var(--g700)}
+.kit{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:15px;font-weight:600;color:var(--g700)}
+.kit .ico{width:18px;height:18px;color:var(--ink);stroke-width:2.25}
 /* ticker: the game, play by play, like the arena board */
 .ticker{position:absolute;z-index:4;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;background:var(--ink);color:var(--white);overflow:hidden;border-top:1px solid var(--dk-border)}
 .ticker .tag{position:relative;z-index:2;flex:none;display:flex;align-items:center;gap:10px;height:100%;padding:0 18px 0 var(--gutter);background:var(--ink);box-shadow:16px 0 16px -8px var(--ink)}
@@ -731,6 +733,7 @@ html.static .points li span,.unpin .points li span{color:var(--g300)}
         <a class="store" href="https://apps.apple.com/us/app/courtside-iq/id6748415872"><small>Download on the</small><span>App Store</span></a>
         <a class="store" href="https://play.google.com/store/apps/details?id=com.mycompany.courtsideiq"><small>Get it on</small><span>Google Play</span></a>
       </div>
+      <p class="kit"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>No expensive equipment. Just your phone.</p>
     </div>
     <figure class="hero-phone">
       <div class="iphone"><span class="hw l act"></span><span class="hw l vu"></span><span class="hw l vd"></span><span class="hw r pw"></span><div class="iphone-bezel"><div class="iphone-screen"><span class="island"></span><img src="assets/live-tracker.jpg" width="780" height="1688" alt="The Courtside IQ live tracker: 12 points, and Make or Miss buttons for 2PT, 3PT and free throws"></div></div></div>
@@ -1005,6 +1008,7 @@ html.static .points li span,.unpin .points li span{color:var(--g300)}
       <details><summary>Why can't I see a Growth IQ yet?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Growth IQ needs five games before it shows, so one big or quiet night can't define your player. Until then, every game still gets its own insight. On the free plan, Premium unlocks the games that get you there.</p></details>
       <details><summary>Is my player compared to other kids?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>No. There are no leaderboards and no team scores. Growth IQ reads your player against what is typical for their age and against their own recent games, never against teammates.</p></details>
       <details><summary>Who can see my player's information?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Player profiles belong to your account and there are no public profiles. Our privacy policy explains exactly what is stored and why.</p></details>
+      <details><summary>Do I need any equipment?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>No. Courtside IQ runs on the phone you already bring to every game. There are no cameras, ball sensors or wearables to buy, mount or charge. Open the app, pick your player and tap each play from the stands.</p></details>
       <details><summary>Do I need signal in the gym?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>No. Track the whole game without a connection and it syncs when you are back online. The insight arrives once it does.</p></details>
       <details><summary>How do I cancel Premium?<svg class="ico" aria-hidden="true"><use href="#i-chev"/></svg></summary><p>Cancel any time in your app store subscription settings. On the monthly plan, cancelling before the 7-day trial ends means you are not charged.</p></details>
     </div>
